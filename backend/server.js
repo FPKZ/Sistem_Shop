@@ -13,9 +13,10 @@
 //   console.log(`Server running at http://${hostname}:${port}/`);
 // });
 import { fastify } from "fastify";
-import { database } from "./database/memory-database.js";
-import { request } from "http";
 import cors from "@fastify/cors"
+
+import { Produto, Categoria, Nota } from "./database/models/index.js";
+import sequelize from "./database/sequelize.js";
 
 const server = fastify()
 
@@ -29,59 +30,93 @@ await server.register(cors, {
 // PUT http://localhost:3333/509
 // DELETE http://localhost:3333/509
 
-const data = new database()
+server.get('/', async () => {
+  return 'Servidor rodando com Fastify e ES Modules!';
+});
 
-server.get("/videos", (request) => {
-  const query = request.query.query
-  console.log(query)
-  
-  const video = data.list(query)
 
-  return video
+server.get("/produtos", async (request, reply) => {
+  try{
+    const produtos = await Produto.findAll({
+      include: [
+        { model: Categoria, as: 'categoria' },
+        { model: Nota, as: 'Nota' }
+      ]
+    })
+
+    reply.send(produtos)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao buscar produtos' })
+  }
 })
 
-server.post("/videos", (request, reply) => {
-  const {titulo, descricao, duracao} = request.body
-  
-  data.create({
-    titulo: titulo,
-    descricao: descricao,
-    duracao: duracao,
-  })
-  //caso o nome da variavel seja o msm do conteudo isso tambem é possivel
-  // data.create({
-  //   titulo,
-  //   descricao,
-  //   duracao,
-  // })
-  console.log(data.list())
+server.post("/produto", async (request, reply) => {
+  try{
+    const query = request.query.query
+    console.log(query)
+    
+    const data = request.body
 
-  return reply.status(201).send() // 201 algo foi criado
+    const novoProduto = await Produto.create(data)
+
+    reply.code(201).send(novoProduto)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao buscar produtos' })
+  }
 })
 
-server.put("/videos/:id", (request, replay) => {
-  const video = request.params.id
-  const {titulo, descricao, duracao} = request.body
+server.put("/produto/:id", async (request, reply) => {
+  try{
+    const produtoId = request.params.id
+    const data = request.body
 
-  //caso o nome da variavel seja o msm do conteudo isso tambem é possivel
-  data.atualizar(video, {
-    titulo,
-    descricao,
-    duracao,
-  })
+    const produto = await Produto.findByPk(produtoId)
 
-  //console.log(video)
-  return replay.status(204).send() // 204 sucesso mas sem conteudo de resposta
+    if (!produto) {
+      return reply.status(404).send({ error: 'Produto não encontrado' })
+    }
 
-})
-server.delete("/videos/:id", (request, replay) => {
-  const video = request.params.id
-  
-  data.delete(video)
-  return replay.status(204).send()
+    await produto.update(data)
+
+    reply.send({ message: 'Produto atualizado com sucesso', produto })
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao atualizar produto' })
+  }
 })
 
-server.listen({
-  port: 3333,
+server.delete("/produto/:id", async (request, reply) => {
+  try {
+    const produtoId = request.params.id
+    
+    const produto = await Produto.findByPk(produtoId)
+
+    if (!produto) {
+      return reply.status(404).send({ error: 'Produto não encontrado' })
+    }
+
+    await produto.destroy()
+
+    reply.status(204).send({message: 'Produto deletado com sucesso'})
+  } catch (err) {
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao deletar produto' })
+  }
 })
 
+async function start(){
+  try{
+    await sequelize.sync({ alter: true })
+    console.log("Conectou ao banco de dados com sucesso!")
+
+    await server.listen({ port: 3333 })
+    console.log("Servidor rodando na porta 3333")
+  } catch(err){
+    console.log("Erro ao iniciar o servidor:", err)
+    //process.exit(1)
+  } 
+}
+
+start()

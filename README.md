@@ -17,3 +17,5 @@ npm install bootstrap bootstrap-icons react-router-dom fastfy http @fastify/cors
 
 npm install -save-dev nodemon
 npm install concurrently --save-dev
+
+npm install sequelize sqlite3
