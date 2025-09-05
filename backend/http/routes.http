@@ -1,0 +1,23 @@
+POST http://localhost:3333/videos
+Content-Type: application/json
+
+{
+    "titulo": "video01",
+    "descricao": "adfasdasd",
+    "duracao": 120
+}
+
+###
+GET http://localhost:3333/videos?query=
+###
+PUT http://localhost:3333/videos/afd7014d-8d78-4f9c-b97e-2692613129db
+Content-Type: application/json
+
+{
+    "titulo": "video02",
+    "descricao": "adfasdasd",
+    "duracao": 120
+}
+
+###
+DELETE http://localhost:3333/videos/d76622e6-289b-49b7-aead-9d43f1c23363

@@ -13,4 +13,7 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 npm install -D vite
-npm install bootstrap bootstrap-icons react-router-dom
+npm install bootstrap bootstrap-icons react-router-dom fastfy http @fastify/cors
+
+npm install -save-dev nodemon
+npm install concurrently --save-dev

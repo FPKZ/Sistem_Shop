@@ -1,0 +1,131 @@
+
+#dashbord, #cards{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+
+    background-color: coral;
+}
+#dashbord h1, #cards h1{
+    width: 100%;
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
+.fold{
+    width: 25rem;
+    height: 10rem;
+    border-radius: 10px;
+    margin: 1rem;
+    background-color: blueviolet;
+}
+#cards{
+
+    background-color: darkgoldenrod;
+}
+.card{
+    width: 14rem;
+    height: 14rem;
+    border-radius: 10px;
+    margin: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: white;
+    font-size: 2rem;
+    text-align: center;
+    align-content: center;
+    background-color: blueviolet;
+}
+.card i{
+    width: 100%;
+    font-size: 4rem;
+}
+.card a{
+    width: 100%;
+}
+#tela{
+    border: 1px solid black;
+    width: 70%;
+    height: 90%;
+}
+#filtros{
+    display: flex;
+    justify-items: baseline;
+    padding: 8px;
+    background-color: rgb(206, 205, 205);
+    justify-content: end;
+    text-align: center;
+}
+
+#id{
+    width: 10% !important;
+}
+#Nome{
+    width: 50%;
+}
+#entrada{
+    width: 10%;
+}
+#saida{
+    width: 10%;
+}
+#estoque{
+    width: 10%;
+}
+#itens{
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
+    justify-self: center;
+    overflow: auto;
+}
+#item {
+    width: 98%;
+    height: 7%;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: rgb(255, 237, 252);
+    display: flex;
+    margin: 1%;
+    justify-content: end;
+    overflow: hidden;
+}
+#item div{
+    align-content: center;
+}
+#img{
+    text-align: left;
+
+    width: 10%;
+    overflow: hidden;
+}
+#img img{
+    width: auto;
+    height: 100%;
+}
+#cont{
+    border: 1px solid black;
+    width: 30%;
+    height: 100%;
+}
+#info{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 2%;
+    gap: 1rem;
+}
+#produt_img{
+    width: 96%;
+    border: 1px solid;
+    border-radius: 20px;
+    overflow: hidden;
+}
+#produt_img img {
+    width: 100%;
+}
+#nome_produto{
+    width: 100%;
+}

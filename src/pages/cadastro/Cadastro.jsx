@@ -1,8 +1,13 @@
+import Header from "../../components/Header"
+import Menu from "../../components/Menu"
+
 function Cadastro() {
   return (
-    <div>
-      <h1>Cadastro Page</h1>
-    </div>
+    <>
+      <Header/>
+      <Menu />
+      
+    </>
   )
 }
 export default Cadastro

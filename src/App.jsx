@@ -1,9 +1,10 @@
 //import { useState } from 'react'
 import Header from './components/Header'
 import Menu from './components/Menu'
+import { useNavigate } from 'react-router-dom'
 
 function App() {
-
+  const navigate = useNavigate();
 
   return (
     <>
@@ -11,24 +12,24 @@ function App() {
       <Menu />
       <div id="dashbord">
         <h1>Dashbord</h1>
-          <div class="fold"></div>
-          <div class="fold"></div>
-          <div class="fold"></div>
+          <div className="fold"></div>
+          <div className="fold"></div>
+          <div className="fold"></div>
       </div>
       <div id="cards">
           <h1>Atalhos</h1>
-      <div class="card btn-cadastro"><i class="fa-solid fa-square-plus"></i><a>Cadastro</a></div>
-          <div class="card"><i class="fa-solid fa-shapes"></i><a>Produtos</a></div>
-          <div class="card"><i class="fa-solid fa-address-book"></i><a>Clientes</a></div>
-          <div class="card"><i class="fa-solid fa-barcode"></i><a>Notas</a></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
+          <div className="card btn-cadastro" onClick={() => navigate(`/cadastro`)}><i className="bi bi-plus-square-fill"></i><a>Cadastro</a></div>
+          <div className="card" onClick={() => navigate(`/produtos`)}><i className="bi bi-grid-fill"></i><a>Produtos</a></div>
+          <div className="card" onClick={() => navigate(`/clientes`)}><i className="bi bi-journal-bookmark-fill"></i><a>Clientes</a></div>
+          <div className="card" onClick={() => navigate(`/notas`)}><i className="bi bi-upc"></i><a>Notas</a></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
+          <div className="card"></div>
       </div>
     </>
   )
