@@ -1,14 +1,12 @@
-import Header from "../../components/Header"
-import Menu from "../../components/Menu"
+import Header from "../../components/layout/components/Header";
+import Menu from "../../components/layout/components/Menu";
 
-function Clientes(){
-    return (
-        <>
-            <Header />
-            <Menu />
-            <h1>Clentes Page</h1>
-        </>
-    )
+function Clientes() {
+  return (
+    <>
+      <h1>Clentes Page</h1>
+    </>
+  );
 }
 
-export default Clientes
+export default Clientes;

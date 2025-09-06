@@ -1,13 +1,11 @@
-import Header from "../../components/Header"
-import Menu from "../../components/Menu"
+import Header from "../../components/layout/components/Header";
+import Menu from "../../components/layout/components/Menu";
 
-function Notas(){
-    return (
-        <>
-            <Header />
-            <Menu />
-            <h1>Notas Page</h1>
-        </>
-    )
+function Notas() {
+  return (
+    <>
+      <h1>Notas Page</h1>
+    </>
+  );
 }
-export default Notas
+export default Notas;

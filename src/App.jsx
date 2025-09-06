@@ -1,38 +1,38 @@
-//import { useState } from 'react'
-import Header from './components/Header'
-import Menu from './components/Menu'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const navigate = useNavigate();
 
   return (
     <>
-      <Header />
-      <Menu />
-      <div id="dashbord">
-        <h1>Dashbord</h1>
-          <div className="fold"></div>
-          <div className="fold"></div>
-          <div className="fold"></div>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 className="h2">Dashbord</h1>
+        <div className="fold"></div>
+        <div className="fold"></div>
+        <div className="fold"></div>
       </div>
-      <div id="cards">
-          <h1>Atalhos</h1>
-          <div className="card btn-cadastro" onClick={() => navigate(`/cadastro`)}><i className="bi bi-plus-square-fill"></i><a>Cadastro</a></div>
-          <div className="card" onClick={() => navigate(`/produtos`)}><i className="bi bi-grid-fill"></i><a>Produtos</a></div>
-          <div className="card" onClick={() => navigate(`/clientes`)}><i className="bi bi-journal-bookmark-fill"></i><a>Clientes</a></div>
-          <div className="card" onClick={() => navigate(`/notas`)}><i className="bi bi-upc"></i><a>Notas</a></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
-          <div className="card"></div>
+      <h1 className="h4 mb-4">Atalhos</h1>
+      <div className="row row-cols-*  g-4">
+          <Card icon="plus-square-fill" location={() => navigate(`/cadastro`)}>Cadastro</Card>
+          <Card icon="grid-fill" location={() => navigate(`/produtos`)}>Produtos</Card>
+          <Card icon="journal-bookmark-fill" location={() => navigate(`/clientes`)}>Clientes</Card>
+          <Card icon="upc" location={() => navigate(`/notas`)}>Notas</Card>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+function Card(props) {
+  return (
+      <div className="col-auto">
+        <div className="card text-center h-100 shadow-sm" onClick={() => props.location()} style={{cursor: 'pointer'}}>
+          <div className="card-dimensions card-body px-5 d-flex flex-column justify-content-center align-items-center">
+            <i className={`bi bi-${props.icon} mt-0 fs-1 text-primary`}></i>
+            <p className="card-text mt-2 mb-0 fw-bold">{props.children}</p>
+          </div>
+        </div>
+      </div>
+);
+}
+
+export default App;

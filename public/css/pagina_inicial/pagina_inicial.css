@@ -1,4 +1,4 @@
-
+/* 
 #dashbord, #cards{
     width: 100%;
     display: flex;
@@ -128,4 +128,24 @@
 }
 #nome_produto{
     width: 100%;
+} */
+
+.card-dimensions {
+    width: 10rem;
+    height: 9rem;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+
+    .card-dimensions {
+        width: 7.8rem;
+        height: 6.7rem;
+    
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
 }
