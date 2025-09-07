@@ -1,8 +1,15 @@
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './backend/database/produtos.db'
+dotenv.config();
+
+if(!process.env.DATABASE_URL) {
+    throw new Error("A variavel de ambiente DATABASE_URL não está definida.");
+}
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false,
 })
 
 export default sequelize

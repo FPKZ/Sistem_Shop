@@ -19,3 +19,5 @@ npm install -save-dev nodemon
 npm install concurrently --save-dev
 
 npm install sequelize sqlite3
+
+npm install pg dotenv

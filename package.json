@@ -17,8 +17,10 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
     "fastify": "^5.6.0",
     "http": "^0.0.1-security",
+    "pg": "^8.16.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@types/node": "^24.3.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
