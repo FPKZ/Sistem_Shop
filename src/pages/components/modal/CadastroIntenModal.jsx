@@ -1,5 +1,5 @@
 // components/CadastroModal.jsx
-import './CadastroItenModal.css';
+import './cadastroItenModal.css';
 
 export default function CadastroModal({ visible, onClose, onSubmit }) {
   if (!visible) return null;
