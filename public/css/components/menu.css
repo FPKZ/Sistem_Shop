@@ -10,7 +10,7 @@ body.menu-expand #header{
 }
 body.menu-expand #root{
     margin-left: 13rem;
-    width: calc(100% - 13rem);
+
 }
 
 
