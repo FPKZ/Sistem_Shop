@@ -21,9 +21,17 @@ import sequelize from "./database/sequelize.js";
 
 const server = fastify()
 
+const origins = [
+  "http://localhost:5173",
+]
+
+if (process.env.FRONTEND_URL) {
+  origins.push(process.env.FRONTEND_URL)
+}
+
 await server.register(cors, {
-  origin: "http://localhost:5173", // ou true para liberar geral
-  methods: ["GET", "POST", "PUT", "DELETE"], // libera DELETE
+  origin: origins,
+  methods: ["GET", "POST", "PUT", "DELETE"],
 });
 
 // GET http://localhost:3333/
