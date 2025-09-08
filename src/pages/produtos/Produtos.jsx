@@ -1,53 +1,33 @@
 import { useState, useEffect } from "react";
 import Produto from "./components/Produto";
 import CadastroModal from "../components/modal/CadastroIntenModal";
+import API from "../../components/app/api.js"
 
-async function api() {
-  // await fetch(`http://localhost:3333/videos`, {
-  //     method: "POST",
-  //     headers: {
-  //         "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //         titulo: "video01",
-  //         descricao: "adfasdasd",
-  //         duracao: 120
-  //     })
-  // })
-
-  const produtos = await (
-    await fetch(`https://sistemshop-production.up.railway.app/produtos`, { method: "GET" })
-  ).json();
-  console.log(produtos);
-  return produtos;
-}
 
 function Produtos() {
   const [produtos, setProdutos] = useState([]);
   const [modal, setModal] = useState(false)
-
-  const getProdutos = async () => {
-    const p = await api();
+  
+  const getProduto = async () => {
+    const p = await API.getProduto()
+    console.log(p)
     setProdutos(p);
-  }
-  const cadastroProduto = async (data) => {
-    await fetch(`https://sistemshop-production.up.railway.app/produto`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data)
-    })
-  }
-
-  const deleteProduto = async (id) => {
-    await fetch(`https://sistemshop-production.up.railway.app/produto/${id}`, { method: "DELETE" });
-    await getProdutos();
   }
 
   useEffect(() => {
-    getProdutos();
-  }, []);
+    getProduto()
+  }, [])
+
+  const cadastroProduto = async (data) => {
+    await API.putProduto(data)
+    await getProduto()
+  }
+
+  const deleteProduto = async (id) => {
+    await API.deleteProduto(id)
+    await getProduto()
+  }
+
 
   return (
     <>

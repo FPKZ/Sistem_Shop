@@ -1,0 +1,4 @@
+.btg{
+    --bs-breadcrumb-divider: url('/public/chevron-right.svg');
+    
+}
