@@ -1,3 +1,4 @@
+
 POST https://sistemshop-production.up.railway.app/produto
 Content-Type: application/json
 
@@ -19,7 +20,7 @@ Content-Type: application/json
 ###
 GET https://sistemshop-production.up.railway.app/produtos
 ###
-PUT http://localhost:3333/produto/afd7014d-8d78-4f9c-b97e-2692613129db
+PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
 Content-Type: application/json
 
 {
@@ -29,4 +30,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3333/produto/2
+DELETE https://sistemshop-production.up.railway.app/produto/5
