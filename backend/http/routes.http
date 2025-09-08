@@ -1,4 +1,4 @@
-POST http://localhost:3333/produto
+POST https://sistemshop-production.up.railway.app/produto
 Content-Type: application/json
 
 {

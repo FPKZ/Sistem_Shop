@@ -18,7 +18,7 @@ async function api() {
   // })
 
   const produtos = await (
-    await fetch(`http://localhost:3333/produtos`, { method: "GET" })
+    await fetch(`https://sistemshop-production.up.railway.appprodutos`, { method: "GET" })
   ).json();
   console.log(produtos);
   return produtos;
