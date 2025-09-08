@@ -14,6 +14,7 @@
 // });
 import { fastify } from "fastify";
 import cors from "@fastify/cors"
+import process from "node:process"
 
 import { Produto, Categoria, Nota } from "./database/models/index.js";
 import sequelize from "./database/sequelize.js";
@@ -111,8 +112,9 @@ async function start(){
     await sequelize.sync({ alter: true })
     console.log("Conectou ao banco de dados com sucesso!")
 
-    await server.listen({ port: 3333 })
-    console.log("Servidor rodando na porta 3333")
+    const port = process.env.PORT || 3333
+    await server.listen({ port, host: '0.0.0.0' })
+    console.log(`Servidor rodando na porta ${port}`)
   } catch(err){
     console.log("Erro ao iniciar o servidor:", err)
     //process.exit(1)

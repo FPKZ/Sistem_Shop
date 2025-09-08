@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3333/produtos
+GET https://sistemshop-production.up.railway.app/produtos
 ###
 PUT http://localhost:3333/produto/afd7014d-8d78-4f9c-b97e-2692613129db
 Content-Type: application/json
