@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../../components/layout/components/Header";
-import Menu from "../../components/layout/components/Menu";
 import Produto from "./components/Produto";
 import CadastroModal from "../components/modal/CadastroIntenModal";
 
@@ -18,7 +16,7 @@ async function api() {
   // })
 
   const produtos = await (
-    await fetch(`https://sistemshop-production.up.railway.appprodutos`, { method: "GET" })
+    await fetch(`https://sistemshop-production.up.railway.app/produtos`, { method: "GET" })
   ).json();
   console.log(produtos);
   return produtos;
@@ -33,7 +31,7 @@ function Produtos() {
     setProdutos(p);
   }
   const cadastroProduto = async (data) => {
-    await fetch(`http://localhost:3333/produto`, {
+    await fetch(`https://sistemshop-production.up.railway.app/produto`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +41,7 @@ function Produtos() {
   }
 
   const deleteProduto = async (id) => {
-    await fetch(`http://localhost:3333/produto/${id}`, { method: "DELETE" });
+    await fetch(`https://sistemshop-production.up.railway.app/produto/${id}`, { method: "DELETE" });
     await getProdutos();
   }
 
