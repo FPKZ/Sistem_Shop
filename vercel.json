@@ -1,7 +1,7 @@
 {
     "rewrites": [
         {
-            "surce": "/((?!api|.*\\..*).*)",
+            "source": "/((?!api|.*\\..*).*)",
             "destination": "index.html"
         }
     ]
