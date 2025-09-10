@@ -4,6 +4,7 @@
     width: calc(100% - 4.5rem);
     padding: 0 1rem;
     height: 5rem;
+    background-color: rgb(163, 34, 210);
 }
 #header h1{
     font-size: 1.5rem;

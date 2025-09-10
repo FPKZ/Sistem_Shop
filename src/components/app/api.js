@@ -1,10 +1,11 @@
+const back = "https://sistemshop-production.up.railway.app"
 
 export default class API{
     
     static async getProduto(){
         try{
             const produtos = await (
-                await fetch(`https://sistemshop-production.up.railway.app/produtos`, { method: "GET" })
+                await fetch(`${back}/produtos`, { method: "GET" })
             ).json();
             console.log(produtos);
             return produtos;
@@ -15,7 +16,7 @@ export default class API{
 
     static async putProduto(data){
         try{
-            await fetch(`https://sistemshop-production.up.railway.app/produto`, {
+            await fetch(`${back}/produto`, {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",
@@ -29,7 +30,7 @@ export default class API{
 
     static async deleteProduto(id){
         try{
-            await fetch(`https://sistemshop-production.up.railway.app/produto/${id}`, { method: "DELETE" });
+            await fetch(`${back}/produto/${id}`, { method: "DELETE" });
         } catch (error){
             console.error("Erro ao deletar produto", error)
         }

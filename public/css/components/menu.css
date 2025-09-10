@@ -24,6 +24,7 @@ body.menu-expand #root{
     top: 0; left: 0;
     width: 4.5rem;
     overflow: hidden;
+    background-color: rgba(120, 0, 154, 1);
     /* height: 100%;
     display: flex;
     flex-direction: column;
@@ -46,7 +47,7 @@ body.menu-expand #root{
     text-align: left;
 } */
 #menu .nav-link:hover{
-    background-color: blue;
+    background-color: rgb(137, 33, 175);
 }
 /* #menu li i{
     font-size: 1.6rem;

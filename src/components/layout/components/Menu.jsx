@@ -30,7 +30,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
   }
 
   return (
-    <nav id="menu" ref={menuRef} className="d-flex flex-column vh-100 text-white bg-primary p-0 z-3">
+    <nav id="menu" ref={menuRef} className="d-flex flex-column vh-100 text-white p-0 z-3">
       <ul className="nav nav-pills flex-column mb-auto">
         {mobile && (
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>

@@ -1,6 +1,6 @@
 function Produto({produtos, deleteProduto}) {
     if(!produtos || produtos.length === 0) return (
-        <div className="alert alert-info mt-4" role="alert">
+        <div className="alert alert-roxo mt-4" role="alert" >
             Nenhum produto cadastrado!
         </div>
     )
@@ -27,7 +27,7 @@ function Produto({produtos, deleteProduto}) {
                 <h4 className="mb-3">Total de Produtos: {produtos.length}</h4>
                 <hr />
                 <p className="text-muted">Gerencie seus produtos com facilidade.</p>
-                <button className="btn btn-primary">Adicionar Produto</button>
+                <button className="btn btn-roxo">Adicionar Produto</button>
                 <button className="btn btn-secondary ms-2">Exportar Lista</button>
                 <button className="btn btn-secondary ms-2">Filtrar Produtos</button>
             </div>

@@ -21,6 +21,22 @@ html, body {
     margin-top: 5rem;
     overflow-x: auto;
 }
+.btn-roxo{
+    color: white;
+    background-color: rgb(163, 34, 210);
+    border-color: rgb(163, 34, 210);
+    font-weight: 600;
+}
+.btn-roxo:hover{
+    color:  #60007b;
+    background-color: rgb(248, 215, 255);
+    border-color: rgb(163, 34, 210);
+}
+.alert-roxo{
+    color: #4c0061;
+    background-color: #f2e6f6;
+    border-color: #e6cfea;    
+}
 @media (max-width: 900px){
 
 

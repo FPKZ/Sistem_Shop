@@ -27,8 +27,8 @@ function Card(props) {
       <div className="col-auto">
         <div className="card text-center h-100 shadow-sm" onClick={() => props.location()} style={{cursor: 'pointer'}}>
           <div className="card-dimensions card-body px-5 d-flex flex-column justify-content-center align-items-center">
-            <i className={`bi bi-${props.icon} mt-0 fs-1 text-primary`}></i>
-            <p className="card-text mt-2 mb-0 fw-bold">{props.children}</p>
+            <i className={`bi bi-${props.icon} mt-0 fs-1`} style={{"color": "rgba(120, 0, 154, 1)"}}></i>
+            <p className="card-text mt-2 mb-0 fw-bold" style={{"color": " #4c0061", "fontWeight": "600"}}>{props.children}</p>
           </div>
         </div>
       </div>
