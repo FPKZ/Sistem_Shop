@@ -1,4 +1,6 @@
-const back = "https://sistemshop-production.up.railway.app"
+
+ 
+const back = import.meta.env.VITE_BACKEND_URL
 
 export default class API{
     
@@ -7,22 +9,24 @@ export default class API{
             const produtos = await (
                 await fetch(`${back}/produtos`, { method: "GET" })
             ).json();
-            console.log(produtos);
+            //console.log(produtos);
             return produtos;
         } catch (error) {
             console.error("Erro ao buscar produtos", error)
         }
     }
 
-    static async putProduto(data){
+    static async postProduto(data){
         try{
-            await fetch(`${back}/produto`, {
+            const response  = await fetch(`${back}/produto`, {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data)
             })
+            console.log(response.status)
+            return response
         } catch (error){
             console.error("Erro ao cadastrar produto", error)
         }

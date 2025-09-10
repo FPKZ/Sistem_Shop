@@ -10,21 +10,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 3%;
 }
 
 .modal-box {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  width: 300px;
 }
 
-.modal-box input {
-  display: block;
-  margin-bottom: 1rem;
-  width: 100%;
-  padding: 0.5rem;
-}
+
 
 .fechar {
   margin-top: 1rem;

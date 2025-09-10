@@ -23,14 +23,14 @@ function Produto({produtos, deleteProduto}) {
     console.log(produtos)
     return (
         <>
-            <div>
+            {/* <div>
                 <h4 className="mb-3">Total de Produtos: {produtos.length}</h4>
                 <hr />
                 <p className="text-muted">Gerencie seus produtos com facilidade.</p>
                 <button className="btn btn-roxo">Adicionar Produto</button>
                 <button className="btn btn-secondary ms-2">Exportar Lista</button>
                 <button className="btn btn-secondary ms-2">Filtrar Produtos</button>
-            </div>
+            </div> */}
             <div className="my-4">
                 <input type="text" className="form-control" placeholder="Buscar produtos..." />
                 <button className="btn btn-secondary mt-2">Buscar</button>

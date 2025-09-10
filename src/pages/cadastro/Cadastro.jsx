@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Produtos from "./produtos/Produtos";
+import API from "../../components/app/api.js"
 
 
 function Cadastro() {
   const [tela, setTela] = useState()
   const navigate = useNavigate()
+
+  const cadastrarProduto = async (data) => {
+    try {
+      const response = API.postProduto(data);
+      console.log(response)
+    } catch (error){
+      console.error("erro ao cadastar" , error)
+    }
+  }
 
   return (
     <>
@@ -15,7 +25,7 @@ function Cadastro() {
             <i className="bi bi-chevron-left"></i>
           </button>
         )}
-        <nav className="d-flex justify-content-center align-items-center" style={{'--bs-breadcrumb-divider': `url('/public/chevron-right.svg')`, "color": "rgba(101, 0, 137, 1)", "opacity": "0.8"}} aria-label="breadcrumb">
+        <nav className="d-flex justify-content-center align-items-center" style={{'--bs-breadcrumb-divider': `url('/public/chevron-right.svg')`}} aria-label="breadcrumb">
           <ol className="breadcrumb">
             <li className="breadcrumb-item"><h1 className="h2">Cadastrar</h1></li>
             {tela && (
@@ -26,7 +36,7 @@ function Cadastro() {
         </nav>
 
       </div>
-      <div className="row row-cols-6 g-4 p-3">
+      <div className="row row-cols-6 g-4 py-2">
         {
           !tela && (
             <>
@@ -38,7 +48,7 @@ function Cadastro() {
         }
         {
           tela === "Produtos" && (
-            <Produtos />
+            <Produtos cadastrarProduto={cadastrarProduto} />
           )
         }
       </div>
@@ -52,8 +62,8 @@ function Card(props) {
       <div className="col-auto">
         <div className="card text-center h-100 shadow-sm" onClick={() => props.setTela()} style={{cursor: 'pointer'}}>
           <div className="card-dimensions card-body px-5 d-flex flex-column justify-content-center align-items-center">
-            <i className={`bi bi-${props.icon} mt-0 fs-1`} style={{"color": "rgba(120, 0, 154, 1)"}}></i>
-            <p className="card-text mt-2 mb-0 fw-bold" style={{"color": " #4c0061", "fontWeight": "600"}}>{props.children}</p>
+            <i className={`bi bi-${props.icon} mt-0 fs-1`} style={{"color": "rgb(207, 4, 190)"}}></i>
+            <p className="card-text mt-2 mb-0 fw-bold" style={{"color": " rgba(165, 16, 153, 1)", "fontWeight": "600"}}>{props.children}</p>
           </div>
         </div>
       </div>

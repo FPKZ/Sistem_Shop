@@ -19,7 +19,7 @@ function Produtos() {
   }, [])
 
   const cadastroProduto = async (data) => {
-    await API.putProduto(data)
+    await API.postProduto(data)
     await getProduto()
   }
 
