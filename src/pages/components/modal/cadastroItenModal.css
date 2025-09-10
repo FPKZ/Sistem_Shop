@@ -25,3 +25,10 @@
 .fechar {
   margin-top: 1rem;
 }
+
+@media (max-width: 900px){
+  .modal-overlay{
+    justify-content: start;
+    align-items: start;
+  }
+}
