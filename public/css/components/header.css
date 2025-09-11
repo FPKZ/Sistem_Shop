@@ -12,7 +12,10 @@
 
 @media (max-width: 900px){
     #header{
-        left: 4rem;
-        width: calc(100% - 4rem);
+        left: 3.5rem;
+        width: calc(100% - 3.5rem) !important;
+    }
+    body.menu-expand #header{
+        left: 3.5rem;
     }
 }

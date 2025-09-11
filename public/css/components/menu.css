@@ -6,7 +6,6 @@ body.menu-expand #menu span{
 }
 body.menu-expand #header{
     left: 13rem;
-    width: calc(100% - 13rem);
 }
 body.menu-expand #root{
     margin-left: 13rem;
@@ -59,11 +58,9 @@ body.menu-expand #root{
     transition: opacity 0.4s ease;
 }
 
-/* @media (max-width: 900px){
+@media (max-width: 900px){
     #menu{
-        width: 4rem;
+        width: 3.5rem;
     }
-    #menu li{
-        padding-left: 1.2rem;
-    }
-} */
+
+} 

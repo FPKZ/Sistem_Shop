@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import Produtos from "./produtos/Produtos";
 import API from "../../components/app/api.js"
 
 
 function Cadastro() {
   const [tela, setTela] = useState()
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
   const cadastrarProduto = async (data) => {
     try {
@@ -36,7 +36,7 @@ function Cadastro() {
         </nav>
 
       </div>
-      <div className="row row-cols-6 g-4 py-2">
+      <div className="row row-cols-6 g-2 g-md-4 py-2">
         {
           !tela && (
             <>

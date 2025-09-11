@@ -41,7 +41,7 @@ html, body {
 
 
     #root{
-        margin-left: 4rem !important;
-        width: calc(100% - 4rem) !important;
+        margin-left: 3.5rem !important;
+        width: calc(100% - 3.5rem) !important;
     }
 }

@@ -29,7 +29,7 @@ export default function Layout() {
   
   return (
     <>
-      <Header menuExpand={menuExpand} setMenuExpand={setMenuExpand} />
+      <Header menuExpand={menuExpand} setMenuExpand={setMenuExpand} mobile={mobile} />
       <Menu menuExpand={menuExpand} setMenuExpand={setMenuExpand} mobile={mobile} />
       <div id="root-content">
         <main className="p-4">
