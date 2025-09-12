@@ -8,6 +8,7 @@ const Venda = sequelize.define('Venda', {
         defaultValue: DataTypes.NOW,
         allowNull: false
     },
+    status: DataTypes.STRING,
 }, {
     tableName: 'Vendas'
 });

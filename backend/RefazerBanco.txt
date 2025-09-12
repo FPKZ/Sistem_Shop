@@ -1,9 +1,11 @@
-Entendi perfeitamente. Sua lógica está correta e você chegou a uma questão crucial em sistemas de estoque: a diferença entre **produto-conceito** e **item-físico**.
+Entendi perfeitamente. Sua lógica está correta e você chegou a uma questão crucial em sistemas de estoque:
+a diferença entre **produto-conceito** e **item-físico**.
 
 *   **Produto-Conceito:** "Camiseta Nike Azul Tamanho M". É o item do catálogo.
 *   **Item-Físico:** A camiseta específica que está na prateleira, que veio na nota fiscal X, com o código de barras Y.
 
-Sua ideia de tornar cada produto único na tabela `Produto` é **exatamente a abordagem correta** para o que você precisa. Isso se chama **controle de inventário por item serializado** (ou individualizado).
+Sua ideia de tornar cada produto único na tabela `Produto` é **exatamente a abordagem correta** para o que você precisa.
+Isso se chama **controle de inventário por item serializado** (ou individualizado).
 
 Vamos refinar a estrutura para suportar isso. Esta é a forma mais robusta e profissional de fazer.
 

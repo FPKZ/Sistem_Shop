@@ -16,8 +16,9 @@ import { fastify } from "fastify";
 import cors from "@fastify/cors"
 import process from "node:process"
 
-import { Produto, Categoria, Nota } from "./database/models/index.js";
+import { Produto, Categoria, Nota, ItemEstoque, ItemVendido, Cliente, NotaVenda, Venda } from "./database/models/index.js";
 import sequelize from "./database/sequelize.js";
+import { request } from "node:http";
 
 const server = fastify()
 
@@ -45,18 +46,59 @@ server.get('/', async () => {
 
 
 server.get("/produtos", async (request, reply) => {
-  try{
-    const produtos = await Produto.findAll({
+  const query = request.query
+  console.log(query)
+
+  if(!query.itens){
+    try{
+      const produtos = await Produto.findAll({
+        include: [
+          { model: Categoria, as: 'categoria' },
+          { model: ItemEstoque, as: 'itemEstoque',
+            include: [
+              { model: Nota, as: "nota" }
+            ]
+           }
+        ]
+      })
+  
+      reply.send(produtos)
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao buscar produtos' })
+    }
+  }
+  else if(query.itens === "all"){
+
+    const produtos = await ItemEstoque.findAll({
       include: [
-        { model: Categoria, as: 'categoria' },
-        { model: Nota, as: 'Nota' }
+        {model: Nota, as: "nota"}
       ]
     })
 
-    reply.send(produtos)
-  } catch(err){
-    console.log(err)
-    reply.code(500).send({ error: 'Erro ao buscar produtos' })
+    reply.code(200).send(produtos)
+  }
+  else if(query.itens === "vendidos"){
+    console.log("vendidos")
+    const produtos = await ItemEstoque.findAll({
+      where: {status: "Vendido"},
+      include: [
+        {model: Nota, as: "nota"}
+      ]
+    })
+    console.log(produtos)
+    reply.code(200).send(produtos)
+  }
+  else if(query.itens === "estoque"){
+    console.log("estoque")
+    const produtos = await ItemEstoque.findAll({
+      where: {status: "Disponivel"},
+      include: [
+        {model: Nota, as: "nota"}
+      ]
+    })
+    console.log(produtos)
+    reply.code(200).send(produtos)
   }
 })
 
@@ -64,7 +106,7 @@ server.get("/notas", async (request, reply) => {
   try{
     const notas = await Nota.findAll({
       include: [
-        { model: Produto, as: "produtos"},
+        { model: ItemEstoque, as: "itensNota"},
       ]
     })
 
@@ -89,16 +131,59 @@ server.get("/categorias", async (request, reply) => {
   }
 })
 
+server.get("/clientes", async (request, reply) => {
+  try{
+    const clientes = await Cliente.findAll({
+      include: [
+      { model: Venda, as: "vendas", 
+        include: [
+          { model: ItemVendido, as: "itensVendidos"},
+          { model: NotaVenda, as: "pagamento"}
+        ]
+      },
+      ]
+    })
+
+    reply.code(500).send(clientes)
+  }catch(err){
+    console.log(err)
+    reply.code(500).send({message: "Erro ao buscar Clientes"})
+  }
+})
+
 server.post("/produto", async (request, reply) => {
   try{
     const query = request.query.query
     console.log(query)
     
-    const data = request.body
+    const { nome, descricao, img, categoria_id, itens } = request.body
 
-    const novoProduto = await Produto.create(data)
+    let produto = await Produto.findOne({ where: { nome: nome }})
 
-    reply.code(201).send(novoProduto)
+    if(!produto){
+      produto = await Produto.create({nome, descricao, img, categoria_id: categoria_id})
+    }
+
+    if(itens && itens.length > 0){
+      const NovoItem = await itens.map(item => ({
+        nome,
+        nota_id: item.nota_id,
+        tamanho: item.tamanho,
+        cor: item.cor,
+        valor_compra: item.valor_compra,
+        valor_venda: item.valor_venda,
+        lucro: item.lucro,
+        produto_id: produto.id,
+        status: "Vendido"
+      }))
+      console.log(NovoItem)
+      await ItemEstoque.bulkCreate(NovoItem)
+    }
+
+
+    //const novoProduto = await Produto.create(data)
+
+    reply.code(201).send({ message: "Estoque atualizado com sucesso!", produto })
   } catch(err){
     console.log(err)
     reply.code(500).send({ error: 'Erro ao cadastrar produtos' })
@@ -128,6 +213,37 @@ server.post("/nota", async (request, reply) => {
   reply.code(500).send({error: "Erro ao cadastrar nota"})
   }
 })
+
+server.post("/cliente", async (request, reply) => {
+  try{
+    const data = request.body
+    const novoCliente = await Cliente.create(data)
+
+    reply.code(201).send(novoCliente)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao cadastrar Cliente", err})
+  }
+})
+
+server.post("/venda", async (request, reply) => {
+  try{
+    const data = request.body
+    const novaVenda = await Venda.create(data)
+
+    reply.code(201).send(novaVenda)
+  }catch(err){
+    console.log(err)
+    reply.code(500).send({message: "Erro ao cadastrar venda", err})
+  }
+})
+
+// server.post("/notaVenda", async (request, repy) => {
+//   try{
+
+//   }
+// })
+
 
 server.put("/produto/:id", async (request, reply) => {
   try{

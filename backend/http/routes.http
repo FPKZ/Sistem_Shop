@@ -1,19 +1,24 @@
 
-POST https://sistemshop-production.up.railway.app/produto
+#POST https://sistemshop-production.up.railway.app/produto
+POST http://localhost:3333/produto
 Content-Type: application/json
 
 {
     "nome": "gel skdjas",
-    "tamanho": "12.3cm",
-    "cor": "rosa",
-    "img": "https://img.freepik.com",
     "descricao": "um gel muito bom",
-    "valor_compra": 12.50,
-    "valor_venda": 20.00,
-    "lucro": 7.50,
-    "entrada_estoque": 100,
-    "saida_estoque": 0,
-    "estoque_atual": 100
+    "img": "https://img.freepik.com",
+    "categoria_id": 1,
+    "itens": [{
+        "nota_id": 1,
+        "tamanho": "12.3cm",
+        "cor": "rosa",
+        "marca": "gal",
+        "codigo_barras": "12837192837",
+        "valor_compra": 12.50,
+        "valor_venda": 20.00,
+        "lucro": 7.50
+    }]
+    
 
 }
 
@@ -22,9 +27,9 @@ POST http://localhost:3333/nota
 Content-Type: application/json
 
 {
-    "codigo": "52576",
-    "quantidade": 5,
-    "valor_total": 106.5,
+    "codigo": "52346",
+    "quantidade": 10,
+    "valor_total": 150.5,
     "data": "2025-09-11 23:39:19.585 +00:00"
 }
 
@@ -33,11 +38,31 @@ POST http://localhost:3333/categoria
 Content-Type: application/json
 
 {
-    "nome": "Gel"
+    "nome": "Fantasias",
+    "descricao": "asdasad"
+}
+###
+POST http://localhost:3333/cliente
+Content-Type: application/json
+
+{
+    "nome": "Rosangela",
+    "email": "romafe@gmail.com",
+    "telefone": "(13) 99741-1234",
+    "endereco": "aksldjasdakjca"
+}
+###
+POST http://localhost:3333/venda
+Content-Type: application/json
+
+{
+    "cliente_id": 1
+
 }
 
 ###
-GET https://sistemshop-production.up.railway.app/produtos
+#GET https://sistemshop-production.up.railway.app/produtos
+GET http://localhost:3333/produtos?itens=vendidos
 
 
 ###
@@ -45,6 +70,9 @@ GET http://localhost:3333/notas
 
 ###
 GET http://localhost:3333/categorias
+
+###
+GET http://localhost:3333/clientes
 
 ###
 PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
