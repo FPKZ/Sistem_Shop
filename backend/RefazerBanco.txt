@@ -1,0 +1,79 @@
+Entendi perfeitamente. Sua lógica está correta e você chegou a uma questão crucial em sistemas de estoque: a diferença entre **produto-conceito** e **item-físico**.
+
+*   **Produto-Conceito:** "Camiseta Nike Azul Tamanho M". É o item do catálogo.
+*   **Item-Físico:** A camiseta específica que está na prateleira, que veio na nota fiscal X, com o código de barras Y.
+
+Sua ideia de tornar cada produto único na tabela `Produto` é **exatamente a abordagem correta** para o que você precisa. Isso se chama **controle de inventário por item serializado** (ou individualizado).
+
+Vamos refinar a estrutura para suportar isso. Esta é a forma mais robusta e profissional de fazer.
+
+### A Melhor Forma: Modelo de "Item de Estoque"
+
+A melhor maneira de modelar isso é separar o "catálogo de produtos" dos "itens físicos em estoque".
+
+**Novos Modelos (Tabelas):**
+
+1.  **`Produto`** (O Catálogo - O que você vende):
+    *   `id`
+    *   `nome` ("Camiseta Nike")
+    *   `descricao`
+    *   `marca`
+    *   `categoriaId`
+    *   *Não tem mais estoque, nem valor de compra/venda aqui.*
+
+2.  **`ItemEstoque`** (Cada item físico e único que você possui):
+    *   `id`
+    *   `produtoId` (Refere-se ao produto do catálogo)
+    *   `codigo_barras` (Pode ser único para cada item)
+    *   `valor_compra`
+    *   `valor_venda`
+    *   `notaId` (Nota de entrada deste item específico)
+    *   `status` (Um campo crucial: 'Disponível', 'Vendido', 'Reservado', 'Devolvido')
+
+3.  **`Venda`**:
+    *   `id`
+    *   `data`, `clienteId`, etc.
+
+4.  **`ItemVendido`** (Link entre a Venda e o Item de Estoque):
+    *   `id`
+    *   `vendaId`
+    *   `itemEstoqueId` (Refere-se ao item físico que foi vendido)
+    *   `valor_vendido` (Preço no momento da venda)
+
+---
+
+### Como o Fluxo Funciona Agora:
+
+1.  **Cadastro de Novos Produtos (Entrada no Estoque):**
+    *   Você recebe uma `Nota` com 5 camisetas iguais.
+    *   Você verifica se o `Produto` "Camiseta Nike" já existe no catálogo. Se não, você o cria.
+    *   Você cria **5 registros separados** na tabela `ItemEstoque`. Cada um deles terá:
+        *   `produtoId` apontando para a "Camiseta Nike".
+        *   O `codigo_barras` único de cada camiseta.
+        *   O `valor_compra` e `valor_venda` daquela nota.
+        *   O `notaId` da nota de entrada.
+        *   O `status` inicial como **'Disponível'**.
+
+2.  **Busca de Produtos para Venda:**
+    *   Sua tela de busca de produtos não vai mais consultar a tabela `Produto` diretamente.
+    *   Ela vai consultar a tabela `ItemEstoque` e trazer todos os itens com **`status` = 'Disponível'**.
+    *   Na busca, você pode agrupar os resultados pelo `produtoId` para mostrar ao vendedor: "Camiseta Nike - 5 unidades disponíveis".
+
+3.  **Realizar uma Venda:**
+    *   O vendedor seleciona um `ItemEstoque` específico (pelo código de barras, por exemplo).
+    *   Você cria a `Venda`.
+    *   Você cria um `ItemVendido` que conecta a `Venda` ao `itemEstoqueId` daquele item.
+    *   Você atualiza o `status` daquele `ItemEstoque` para **'Vendido'**.
+
+---
+
+### Vantagens Desta Abordagem:
+
+*   **Resolve seu problema principal:** Itens com `status` 'Vendido' **automaticamente somem** da busca de produtos disponíveis, sem precisar deletar ou mover nada.
+*   **Rastreabilidade Total:** Você sabe exatamente qual item físico (com seu código de barras e nota de origem) foi para qual cliente em qual venda. Isso é perfeito para garantias, devoluções, etc.
+*   **Precificação Flexível:** Permite que itens idênticos do catálogo (`Produto`) tenham preços de venda diferentes, pois o preço é definido no `ItemEstoque` (baseado no custo da nota de entrada).
+*   **Lógica Limpa:** As responsabilidades de cada tabela são muito claras.
+
+Esta abordagem é mais complexa de implementar inicialmente, mas é a forma "correta" e mais escalável para um sistema de estoque que precisa de rastreabilidade por item. Ela resolve todos os pontos que você levantou.
+
+O que acha deste modelo? Ele parece atender às suas necessidades?

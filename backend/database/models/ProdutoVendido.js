@@ -1,18 +1,15 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../sequelize.js";
 
-const Produto = sequelize.define('Produto', {
+const ProdutoVendido = sequelize.define('ProdutoVendido', {
     nome: DataTypes.STRING,
     tamanho: DataTypes.STRING,
     cor: DataTypes.STRING,
     img: DataTypes.STRING,
     descricao: DataTypes.STRING,
-    valor_compra: DataTypes.FLOAT,
     valor_venda: DataTypes.FLOAT,
-    lucro: DataTypes.FLOAT,
-
 }, {
-    tableName: 'Produtos'
+    tableName: 'ProdutosVendidos'
 });
 
-export default Produto;
+export default ProdutoVendido;
