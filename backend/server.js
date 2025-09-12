@@ -60,6 +60,35 @@ server.get("/produtos", async (request, reply) => {
   }
 })
 
+server.get("/notas", async (request, reply) => {
+  try{
+    const notas = await Nota.findAll({
+      include: [
+        { model: Produto, as: "produtos"},
+      ]
+    })
+
+    reply.send(notas)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao buscar Notas"})
+  }
+})
+
+server.get("/categorias", async (request, reply) => {
+  try{
+    const categoria = await Categoria.findAll({
+      include: [
+        { model: Produto, as: "produtos"}
+      ]
+    })
+    reply.send(categoria)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao buscar Categorias"})
+  }
+})
+
 server.post("/produto", async (request, reply) => {
   try{
     const query = request.query.query
@@ -72,7 +101,31 @@ server.post("/produto", async (request, reply) => {
     reply.code(201).send(novoProduto)
   } catch(err){
     console.log(err)
-    reply.code(500).send({ error: 'Erro ao buscar produtos' })
+    reply.code(500).send({ error: 'Erro ao cadastrar produtos' })
+  }
+})
+server.post("/categoria", async (request, reply) => {
+  try{
+    const query = request.query.query
+    
+    const data = request.body
+    const novacategoria = await Categoria.create(data)
+
+    reply.code(201).send(novacategoria)
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao cadastrar categoria"})
+  }
+})
+server.post("/nota", async (request, reply) => {
+  try{
+    const data = request.body
+    const novanota = await Nota.create(data)
+
+    reply.code(201).send(novanota)
+  } catch(err){
+    console.log(err)
+  reply.code(500).send({error: "Erro ao cadastrar nota"})
   }
 })
 
@@ -95,6 +148,45 @@ server.put("/produto/:id", async (request, reply) => {
     reply.code(500).send({ error: 'Erro ao atualizar produto' })
   }
 })
+server.put("/categoria/:id", async (request, reply) => {
+  try{
+    const categoria_Id = request.params.id
+    const data = request.body
+
+    const categoria = await Categoria.findByPk(categoria_Id)
+
+    if (!categoria) {
+      return reply.status(404).send({ error: 'Categoria não encontrado' })
+    }
+
+    await categoria.update(data)
+
+    reply.send({ message: 'Categoria atualizado com sucesso', categoria })
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao atualizar categoria' })
+  }
+})
+server.put("/nota/:id", async (request, reply) => {
+  try{
+    const nota_id = request.params.id
+    const data = request.body
+
+    const nota = await Nota.findByPk(nota_id)
+
+    if (!nota) {
+      return reply.status(404).send({ error: 'Nota não encontrado' })
+    }
+
+    await nota.update(data)
+
+    reply.send({ message: 'Nota atualizado com sucesso', nota })
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({ error: 'Erro ao atualizar nota' })
+  }
+})
+
 
 server.delete("/produto/:id", async (request, reply) => {
   try {
@@ -114,6 +206,40 @@ server.delete("/produto/:id", async (request, reply) => {
     reply.code(500).send({ error: 'Erro ao deletar produto' })
   }
 })
+server.delete("/categoria/:id", async (request, reply) => {
+  try{
+    const categoria_Id = request.params.id
+
+    const categoria =await Categoria.findByPk(categoria_Id)
+
+    if(!categoria){
+      return reply.status(404).send({error : "Categoria não encontrada"})
+    }
+    await categoria.destroy()
+
+    reply.status(204).send({message: "Categoria deletada com sucesso"})
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao deletar categoria"})
+  }
+})
+server.delete("/nota/:id", async (request, reply) => {
+  try{
+    const nota_id = request.params.id
+
+    const nota = await Nota.findByPk(nota_id)
+
+    if(!nota) return reply.status(404).send({error : "Nota não encontrada"})
+    
+    await nota.destroy()
+    
+    reply.status(204).send({message: "Nota deletada com sucesso"})
+  } catch(err){
+    console.log(err)
+    reply.code(500).send({error: "Erro ao deletar nota"})
+  }
+})
+
 
 async function start(){
   try{

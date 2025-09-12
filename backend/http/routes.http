@@ -18,7 +18,34 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3333/nota
+Content-Type: application/json
+
+{
+    "codigo": "52576",
+    "quantidade": 5,
+    "valor_total": 106.5,
+    "data": "2025-09-11 23:39:19.585 +00:00"
+}
+
+###
+POST http://localhost:3333/categoria
+Content-Type: application/json
+
+{
+    "nome": "Gel"
+}
+
+###
 GET https://sistemshop-production.up.railway.app/produtos
+
+
+###
+GET http://localhost:3333/notas
+
+###
+GET http://localhost:3333/categorias
+
 ###
 PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
 Content-Type: application/json
@@ -30,4 +57,30 @@ Content-Type: application/json
 }
 
 ###
+PUT http://localhost:3333/nota/3
+Content-Type: application/json
+
+{
+    "codigo": "4",
+    "quantidade": 6,
+    "valor_total": 106.5,
+    "data": "2025-09-11 23:39:19.585 +00:00"
+}
+
+###
+PUT http://localhost:3333/categoria/2
+Content-Type: application/json
+
+{
+    "nome": "Gel GA"
+}
+
+###
 DELETE https://sistemshop-production.up.railway.app/produto/5
+
+###
+DELETE http://localhost:3333/nota/3
+
+
+###
+DELETE http://localhost:3333/categoria/1
