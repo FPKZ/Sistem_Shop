@@ -56,8 +56,13 @@ POST http://localhost:3333/venda
 Content-Type: application/json
 
 {
-    "cliente_id": 1
-
+    "cliente_id": 1,
+    "itensVendidos": [
+        {"itemEstoque_id": 4, "valor_vendido": 25.00},
+        {"itemEstoque_id": 5, "valor_vendido": 30.00},
+        {"itemEstoque_id": 6, "valor_vendido": 15.00}
+    ],
+    "status": "finalizada"
 }
 
 ###

@@ -18,7 +18,7 @@ import process from "node:process"
 
 import { Produto, Categoria, Nota, ItemEstoque, ItemVendido, Cliente, NotaVenda, Venda } from "./database/models/index.js";
 import sequelize from "./database/sequelize.js";
-import { request } from "node:http";
+//import { request } from "node:http";
 
 const server = fastify()
 
@@ -191,7 +191,7 @@ server.post("/produto", async (request, reply) => {
 })
 server.post("/categoria", async (request, reply) => {
   try{
-    const query = request.query.query
+    //const query = request.query.query
     
     const data = request.body
     const novacategoria = await Categoria.create(data)
@@ -229,8 +229,41 @@ server.post("/cliente", async (request, reply) => {
 server.post("/venda", async (request, reply) => {
   try{
     const data = request.body
-    const novaVenda = await Venda.create(data)
+    const itensVendidos = data.itensVendidos
 
+    if(!itensVendidos || itensVendidos.length === 0) {
+      return reply.code(400).send({message: "A venda deve conter ao menos um item vendido"})
+    }
+    const itensEstoqueIds = itensVendidos.map(item => item.itemEstoque_id)
+
+    const itensEstoque = await ItemEstoque.findAll({
+      where: {
+        id: itensEstoqueIds
+      }
+    })
+    // Verifica se todos os itens existem no estoque
+    if (itensEstoque.length !== itensEstoqueIds.length) {
+      return reply.code(400).send({ message: "Um ou mais itens do estoque não foram encontrados" })
+    }
+
+    // Verifica se todos os itens estão disponíveis
+    const itensIndisponiveis = itensEstoque.filter(item => item.status !== "Disponivel")
+    if (itensIndisponiveis.length > 0) {
+      //return reply.code(400).send({ message: "Um ou mais itens do estoque não estão disponíveis" })
+    }
+    // Atualiza o status dos itens para "Vendido"
+    await Promise.all(itensEstoque.map(item => {
+      item.status = "Vendido"
+      return item.save()
+    }))
+    // Remove os itensVendidos do corpo da requisição para evitar conflito com a criação da venda
+
+    const novaVenda = await Venda.create(data, {
+      include: [
+        { model: ItemVendido, as: "itensVendidos" },]
+    })
+    //const novaVenda = await Venda.create(data)
+    console.log(data)
     reply.code(201).send(novaVenda)
   }catch(err){
     console.log(err)
