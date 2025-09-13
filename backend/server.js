@@ -144,10 +144,45 @@ server.get("/clientes", async (request, reply) => {
       ]
     })
 
-    reply.code(500).send(clientes)
+    reply.code(200).send(clientes)
   }catch(err){
     console.log(err)
     reply.code(500).send({message: "Erro ao buscar Clientes"})
+  }
+})
+server.get("/vendas", async (request, reply) => {
+  try{
+    const vendas = await Venda.findAll({
+      include: [
+        { model: Cliente, as: "cliente" },
+        { model: ItemVendido, as: "itensVendidos" },
+        { model: NotaVenda, as: "pagamento" }
+      ]
+    })
+
+    reply.code(200).send(vendas)
+  }catch(err){
+    console.log(err)
+    reply.code(500).send({message: "Erro ao buscar Vendas"})
+  }
+})
+server.get("/notasVendas", async (request, reply) => {
+  try{
+    const notasVenda = await NotaVenda.findAll({
+      include: [
+        { model: Venda, as: "venda",
+          include: [
+            { model: Cliente, as: "cliente" },
+            { model: ItemVendido, as: "itensVendidos" }
+          ]
+         }
+      ]
+    })
+
+    reply.code(200).send(notasVenda)
+  }catch(err){
+    console.log(err)
+    reply.code(500).send({message: "Erro ao buscar Notas de Venda"})
   }
 })
 
@@ -174,7 +209,7 @@ server.post("/produto", async (request, reply) => {
         valor_venda: item.valor_venda,
         lucro: item.lucro,
         produto_id: produto.id,
-        status: "Vendido"
+        status: "Disponivel"
       }))
       console.log(NovoItem)
       await ItemEstoque.bulkCreate(NovoItem)
@@ -249,33 +284,62 @@ server.post("/venda", async (request, reply) => {
     // Verifica se todos os itens estão disponíveis
     const itensIndisponiveis = itensEstoque.filter(item => item.status !== "Disponivel")
     if (itensIndisponiveis.length > 0) {
-      //return reply.code(400).send({ message: "Um ou mais itens do estoque não estão disponíveis" })
+      return reply.code(400).send({ message: "Um ou mais itens do estoque não estão disponíveis" })
     }
     // Atualiza o status dos itens para "Vendido"
     await Promise.all(itensEstoque.map(item => {
       item.status = "Vendido"
       return item.save()
     }))
-    // Remove os itensVendidos do corpo da requisição para evitar conflito com a criação da venda
-
-    const novaVenda = await Venda.create(data, {
-      include: [
-        { model: ItemVendido, as: "itensVendidos" },]
-    })
-    //const novaVenda = await Venda.create(data)
-    console.log(data)
-    reply.code(201).send(novaVenda)
+    const notaVenda = data.notaVenda
+    if(!notaVenda){
+      const novaVenda = await Venda.create(data, {
+        include: [
+          { model: ItemVendido, as: "itensVendidos" },]
+      })
+      return reply.code(201).send(novaVenda)
+    }
+    else{
+      const novaVenda = await Venda.create(data, {
+        include: [
+          { model: NotaVenda, as: "notaVenda" },
+          { model: ItemVendido, as: "itensVendidos" },
+        ]
+      })
+      return reply.code(201).send(novaVenda)
+    }
   }catch(err){
     console.log(err)
     reply.code(500).send({message: "Erro ao cadastrar venda", err})
   }
 })
 
-// server.post("/notaVenda", async (request, repy) => {
-//   try{
+server.post("/notaVenda", async (request, reply) => {
+  try{
+    const data = request.body
 
-//   }
-// })
+    const venda_id = data.venda_id
+    if(!venda_id){
+      return reply.code(400).send({message: "O ID da venda é obrigatório para cadastrar uma nota de venda"})
+    }
+    if(!data.codigo || data.codigo.trim() === ""){
+      return reply.code(400).send({message: "O código da nota de venda é obrigatório"})
+    }
+    if(!data.valor_nota || isNaN(data.valor_nota) || Number(data.valor_nota) <= 0){
+      return reply.code(400).send({message: "O valor da nota de venda deve ser um número positivo"})
+    }
+    if(!data.forma_pagamento || data.forma_pagamento.trim() === ""){
+      return reply.code(400).send({message: "A forma de pagamento é obrigatória"})
+    }
+
+    const novaNotaVenda = await NotaVenda.create(data)
+
+    reply.code(201).send(novaNotaVenda)
+  }catch(err){
+    console.log(err)
+    reply.code(500).send({message: "Erro ao cadastrar nota de venda", err})
+  }
+})
 
 
 server.put("/produto/:id", async (request, reply) => {

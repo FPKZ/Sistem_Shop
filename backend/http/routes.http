@@ -58,11 +58,22 @@ Content-Type: application/json
 {
     "cliente_id": 1,
     "itensVendidos": [
-        {"itemEstoque_id": 4, "valor_vendido": 25.00},
-        {"itemEstoque_id": 5, "valor_vendido": 30.00},
-        {"itemEstoque_id": 6, "valor_vendido": 15.00}
+        {"itemEstoque_id": 4, "valor_produto": 25.00},
+        {"itemEstoque_id": 5, "valor_produto": 30.00},
+        {"itemEstoque_id": 6, "valor_produto": 15.00}
     ],
     "status": "finalizada"
+}
+
+###
+POST http://localhost:3333/notaVenda
+Content-Type: application/json
+
+{
+    "venda_id": 4,
+    "codigo": "52346",
+    "valor_nota": 150.5,
+    "forma_pagamento": "cartão"
 }
 
 ###
@@ -78,6 +89,10 @@ GET http://localhost:3333/categorias
 
 ###
 GET http://localhost:3333/clientes
+###
+GET http://localhost:3333/vendas
+###
+GET http://localhost:3333/notasVendas
 
 ###
 PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
