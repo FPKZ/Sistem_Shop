@@ -70,4 +70,36 @@ export default async function vendaRoutes(fastify) {
             reply.code(500).send({message: "Erro ao cadastrar venda", err})
         }
     })
+    fastify.put("/venda/:id", async (request, reply) => {
+        try{
+            const venda_Id = request.params.id
+            const data = request.body
+
+            const venda = await Venda.findByPk(venda_Id)
+            if (!venda) {
+                return reply.code(404).send({ error: "Venda não encontrada" })
+            }
+
+            await venda.update(data)
+            reply.send({ message: "Venda atualizada com sucesso", venda })
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao atualizar venda", err })
+        }
+    })
+    fastify.delete("/venda/:id", async (request, reply) => {
+        try{
+            const { id } = request.params
+            const venda = await Venda.findByPk(id)
+            if (!venda) {
+                return reply.code(404).send({ error: "Venda não encontrada" })
+            }
+
+            await venda.destroy()
+            reply.code(204).send()
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao deletar venda", err })
+        }
+    })
 }

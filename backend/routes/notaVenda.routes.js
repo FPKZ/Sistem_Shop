@@ -46,4 +46,37 @@ export default async function notaVendaRoutes(fastify) {
             reply.code(500).send({message: "Erro ao cadastrar nota de venda", err})
         }
     })
+
+    fastify.put("/notaVenda/:id", async (request, reply) => {
+        try{
+            const notaVenda_Id = request.params.id
+            const data = request.body
+
+            const notaVenda = await NotaVenda.findByPk(notaVenda_Id)
+            if (!notaVenda) {
+                return reply.code(404).send({ error: "Nota de venda não encontrada" })
+            }
+
+            await notaVenda.update(data)
+            reply.send({ message: "Nota de venda atualizada com sucesso", notaVenda })
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao atualizar nota de venda", err })
+        }
+    })
+    fastify.delete("/notaVenda/:id", async (request, reply) => {
+        try{
+            const notaVenda_Id = request.params.id
+            const notaVenda = await NotaVenda.findByPk(notaVenda_Id)
+            if (!notaVenda) {
+                return reply.code(404).send({ error: "Nota de venda não encontrada" })
+            }
+
+            await notaVenda.destroy()
+            reply.code(204).send()
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao deletar nota de venda", err })
+        }
+    })
 }
