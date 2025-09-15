@@ -6,7 +6,11 @@ export default async function vendaRoutes(fastify) {
             const vendas = await Venda.findAll({
             include: [
                 { model: Cliente, as: "cliente" },
-                { model: ItemVendido, as: "itensVendidos" },
+                { model: ItemVendido, as: "itensVendidos",
+                    include: [
+                        {model: ItemEstoque, as: "itemEstoque"}
+                    ]
+                 },
                 { model: NotaVenda, as: "pagamento" }
             ]
             })

@@ -1,30 +1,12 @@
 import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
+import { Op } from "sequelize"
 
 export default async function produtoRoutes(fastify) {
   fastify.get("/produtos", async (request, reply) => {
     const query = request.query
     console.log(query)
-  
-    if(!query.itens){
-      try{
-        const produtos = await Produto.findAll({
-          include: [
-            { model: Categoria, as: 'categoria' },
-            { model: ItemEstoque, as: 'itemEstoque',
-              include: [
-                { model: Nota, as: "nota" }
-              ]
-             }
-          ]
-        })
-    
-        reply.send(produtos)
-      } catch(err){
-        console.log(err)
-        reply.code(500).send({ error: 'Erro ao buscar produtos' })
-      }
-    }
-    else if(query.itens === "all"){
+
+    if(query.itens === "all"){
   
       const produtos = await ItemEstoque.findAll({
         include: [
@@ -32,7 +14,7 @@ export default async function produtoRoutes(fastify) {
         ]
       })
   
-      reply.code(200).send(produtos)
+      return reply.code(200).send(produtos)
     }
     else if(query.itens === "vendidos"){
       console.log("vendidos")
@@ -43,7 +25,7 @@ export default async function produtoRoutes(fastify) {
         ]
       })
       console.log(produtos)
-      reply.code(200).send(produtos)
+      return reply.code(200).send(produtos)
     }
     else if(query.itens === "estoque"){
       console.log("estoque")
@@ -54,8 +36,43 @@ export default async function produtoRoutes(fastify) {
         ]
       })
       console.log(produtos)
-      reply.code(200).send(produtos)
+      return reply.code(200).send(produtos)
     }
+    else if(query.nome && query.nome !== " "){
+      console.log(query.nome)
+      const produtos = await Produto.findAll({
+        where: { nome: { [Op.like]: "%" + query.nome + "%"} },
+        include: [
+          { model: Categoria, as: "categoria"},
+          { model: ItemEstoque, as: "itemEstoque",
+            include: [
+              {model: Nota, as: "nota"}
+            ]
+          }
+        ]
+      })
+
+      return reply.code(200).send(produtos)
+    }
+    
+    try{
+      const produtos = await Produto.findAll({
+        include: [
+          { model: Categoria, as: 'categoria' },
+          { model: ItemEstoque, as: 'itemEstoque',
+            include: [
+              { model: Nota, as: "nota" }
+            ]
+           }
+        ]
+      })
+  
+      return reply.send(produtos)
+    } catch(err){
+      console.log(err)
+      return reply.code(500).send({ error: 'Erro ao buscar produtos' })
+    }
+
   })
 
   fastify.post("/produto", async (request, reply) => {
@@ -63,12 +80,12 @@ export default async function produtoRoutes(fastify) {
       const query = request.query.query
       console.log(query)
       
-      const { nome, descricao, img, categoria_id, itens } = request.body
+      const { nome, descricao, categoria_id, img, itens } = request.body
   
       let produto = await Produto.findOne({ where: { nome: nome }})
   
       if(!produto){
-        produto = await Produto.create({nome, descricao, img, categoria_id: categoria_id})
+        produto = await Produto.create({nome, descricao, categoria_id, img})
       }
   
       if(itens && itens.length > 0){
@@ -77,6 +94,8 @@ export default async function produtoRoutes(fastify) {
           nota_id: item.nota_id,
           tamanho: item.tamanho,
           cor: item.cor,
+          marca: item.marca,
+          codigo_barras: item.codigo_barras,
           valor_compra: item.valor_compra,
           valor_venda: item.valor_venda,
           lucro: item.lucro,

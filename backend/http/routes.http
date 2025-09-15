@@ -4,15 +4,15 @@ POST http://localhost:3333/produto
 Content-Type: application/json
 
 {
-    "nome": "gel skdjas",
+    "nome": "infermeira",
     "descricao": "um gel muito bom",
     "img": "https://img.freepik.com",
-    "categoria_id": 1,
+    "categoria_id": 3,
     "itens": [{
         "nota_id": 1,
-        "tamanho": "12.3cm",
-        "cor": "rosa",
-        "marca": "gal",
+        "tamanho": "15.3cm",
+        "cor": "azul",
+        "marca": "rex",
         "codigo_barras": "12837192837",
         "valor_compra": 12.50,
         "valor_venda": 20.00,
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
     "codigo": "52346",
-    "quantidade": 10,
+    "quantidade": 15,
     "valor_total": 150.5,
     "data": "2025-09-11 23:39:19.585 +00:00"
 }
@@ -38,7 +38,7 @@ POST http://localhost:3333/categoria
 Content-Type: application/json
 
 {
-    "nome": "Fantasias",
+    "nome": "fantasia",
     "descricao": "asdasad"
 }
 ###
@@ -58,9 +58,9 @@ Content-Type: application/json
 {
     "cliente_id": 1,
     "itensVendidos": [
-        {"itemEstoque_id": 4, "valor_produto": 25.00},
-        {"itemEstoque_id": 5, "valor_produto": 30.00},
-        {"itemEstoque_id": 6, "valor_produto": 15.00}
+        {"itemEstoque_id": 7, "valor_produto": 25.00},
+        {"itemEstoque_id": 8, "valor_produto": 30.00},
+        {"itemEstoque_id": 9, "valor_produto": 15.00}
     ],
     "status": "finalizada"
 }
@@ -70,7 +70,7 @@ POST http://localhost:3333/notaVenda
 Content-Type: application/json
 
 {
-    "venda_id": 4,
+    "venda_id": 3,
     "codigo": "52346",
     "valor_nota": 150.5,
     "forma_pagamento": "cartão"
@@ -78,7 +78,7 @@ Content-Type: application/json
 
 ###
 #GET https://sistemshop-production.up.railway.app/produtos
-GET http://localhost:3333/produtos?itens=vendidos
+GET http://localhost:3333/produtos?item=&nome=
 
 
 ###
