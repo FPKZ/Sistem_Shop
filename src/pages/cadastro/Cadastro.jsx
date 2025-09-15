@@ -1,6 +1,8 @@
 import { useState } from "react";
 //import { useNavigate } from "react-router-dom";
 import Produtos from "./produtos/Produtos";
+import Clientes from "./clientes/Clientes";
+import Notas from "./notas/Notas";
 import API from "../../components/app/api.js"
 
 
@@ -49,6 +51,16 @@ function Cadastro() {
         {
           tela === "Produtos" && (
             <Produtos cadastrarProduto={cadastrarProduto} />
+          )
+        }
+        {
+          tela === "Clientes" && (
+            <Clientes />
+          )
+        }
+        {
+          tela === "Notas" && (
+            <Notas/>
           )
         }
       </div>

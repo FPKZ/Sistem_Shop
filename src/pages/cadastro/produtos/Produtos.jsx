@@ -1,8 +1,11 @@
-import { use, useState } from "react"
+import { useEffect, useState } from "react"
+import API from "../../../components/app/api.js"
 
 export default function Produtos({cadastrarProduto}){
-    const [categoria , setCategoria] = useState("")
-    const [nota , setNota] = useState("")
+    const [categoria , setCategoria] = useState({})
+    const [nota , setNota] = useState({})
+    const [notas, setNotas] = useState([])
+    const [categorias, setCategorias] = useState([])
 
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
@@ -50,10 +53,40 @@ export default function Produtos({cadastrarProduto}){
         if(Object.keys(newErrors).length === 0){
             const formData = new FormData(e.target)
             const data = Object.fromEntries(formData.entries())
-            //console.log(data)
-            data.img = "teste"
-            cadastrarProduto(data)
+            const data_refatorada = {
+                nome: data.nome,
+                descricao: data.descricao,
+                img: "teste",
+                categoria_id: data.categoria,
+                itens: [{
+                    codigo_barras: data.codigo_barras,
+                    nota_id: data.nota,
+                    tamanho: data.tamanho,
+                    cor: data.cor,
+                    marca: data.marca,
+                    valor_compra: data.valor_compra,
+                    valor_venda: data.valor_venda,
+                    lucro: data.lucro
+                }]
+            }
+            console.log(data_refatorada)
+            //cadastrarProduto(data_refatorada)
         }
+    }
+
+    useEffect(() => {
+        GetNotas()
+        GetCategorias()
+    }, [])
+
+    const GetCategorias = async () => {
+        const categorias = await API.getCategoria()
+        //console.log(categorias)
+        setCategorias(categorias)
+    }
+    const GetNotas = async () => {
+        const notas = await API.getNotas()
+        setNotas(notas)
     }
 
     return (
@@ -61,33 +94,36 @@ export default function Produtos({cadastrarProduto}){
             <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
                 <div className="row gap-4 mb-3 pb-4 border-bottom m-0">
                     <div className="col-md-12 w-100 p-0">
-                        <label htmlFor="nomeProduto" className="form-label">Nome Do Produto</label>
+                        <label htmlFor="nomeProduto" className="form-label">Nome</label>
                         <input className={`form-control ${validated ? (erros.nome ? "is-invalid" : "is-valid") : ""}`} name="nome" id="nomeProduto" type="text" placeholder="nome" onChange={handleChange} required/>
                     </div>
                     <div className="col-md-4 p-0">
-                        <label htmlFor="imgProduto" className="form-label">Imagem do Produto</label>
+                        <label htmlFor="imgProduto" className="form-label">Imagem</label>
                         <input className={`form-control ${validated ? (erros.img ? "is-invalid" : "is-valid") : ""}`} name="img" id="imgProduto" type="file" required/>
                     </div>
-                    <div className="col-md-2 p-0">
-                        <label htmlFor="corProduto" className="form-label">Cor do Produto</label>
+                    <div className="col-md-1 p-0">
+                        <label htmlFor="corProduto" className="form-label">Cor</label>
                         <input className="form-control form-control-color" name="cor" id="corProduto" type="color" placeholder="Cor" />
                     </div>
-                    <div className="col-md p-0">
-                        <label htmlFor="tamanhoProduto" className="form-label">Tamanho do Produto</label>
-                        <input className={`form-control ${validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""}`} name="tamanho" id="tamanhoProduto" type="number" placeholder="Tamanho" required />
+                    <div className="col-md-2 p-0">
+                        <label htmlFor="marcaProduto" className="form-label">Marca</label>
+                        <input className={`form-control ${validated ? (erros.marca ? "is-invalid" : "is-valid") : ""}`} name="marca" id="marcaProduto" type="text" placeholder="Marca" required />
                     </div>
                     <div className="col-md p-0 d-flex flex-column">
-                        <label htmlFor="categoriaProduto" className="form-label">Categoria do Produto</label>
+                        <label htmlFor="categoriaProduto" className="form-label">Categoria</label>
                         <div className="btn-group">
-                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{categoria || "Selecione a Categoria"}</button>
-                            <input className={`form-control `} id="categoriaProduto" type="hidden" name="categoria" value={categoria} required/>
+                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{categoria.nome || "Selecione a Categoria"}</button>
+                            <input className={`form-control `} id="categoriaProduto" type="hidden" name="categoria" value={categoria.id || ""} required/>
                             <ul className="dropdown-menu w-100">
-                                <li><a className="dropdown-item" href="#" onClick={() => setCategoria("cat")}>cat</a></li>
-                                <li><a className="dropdown-item" href="#">dasd</a></li>
+                                <Categoria categorias={categorias} setCategoria={setCategoria} />
                                 <li><hr className="dropdown-divider"></hr></li>
                                 <li><a className="dropdown-item" href="#">Nova Categoria</a></li>
                             </ul>
                         </div>
+                    </div>
+                    <div className="col-md p-0">
+                        <label htmlFor="tamanhoProduto" className="form-label">Tamanho</label>
+                        <input className={`form-control ${validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""}`} name="tamanho" id="tamanhoProduto" type="number" placeholder="Tamanho" required />
                     </div>
                     {/* <div class="col-md-4">
                         <label for="inputState" class="form-label">State</label>
@@ -99,18 +135,25 @@ export default function Produtos({cadastrarProduto}){
                     </div> */}
                 </div>
                 <div className="row gap-5  m-0 pb-4 mb-3 border-bottom">
-                    <div className="col-md-2 d-flex flex-column p-0 m-0">
-                        <label htmlFor="notaProduto" className="form-label">Nota do Produto</label>
+                    <div className="col-md-4 d-flex flex-column p-0 m-0">
+                        <label htmlFor="notaProduto" className="form-label">Nota</label>
                         <div className="dropdown-center">
-                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{nota || "Selecione a Nota"}</button>
-                            <input className={`form-control ${validated ? (erros.notaProduto ? "is-invalid" : "is-valid") : ""}`} id="notaProduto" type="hidden" name="nota" value={nota} onChange={handleChange} required/>
+                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.nota ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{nota.codigo || "Selecione a Nota"}</button>
+                            <input className={`form-control ${validated ? (erros.notaProduto ? "is-invalid" : "is-valid") : ""}`} id="notaProduto" type="hidden" name="nota" value={nota.id || ""} onChange={handleChange} required/>
                             <ul className="dropdown-menu w-100">
-                                <li><a className="dropdown-item" href="#" onClick={() => setNota("cat")}>cat</a></li>
-                                <li><a className="dropdown-item" href="#">dasd</a></li>
+                                <Nota notas={notas} setNota={setNota} />
                                 <li><hr className="dropdown-divider"></hr></li>
                                 <li><a className="dropdown-item" href="#">Nova Categoria</a></li>
                             </ul>
                         </div>
+                    </div>
+                    <div className="col-md-5 p-0">
+                        <label htmlFor="codigoBarras" className="form-label">Codigo de Barras</label>
+                        <input className={`form-control ${validated ? (erros.codigo_barras ? "is-invalid" : "is-valid") : ""}`} name="codigo_barras" id="codigoBarras" type="text" placeholder="Codigo de Barras" required />
+                    </div>
+                    <div className="col-md-2 p-0 m-0">
+                        <label htmlFor="entradaEstoqueProduto" className="form-label">Entrada</label>
+                        <input className={`form-control ${validated ? (erros.entrada_estoque ? "is-invalid" : "is-valid") : ""}`} name="entrada_estoque" id="entradaEstoqueProduto" type="number" placeholder="Quantidade" onChange={handleChange} required/>
                     </div>
                     <div className="col-md p-0 m-0">
                         <label htmlFor="valorCompraProduto" className="form-label">Valor de Compra</label>
@@ -133,13 +176,9 @@ export default function Produtos({cadastrarProduto}){
                             <input className={`form-control ${validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""}`} name="lucro" id="LucroProduto" type="number" placeholder="lucro" onChange={handleChange} required/>
                         </div>
                     </div>
-                    <div className="col-md-2 p-0 m-0">
-                        <label htmlFor="entradaEstoqueProduto" className="form-label">Entrada do Produto</label>
-                        <input className={`form-control ${validated ? (erros.entrada_estoque ? "is-invalid" : "is-valid") : ""}`} name="entrada_estoque" id="entradaEstoqueProduto" type="number" placeholder="Quantidade" onChange={handleChange} required/>
-                    </div>
                 </div>
                 <div className="col-md-12 mb-3">
-                    <label htmlFor="descricaoProduto" className="form-label">Descrição do Produto</label>
+                    <label htmlFor="descricaoProduto" className="form-label">Descrição</label>
                     <input className={`form-control ${validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""}`} name="descricao" type="text" id="descricaoProduto" placeholder="Descrição" onChange={handleChange} required/>
                 </div>
                 <div className="col-md-12">
@@ -147,5 +186,24 @@ export default function Produtos({cadastrarProduto}){
                 </div>
             </form>
         </div>
+    )
+}
+
+function Nota({notas, setNota}){   
+    return (
+        <>
+            {notas.map(nota => (
+                 <li key={nota.id}><a className="dropdown-item" href="#" onClick={() => setNota(nota)}>{nota.codigo}</a></li>
+            ))}
+            </>
+        )
+}
+function Categoria({categorias,  setCategoria}){
+    return (
+        <>
+            {categorias.map(categoria => (
+                <li key={categoria.id}><a className="dropdown-item" href="#" onClick={() => setCategoria(categoria)}>{categoria.nome}</a></li>
+            ))}
+        </>
     )
 }

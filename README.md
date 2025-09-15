@@ -21,3 +21,4 @@ npm install concurrently --save-dev
 npm install sequelize sqlite3
 
 npm install pg dotenv
+npm install @fastify/multipart @fastify/static
