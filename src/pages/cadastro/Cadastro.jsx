@@ -18,7 +18,7 @@ function Cadastro() {
       console.error("erro ao cadastar" , error)
     }
   }
-
+  
   return (
     <>
       <div className="d-flex justify-content-start flex-wrap flex-md-nowarp align-items-start pt-3 pb-1 mb-3 gap-2 border-bottom">
