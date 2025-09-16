@@ -1,5 +1,11 @@
 import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize"
+import fs from "node:fs"
+import util from "node:util"
+import { pipeline } from "node:stream";
+import path from "node:path";
+
+const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
   fastify.get("/produtos", async (request, reply) => {
@@ -79,13 +85,31 @@ export default async function produtoRoutes(fastify) {
     try{
       const query = request.query.query
       console.log(query)
+
+      const data = await  request.file()
+      const body = {}
       
-      const { nome, descricao, categoria_id, img, itens } = request.body
+      for await (const part of data.parts()){
+        if(part.file){
+          const ext = path.extname(part.filename)
+          const newFilename = `${Date.now()}${ext}`
+          const uploadPath = path.join("backend", "uploads", newFilename)
+
+          await pump(part.file, fs.createWriteStream(uploadPath))
+          body.img = `${request.protocol}://${request.hostname}/uploads/${newFilename}`
+        } else {
+          body[part.fieldname] = part.value;
+        }
+      }
+
+      const itens = JSON.parse(body.itens)
+
+      const { nome, descricao, categoria_id } = body
   
       let produto = await Produto.findOne({ where: { nome: nome }})
   
       if(!produto){
-        produto = await Produto.create({nome, descricao, categoria_id, img})
+        produto = await Produto.create({nome, descricao, categoria_id, img: body.img})
       }
   
       if(itens && itens.length > 0){

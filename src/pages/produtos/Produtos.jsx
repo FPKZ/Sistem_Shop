@@ -15,10 +15,12 @@ function Produtos() {
   const [produtos, setProdutos] = useState([]);
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
+
+  const [mobile, setMobile] = useState(window.innerWidth < 900)
   
   const getProduto = async () => {
     const p = await API.getProduto()
-    //console.log(p)
+    console.log(p)
     setProdutos(p);
   }
 
@@ -26,7 +28,17 @@ function Produtos() {
     getProduto()
     GetNotas()
     GetCategorias()
-  }, [])
+
+    const handleResize = () => {
+      setMobile(window.innerWidth < 900)
+    }
+
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [ modalAddProduto, modalInfoProduto ])
   
   const GetCategorias = async () => {
       const data = await API.getCategoria()
@@ -85,6 +97,7 @@ function Produtos() {
         nota={nota}
         setNota={setNota}
         produto={produto}
+        mobile={mobile}
       />
     </>
   );

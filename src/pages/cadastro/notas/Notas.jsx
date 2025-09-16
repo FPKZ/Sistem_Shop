@@ -93,18 +93,37 @@ export default function Notas(){
 function Produtos(){
     return(
         <>
-            <div className="card col-12 d-flex flex-wrap justify-content-around align-content-start gap-4" style={{maxHeight: "120px"}}>
-                <img className="col-1 p-1 m-0" src="src\assets\la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg" alt="" />
-                <h1 className="col-3 h-100 h4 m-0 align-content-center">Algemas</h1>
-                <div className="col-1 card-text m-0 h-100 align-content-center">marca</div>
-                <div className="col-1 card-text h-100 align-content-center">Categoria</div>
-                <div className="col-1 card-text h-100 align-content-center">quantidade</div>
-                <div className="col-1 card-text h-100 align-content-center">valor_compra</div>
-                <div className="col-1 card-text h-100 align-content-center">valor_venda</div>
-                <div className="col-1 position-absolute end-0 d-flex flex-column gap-2 p-3">
-                    <button className="btn btn-outline-danger" type="button"><i className="bi bi-trash3"></i></button>
-                    <button className="btn btn-outline-secondary" type="button"><i className="bi bi-three-dots"></i></button>
-                </div>
+            <div
+            className={`col-12 d-flex flex-wrap position-relative justify-content-around align-content-start gap-1 p-1 alert alert-light`}
+            style={{ maxHeight: "120px", cursor: "pointer" }}
+            >
+            <img
+                className="col-1 p-0 m-0 img-fluid img-thumbnail object-fit-fill"
+                src="src\assets\la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
+                alt=""
+            />
+            <h1 className="col-2 h-100 h5 m-0 align-content-center">
+                Algema
+            </h1>
+            <div className="col-1 card-text m-0 h-100 align-content-center">
+                Gal
+            </div>
+            <div className="col-2 card-text h-100 align-content-center">
+                Acessorio
+            </div>
+            <div className="col-1 card-text h-100 align-content-center">
+                R$14.5
+            </div>
+            <div className="col-1 card-text h-100 align-content-center">
+                R$35.5
+            </div>
+            <div className="col-2 card-text h-100 align-content-center">
+                Disponivel
+            </div>
+            {/* <div className="col-1  end-0 d-flex flex-wrap gap-2 p-1">
+                            <button className="btn btn-outline-danger" type="button"><i className="bi bi-trash3"></i></button>
+                            <button className="btn btn-outline-secondary" type="button"><i className="bi bi-three-dots"></i></button>
+                        </div> */}
             </div>
         </>
     )
