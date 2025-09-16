@@ -1,4 +1,4 @@
-function Produto({produtos, deleteProduto}) {
+function Produto({produtos, deleteProduto, setModalInfoProduto, setProduto}) {
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
             Nenhum produto cadastrado!
@@ -6,10 +6,10 @@ function Produto({produtos, deleteProduto}) {
     )
     const getEstoqueBadge = (estoque) => {
         const quantidade = estoque || 0;
-        if (quantidade > 20) {
+        if (quantidade >= 10) {
         // Estoque alto: verde
         return <span className="badge bg-success">Estoque Alto</span>;
-        } else if (quantidade > 5) {
+        } else if (quantidade >= 5) {
         // Estoque médio: amarelo
         return <span className="badge bg-warning text-dark">Estoque Médio</span>;
         } else if (quantidade > 0) {
@@ -53,13 +53,13 @@ function Produto({produtos, deleteProduto}) {
                                 </div>
                                 <div className="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span className="fw-bold fs-5">{produto.estoque_atual || `0`}</span>
+                                        <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
                                         <span className="text-muted small"> unidades</span>
                                     </div>
-                                    {getEstoqueBadge(produto.estoque_atual)}
+                                    {getEstoqueBadge(produto.itemEstoque.length)}
                                 </div>
                                 <div className="card-footer d-flex justify-content-end">
-                                    <button className="btn btn-outline-secondary btn-sm me-2">
+                                    <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
                                         <i className="bi bi-pencil-square"></i> Editar
                                     </button>
                                     <button className="btn btn-outline-danger btn-sm" onClick={() => deleteProduto(produto.id)}>

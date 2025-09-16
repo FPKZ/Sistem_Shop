@@ -14,6 +14,7 @@ function App() {
       <h1 className="h4 mb-4">Atalhos</h1>
       <div className="row row-cols-*  g-2 g-sm-4">
           <Card icon="plus-square-fill" location={() => navigate(`/cadastro`)}>Cadastro</Card>
+          <Card icon="bag-fill" location={() => navigate(`/vendas`)}>Vendas</Card>
           <Card icon="grid-fill" location={() => navigate(`/produtos`)}>Produtos</Card>
           <Card icon="journal-bookmark-fill" location={() => navigate(`/clientes`)}>Clientes</Card>
           <Card icon="upc" location={() => navigate(`/notas`)}>Notas</Card>

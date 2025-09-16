@@ -36,6 +36,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>
         )}
         <ItenMenu icon="house-fill" onClick={() => handleNavigate(`/`)}>Inicio</ItenMenu>
+        <ItenMenu icon="bag-fill" onClick={() => handleNavigate(`/vendas`)}>Vendas</ItenMenu>
         <ItenMenu icon="grid-fill" onClick={() => handleNavigate(`/produtos`)}>Produtos</ItenMenu>
         <ItenMenu icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
         <ItenMenu icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>

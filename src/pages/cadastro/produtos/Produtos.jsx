@@ -70,7 +70,7 @@ export default function Produtos({cadastrarProduto}){
                 }]
             }
             console.log(data_refatorada)
-            //cadastrarProduto(data_refatorada)
+            cadastrarProduto(data_refatorada)
         }
     }
 

@@ -46,7 +46,7 @@ export default class API{
             const categorias = await (
                 await fetch(`${back}/categorias`, { method: "GET" })
             ).json();
-            //console.log(categorias);
+            console.log(categorias);
             return categorias;
         } catch (error) {
             console.error("Erro ao buscar categorias", error)
