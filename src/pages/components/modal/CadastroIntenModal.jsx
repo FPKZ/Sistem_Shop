@@ -1,16 +1,27 @@
 // components/CadastroModal.jsx
 import './cadastroItenModal.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function CadastroModal({ visible, onClose, categorias, categoria, setCategoria, notas, nota, setNota, cadastrarProduto }) {
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
   
+    
+    useEffect(() => {
+        if(!visible){
+            const timer = setTimeout(() => {
+                setValidated(false)
+                setErros({})
+                setFormValue({})
+
+            }, 200)
+            return () => clearTimeout(timer)
+        }
+    }, [visible])
+    
     if (!visible) return null;
-
-    console.log(notas)
-
+    //console.log(notas)
 
     function handleChange(e){
         const { name, value } = e.target
