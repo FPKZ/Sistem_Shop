@@ -40,7 +40,7 @@ export default function Produtos({cadastrarProduto}){
     }
 
 
-    function handleSubimit(e){
+    async function handleSubimit(e){
         e.preventDefault()
         const form = e.target;
 
@@ -51,26 +51,38 @@ export default function Produtos({cadastrarProduto}){
         //console.log(validated)
 
         if(Object.keys(newErrors).length === 0){
-            const formData = new FormData(e.target)
-            const data = Object.fromEntries(formData.entries())
-            const data_refatorada = {
-                nome: data.nome,
-                descricao: data.descricao,
-                img: "teste",
-                categoria_id: data.categoria,
-                itens: [{
-                    codigo_barras: data.codigo_barras,
-                    nota_id: data.nota,
-                    tamanho: data.tamanho,
-                    cor: data.cor,
-                    marca: data.marca,
-                    valor_compra: data.valor_compra,
-                    valor_venda: data.valor_venda,
-                    lucro: data.lucro
-                }]
+            const formData = new FormData()
+            const formElements = e.target.elements
+
+            for ( const element of formElements ) {
+                if( element.name ) {
+                    if ( element.type === "file") {
+                        if ( element.files[0] ) {
+                            formData.append(element.name, element.files[0])
+                        }
+                    } else {
+                        formData.append(element.name, element.value)
+                    }
+                }
             }
-            console.log(data_refatorada)
-            cadastrarProduto(data_refatorada)
+            const itens = [{
+                codigo_barras: formData.get("codigo_barras"),
+                nota_id: formData.get("nota"),
+                tamanho: formData.get("tamanho"),
+                cor: formData.get("cor"),
+                marca: formData.get("marca"),
+                valor_compra: formData.get("valor_compra"),
+                valor_venda: formData.get("valor_venda"),
+                lucro: formData.get("lucro")
+            }]
+            formData.set("itens", JSON.stringify(itens))
+
+            ['codigo_barras', 'nota', 'tamanho', 'cor', 'marca', 'valor_compra', 'valor_venda', 'lucro'].forEach(field => {
+                formData.delete(field)
+            })
+
+            console.log(formData)
+            //cadastrarProduto(formData)
         }
     }
 
