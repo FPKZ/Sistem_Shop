@@ -57,24 +57,24 @@ export default function Notas(){
             <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3">
                 <div className="col-sm col-md-12 p-0">
                     <label htmlFor="numeroNota"  className="form-label">Numero da Nota</label>
-                    <input type="text" className={`form-control ${validated ? (erros.codigo ? `is-invalid` : `is-valided`): ""}`} name="codigo" id="numeroNota" required/>
+                    <input type="text" className={`form-control ${validated ? (erros.codigo ? `is-invalid` : `is-valid`): ""}`} name="codigo" id="numeroNota" onChange={handleChange} required/>
                 </div>
                 <div className="col-sm col-md-2 p-0">
                     <label htmlFor="valor_total" className="form-label">Valor da Nota</label>
-                    <input type="number" className={`form-control ${validated ? (erros.valor_total ? `is-invalid` : `is-valided`): ""}`} name="valor_total" id="valor_total" required/>
+                    <input type="number" className={`form-control ${validated ? (erros.valor_total ? `is-invalid` : `is-valid`): ""}`} name="valor_total" id="valor_total" onChange={handleChange} required/>
                 </div>
                 <div className="col-sm col-md-2 p-0">
                     <label htmlFor="data" className="form-label">Data da nota</label>
-                    <input type="date" className={`form-control ${validated ? (erros.data ? `is-invalid` : `is-valided`): ""}`} name="data" id="data" required/>
+                    <input type="date" className={`form-control ${validated ? (erros.data ? `is-invalid` : `is-valid`): ""}`} name="data" id="data" onChange={handleChange} required/>
                 </div>
                 <div className="col-sm col-md-3 p-0">
                     <label htmlFor="quantidade" className="form-label">Quantidade de produtos da nota</label>
-                    <input type="number" className={`form-control ${validated ? (erros.quantidade ? `is-invalid` : `is-valided`): ""}`} name="quantidade" id="quantidade" required/>
+                    <input type="number" className={`form-control ${validated ? (erros.quantidade ? `is-invalid` : `is-valid`): ""}`} name="quantidade" id="quantidade" onChange={handleChange} required/>
                 </div>
                 <div className="col-12 form-control d-flex flex-wrap mt-4 p-2" style={{height:  '400px'}}>
                     <div className="col-12 d-flex justify-content-between pb-2 mb-2 border-bottom">
                         <p className="align-content-center m-0">Produtos</p>
-                        <button className="btn btn-light">Adicionar Produto</button>
+                        <button className="btn btn-light" type="button">Adicionar Produto</button>
                     </div>
                     <div className="col-12 d-flex flex-column gap-2 overflow-y-auto flex-grow-1" style={{height: "86%"}}>
                     <Produtos/>

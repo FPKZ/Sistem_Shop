@@ -1,15 +1,16 @@
 // components/CadastroModal.jsx
 import './cadastroItenModal.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export default function CadastroModal({ visible, onClose, onSubmit, categorias, categoria, setCategoria, notas, nota, setNota }) {
-  if (!visible) return null;
-
-  console.log(notas)
-
-  const [formValue, setFormValue] = useState({})
+export default function CadastroModal({ visible, onClose, categorias, categoria, setCategoria, notas, nota, setNota, cadastrarProduto }) {
+    const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
+  
+    if (!visible) return null;
+
+    console.log(notas)
+
 
     function handleChange(e){
         const { name, value } = e.target
@@ -77,7 +78,9 @@ export default function CadastroModal({ visible, onClose, onSubmit, categorias, 
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()}>
+      <div className="modal-box position-relative" onClick={e => e.stopPropagation()}>
+        <div className="btn-close position-absolute end-0 top-0 px-2 m-2 fs-4" style={{cursor: "pointer"}} onClick={onClose}>
+        </div>
         <h2>Cadastrar Item</h2>
         <div className="row-cols-2 w-100 p-3 d-flex gap-4">
             <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">

@@ -1,4 +1,4 @@
-function Produto({produtos, deleteProduto, setModalInfoProduto, setProduto}) {
+function Produto({produtos, setModalInfoProduto, setProduto}) {
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
             Nenhum produto cadastrado!
@@ -20,7 +20,7 @@ function Produto({produtos, deleteProduto, setModalInfoProduto, setProduto}) {
         return <span className="badge bg-secondary">Fora de Estoque</span>;
         }
     };
-    console.log(produtos)
+    //console.log(produtos)
     return (
         <>
             {/* <div>
@@ -58,12 +58,9 @@ function Produto({produtos, deleteProduto, setModalInfoProduto, setProduto}) {
                                     </div>
                                     {getEstoqueBadge(produto.itemEstoque.length)}
                                 </div>
-                                <div className="card-footer d-flex justify-content-end">
-                                    <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
+                                <div className="card-footer d-flex justify-content-end p-2">
+                                    <button className="btn btn-outline-secondary btn-sm " onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
                                         <i className="bi bi-pencil-square"></i> Editar
-                                    </button>
-                                    <button className="btn btn-outline-danger btn-sm" onClick={() => deleteProduto(produto.id)}>
-                                        <i className="bi bi-trash3"></i>
                                     </button>
                                 </div>
                             </div>

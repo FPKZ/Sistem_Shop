@@ -30,12 +30,12 @@ function Produtos() {
   
   const GetCategorias = async () => {
       const data = await API.getCategoria()
-      console.log(data)
+      //console.log(data)
       setCategorias(data)
   }
   const GetNotas = async () => {
       const data = await API.getNotas()
-      console.log(data)
+      //console.log(data)
       setNotas(data)
   }
 
@@ -72,6 +72,8 @@ function Produtos() {
         setCategoria={setCategoria}
         notas={notas}
         nota={nota}
+        setNota={setNota}
+        cadastrarProduto={cadastroProduto}
       />
       <ProdutoInfo 
         visible={modalInfoProduto}

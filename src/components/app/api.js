@@ -46,7 +46,7 @@ export default class API{
             const categorias = await (
                 await fetch(`${back}/categorias`, { method: "GET" })
             ).json();
-            console.log(categorias);
+            //onsole.log(categorias);
             return categorias;
         } catch (error) {
             console.error("Erro ao buscar categorias", error)
@@ -186,6 +186,7 @@ export default class API{
     static async getNotaVendas(){
         try{
             const notavendas = await ( await fetch(`${back}/notasVendas`, { method: "GET"})).json()
+            return notavendas
         } catch(error){
             console.error("Erro ao buscar Notas Vendas", error)
         }
