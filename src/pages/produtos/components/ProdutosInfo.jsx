@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react"
+import { useState, useEffect } from "react"
 
 export default function ProdutoInfo({visible, onClose, produto}){
     const [ itemEstoque, setItemEstoque ] = useState({})
@@ -6,7 +6,7 @@ export default function ProdutoInfo({visible, onClose, produto}){
     useEffect(() => {
         setItemEstoque({})
     }, [produto])
-    
+
     if(!visible) return null
     console.log(produto)
     return(
