@@ -1,16 +1,17 @@
 import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize"
 import fs from "node:fs"
-import util from "node:util"
-import { pipeline } from "node:stream";
+//import util from "node:util"
+import { pipeline } from "node:stream/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 
-const pump = util.promisify(pipeline)
+//const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
   fastify.get("/produtos", async (request, reply) => {
     const query = request.query
-    console.log(query)
+    //console.log(query)
 
     if(query.itens === "all"){
   
@@ -83,24 +84,36 @@ export default async function produtoRoutes(fastify) {
 
   fastify.post("/produto", async (request, reply) => {
     try{
-      const query = request.query.query
-      console.log(query)
+      //const query = request.query.query
+      //console.log(query)
 
-      const data = await  request.file()
+      const data = await  request.parts()
       const body = {}
+      let imgPath = null
+      let filename = null
       
-      for await (const part of data.parts()){
-        if(part.file){
-          const ext = path.extname(part.filename)
-          const newFilename = `${Date.now()}${ext}`
-          const uploadPath = path.join("backend", "uploads", newFilename)
+      for await (const part of data){
+        if(part.type === "file") {
+          const uploadDir = path.join("backend", "uploads");
 
-          await pump(part.file, fs.createWriteStream(uploadPath))
-          body.img = `${request.protocol}://${request.hostname}/uploads/${newFilename}`
+          // Garante que o diretório de uploads exista
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          
+          const uniqueSuffix = randomUUID()
+          filename = `${uniqueSuffix}-${part.filename}`
+          const uploadPath = path.join("backend", "uploads", filename)
+
+          await pipeline(part.file, fs.createWriteStream(uploadPath))
+
+          imgPath = `${request.protocol}://${request.hostname}/uploads/${filename}`
         } else {
-          body[part.fieldname] = part.value;
+          body[part.fieldname] = part.value
         }
       }
+
+      body.img = imgPath
 
       const itens = JSON.parse(body.itens)
 

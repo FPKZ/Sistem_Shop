@@ -14,7 +14,7 @@
 // });
 import { fastify } from "fastify";
 import cors from "@fastify/cors"
-import multpart from "@fastify/multipart"
+import multipart from "@fastify/multipart"
 import staticPlugin from "@fastify/static"
 import { fileURLToPath } from "node:url";
 import path from "node:path"
@@ -37,6 +37,8 @@ await server.register(cors, {
   origin: origins,
   methods: ["GET", "POST", "PUT", "DELETE"],
 });
+
+server.register(multipart)
 
 const _filename = fileURLToPath(import.meta.url)
 const _dirme = path.dirname(_filename)

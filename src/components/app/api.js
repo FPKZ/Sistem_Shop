@@ -20,10 +20,7 @@ export default class API{
         try{
             const response  = await fetch(`${back}/produto`, {
                 method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data)
+                body: data
             })
             //console.log(response.status)
             return response

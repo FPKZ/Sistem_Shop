@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Row, Col, Button, Card, Form, Alert, Container } from "react-bootstrap";
 
 export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
@@ -36,8 +36,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
                 <img
                   className="img-thumbnail h-100 rounded"
                   src={
-                    "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg" ||
-                    produto.img
+                    produto.img || "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
                   }
                   alt={produto.nome}
                 />
