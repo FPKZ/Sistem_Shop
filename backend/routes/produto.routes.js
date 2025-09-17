@@ -5,6 +5,7 @@ import fs from "node:fs"
 import { pipeline } from "node:stream/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { fileURLToPath } from "node:url";
 
 //const pump = util.promisify(pipeline)
 
@@ -94,20 +95,23 @@ export default async function produtoRoutes(fastify) {
       
       for await (const part of data){
         if(part.type === "file") {
-          const uploadDir = path.join("backend", "uploads");
+          // Cria um caminho absoluto para a pasta 'uploads' a partir da localização deste arquivo
+          const __filename = fileURLToPath(import.meta.url);
+          const __dirname = path.dirname(__filename);
+          const uploadDir = path.join(__dirname, "uploads");
 
           // Garante que o diretório de uploads exista
           if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
           }
-          
+
           const uniqueSuffix = randomUUID()
           filename = `${uniqueSuffix}-${part.filename}`
           const uploadPath = path.join("backend", "uploads", filename)
 
           await pipeline(part.file, fs.createWriteStream(uploadPath))
 
-          imgPath = `${request.protocol}://${request.hostname}/uploads/${filename}`
+          imgPath = filename
         } else {
           body[part.fieldname] = part.value
         }
