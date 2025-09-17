@@ -24,3 +24,4 @@ npm install pg dotenv
 npm install @fastify/multipart @fastify/static
 
 npm install react-bootstrap bootstrap
+npm install lucide-react
