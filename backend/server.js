@@ -40,10 +40,9 @@ await server.register(cors, {
 
 server.register(multipart)
 
-const _filename = fileURLToPath(import.meta.url)
-const _dirme = path.dirname(_filename)
+const  uploadDir = path.join(process.cwd(), "backend", "uploads")
 server.register(staticPlugin, {
-  root: path.join(_dirme, "uploads"),
+  root: uploadDir,
   prefix: "/uploads/",
 })
 
