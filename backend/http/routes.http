@@ -46,10 +46,10 @@ POST http://localhost:3333/cliente
 Content-Type: application/json
 
 {
-    "nome": "Rosangela",
-    "email": "romafe@gmail.com",
+    "nome": "Marcelo",
+    "email": "romafe123@gmail.com",
     "telefone": "(13) 99741-1234",
-    "endereco": "aksldjasdakjca"
+    "endereco": "aksldjadaasdakjca"
 }
 ###
 POST http://localhost:3333/venda

@@ -25,3 +25,4 @@ npm install @fastify/multipart @fastify/static
 
 npm install react-bootstrap bootstrap
 npm install lucide-react
+npm install date-fns
