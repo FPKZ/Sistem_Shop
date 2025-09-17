@@ -98,7 +98,7 @@ export default async function produtoRoutes(fastify) {
           // Cria um caminho absoluto para a pasta 'uploads' a partir da localização deste arquivo
           const __filename = fileURLToPath(import.meta.url);
           const __dirname = path.dirname(__filename);
-          const uploadDir = path.join(__dirname, "uploads");
+          const uploadDir = path.join(__dirname, "..", "uploads");
 
           // Garante que o diretório de uploads exista
           if (!fs.existsSync(uploadDir)) {
