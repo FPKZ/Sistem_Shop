@@ -3,6 +3,7 @@ import Produto from "./components/Produto";
 import CadastroModal from "../components/modal/CadastroIntenModal";
 import API from "../../components/app/api.js"
 import ProdutoInfo from "./components/ProdutosInfo.jsx";
+import ProdutoInfoTeste from "./components/ProdutosInfoTexte.jsx";
 
 
 function Produtos() {
@@ -87,7 +88,7 @@ function Produtos() {
         setNota={setNota}
         cadastrarProduto={cadastroProduto}
       />
-      <ProdutoInfo 
+      <ProdutoInfoTeste 
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}
         categorias={categorias}
