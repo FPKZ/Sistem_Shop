@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import API from "../../../components/app/api.js";
+import API from "../../../app/api.js";
 
 export default function Produtos({cadastrarProduto}) {
   const [categoria, setCategoria] = useState({});

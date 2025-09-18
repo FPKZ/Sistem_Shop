@@ -1,4 +1,4 @@
-import util from "../../../components/app/utils.js"
+import util from "../../../app/utils.js"
 
 function Produto({produtos, setModalInfoProduto, setProduto}) {
     if(!produtos || produtos.length === 0) return (

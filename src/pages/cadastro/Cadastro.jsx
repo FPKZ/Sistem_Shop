@@ -3,7 +3,7 @@ import { useState } from "react";
 import Produtos from "./produtos/Produtos";
 import Clientes from "./clientes/Clientes";
 import Notas from "./notas/Notas";
-import API from "../../components/app/api.js"
+import API from "../../app/api.js"
 
 
 function Cadastro() {

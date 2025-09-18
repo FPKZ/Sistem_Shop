@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import util from "../../../components/app/utils.js"
+import util from "../../../app/utils.js"
 import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
 import InputGroupText from "react-bootstrap/esm/InputGroupText.js";
+import TabelaProdutos from "../../../components/modal/Tabelas/TabelaProduto.jsx";
 
 
 export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
@@ -31,22 +32,23 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
       <Modal.Body ref={mobile ? detailsRef : null} style={{height: "80dvh", padding: 0}} className={mobile ? "overflow-auto" : "overflow-hidden"}>
         <Row className="h-100 g-0 p-0">
           {/* Lista de Produtos */}
-          <Col md={6} className={`order-md-1 order-2 m-0 p-0 d-flex flex-column ${mobile ? "" : "h-100"}`}>
+          {/* <Col md={6} className={`order-md-1 order-2 m-0 p-0 d-flex flex-column border ${mobile ? "" : "h-100"}`}> */}
             {/* Cabeçalho Fixo */}
-            <Row className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light" style={{zIndex: 1}}>
+            {/* <Row className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light" style={{zIndex: 1}}>
                 <Col xs={1}><strong>Id</strong></Col>
                 <Col xs={2}><strong>Img</strong></Col>
                 <Col xs={3}><strong>Nome</strong></Col>
                 <Col xs={2}><strong>Compra</strong></Col>
                 <Col xs={2}><strong>Venda</strong></Col>
                 <Col xs={2}><strong>Status</strong></Col>
-            </Row>
+            </Row> */}
 
             {/* Container dos Cards com Rolagem */}
-            <div className={`flex-grow-1 ${mobile ? "" : "overflow-y-auto"}`}>
+            {/* <div className={`flex-grow-1 p-2 overflow-hidden ${mobile ? "" : "overflow-y-auto"}`}>
               <Produtos produtos={produto} setItemEstoque={setItemEstoque} />
-            </div>
-          </Col>
+            </div> */}
+          {/* </Col> */}
+          <TabelaProdutos mobile={mobile} produto={produto} setItemEstoque={setItemEstoque} width={6}/>
 
           {/* Detalhes */}
           <Col ref={mobile ? null : detailsRef} md={6} className={`order-md-2 order-1 p-0 ${mobile ? "" : "overflow-y-auto h-100"}`}>
@@ -147,7 +149,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
                           value={util.formatMoney(itemEstoque.lucro)}
                           disabled
                         />
-                        <InputGroup.Text>{ itemEstoque.lucro ? (((itemEstoque.valor_venda - itemEstoque.valor_compra) / itemEstoque.valor_venda) * 100).toFixed(2) : 0}%</InputGroup.Text>
+                        <InputGroup.Text>{ itemEstoque.lucro ? (((itemEstoque.valor_venda - itemEstoque.valor_compra) / itemEstoque.valor_venda) * 100).toFixed(0) : 0}%</InputGroup.Text>
                       </InputGroup>
                     </Form.Group>
                   </Col>
@@ -221,7 +223,7 @@ function Produtos({ produtos, setItemEstoque }) {
   };
 
   return (
-    <Container fluid className="p-0 pt-3 ">
+    <Container fluid className="p-0 m-0 pt-3 ">
         {itens.map((produto) => (
           <Card
             key={produto.id}

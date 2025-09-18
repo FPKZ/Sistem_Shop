@@ -25,8 +25,8 @@ import {
   ShoppingBasket 
 } from 'lucide-react';
 
-import API from "../../components/app/api.js"
-import util from "../../components/app/utils.js"
+import API from "../../app/api.js"
+import util from "../../app/utils.js"
 import { useEffect, useState } from 'react';
 
 function Clientes() {

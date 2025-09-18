@@ -25,7 +25,7 @@ import {
   ArrowUpDown 
 } from 'lucide-react';
 import { useEffect, useState } from "react";
-import API from "../../components/app/api.js"
+import API from "../../app/api.js"
 
 function Notas() {
   const [notas, setNotas] = useState([])

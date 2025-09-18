@@ -1,9 +1,95 @@
-import { useState } from "react"
+import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
+import { useState, useEffect } from "react"
+import TabelaProdutos from "../../../components/modal/Tabelas/TabelaProduto";
 
 export default function Notas(){
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
+
+    const [mobile, setMobile] = useState( window.innerWidth < 900)
+
+    const [itemEstoque, setItemEstoque] = useState()
+    const [produtos, setProdutos ] = useState()
+
+    useEffect(() => {
+        const handleResize = () => {
+           setMobile(window.innerWidth < 900)
+        }
+        setProdutos({
+            id: 8,
+            nome: "algema",
+            img: "teste",
+            descricao: "wsadaSDASD",
+            createdAt: "2025-09-15T22:04:54.955Z",
+            updatedAt: "2025-09-15T22:04:54.955Z",
+            categoria_id: 3,
+            categoria: {
+                id: 3,
+                nome: "Acessorios",
+                descricao: "asdasad",
+                createdAt: "2025-09-15T14:32:55.040Z",
+                updatedAt: "2025-09-15T14:32:55.040Z"
+            },
+            itemEstoque: [
+                {
+                    id: 9,
+                    nome: "algema",
+                    tamanho: "21",
+                    cor: "#a3a3a3",
+                    marca: "gal",
+                    codigo_barras: "1231243124124124124124",
+                    valor_compra: 123,
+                    valor_venda: 12,
+                    lucro: 12,
+                    status: "Disponivel",
+                    createdAt: "2025-09-15T22:04:55.025Z",
+                    updatedAt: "2025-09-15T22:04:55.025Z",
+                    produto_id: 8,
+                    nota_id: 1,
+                    nota: {
+                        id: 1,
+                        codigo: "52346",
+                        quantidade: 15,
+                        valor_total: 150.5,
+                        data: "2025-09-11T23:39:19.585Z",
+                        createdAt: "2025-09-15T13:31:23.756Z",
+                        updatedAt: "2025-09-15T13:31:23.756Z"
+                    }
+                },
+                {
+                    id: 10,
+                    nome: "algema",
+                    tamanho: "21",
+                    cor: "#a3a3a3",
+                    marca: "gal",
+                    codigo_barras: "1231243124124124124124",
+                    valor_compra: 123,
+                    valor_venda: 12,
+                    lucro: 12,
+                    status: "Disponivel",
+                    createdAt: "2025-09-15T22:05:10.892Z",
+                    updatedAt: "2025-09-15T22:05:10.892Z",
+                    produto_id: 8,
+                    nota_id: 1,
+                    nota: {
+                        id: 1,
+                        codigo: "52346",
+                        quantidade: 15,
+                        valor_total: 150.5,
+                        data: "2025-09-11T23:39:19.585Z",
+                        createdAt: "2025-09-15T13:31:23.756Z",
+                        updatedAt: "2025-09-15T13:31:23.756Z"
+                    }
+                }
+            ]
+        })
+        window.addEventListener("resize", handleResize)
+
+        return () => {
+            window.removeEventListener("resize", handleResize)
+        }
+    },[])
 
     function handleChange(e){
         const { name, value } = e.target
@@ -51,7 +137,7 @@ export default function Notas(){
             //cadastrarProduto(data_refatorada)
         }
     }
-    
+    console.log(produtos)
     return(
         <div className="row-col w-100 p-3 d-flex gap-4 justify-content-center">
             <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3">
@@ -71,17 +157,13 @@ export default function Notas(){
                     <label htmlFor="quantidade" className="form-label">Quantidade de produtos da nota</label>
                     <input type="number" className={`form-control ${validated ? (erros.quantidade ? `is-invalid` : `is-valid`): ""}`} name="quantidade" id="quantidade" onChange={handleChange} required/>
                 </div>
-                <div className="col-12 form-control d-flex flex-wrap mt-4 p-2" style={{height:  '400px'}}>
-                    <div className="col-12 d-flex justify-content-between pb-2 mb-2 border-bottom">
+                <div className="col-12 form-control d-flex flex-wrap mt-4 p-0" style={{height:  '400px'}}>
+                    <div className="col-12 d-flex justify-content-between p-2 border-bottom">
                         <p className="align-content-center m-0">Produtos</p>
                         <button className="btn btn-light" type="button">Adicionar Produto</button>
                     </div>
                     <div className="col-12 d-flex flex-column gap-2 overflow-y-auto flex-grow-1" style={{height: "86%"}}>
-                    <Produtos/>
-                    <Produtos/>
-                    <Produtos/>
-                    <Produtos/>
-                    <Produtos/>
+                        <TabelaProdutos mobile={mobile} produto={produtos} setItemEstoque={setItemEstoque}/>
                     </div>
                 </div>
                 <button className="btn btn-roxo" type="submit">Adicionar</button>
@@ -90,41 +172,3 @@ export default function Notas(){
     )
 }
 
-function Produtos(){
-    return(
-        <>
-            <div
-            className={`col-12 d-flex flex-wrap position-relative justify-content-around align-content-start gap-1 p-1 alert alert-light`}
-            style={{ maxHeight: "120px", cursor: "pointer" }}
-            >
-            <img
-                className="col-1 p-0 m-0 img-fluid img-thumbnail object-fit-fill"
-                src="src\assets\la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
-                alt=""
-            />
-            <h1 className="col-2 h-100 h5 m-0 align-content-center">
-                Algema
-            </h1>
-            <div className="col-1 card-text m-0 h-100 align-content-center">
-                Gal
-            </div>
-            <div className="col-2 card-text h-100 align-content-center">
-                Acessorio
-            </div>
-            <div className="col-1 card-text h-100 align-content-center">
-                R$14.5
-            </div>
-            <div className="col-1 card-text h-100 align-content-center">
-                R$35.5
-            </div>
-            <div className="col-2 card-text h-100 align-content-center">
-                Disponivel
-            </div>
-            {/* <div className="col-1  end-0 d-flex flex-wrap gap-2 p-1">
-                            <button className="btn btn-outline-danger" type="button"><i className="bi bi-trash3"></i></button>
-                            <button className="btn btn-outline-secondary" type="button"><i className="bi bi-three-dots"></i></button>
-                        </div> */}
-            </div>
-        </>
-    )
-}

@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import Produto from "./components/Produto";
-import CadastroModal from "../components/modal/CadastroIntenModal";
-import API from "../../components/app/api.js"
-import ProdutoInfo from "./components/ProdutosInfo.jsx";
-import ProdutoInfoTeste from "./components/ProdutosInfoTexte.jsx";
+import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
+import API from "../../app/api.js"
+import InfoProdutos from "./components/InfoProdutos.jsx";
 
 
 function Produtos() {
@@ -88,7 +87,7 @@ function Produtos() {
         setNota={setNota}
         cadastrarProduto={cadastroProduto}
       />
-      <ProdutoInfoTeste 
+      <InfoProdutos 
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}
         categorias={categorias}

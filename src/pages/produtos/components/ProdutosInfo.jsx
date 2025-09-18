@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Row, Col, Button, Card, Form, Alert, Container } from "react-bootstrap";
+import TabelaProdutos from "../../../components/modal/Tabelas/TabelaProduto";
 
 export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
   const [itemEstoque, setItemEstoque] = useState({});
