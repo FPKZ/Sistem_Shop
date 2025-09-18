@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 
 import API from "../../components/app/api.js"
+import util from "../../components/app/utils.js"
 import { useEffect, useState } from 'react';
 
 function Clientes() {
@@ -89,7 +90,7 @@ function Clientes() {
                   </td>
                   <td>
                     <div>
-                      <span>{cliente.endereco}</span>
+                      <span>{util.capitalize(cliente.endereco, 20)}</span>
                     </div>
                   </td>
                   <td>

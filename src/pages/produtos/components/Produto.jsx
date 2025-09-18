@@ -1,3 +1,5 @@
+import util from "../../../components/app/utils.js"
+
 function Produto({produtos, setModalInfoProduto, setProduto}) {
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
@@ -53,7 +55,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                                 />
                                 <div className="card-body">
                                     <h5 className="card-title">{produto.nome}</h5>
-                                    <p className="card-text text-muted small">{produto.descricao}</p>
+                                    <p className="card-text text-muted small">{util.capitalize(produto.descricao, 60)}</p>
                                 </div>
                                 <div className="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
                                     <div>
