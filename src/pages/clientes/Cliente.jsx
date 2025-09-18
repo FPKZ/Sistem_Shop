@@ -66,7 +66,7 @@ function Clientes() {
             </thead>
             <tbody>
               {clientes.map((cliente) => (
-                <tr>
+                <tr key={cliente.id}>
                   <td>
                     <div>
                       <strong>{cliente.id}</strong>

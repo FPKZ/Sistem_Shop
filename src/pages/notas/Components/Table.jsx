@@ -1,5 +1,5 @@
 // TraineesModule.jsx (convertida)
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { format } from "date-fns"
 import { 
   Table, 
@@ -130,10 +130,10 @@ export default function TraineesModule({notas}) {
     setisModalOpem(true);
   };
 
-  const handleAssignCourse = (trainee) => {
-    setselectNota(trainee);
-    setIsAssignCourseOpen(true);
-  };
+  // const handleAssignCourse = (trainee) => {
+  //   setselectNota(trainee);
+  //   setIsAssignCourseOpen(true);
+  // };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -200,16 +200,16 @@ export default function TraineesModule({notas}) {
     </div>
     )
     
-    switch(disponiveis.length){
-        case 0:
-            return 100
-        case itens.length:
-            return 0
-        default:
-            return (vendidos.length / itens.length) * 100
-        console.log(12)
+  //   switch(disponiveis.length){
+  //       case 0:
+  //           return 100
+  //       case itens.length:
+  //           return 0
+  //       default:
+  //           return (vendidos.length / itens.length) * 100
+  //       console.log(12)
+  //   }
     }
-  }
 
   return (
     <div>
