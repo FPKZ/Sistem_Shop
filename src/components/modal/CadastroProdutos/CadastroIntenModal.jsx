@@ -1,12 +1,17 @@
 // components/CadastroModal.jsx
 import './cadastroItenModal.css';
+import API from "@app/api"
 import { useState, useEffect } from 'react';
 
-export default function CadastroModal({ visible, onClose, categorias, categoria, setCategoria, notas, nota, setNota, cadastrarProduto }) {
+function CadastroModal({ visible, onClose, cadastrarProduto, cadastroNota = false }) {
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
-  
+    
+    const [notas, setNotas] = useState([])
+    const [nota , setNota] = useState({})
+    const [categorias, setCategorias] = useState([])
+    const [categoria , setCategoria] = useState({})
     
     useEffect(() => {
         if(!visible){
@@ -18,18 +23,55 @@ export default function CadastroModal({ visible, onClose, categorias, categoria,
             }, 200)
             return () => clearTimeout(timer)
         }
+        
+        !cadastroNota && GetNotas()
+        GetCategorias()
     }, [visible])
+
+    const GetCategorias = async () => {
+          const data = await API.getCategoria()
+          //console.log(data)
+          setCategorias(data)
+      }
+      const GetNotas = async () => {
+          const data = await API.getNotas()
+          //console.log(data)
+          setNotas(data)
+      }
     
     if (!visible) return null;
     //console.log(notas)
 
     function handleChange(e){
-        const { name, value } = e.target
+        const { name, value, type, files } = e.target;
+        setFormValue((prev) => {
+            const updatedValues = {
+                ...prev,
+                [name]: type === "file" ? files[0] : value,
+            };
 
-        setFormValue({
-            ...formValue,
-            [name]: value,
-        })
+            const valorCompra = parseFloat(updatedValues.valor_compra) || 0;
+            const lucro = parseFloat(updatedValues.lucro) || 0;
+            const valorVenda = parseFloat(updatedValues.valor_venda) || 0;
+
+            if (name === "valor_venda") {
+                if (valorCompra > 0) {
+                updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
+                }
+            } else if (name === "lucro") {
+                if (valorCompra > 0) {
+                updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
+                }
+            } else if (name === "valor_compra") {
+                if (valorVenda > 0) {
+                updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
+                } else if (lucro > 0) {
+                updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
+                }
+            }
+
+            return updatedValues;
+        });
     }
 
     function validate(form){
@@ -94,98 +136,316 @@ export default function CadastroModal({ visible, onClose, categorias, categoria,
         </div>
         <h2>Cadastrar Item</h2>
         <div className="row-cols-2 w-100 p-3 d-flex gap-4">
-            <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
+        <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
                 <div className="row gap-4 mb-3 pb-4 border-bottom m-0">
-                    <div className="col-md-12 w-100 p-0">
-                        <label htmlFor="nomeProduto" className="form-label">Nome</label>
-                        <input className={`form-control ${validated ? (erros.nome ? "is-invalid" : "is-valid") : ""}`} name="nome" id="nomeProduto" type="text" placeholder="nome" onChange={handleChange} required/>
-                    </div>
-                    <div className="col-md-4 p-0">
-                        <label htmlFor="imgProduto" className="form-label">Imagem</label>
-                        <input className={`form-control ${validated ? (erros.img ? "is-invalid" : "is-valid") : ""}`} name="img" id="imgProduto" type="file" required/>
-                    </div>
-                    <div className="col-md-1 p-0">
-                        <label htmlFor="corProduto" className="form-label">Cor</label>
-                        <input className="form-control form-control-color" name="cor" id="corProduto" type="color" placeholder="Cor" />
-                    </div>
-                    <div className="col-md-2 p-0">
-                        <label htmlFor="marcaProduto" className="form-label">Marca</label>
-                        <input className={`form-control ${validated ? (erros.marca ? "is-invalid" : "is-valid") : ""}`} name="marca" id="marcaProduto" type="text" placeholder="Marca" required />
-                    </div>
-                    <div className="col-md p-0 d-flex flex-column">
-                        <label htmlFor="categoriaProduto" className="form-label">Categoria</label>
-                        <div className="btn-group">
-                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{categoria?.nome || "Selecione a Categoria"}</button>
-                            <input className={`form-control `} id="categoriaProduto" type="hidden" name="categoria" value={categoria?.id || ""} required/>
-                            <ul className="dropdown-menu w-100">
-                                <Categoria categorias={categorias} setCategoria={setCategoria} />
-                                <li><hr className="dropdown-divider"></hr></li>
-                                <li><a className="dropdown-item" href="#">Nova Categoria</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="col-md p-0">
-                        <label htmlFor="tamanhoProduto" className="form-label">Tamanho</label>
-                        <input className={`form-control ${validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""}`} name="tamanho" id="tamanhoProduto" type="number" placeholder="Tamanho" required />
-                    </div>
-                    {/* <div class="col-md-4">
-                        <label for="inputState" class="form-label">State</label>
-                        <select id="inputState" class="form-select">
-                        <option selected>Choose...</option>
-                        <option><hr></hr></option>
-                        <option>...</option>
-                        </select>
-                    </div> */}
+                <div className="col-md-12 w-100 p-0">
+                    <label htmlFor="nomeProduto" className="form-label">
+                    Nome
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated ? (erros.nome ? "is-invalid" : "is-valid") : ""
+                    }`}
+                    name="nome"
+                    id="nomeProduto"
+                    type="text"
+                    placeholder="nome"
+                    value={formValue.nome}
+                    onChange={handleChange}
+                    required
+                    />
                 </div>
-                <div className="row gap-5  m-0 pb-4 mb-3 border-bottom">
-                    <div className="col-md-4 d-flex flex-column p-0 m-0">
-                        <label htmlFor="notaProduto" className="form-label">Nota</label>
+                <div className="col-md-4 p-0">
+                    <label htmlFor="imgProduto" className="form-label">
+                    Imagem
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated ? (erros.img ? "is-invalid" : "is-valid") : ""
+                    }`}
+                    name="img"
+                    id="imgProduto"
+                    type="file"
+                    onChange={handleChange}
+                    required
+                    />
+                </div>
+                <div className="col-md-1 p-0">
+                    <label htmlFor="corProduto" className="form-label">
+                    Cor
+                    </label>
+                    <input
+                    className="form-control form-control-color"
+                    name="cor"
+                    id="corProduto"
+                    type="color"
+                    placeholder="Cor"
+                    value={formValue.cor}
+                    onChange={handleChange}
+                    />
+                </div>
+                <div className="col-md-2 p-0">
+                    <label htmlFor="marcaProduto" className="form-label">
+                    Marca
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated ? (erros.marca ? "is-invalid" : "is-valid") : ""
+                    }`}
+                    name="marca"
+                    id="marcaProduto"
+                    type="text"
+                    placeholder="Marca"
+                    value={formValue.marca}
+                    onChange={handleChange}
+                    required
+                    />
+                </div>
+                {categoria && (
+                    <div className="col-md-3 p-0 d-flex flex-column">
+                        <label htmlFor="categoriaProduto" className="form-label">
+                        Categoria
+                        </label>
+                        <div className="btn-group">
+                        <button
+                            type="button"
+                            className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${
+                            validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""
+                            }`}
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            {categoria.nome || "Selecione a Categoria"}
+                        </button>
+                        <input
+                            className={`form-control `}
+                            id="categoriaProduto"
+                            type="hidden"
+                            name="categoria"
+                            value={categoria.id || ""}
+                            required
+                        />
+                        <ul className="dropdown-menu w-100">
+                            <Categoria
+                            categorias={categorias}
+                            setCategoria={setCategoria}
+                            />
+                            <li>
+                            <hr className="dropdown-divider"></hr>
+                            </li>
+                            <li>
+                            <a className="dropdown-item" href="#">
+                                Nova Categoria
+                            </a>
+                            </li>
+                        </ul>
+                        </div>
+                    </div>
+                )}
+                <div className="col-md p-0">
+                    <label htmlFor="tamanhoProduto" className="form-label">
+                    Tamanho
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""
+                    }`}
+                    name="tamanho"
+                    id="tamanhoProduto"
+                    type="number"
+                    value={formValue.tamanho}
+                    onChange={handleChange}
+                    placeholder="Tamanho"
+                    required
+                    />
+                </div>
+                {/* <div class="col-md-4">
+                                <label for="inputState" class="form-label">State</label>
+                                <select id="inputState" class="form-select">
+                                <option selected>Choose...</option>
+                                <option><hr></hr></option>
+                                <option>...</option>
+                                </select>
+                            </div> */}
+                </div>
+                <div className="row gap-4  m-0 pb-4 mb-3 border-bottom">
+                {!cadastroNota && (
+                    <div className="col-md-5 d-flex flex-column p-0 m-0">
+                        <label htmlFor="notaProduto" className="form-label">
+                        Nota
+                        </label>
                         <div className="dropdown-center">
-                            <button type="button" className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${validated ? (erros.nota ? "is-invalid" : "is-valid") : ""}`} data-bs-toggle="dropdown" aria-expanded="false">{nota?.codigo || "Selecione a Nota"}</button>
-                            <input className={`form-control ${validated ? (erros.notaProduto ? "is-invalid" : "is-valid") : ""}`} id="notaProduto" type="hidden" name="nota" value={nota?.id || ""} onChange={handleChange} required/>
-                            <ul className="dropdown-menu w-100">
-                                <Nota notas={notas} setNota={setNota} />
-                                <li><hr className="dropdown-divider"></hr></li>
-                                <li><a className="dropdown-item" href="#">Nova Categoria</a></li>
-                            </ul>
+                        <button
+                            type="button"
+                            className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${
+                            validated ? (erros.nota ? "is-invalid" : "is-valid") : ""
+                            }`}
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            {nota.codigo || "Selecione a Nota"}
+                        </button>
+                        <input
+                            className={`form-control ${
+                            validated
+                                ? erros.notaProduto
+                                ? "is-invalid"
+                                : "is-valid"
+                                : ""
+                            }`}
+                            id="notaProduto"
+                            type="hidden"
+                            name="nota"
+                            value={nota.id || ""}
+                            onChange={handleChange}
+                            required
+                        />
+                        <ul className="dropdown-menu w-100">
+                            <Nota notas={notas} setNota={setNota} />
+                            <li>
+                            <hr className="dropdown-divider"></hr>
+                            </li>
+                            <li>
+                            <a className="dropdown-item" href="#">
+                                Nova Nota
+                            </a>
+                            </li>
+                        </ul>
                         </div>
                     </div>
-                    <div className="col-md-5 p-0">
-                        <label htmlFor="codigoBarras" className="form-label">Codigo de Barras</label>
-                        <input className={`form-control ${validated ? (erros.codigo_barras ? "is-invalid" : "is-valid") : ""}`} name="codigo_barras" id="codigoBarras" type="text" placeholder="Codigo de Barras" required />
+                )}
+                <div className={`${!cadastroNota ? "col-md-5" : "col-md-10"} p-0`}>
+                    <label htmlFor="codigoBarras" className="form-label">
+                    Codigo de Barras
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated
+                        ? erros.codigo_barras
+                            ? "is-invalid"
+                            : "is-valid"
+                        : ""
+                    }`}
+                    name="codigo_barras"
+                    id="codigoBarras"
+                    type="text"
+                    placeholder="Codigo de Barras"
+                    value={formValue.codigo_barras}
+                    onChange={handleChange}
+                    required
+                    />
+                </div>
+                <div className="col-md p-0 m-0">
+                    <label htmlFor="entradaEstoqueProduto" className="form-label">
+                    Entrada
+                    </label>
+                    <input
+                    className={`form-control ${
+                        validated
+                        ? erros.entrada_estoque
+                            ? "is-invalid"
+                            : "is-valid"
+                        : ""
+                    }`}
+                    name="entrada_estoque"
+                    id="entradaEstoqueProduto"
+                    type="number"
+                    placeholder="Quantidade"
+                    value={formValue.entrada_estoque}
+                    onChange={handleChange}
+                    required
+                    />
+                </div>
+                <div className="col-md-4 p-0 m-0">
+                    <label htmlFor="valorCompraProduto" className="form-label">
+                    Valor de Compra
+                    </label>
+                    <div className="input-group">
+                    <span className="input-group-text">R$</span>
+                    <input
+                        className={`form-control ${
+                        validated
+                            ? erros.valor_compra
+                            ? "is-invalid"
+                            : "is-valid"
+                            : ""
+                        }`}
+                        name="valor_compra"
+                        id="valorCompraProduto"
+                        type="number"
+                        placeholder="0.00"
+                        value={formValue.valor_compra || ""}
+                        onChange={handleChange}
+                        required
+                    />
                     </div>
-                    <div className="col-md-2 p-0 m-0">
-                        <label htmlFor="entradaEstoqueProduto" className="form-label">Entrada</label>
-                        <input className={`form-control ${validated ? (erros.entrada_estoque ? "is-invalid" : "is-valid") : ""}`} name="entrada_estoque" id="entradaEstoqueProduto" type="number" placeholder="Quantidade" onChange={handleChange} required/>
+                </div>
+                <div className="col-md-4 p-0 m-0">
+                    <label htmlFor="valorVendaProduto" className="form-label">
+                    Valor de Venda
+                    </label>
+                    <div className="input-group">
+                    <span className="input-group-text">R$</span>
+                    <input
+                        className={`form-control ${
+                        validated
+                            ? erros.valor_venda
+                            ? "is-invalid"
+                            : "is-valid"
+                            : ""
+                        }`}
+                        name="valor_venda"
+                        id="valorVendaProduto"
+                        type="number"
+                        placeholder="0.00"
+                        value={formValue.valor_venda || ""}
+                        onChange={handleChange}
+                        required
+                    />
                     </div>
-                    <div className="col-md p-0 m-0">
-                        <label htmlFor="valorCompraProduto" className="form-label">Valor de Compra</label>
-                        <div className="input-group">
-                            <span className="input-group-text">R$</span>
-                            <input className={`form-control ${validated ? (erros.valor_compra ? "is-invalid" : "is-valid") : ""}`} name="valor_compra" id="valorCompraProduto" type="text" placeholder="0.00" onChange={handleChange} required/>
-                        </div>
+                </div>
+                <div className="col-md p-0 m-0">
+                    <label htmlFor="LucroProduto" className="form-label">
+                    Lucro
+                    </label>
+                    <div className="input-group">
+                    <span className="input-group-text">R$</span>
+                    <input
+                        className={`form-control ${
+                        validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
+                        }`}
+                        name="lucro"
+                        id="LucroProduto"
+                        type="number"
+                        placeholder="0.00"
+                        value={formValue.lucro || ""}
+                        onChange={handleChange}
+                        required
+                    />
                     </div>
-                    <div className="col-md p-0 m-0">
-                        <label htmlFor="valorVendaProduto" className="form-label">Valor de Venda</label>
-                        <div className="input-group">
-                            <span className="input-group-text">R$</span>
-                            <input className={`form-control ${validated ? (erros.valor_venda ? "is-invalid" : "is-valid") : ""}`} name="valor_venda" id="valorVendaProduto" type="text" placeholder="0.00" onChange={handleChange} required/>
-                        </div>
-                    </div>
-                    <div className="col-md p-0 m-0">
-                        <label htmlFor="LucroProduto" className="form-label">Lucro</label>
-                        <div className="input-group">
-                            <span className="input-group-text">R$</span>
-                            <input className={`form-control ${validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""}`} name="lucro" id="LucroProduto" type="number" placeholder="lucro" onChange={handleChange} required/>
-                        </div>
-                    </div>
+                </div>
                 </div>
                 <div className="col-md-12 mb-3">
-                    <label htmlFor="descricaoProduto" className="form-label">Descrição</label>
-                    <input className={`form-control ${validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""}`} name="descricao" type="text" id="descricaoProduto" placeholder="Descrição" onChange={handleChange} required/>
+                <label htmlFor="descricaoProduto" className="form-label">
+                    Descrição
+                </label>
+                <input
+                    className={`form-control ${
+                    validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""
+                    }`}
+                    name="descricao"
+                    type="text"
+                    id="descricaoProduto"
+                    placeholder="Descrição"
+                    value={formValue.descricao}
+                    onChange={handleChange}
+                    required
+                />
                 </div>
                 <div className="col-md-12">
-                    <button className="btn btn-roxo w-100" type="submit">Salvar</button>
+                <button className="btn btn-roxo w-100" type="submit">
+                    Salvar
+                </button>
                 </div>
             </form>
         </div>
@@ -195,21 +455,36 @@ export default function CadastroModal({ visible, onClose, categorias, categoria,
   
 }
 
-function Nota({notas, setNota}){   
+function Nota({ notas, setNota }) {
     return (
-        <>
-            {notas.map(nota => (
-                 <li key={nota.id}><a className="dropdown-item" href="#" onClick={() => setNota(nota)}>{nota.codigo}</a></li>
-            ))}
-            </>
-        )
-}
-function Categoria({categorias,  setCategoria}){
+      <>
+        {notas.map((nota) => (
+          <li key={nota.id}>
+            <a className="dropdown-item" href="#" onClick={() => setNota(nota)}>
+              {nota.codigo}
+            </a>
+          </li>
+        ))}
+      </>
+    );
+  }
+  function Categoria({ categorias, setCategoria }) {
     return (
-        <>
-            {categorias.map(categoria => (
-                <li key={categoria.id}><a className="dropdown-item" href="#" onClick={() => setCategoria(categoria)}>{categoria.nome}</a></li>
-            ))}
-        </>
-    )
-}
+      <>
+        {categorias.map((categoria) => (
+          <li key={categoria.id}>
+            <a
+              className="dropdown-item"
+              href="#"
+              onClick={() => setCategoria(categoria)}
+            >
+              {categoria.nome}
+            </a>
+          </li>
+        ))}
+      </>
+    );
+  }
+  
+
+export default CadastroModal

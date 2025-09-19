@@ -20,7 +20,7 @@ function Cadastro() {
   }
   
   return (
-    <>
+    <div className="p-2 p-md-4">
       <div className="d-flex justify-content-start flex-wrap flex-md-nowarp align-items-start pt-3 pb-1 mb-3 gap-2 border-bottom">
         {tela && (
           <button className="btn btn-roxo" onClick={() => /*navigate(-1)*/ setTela("")}>
@@ -38,7 +38,7 @@ function Cadastro() {
         </nav>
 
       </div>
-      <div className="row row-cols-6 g-2 g-md-4 py-2">
+      <div className="row row-cols-6 g-2 g-md-4">
         {
           !tela && (
             <>
@@ -64,7 +64,7 @@ function Cadastro() {
           )
         }
       </div>
-    </>
+    </div>
   );
 }
 export default Cadastro;

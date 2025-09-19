@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import API from "../../../app/api.js";
+import API from "@app/api";
 
 export default function Produtos({cadastrarProduto}) {
   const [categoria, setCategoria] = useState({});
@@ -301,7 +301,7 @@ export default function Produtos({cadastrarProduto}) {
                 </li>
                 <li>
                   <a className="dropdown-item" href="#">
-                    Nova Categoria
+                    Nova Nota
                   </a>
                 </li>
               </ul>

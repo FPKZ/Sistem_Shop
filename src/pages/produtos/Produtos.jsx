@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import Produto from "./components/Produto";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
 import API from "../../app/api.js"
-import InfoProdutos from "./components/InfoProdutos.jsx";
+import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 
 
 function Produtos() {
-  const [categoria , setCategoria] = useState({})
-  const [nota , setNota] = useState({})
-  const [notas, setNotas] = useState([])
-  const [categorias, setCategorias] = useState([])
+  
+  
 
   const [produto, setProduto] = useState({})
   const [produtos, setProdutos] = useState([]);
@@ -26,8 +24,6 @@ function Produtos() {
 
   useEffect(() => {
     getProduto()
-    GetNotas()
-    GetCategorias()
 
     const handleResize = () => {
       setMobile(window.innerWidth < 900)
@@ -40,16 +36,7 @@ function Produtos() {
     }
   }, [ modalAddProduto, modalInfoProduto ])
   
-  const GetCategorias = async () => {
-      const data = await API.getCategoria()
-      //console.log(data)
-      setCategorias(data)
-  }
-  const GetNotas = async () => {
-      const data = await API.getNotas()
-      //console.log(data)
-      setNotas(data)
-  }
+  
 
   const cadastroProduto = async (data) => {
     await API.postProduto(data)
@@ -79,23 +66,11 @@ function Produtos() {
       <CadastroModal visible={modalAddProduto}
         onClose={() => setModalAddProduto(false)}
         onSubmit={async (data) =>  await cadastroProduto(data)}
-        categorias={categorias}
-        categoria={categoria}
-        setCategoria={setCategoria}
-        notas={notas}
-        nota={nota}
-        setNota={setNota}
         cadastrarProduto={cadastroProduto}
       />
-      <InfoProdutos 
+      <ProdutosInfo 
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}
-        categorias={categorias}
-        categoria={categoria}
-        setCategoria={setCategoria}
-        notas={notas}
-        nota={nota}
-        setNota={setNota}
         produto={produto}
         mobile={mobile}
       />

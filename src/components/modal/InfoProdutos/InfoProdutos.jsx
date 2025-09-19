@@ -1,17 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import util from "../../../app/utils.js"
 import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
-import InputGroupText from "react-bootstrap/esm/InputGroupText.js";
 import TabelaProdutos from "../../../components/modal/Tabelas/TabelaProduto.jsx";
 
 
-export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
+export default function ProdutoInfo({ visible, onClose, produto, mobile, tableShow = true }) {
   const [itemEstoque, setItemEstoque] = useState({});
-
+  console.log(itemEstoque)
   const detailsRef = useRef(null)
 
+  
   useEffect(() => {
-    setItemEstoque({});
+    if(!tableShow){
+      setItemEstoque(produto)
+      console.log(itemEstoque)
+    }
+    
+  },[visible])
+
+  useEffect(() => {
+    if(tableShow) setItemEstoque({});
   }, [produto]);
 
   useEffect(() => {
@@ -32,26 +40,12 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
       <Modal.Body ref={mobile ? detailsRef : null} style={{height: "80dvh", padding: 0}} className={mobile ? "overflow-auto" : "overflow-hidden"}>
         <Row className="h-100 g-0 p-0">
           {/* Lista de Produtos */}
-          {/* <Col md={6} className={`order-md-1 order-2 m-0 p-0 d-flex flex-column border ${mobile ? "" : "h-100"}`}> */}
-            {/* Cabeçalho Fixo */}
-            {/* <Row className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light" style={{zIndex: 1}}>
-                <Col xs={1}><strong>Id</strong></Col>
-                <Col xs={2}><strong>Img</strong></Col>
-                <Col xs={3}><strong>Nome</strong></Col>
-                <Col xs={2}><strong>Compra</strong></Col>
-                <Col xs={2}><strong>Venda</strong></Col>
-                <Col xs={2}><strong>Status</strong></Col>
-            </Row> */}
-
-            {/* Container dos Cards com Rolagem */}
-            {/* <div className={`flex-grow-1 p-2 overflow-hidden ${mobile ? "" : "overflow-y-auto"}`}>
-              <Produtos produtos={produto} setItemEstoque={setItemEstoque} />
-            </div> */}
-          {/* </Col> */}
-          <TabelaProdutos mobile={mobile} produto={produto} setItemEstoque={setItemEstoque} width={6}/>
+          {tableShow && (
+            <TabelaProdutos mobile={mobile} produto={produto} setItemEstoque={setItemEstoque} width={6}/>
+          )}
 
           {/* Detalhes */}
-          <Col ref={mobile ? null : detailsRef} md={6} className={`order-md-2 order-1 p-0 ${mobile ? "" : "overflow-y-auto h-100"}`}>
+          <Col ref={mobile ? null : detailsRef} className={`order-md-2 order-1 p-0 ${mobile ? "" : "overflow-y-auto h-100"}`}>
             <Container fluid className={`d-flex flex-column ${mobile ? "" : "h-100"}`}>
               <div className="text-center mb-3 mt-2 border-bottom">
                 <h3>{produto.nome}</h3>
@@ -157,7 +151,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile }) {
                   <Col md={8} xs={8}>
                     <Form.Group>
                       <Form.Label>Categoria</Form.Label>
-                      <Form.Control type="text" value={produto.categoria.nome} disabled />
+                      {/* <Form.Control type="text" value={produto.categoria.nome} disabled /> */}
                     </Form.Group>
                   </Col>
 

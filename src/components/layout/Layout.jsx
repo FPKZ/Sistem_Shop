@@ -32,7 +32,7 @@ export default function Layout() {
       <Header menuExpand={menuExpand} setMenuExpand={setMenuExpand} mobile={mobile} />
       <Menu menuExpand={menuExpand} setMenuExpand={setMenuExpand} mobile={mobile} />
       <div id="root-content">
-        <main className="p-4">
+        <main className="">
           <Outlet />
         </main>
       </div>
