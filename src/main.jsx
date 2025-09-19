@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./imports.jsx";
 import { Cadastro, Clientes, Produtos, Notas, Vendas } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
+
  
 const router = createBrowserRouter([
   {

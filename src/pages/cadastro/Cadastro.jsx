@@ -27,7 +27,7 @@ function Cadastro() {
             <i className="bi bi-chevron-left"></i>
           </button>
         )}
-        <nav className="d-flex justify-content-center align-items-center" style={{'--bs-breadcrumb-divider': `url('/public/chevron-right.svg')`}} aria-label="breadcrumb">
+        <nav className="d-flex justify-content-center align-items-center" style={{'--bs-breadcrumb-divider': `url('/assets/chevron-right.svg')`}} aria-label="breadcrumb">
           <ol className="breadcrumb">
             <li className="breadcrumb-item"><h1 className="h2">Cadastrar</h1></li>
             {tela && (
