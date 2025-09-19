@@ -12,7 +12,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@app': path.resolve(__dirname, './src/app'),
-      '@components': path.resolve(__dirname, './src/components')
+      '@components': path.resolve(__dirname, './src/components'),
+      '@tabelas': path.resolve(__dirname, './src/components/modal/Tabelas')
     },
   },
 });

@@ -3,7 +3,8 @@
     "baseUrl": "src",
     "paths": {
       "@app/*": ["app/*"],
-      "@components": ["components/*"]
+      "@components": ["components/*"],
+      "@tabelas": ["components/modal/Tabelas/*"]
     }
   }
 }

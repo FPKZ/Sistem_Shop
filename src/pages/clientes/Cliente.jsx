@@ -44,7 +44,7 @@ function Clientes() {
 
 
   return (
-    <>
+    <div className='p-2 p-md-4'>
       <Card>
         <Card.Header className='d-flex justify-content-between'>
           <Card.Title className='m-0 d-flex align-items-center'>
@@ -126,7 +126,7 @@ function Clientes() {
           </Table>
         </Card.Body>
       </Card>
-    </>
+    </div>
   );
 }
 

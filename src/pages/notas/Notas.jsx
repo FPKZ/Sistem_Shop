@@ -131,7 +131,7 @@ function Notas() {
   
 
   return (
-    <>
+    <div className="p-2 p-md-4">
       {/* Main Table */}
       <Card className="medical-card">
         <Card.Header className="d-flex justify-content-between">
@@ -340,7 +340,7 @@ function Notas() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 }
 export default Notas;
