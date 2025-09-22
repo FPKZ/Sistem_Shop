@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./imports.jsx";
-import { Cadastro, Clientes, Produtos, Notas, Vendas } from "./Router.jsx";
+import { Cadastro, Clientes, Produtos, Notas, Vendas, NovaVenda, TelaVendas, Extorno, Devolucao } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
 
  
@@ -14,10 +14,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <App /> },
       { path: "cadastro", element: <Cadastro /> },
-      { path: "vendas", element: <Vendas /> },
       { path: "clientes", element: <Clientes /> },
       { path: "produtos", element: <Produtos /> },
       { path: "notas", element: <Notas /> },
+      { path: "vendas", 
+        element: <Vendas />,
+        children: [
+          { index: true, element: <TelaVendas />},
+          { path: "NovaVenda", element: <NovaVenda />},
+          { path: "Extorno", element: <Extorno />},
+          { path: "Devolucao", element: <Devolucao />},
+        ]
+      },
     ],
   },
 ]);

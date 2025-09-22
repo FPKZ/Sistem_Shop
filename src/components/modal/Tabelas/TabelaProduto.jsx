@@ -1,5 +1,5 @@
 import { Container, Card, Row, Col, Badge } from "react-bootstrap"
-import util from "../../../app/utils.js"
+import util from "@app/utils.js"
 
 export default function TabelaProdutos({mobile, produto, setItemEstoque, width, custom, setmodalInfoProduto}){
     if(!produto || produto === null || produto === undefined) return
