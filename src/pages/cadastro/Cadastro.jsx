@@ -1,5 +1,6 @@
 import { useState } from "react";
 //import { useNavigate } from "react-router-dom";
+import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados"
 import Produtos from "./produtos/Produtos";
 import Clientes from "./clientes/Clientes";
 import Notas from "./notas/Notas";
@@ -8,12 +9,15 @@ import API from "../../app/api.js"
 
 function Cadastro() {
   const [tela, setTela] = useState()
+  const [itensCriados,  setItensCriados] = useState([])
+  const [modalCriar, setModalCriar] = useState(false)
   //const navigate = useNavigate()
 
   const cadastrarProduto = async (data) => {
     try {
       const response = API.postProduto(data);
-      console.log(response)
+      //console.log(response)
+      return response
     } catch (error){
       console.error("erro ao cadastar" , error)
     }
@@ -50,7 +54,7 @@ function Cadastro() {
         }
         {
           tela === "Produtos" && (
-            <Produtos cadastrarProduto={cadastrarProduto} />
+            <Produtos cadastrarProduto={cadastrarProduto} setTela={setTela} setItensCriados={setItensCriados} />
           )
         }
         {
@@ -64,6 +68,7 @@ function Cadastro() {
           )
         }
       </div>
+      <ProdutosCriados visible={modalCriar}/>
     </div>
   );
 }

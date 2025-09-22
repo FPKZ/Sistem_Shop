@@ -38,7 +38,11 @@ await server.register(cors, {
   methods: ["GET", "POST", "PUT", "DELETE"],
 });
 
-server.register(multipart)
+server.register(multipart, {
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+  }
+})
 
 const _filename = fileURLToPath(import.meta.url)
 const _dirme = path.dirname(_filename)

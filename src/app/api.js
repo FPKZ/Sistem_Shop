@@ -22,8 +22,9 @@ export default class API{
                 method: "POST",
                 body: data
             })
-            //console.log(response.status)
-            return response
+            const result = await response.json()
+            //console.log(result)
+            return result
         } catch (error){
             console.error("Erro ao cadastrar produto", error)
         }

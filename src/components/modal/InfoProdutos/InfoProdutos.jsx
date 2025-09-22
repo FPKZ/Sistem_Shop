@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import util from "../../../app/utils.js"
+import util from "@app/utils.js"
 import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
-import TabelaProdutos from "../../../components/modal/Tabelas/TabelaProduto.jsx";
+import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
 
 
 export default function ProdutoInfo({ visible, onClose, produto, mobile, tableShow = true }) {

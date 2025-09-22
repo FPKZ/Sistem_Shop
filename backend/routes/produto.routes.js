@@ -128,7 +128,9 @@ export default async function produtoRoutes(fastify) {
       if(!produto){
         produto = await Produto.create({nome, descricao, categoria_id, img: body.img})
       }
-  
+      
+      let itensCriados = []
+
       if(itens && itens.length > 0){
         const NovoItem = await itens.map(item => ({
           nome,
@@ -144,13 +146,13 @@ export default async function produtoRoutes(fastify) {
           status: "Disponivel"
         }))
         console.log(NovoItem)
-        await ItemEstoque.bulkCreate(NovoItem)
+        itensCriados = await ItemEstoque.bulkCreate(NovoItem, { returning: true})
       }
   
   
       //const novoProduto = await Produto.create(data)
   
-      reply.code(201).send({ message: "Estoque atualizado com sucesso!", produto })
+      reply.code(201).send({ message: "Estoque atualizado com sucesso!", produto, itensEstoque: itensCriados })
     } catch(err){
       console.log(err)
       reply.code(500).send({ error: 'Erro ao cadastrar produtos' })
