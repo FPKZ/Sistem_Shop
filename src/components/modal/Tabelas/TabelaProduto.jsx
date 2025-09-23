@@ -69,7 +69,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                 </Col>
                 <Col xs={1} sm={2} className="p-0 d-flex">
                   <img
-                    src={produto.img || "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
+                    src={produtos.img || "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}

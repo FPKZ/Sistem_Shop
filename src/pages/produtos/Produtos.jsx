@@ -14,7 +14,7 @@ function Produtos() {
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
 
-  const [mobile, setMobile] = useState(window.innerWidth < 900)
+  const [mobile, setMobile] = useState(window.innerWidth < 768)
   
   const getProduto = async () => {
     const p = await API.getProduto()
@@ -26,7 +26,7 @@ function Produtos() {
     getProduto()
 
     const handleResize = () => {
-      setMobile(window.innerWidth < 900)
+      setMobile(window.innerWidth < 768)
     }
 
     window.addEventListener("resize", handleResize)
@@ -50,16 +50,16 @@ function Produtos() {
 
 
   return (
-    <div className="p-2 p-md-4">
-    <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 className="h2">Produtos</h1>
-      <div className="btn-toolbar mb-2 mb-md-0">
-        <button className="btn btn-roxo" onClick={() => setModalAddProduto(true)}>
-          <i className="bi bi-plus-lg me-2"></i>
-          Adicionar Produto
-        </button>
+    <div className="p-2 p-md-4 overflow-hidden">
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 className="h2">Produtos</h1>
+        <div className="btn-toolbar mb-2 mb-md-0">
+          <button className="btn btn-roxo" onClick={() => setModalAddProduto(true)}>
+            <i className="bi bi-plus-lg me-2"></i>
+            Adicionar Produto
+          </button>
+        </div>
       </div>
-    </div>
       <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto}/>
 
 

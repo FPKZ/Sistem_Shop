@@ -58,7 +58,7 @@ body.menu-expand #root{
     transition: opacity 0.4s ease;
 }
 
-@media (max-width: 900px){
+@media (max-width: 768px){
     #menu{
         width: 3.5rem;
     }

@@ -54,7 +54,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
               <div className={`text-center mb-3 ${mobile ? "" : "h-25"}`}>
                 <img
                   className="img-thumbnail h-100 rounded"
-                  src={
+                  src={produto.img ||
                      "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
                   }
                   style={mobile ? {maxHeight: "25dvh"}: {}}

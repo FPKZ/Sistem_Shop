@@ -37,11 +37,13 @@ html, body {
     background-color: rgb(253, 224, 251);
     border-color: rgb(238, 86, 228);  
 }
-@media (max-width: 900px){
+@media (max-width: 768px){
 
 
     #root{
         margin-left: 3.5rem !important;
+        margin-top: 4rem !important;
         width: calc(100% - 3.5rem) !important;
+        height: calc(100% - 4rem) !important;
     }
 }
