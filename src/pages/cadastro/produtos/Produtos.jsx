@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "@app/api";
 
-export default function Produtos({cadastrarProduto, setTela, setItensCriados}) {
+export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
   const [categoria, setCategoria] = useState({});
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
@@ -112,10 +112,10 @@ export default function Produtos({cadastrarProduto, setTela, setItensCriados}) {
 
       finalFormData.set("itens", JSON.stringify(itens));
 
-      console.log(Object.fromEntries(finalFormData));
+      //console.log(Object.fromEntries(finalFormData));
       const response = await cadastrarProduto(finalFormData);
-      setItensCriados(response.itensEstoque)
       setTela("")
+      setModalCriar(true)
     }
   }
 

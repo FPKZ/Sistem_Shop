@@ -23,7 +23,7 @@ export default class API{
                 body: data
             })
             const result = await response.json()
-            //console.log(result)
+            //console.log(result.itensEstoque)
             return result
         } catch (error){
             console.error("Erro ao cadastrar produto", error)

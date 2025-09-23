@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 //import { useNavigate } from "react-router-dom";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados"
 import Produtos from "./produtos/Produtos";
@@ -12,17 +12,20 @@ function Cadastro() {
   const [itensCriados,  setItensCriados] = useState([])
   const [modalCriar, setModalCriar] = useState(false)
   //const navigate = useNavigate()
+  
+
+
 
   const cadastrarProduto = async (data) => {
     try {
-      const response = API.postProduto(data);
-      //console.log(response)
+      const response = await API.postProduto(data);
+      setItensCriados(response.itensEstoque)
       return response
     } catch (error){
       console.error("erro ao cadastar" , error)
     }
   }
-  
+  console.log(itensCriados)
   return (
     <div className="p-2 p-md-4">
       <div className="d-flex justify-content-start flex-wrap flex-md-nowarp align-items-start pt-3 pb-1 mb-3 gap-2 border-bottom">
@@ -54,7 +57,7 @@ function Cadastro() {
         }
         {
           tela === "Produtos" && (
-            <Produtos cadastrarProduto={cadastrarProduto} setTela={setTela} setItensCriados={setItensCriados} />
+            <Produtos cadastrarProduto={cadastrarProduto} setTela={setTela} setModalCriar={setModalCriar} />
           )
         }
         {
@@ -64,11 +67,11 @@ function Cadastro() {
         }
         {
           tela === "Notas" && (
-            <Notas/>
+            <Notas />
           )
         }
       </div>
-      <ProdutosCriados visible={modalCriar}/>
+      <ProdutosCriados visible={modalCriar} onClose={() => setModalCriar(false)} itens={itensCriados}/>
     </div>
   );
 }

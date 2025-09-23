@@ -1,0 +1,11 @@
+.console-id{
+    width: 60px;
+    height: 60px;
+    border: 1px solid rgba(0, 0, 0, 0.413);
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 1.6rem;
+    box-shadow: 0px 0px 2px 0px;
+}
