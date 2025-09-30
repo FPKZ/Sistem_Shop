@@ -57,7 +57,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                       ${produto.status === "Reservado" ? "alert-warning" : ""}`}
             onClick={() => {
               console.log(produto)
-              setItemEstoque(produto)
+              setItemEstoque?.(produto)
               setmodalInfoProduto?.(true) 
             }}
             style={{cursor: 'pointer'}}

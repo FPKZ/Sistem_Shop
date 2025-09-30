@@ -22,74 +22,74 @@ export default function Notas(){
         const handleResize = () => {
            setMobile(window.innerWidth < 900)
         }
-        // setProdutos({
-        //     id: 8,
-        //     nome: "algema",
-        //     img: "teste",
-        //     descricao: "wsadaSDASD",
-        //     createdAt: "2025-09-15T22:04:54.955Z",
-        //     updatedAt: "2025-09-15T22:04:54.955Z",
-        //     categoria_id: 3,
-        //     categoria: {
-        //         id: 3,
-        //         nome: "Acessorios",
-        //         descricao: "asdasad",
-        //         createdAt: "2025-09-15T14:32:55.040Z",
-        //         updatedAt: "2025-09-15T14:32:55.040Z"
-        //     },
-        //     itemEstoque: [
-        //         {
-        //             id: 9,
-        //             nome: "algemaaaaaa",
-        //             tamanho: "21",
-        //             cor: "#a3a3a3",
-        //             marca: "gal",
-        //             codigo_barras: "1231243124124124124124",
-        //             valor_compra: 123,
-        //             valor_venda: 12,
-        //             lucro: 12,
-        //             status: "Disponivel",
-        //             createdAt: "2025-09-15T22:04:55.025Z",
-        //             updatedAt: "2025-09-15T22:04:55.025Z",
-        //             produto_id: 8,
-        //             nota_id: 1,
-        //             nota: {
-        //                 id: 1,
-        //                 codigo: "52346",
-        //                 quantidade: 15,
-        //                 valor_total: 150.5,
-        //                 data: "2025-09-11T23:39:19.585Z",
-        //                 createdAt: "2025-09-15T13:31:23.756Z",
-        //                 updatedAt: "2025-09-15T13:31:23.756Z"
-        //             }
-        //         },
-        //         {
-        //             id: 10,
-        //             nome: "algema",
-        //             tamanho: "21",
-        //             cor: "#a3a3a3",
-        //             marca: "gal",
-        //             codigo_barras: "1231243124124124124124",
-        //             valor_compra: 123,
-        //             valor_venda: 12,
-        //             lucro: 12,
-        //             status: "Disponivel",
-        //             createdAt: "2025-09-15T22:05:10.892Z",
-        //             updatedAt: "2025-09-15T22:05:10.892Z",
-        //             produto_id: 8,
-        //             nota_id: 1,
-        //             nota: {
-        //                 id: 1,
-        //                 codigo: "52346",
-        //                 quantidade: 15,
-        //                 valor_total: 150.5,
-        //                 data: "2025-09-11T23:39:19.585Z",
-        //                 createdAt: "2025-09-15T13:31:23.756Z",
-        //                 updatedAt: "2025-09-15T13:31:23.756Z"
-        //             }
-        //         }
-        //     ]
-        // })
+        setProdutos({
+            id: 8,
+            nome: "algema",
+            img: "teste",
+            descricao: "wsadaSDASD",
+            createdAt: "2025-09-15T22:04:54.955Z",
+            updatedAt: "2025-09-15T22:04:54.955Z",
+            categoria_id: 3,
+            categoria: {
+                id: 3,
+                nome: "Acessorios",
+                descricao: "asdasad",
+                createdAt: "2025-09-15T14:32:55.040Z",
+                updatedAt: "2025-09-15T14:32:55.040Z"
+            },
+            itemEstoque: [
+                {
+                    id: 9,
+                    nome: "algemaaaaaa",
+                    tamanho: "21",
+                    cor: "#a3a3a3",
+                    marca: "gal",
+                    codigo_barras: "1231243124124124124124",
+                    valor_compra: 123,
+                    valor_venda: 12,
+                    lucro: 12,
+                    status: "Disponivel",
+                    createdAt: "2025-09-15T22:04:55.025Z",
+                    updatedAt: "2025-09-15T22:04:55.025Z",
+                    produto_id: 8,
+                    nota_id: 1,
+                    nota: {
+                        id: 1,
+                        codigo: "52346",
+                        quantidade: 15,
+                        valor_total: 150.5,
+                        data: "2025-09-11T23:39:19.585Z",
+                        createdAt: "2025-09-15T13:31:23.756Z",
+                        updatedAt: "2025-09-15T13:31:23.756Z"
+                    }
+                },
+                {
+                    id: 10,
+                    nome: "algema",
+                    tamanho: "21",
+                    cor: "#a3a3a3",
+                    marca: "gal",
+                    codigo_barras: "1231243124124124124124",
+                    valor_compra: 123,
+                    valor_venda: 12,
+                    lucro: 12,
+                    status: "Disponivel",
+                    createdAt: "2025-09-15T22:05:10.892Z",
+                    updatedAt: "2025-09-15T22:05:10.892Z",
+                    produto_id: 8,
+                    nota_id: 1,
+                    nota: {
+                        id: 1,
+                        codigo: "52346",
+                        quantidade: 15,
+                        valor_total: 150.5,
+                        data: "2025-09-11T23:39:19.585Z",
+                        createdAt: "2025-09-15T13:31:23.756Z",
+                        updatedAt: "2025-09-15T13:31:23.756Z"
+                    }
+                }
+            ]
+        })
         window.addEventListener("resize", handleResize)
 
         return () => {

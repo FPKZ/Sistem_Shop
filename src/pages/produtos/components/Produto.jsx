@@ -42,20 +42,20 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                     <button className="btn btn-secondary w-50">Limpar Filtros</button>
                 </div>
             </div>
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 mb-4">
+            <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
                 {
                     produtos.map(produto => (
                         <div className="col" key={produto.id}>
-                            <div className="card h-100 shadow-sm">
+                            <div className="card h-100 shadow-sm" style={{minHeight: "325px"}}>
                                 <img 
                                     className="card-img-top img-fluid"
-                                    src={produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
+                                    src={!produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
                                     alt={produto.nome}
-                                    style={{objectFit: `cover`, height: `200px`}}
+                                    
                                 />
                                 <div className="card-body">
                                     <h5 className="card-title">{produto.nome}</h5>
-                                    <p className="card-text text-muted small">{util.capitalize(produto.descricao, 60)}</p>
+                                    <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
                                 </div>
                                 <div className="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
                                     <div>

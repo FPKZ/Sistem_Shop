@@ -151,7 +151,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
                   <Col md={8} xs={8}>
                     <Form.Group>
                       <Form.Label>Categoria</Form.Label>
-                      {/* <Form.Control type="text" value={produto.categoria.nome} disabled /> */}
+                      <Form.Control type="text" value={produto.categoria.nome} disabled />
                     </Form.Group>
                   </Col>
 
