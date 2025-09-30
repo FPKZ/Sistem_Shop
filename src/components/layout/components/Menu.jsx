@@ -49,8 +49,8 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
 function ItenMenu(props){
   return (
     <li className="nav-item" {...props}>
-      <a href="#" className="nav-link text-white d-flex align-items-center p-md-4 p-3 rounded-0">
-        <i className={`bi bi-${props.icon} fs-4`}></i>
+      <a href="#" className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
+        <i className={`bi bi-${props.icon} fs-5`}></i>
         <span className="ms-3">{props.children}</span>
       </a>
     </li>
