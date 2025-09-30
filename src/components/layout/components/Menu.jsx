@@ -35,12 +35,12 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
         {mobile && (
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>
         )}
-        <ItenMenu icon="house-fill" onClick={() => handleNavigate(`/`)}>Inicio</ItenMenu>
-        <ItenMenu icon="bag-fill" onClick={() => handleNavigate(`/vendas`)}>Vendas</ItenMenu>
-        <ItenMenu icon="grid-fill" onClick={() => handleNavigate(`/produtos`)}>Produtos</ItenMenu>
-        <ItenMenu icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
-        <ItenMenu icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>
-        <ItenMenu icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
+        <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/`)}>Inicio</ItenMenu>
+        <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/vendas`)}>Vendas</ItenMenu>
+        <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/produtos`)}>Produtos</ItenMenu>
+        <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
+        <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>
+        <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
       </ul>
     </nav>
   )
@@ -50,7 +50,7 @@ function ItenMenu(props){
   return (
     <li className="nav-item" {...props}>
       <a href="#" className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
-        <i className={`bi bi-${props.icon} fs-5`}></i>
+        <i className={`bi bi-${props.icon} fs-4 ${props?.mobile ? "fs-5" : "fs-4"}`}></i>
         <span className="ms-3">{props.children}</span>
       </a>
     </li>
