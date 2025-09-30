@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Card } from "@components/Card"
 //import { useNavigate } from "react-router-dom";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados"
 import Produtos from "./produtos/Produtos";
@@ -76,16 +77,3 @@ function Cadastro() {
   );
 }
 export default Cadastro;
-
-function Card(props) {
-  return (
-      <div className="col col-sm-2 col-md-3 col-lg-auto">
-        <div className="card text-center h-100 shadow-sm" onClick={() => props.setTela()} style={{cursor: 'pointer'}}>
-          <div className="card-body px-5 d-flex flex-column justify-content-center align-items-center">
-            <i className={`bi bi-${props.icon} mt-0 fs-1`} style={{"color": "rgb(183, 55, 225)"}}></i>
-            <p className="card-text mt-2 mb-0 fw-bold" style={{"color": " rgba(147, 51, 179, 1)", "fontWeight": "600"}}>{props.children}</p>
-          </div>
-        </div>
-      </div>
-  );
-}
