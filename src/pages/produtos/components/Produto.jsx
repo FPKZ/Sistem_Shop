@@ -49,7 +49,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                             <div className="card h-100 shadow-sm" style={{minHeight: "325px"}}>
                                 <img 
                                     className="card-img-top img-fluid"
-                                    src={!produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
+                                    src={produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
                                     alt={produto.nome}
                                     
                                 />

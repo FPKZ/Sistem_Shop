@@ -3,6 +3,12 @@ import TabelaVendas from "@tabelas/TabelaVendas"
 import { useNavigate } from "react-router-dom"
 import API from "@app/api"
 import { useEffect, useState } from "react"
+import { TextAlignCenter } from "lucide-react"
+
+const stily = {
+    cursor: "pointer",
+    fontSize: "0.9rem",
+}
 
 export default function TelaVendas(){
     const navigate = useNavigate()
@@ -21,10 +27,10 @@ export default function TelaVendas(){
     console.log(vendas)
     return (
         <>
-            <Row className="py-2">
-                <Col>
-                    <Card style={{cursor: "pointer"}} onClick={() => navigate("NovaVenda")}>
-                        <Card.Body className="d-flex gap-3">
+            <Row className="py-2 g-2 g-md-4">
+                <Col xs={6} sm={4} md={4}>
+                    <Card style={stily} onClick={() => navigate("NovaVenda")}>
+                        <Card.Body className="d-flex gap-3 align-items-end">
                             <Card.Title className="p-0 m-0">
                                 <i className="bi bi-bag-plus-fill"></i>
                             </Card.Title>
@@ -32,9 +38,9 @@ export default function TelaVendas(){
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col>
-                    <Card style={{cursor: "pointer"}} onClick={() => navigate("Extorno")}>
-                        <Card.Body className="d-flex gap-3">
+                <Col xs={6} sm={4} md={4}>
+                    <Card style={stily} onClick={() => navigate("Extorno")}>
+                        <Card.Body className="d-flex gap-3 align-items-end">
                             <Card.Title className="p-0 m-0">
                                 <i className="bi bi-bag-x-fill"></i>
                             </Card.Title>
@@ -42,9 +48,9 @@ export default function TelaVendas(){
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col>
-                    <Card style={{cursor: "pointer"}} onClick={() => navigate("Devolucao")}>
-                        <Card.Body className="d-flex gap-3">
+                <Col xs={6} sm={4} md={4}>
+                    <Card style={stily} onClick={() => navigate("Devolucao")}>
+                        <Card.Body className="d-flex gap-3 align-items-end">
                             <Card.Title className="p-0 m-0">
                                 <i className="bi bi-bag-dash-fill"></i>
                             </Card.Title>
