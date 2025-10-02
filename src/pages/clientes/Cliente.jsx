@@ -28,9 +28,12 @@ import {
 import API from "../../app/api.js"
 import util from "../../app/utils.js"
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Clientes() {
   const [clientes, setClientes] = useState([])
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     getClientes()
@@ -45,6 +48,12 @@ function Clientes() {
 
   return (
     <div className='p-2 p-md-4'>
+      <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center  pb-3 mb-3 border-bottom position-relative">
+          <Button className="btn btn-roxo position-absolute start-0" onClick={() => navigate("/")}>
+              <i className="bi bi-chevron-left"></i>
+          </Button>
+          <h1 className="h3 m-0">Clientes</h1>
+      </div>
       <Card>
         <Card.Header className='d-flex justify-content-between'>
           <Card.Title className='m-0 d-flex align-items-center'>

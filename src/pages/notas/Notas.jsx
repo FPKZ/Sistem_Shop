@@ -25,12 +25,15 @@ import {
   ArrowUpDown 
 } from 'lucide-react';
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../../app/api.js"
 
 function Notas() {
   const [notas, setNotas] = useState([])
   const [selectNota, setselectNota] = useState(null);
   const [isModalOpem, setisModalOpem] = useState(false);
+
+  const navigate = useNavigate()
   
   const handleViewProfile = (trainee) => {
     setselectNota(trainee);
@@ -132,6 +135,12 @@ function Notas() {
 
   return (
     <div className="p-2 p-md-4">
+      <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center  pb-3 mb-3 border-bottom position-relative">
+          <Button className="btn btn-roxo position-absolute start-0" onClick={() => navigate("/")}>
+              <i className="bi bi-chevron-left"></i>
+          </Button>
+          <h1 className="h3 m-0">Notas</h1>
+      </div>
       {/* Main Table */}
       <Card className="medical-card">
         <Card.Header className="d-flex justify-content-between">

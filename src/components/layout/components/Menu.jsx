@@ -37,9 +37,9 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
         )}
         <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/`)}>Inicio</ItenMenu>
         <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/vendas`)}>Vendas</ItenMenu>
+        <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>
         <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/produtos`)}>Produtos</ItenMenu>
         <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
-        <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>
         <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
       </ul>
     </nav>
@@ -49,7 +49,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
 function ItenMenu({mobile, icon, children, ...rest}){
   return (
     <li className="nav-item" {...rest}>
-      <a href="#" className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
+      <a href="" className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
         <i className={`bi bi-${icon} ${mobile ? "fs-5" : "fs-4"}`}></i>
         <span className="ms-3">{children}</span>
       </a>
