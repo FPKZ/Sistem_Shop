@@ -1,8 +1,8 @@
-import { Container, Card, Row, Col, Badge } from "react-bootstrap"
+import { Container, Card, Row, Col, Badge, Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap"
 import util from "@app/utils.js"
 
-export default function TabelaProdutos({mobile, produto, setItemEstoque, width, custom, setmodalInfoProduto}){
-    if(!produto || produto === null || produto === undefined) return
+export default function TabelaProdutos({mobile, produto, deleteList, width, custom, setmodalInfoProduto, setProduto}){
+    if(!produto || produto === null || produto === undefined || produto.length === 0) return
     //console.log(produto)
     return(
         <>
@@ -11,26 +11,26 @@ export default function TabelaProdutos({mobile, produto, setItemEstoque, width, 
                 {/* Cabeçalho Fixo */}
                 <Row className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light" style={{zIndex: 1}}>
                     <Col xs={1}><strong>Id</strong></Col>
-                    <Col xs={1} sm={2}><strong>Img</strong></Col>
-                    <Col xs={4} sm={3}><strong>Nome</strong></Col>
-                    <Col xs={2}><strong>Compra</strong></Col>
-                    <Col xs={2}><strong>Venda</strong></Col>
-                    <Col xs={2}><strong>Status</strong></Col>
+                    <Col xs={1} sm={1}><strong>Img</strong></Col>
+                    <Col xs={3} sm={3}><strong>Nome</strong></Col>
+                    <Col xs={2} sm={3}><strong>Marca</strong></Col>
+                    <Col xs={3} sm={2}><strong>Venda</strong></Col>
+                    <Col xs={2} className="pe-4 d-flex justify-content-end"><strong>Ação</strong></Col>
                 </Row>
 
                 {/* Container dos Cards com Rolagem */}
                 <div className={`flex-grow-1 p-0 overflow-hidden ${mobile ? "" : "overflow-y-auto"}`}>
-                <Produtos produtos={produto} setItemEstoque={setItemEstoque}  setmodalInfoProduto={setmodalInfoProduto} />
+                <Produtos produtos={produto} deleteList={deleteList} setProduto={setProduto}  setmodalInfoProduto={setmodalInfoProduto} />
                 </div>
             </Col>
         </>
     )
 }
 
-function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
+function Produtos({ produtos, deleteList, setmodalInfoProduto, setProduto }) {
   //console.log(produtos)
   if(!produtos) return
-  const itens = produtos.itemEstoque;
+  const itens = produtos;
 
   
   const getStatusBadge = (status) => {
@@ -57,8 +57,6 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                       ${produto.status === "Reservado" ? "alert-warning" : ""}`}
             onClick={() => {
               console.log(produto)
-              setItemEstoque?.(produto)
-              setmodalInfoProduto?.(true) 
             }}
             style={{cursor: 'pointer'}}
           >
@@ -67,38 +65,45 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                 <Col xs={1} className="pe-2 m-0 text-center d-flex align-items-center">
                   <strong >{produto.id}</strong>
                 </Col>
-                <Col xs={1} sm={2} className="p-0 d-flex">
+                <Col xs={1} sm={1} className="p-0 d-flex">
                   <img
-                    src={!produtos.img || "../src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
+                    src={!produto.produto.img || "../src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}
                   />
                 </Col>
-                <Col xs={4} sm={3} className="p-2 m-0 text-truncate d-flex align-items-center">
+                <Col xs={3} sm={3} className="p-2 m-0 text-truncate d-flex align-items-center">
                   <span>
                     {produto.nome}
                   </span>
                 </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center overflow-hidden">
+                <Col xs={2} sm={3} className="p-2 m-0 text-truncate d-flex align-items-center">
                   <span>
-                    {util.formatMoney(produto.valor_compra)}
+                    {produto.marca}
                   </span>
                 </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center">
+                <Col xs={3} sm={2} className="p-0 m-0 d-flex align-items-center">
                   <span>
                     {util.formatMoney(produto.valor_venda)}
                   </span>
                 </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center">
-                  <span>
-                    {getStatusBadge(produto.status)}
-                  </span>
+                <Col xs={2} className="p-0 pe-3 m-0 d-flex align-items-center justify-content-end">
+                    <ButtonGroup size="sm">
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={
+                                <Tooltip>Retirar item</Tooltip>
+                            }
+                        >
+                            <Button variant="outline-danger" size="sm" onClick={() => deleteList?.(produto.id)}><i className="bi bi-trash3"></i></Button>
+                        </OverlayTrigger>
+                        <Button variant="outline-secondary" size="sm" onClick={() => {
+                            setmodalInfoProduto?.(true)
+                            setProduto?.(produto)
+                        }}><i className="bi bi-three-dots"></i></Button>
+                    </ButtonGroup>
                 </Col>
-                {/* <div className="col-1  end-0 d-flex flex-wrap gap-2 p-1">
-                              <button className="btn btn-outline-danger" type="button"><i className="bi bi-trash3"></i></button>
-                              <button className="btn btn-outline-secondary" type="button"><i className="bi bi-three-dots"></i></button>
-                          </div> */}
               </Row>
             </Card.Body>
           </Card>

@@ -10,7 +10,7 @@ import NotaVenda from "./NotaVenda.js"
 Produto.belongsTo(Categoria, { foreignKey: 'categoria_id', as: 'categoria' });
 Categoria.hasMany(Produto, { foreignKey: 'categoria_id', as: 'produtos' });
 
-ItemEstoque.belongsTo(Produto, { foreignKey: "produto_id", as: "produtos"})
+ItemEstoque.belongsTo(Produto, { foreignKey: "produto_id", as: "produto"})
 Produto.hasMany(ItemEstoque, { foreignKey: "produto_id", as: "itemEstoque"})
 
 ItemEstoque.belongsTo(Nota, { foreignKey: "nota_id", as: "nota"})

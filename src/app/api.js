@@ -4,10 +4,11 @@ const back = import.meta.env.VITE_BACKEND_URL
 
 export default class API{
     //Produtos
-    static async getProduto(){
+    static async getProduto({item = "", nome = ""} = {}){
         try{
+            //console.log({item, nome})
             const produtos = await (
-                await fetch(`${back}/produtos`, { method: "GET" })
+                await fetch(`${back}/produtos?itens=${item}&nome=${nome}`, { method: "GET" })
             ).json();
             //console.log(produtos);
             return produtos;

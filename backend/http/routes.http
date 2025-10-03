@@ -78,7 +78,7 @@ Content-Type: application/json
 
 ###
 #GET https://sistemshop-production.up.railway.app/produtos
-GET http://localhost:3333/produtos?item=&nome=
+GET http://localhost:3333/produtos?itens=estoque&nome=
 
 
 ###

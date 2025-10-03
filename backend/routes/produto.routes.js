@@ -15,10 +15,15 @@ export default async function produtoRoutes(fastify) {
     //console.log(query)
 
     if(query.itens === "all"){
-  
+      console.log("all")
       const produtos = await ItemEstoque.findAll({
         include: [
-          {model: Nota, as: "nota"}
+          {model: Nota, as: "nota"},
+          {model: Produto, as: "produto",
+            include: [
+              {model: Categoria, as: "categoria"}
+            ]
+          }
         ]
       })
   
@@ -29,7 +34,12 @@ export default async function produtoRoutes(fastify) {
       const produtos = await ItemEstoque.findAll({
         where: {status: "Vendido"},
         include: [
-          {model: Nota, as: "nota"}
+          {model: Nota, as: "nota"},
+          {model: Produto, as: "produto",
+            include: [
+              {model: Categoria, as: "categoria"}
+            ]
+          }
         ]
       })
       console.log(produtos)
@@ -40,7 +50,12 @@ export default async function produtoRoutes(fastify) {
       const produtos = await ItemEstoque.findAll({
         where: {status: "Disponivel"},
         include: [
-          {model: Nota, as: "nota"}
+          {model: Nota, as: "nota"},
+          {model: Produto, as: "produto",
+            include: [
+              {model: Categoria, as: "categoria"}
+            ]
+          }
         ]
       })
       console.log(produtos)
@@ -64,6 +79,7 @@ export default async function produtoRoutes(fastify) {
     }
     
     try{
+      console.log("produtos")
       const produtos = await Produto.findAll({
         include: [
           { model: Categoria, as: 'categoria' },
