@@ -1,6 +1,6 @@
 import { Row, Col, Card } from "react-bootstrap"
 import TabelaVendas from "@tabelas/TabelaVendas"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import API from "@app/api"
 import { useEffect, useState } from "react"
 import { TextAlignCenter } from "lucide-react"
@@ -11,6 +11,7 @@ const stily = {
 }
 
 export default function TelaVendas(){
+    const { mobile } = useOutletContext()
     const navigate = useNavigate()
 
     const [ vendas, setVendas ] = useState([])
@@ -28,7 +29,7 @@ export default function TelaVendas(){
     return (
         <>
             <Row className="py-2 g-2 g-md-4">
-                <Col xs={6} sm={4} md={4}>
+                <Col xs={12} sm={4} md={4}>
                     <Card style={stily} onClick={() => navigate("NovaVenda")}>
                         <Card.Body className="d-flex gap-3 align-items-end">
                             <Card.Title className="p-0 m-0">

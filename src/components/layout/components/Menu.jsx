@@ -49,7 +49,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
 function ItenMenu({mobile, icon, children, ...rest}){
   return (
     <li className="nav-item" {...rest}>
-      <a href="" className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
+      <a className="nav-link text-white d-flex align-items-center p-md-4 p-2 rounded-0">
         <i className={`bi bi-${icon} ${mobile ? "fs-5" : "fs-4"}`}></i>
         <span className="ms-3">{children}</span>
       </a>

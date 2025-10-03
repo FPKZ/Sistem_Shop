@@ -33,7 +33,7 @@ export default function Layout() {
       <Menu menuExpand={menuExpand} setMenuExpand={setMenuExpand} mobile={mobile} />
       <div id="root-content">
         <main className="">
-          <Outlet />
+          <Outlet context={{ mobile }} />
         </main>
       </div>
     </>
