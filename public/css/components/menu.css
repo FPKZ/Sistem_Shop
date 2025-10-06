@@ -64,7 +64,7 @@ body.menu-expand #root{
     transition: opacity 0.4s ease;
 }
 
-@media (max-width: 768px){
+@media (max-width: 766px){
     #menu{
         width: 2.5rem;
     }

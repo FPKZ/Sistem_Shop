@@ -5,11 +5,11 @@ import { useState, useEffect } from "react";
 
 export default function Layout() {
   const [menuExpand, setMenuExpand] = useState(false);
-  const [mobile, setMobile] = useState(window.innerWidth < 768)
+  const [mobile, setMobile] = useState(window.innerWidth < 766)
   
   useEffect(() => {
     const handleResize = () => {
-      setMobile(window.innerWidth < 768)
+      setMobile(window.innerWidth < 766)
     }
 
     window.addEventListener("resize", handleResize)
