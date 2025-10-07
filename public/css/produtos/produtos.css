@@ -19,7 +19,7 @@
     transition: width 0.4s ease, background-color 0.3s ease;
   }
   
-  .animated-btn .text {
+  .btn-roxo .text {
     opacity: 0;
     white-space: nowrap;
     transition: opacity 0.3s ease;

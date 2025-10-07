@@ -1,6 +1,6 @@
 import util from "../../../app/utils.js"
 
-function Produto({produtos, setModalInfoProduto, setProduto}) {
+function Produto({produtos, setModalInfoProduto, setProduto, mobile}) {
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
             Nenhum produto cadastrado!
@@ -45,30 +45,32 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
             <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
                 {
                     produtos.map(produto => (
-                        <div className="col" key={produto.id}>
-                            <div className="card h-100 shadow-sm" style={{minHeight: "325px"}}>
+                        <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
+                            <div className="card h-100 shadow-sm " style={{minHeight: "297px"}}>
                                 <img 
                                     className="card-img-top img-fluid"
-                                    src={produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
+                                    src={!produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
                                     alt={produto.nome}
                                     
                                 />
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                     <h5 className="card-title">{produto.nome}</h5>
                                     <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
                                 </div>
-                                <div className="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
-                                    <div>
+                                <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2">
+                                    <div className={`col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end`}>
                                         <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
                                         <span className="text-muted small"> unidades</span>
                                     </div>
-                                    {getEstoqueBadge(produto.itemEstoque.length)}
+                                    <div className="col-6 d-flex justify-content-end align-items-center h-100">
+                                        {getEstoqueBadge(produto.itemEstoque.length)}
+                                    </div>
                                 </div>
-                                <div className="card-footer d-flex justify-content-end p-2">
+                                {/* <div className="card-footer d-flex justify-content-end p-2">
                                     <button className="btn btn-outline-secondary btn-sm " onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
                                         <i className="bi bi-three-dots"></i> Mais
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     ))

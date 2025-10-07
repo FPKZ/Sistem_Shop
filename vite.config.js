@@ -9,6 +9,10 @@ const __dirname = path.dirname(__filename);
 // configura rotas alias para imports, alterações devem ser feitas no jsconfig.json ao alterar esta parte
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+  },
   resolve: {
     alias: {
       '@app': path.resolve(__dirname, './src/app'),

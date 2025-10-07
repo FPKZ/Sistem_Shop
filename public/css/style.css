@@ -1,7 +1,7 @@
 :root {
     /* Tipografia Fluida */
     --font-size-sm: clamp(0.6rem, 0.17vw + 0.7rem, 0.8rem);
-    --font-size-md: clamp(0.7rem, 0.34vw + 0.8rem, 0.9rem);
+    --font-size-md: clamp(0.7rem, 0.30vw + 0.8rem, 1rem);
     --font-size-lg: clamp(1rem, 0.6vw + 1.1rem, 1.2rem);
     --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.2rem);
     --font-size-xxl: clamp(1.95rem, 1.56vw + 1.56rem, 2.8rem);
@@ -37,12 +37,67 @@ html, body {
     background-color: rgb(198, 60, 244);
     border-color: rgb(198, 60, 244);
     font-weight: 600;
+
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+
+    outline: none;
+    box-shadow: none;
 }
-.btn-roxo:hover{
-    color:  rgb(207, 4, 190);
-    background-color: rgb(253, 224, 251);
-    border-color: rgb(238, 86, 228);
+.btn-roxo:focus,
+.btn-roxo:focus-visible,
+.btn-roxo:focus:active {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: rgb(198, 60, 244);
+  color: white;
+  border-color: rgb(198, 60, 244);
 }
+.btn-roxo:active {
+    color:  rgb(207, 4, 190) !important;
+    background-color: rgb(253, 224, 251) !important;
+    border-color: rgb(238, 86, 228) !important;
+}
+@media (hover: hover){
+    .btn-roxo:hover{
+        color:  rgb(207, 4, 190);
+        background-color: rgb(253, 224, 251);
+        border-color: rgb(238, 86, 228);
+    }
+}
+.btn-roxo:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+.animed-btn{
+    display: flex;
+    width: 2.7rem;
+    height: 2.5rem;
+    overflow: hidden;
+
+    transition: width 0.4s ease, background-color 0.3s ease;
+}
+.btn-roxo .text {
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.5s ease;
+  }
+  
+  .btn-roxo.expanded {
+    width: 12rem; /*tamanho final quando expandido*/
+    /* background-color: #4338ca; */
+  }
+  
+  .btn-roxo.expanded .text {
+    opacity: 1;
+  }
+  
+  .icon {
+    font-size: 1.2rem;
+  }
+
 .alert-roxo{
     color:  rgb(207, 4, 190);
     background-color: rgb(253, 224, 251);

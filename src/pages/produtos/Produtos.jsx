@@ -4,20 +4,18 @@ import CadastroModal from "../../components/modal/CadastroProdutos/CadastroInten
 import API from "../../app/api.js"
 import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-import "../../../public/css/produtos/produtos.css"
+// import "../../../public/css/produtos/produtos.css"
 
 function Produtos() {
   
-  
+  const { mobile, setMobile } = useOutletContext()
 
   const [produto, setProduto] = useState({})
   const [produtos, setProdutos] = useState([]);
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
-
-  const [mobile, setMobile] = useState(window.innerWidth < 768)
 
   const navigate = useNavigate()
   
@@ -30,6 +28,18 @@ function Produtos() {
   useEffect(() => {
     getProduto()
 
+    const handlePopState = () => {
+      if (modalAddProduto || modalInfoProduto){
+        setModalAddProduto(false)
+        setModalInfoProduto(false)
+      }
+    }
+
+    if(modalAddProduto || modalInfoProduto){
+      window.history.pushState({ modak: true }, '')
+      window.addEventListener('popstate', handlePopState)
+    }
+
     const handleResize = () => {
       setMobile(window.innerWidth < 768)
     }
@@ -38,6 +48,7 @@ function Produtos() {
 
     return () => {
       window.removeEventListener("resize", handleResize)
+      window.removeEventListener("popstate", handlePopState)
     }
   }, [ modalAddProduto, modalInfoProduto ])
   
@@ -54,18 +65,34 @@ function Produtos() {
   }
 
 
-  function HoverBtn(){
+  function HoverBtn({mobile}){
     const [hovered, setHovered] = useState(false)
     
 
     return (
-      <Button className={`btn btn-roxo ${hovered ? "expanded" : ""}`} onClick={() => setModalAddProduto(true)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <Button type="button" className={`btn-roxo animed-btn ${hovered ? "expanded" : ""}`}
+        onClick={() => {
+
+          if(mobile){
+            if(hovered){
+              setModalAddProduto(true)
+              setHovered(false)
+            } else {
+              setHovered(true)
+              setTimeout(() => setHovered(false), 3000)
+            }
+          } else {
+            setModalAddProduto(true)
+          }
+
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}>
+
         <i className="bi bi-plus-lg me-2"></i>
-        {hovered && (
           <span className="text">
             Adicionar Produto
           </span>
-        )}
       </Button>
     )
   }
@@ -78,10 +105,10 @@ function Produtos() {
         </Button>
         <h1 className="h2">Produtos</h1>
         <div className="btn-toolbar mb-2 mb-md-0 position-absolute end-0">
-          <HoverBtn/>
+          <HoverBtn mobile={mobile}/>
         </div>
       </div>
-      <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto}/>
+      <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}/>
 
 
       <CadastroModal visible={modalAddProduto}

@@ -23,20 +23,36 @@ import sequelize from "./database/sequelize.js";
 import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes } from "./routes/routers.js";
 //import { request } from "node:http";
 
-const server = fastify()
+const server = fastify({ logger: true, trustProxy: true })
 
 const origins = [
   "http://localhost:5173",
 ]
 
 if (process.env.FRONTEND_URL) {
-  origins.push(process.env.FRONTEND_URL)
+  if (process.env.FRONTEND_URL === "ALL") {
+    console.log("\n\nTodos aparelhos liberados \n\n Aparelho atual \n\n")
+    await server.register(cors, {
+      origin: true,
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    });
+    
+  }else{
+    origins.push(process.env.FRONTEND_URL)
+    console.log("Apenas aparelhos liberados")
+    await server.register(cors, {
+      origin: origins,
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    });
+  }
+}else{
+  console.log("Apenas aparelhos liberados")
+  await server.register(cors, {
+    origin: origins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  });
 }
 
-await server.register(cors, {
-  origin: origins,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-});
 
 server.register(multipart, {
   limits: {
@@ -56,7 +72,10 @@ server.register(staticPlugin, {
 // PUT http://localhost:3333/509
 // DELETE http://localhost:3333/509
 
-server.get('/', async () => {
+server.get('/', async (request, reply) => {
+  const ip = request.ip.replace('::ffff:', '');
+  console.log("Ip Cliente: ", ip)
+  reply.send({message: "Olá ", clientIp: ip})
   return 'Servidor rodando com Fastify e ES Modules!';
 });
 
