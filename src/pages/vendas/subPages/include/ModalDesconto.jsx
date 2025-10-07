@@ -1,4 +1,4 @@
-import { Modal, ModalBody, ModalHeader, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { Modal, ModalBody, ModalHeader, Form, Row, Col, InputGroup, Button } from "react-bootstrap";
 
 export default function ModalDesconto({onVisible, onHiden}){
 
@@ -13,7 +13,7 @@ export default function ModalDesconto({onVisible, onHiden}){
                     <Row>
                         <Col>
                             <Form.Label>Selecione o valor do desconto!</Form.Label>
-                            <Row>
+                            <Row className="g-2">
                                 <Col>
                                     <InputGroup>
                                         <Form.Control type="number"/>
@@ -25,6 +25,9 @@ export default function ModalDesconto({onVisible, onHiden}){
                                         <InputGroup.Text>R$</InputGroup.Text>
                                         <Form.Control type="number"/>
                                     </InputGroup>
+                                </Col>
+                                <Col xs={12}>
+                                    <Button className="btn-roxo w-100">Adicionar Desconto</Button>
                                 </Col>
                             </Row>
                         </Col>
