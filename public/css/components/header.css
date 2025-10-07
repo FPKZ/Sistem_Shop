@@ -10,7 +10,7 @@
     font-weight: 900;
 }
 
-@media (max-width: 768px){
+@media (max-width: 766px){
     #header{
         left: 2.5rem;
         width: calc(100% - 2.5rem) !important;

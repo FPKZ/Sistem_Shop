@@ -6,6 +6,8 @@ import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+import "../../../public/css/produtos/produtos.css"
+
 function Produtos() {
   
   
@@ -52,6 +54,22 @@ function Produtos() {
   }
 
 
+  function HoverBtn(){
+    const [hovered, setHovered] = useState(false)
+    
+
+    return (
+      <Button className={`btn btn-roxo ${hovered ? "expanded" : ""}`} onClick={() => setModalAddProduto(true)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+        <i className="bi bi-plus-lg me-2"></i>
+        {hovered && (
+          <span className="text">
+            Adicionar Produto
+          </span>
+        )}
+      </Button>
+    )
+  }
+
   return (
     <div className="p-2 p-md-4 h-100 overflow-hidden">
       <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom position-relative">
@@ -60,10 +78,7 @@ function Produtos() {
         </Button>
         <h1 className="h2">Produtos</h1>
         <div className="btn-toolbar mb-2 mb-md-0 position-absolute end-0">
-          <button className="btn btn-roxo" onClick={() => setModalAddProduto(true)}>
-            <i className="bi bi-plus-lg me-2"></i>
-            Adicionar Produto
-          </button>
+          <HoverBtn/>
         </div>
       </div>
       <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto}/>
