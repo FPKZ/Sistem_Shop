@@ -46,7 +46,7 @@ function Produto({produtos, setModalInfoProduto, setProduto, mobile}) {
                 {
                     produtos.map(produto => (
                         <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                            <div className="card h-100 shadow-sm " style={{minHeight: "297px"}}>
+                            <div className="card h-100 shadow-sm " style={{minHeight: "37dvh", cursor: "pointer"}}>
                                 <img 
                                     className="card-img-top img-fluid"
                                     src={!produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 

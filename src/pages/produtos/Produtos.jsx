@@ -115,6 +115,7 @@ function Produtos() {
         onClose={() => setModalAddProduto(false)}
         onSubmit={async (data) =>  await cadastroProduto(data)}
         cadastrarProduto={cadastroProduto}
+        mobile={mobile}
       />
       <ProdutosInfo 
         visible={modalInfoProduto}

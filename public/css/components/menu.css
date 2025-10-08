@@ -1,14 +1,14 @@
 body.menu-expand #menu{
-    width: 13rem;
+    width: 10rem;
 }
 body.menu-expand #menu span{
     opacity: 1;
 }
 body.menu-expand #header{
-    left: 13rem;
+    left: 10rem;
 }
 body.menu-expand #root{
-    margin-left: 13rem;
+    margin-left: 10rem;
 
 }
 
@@ -21,7 +21,7 @@ body.menu-expand #root{
 #menu{
     position: fixed;
     top: 0; left: 0;
-    width: 4.5rem;
+    width: 3.5rem;
     overflow: hidden;
     background-color: rgba(120, 0, 154, 1);
     /* height: 100%;

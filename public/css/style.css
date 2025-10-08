@@ -1,19 +1,19 @@
 :root {
     /* Tipografia Fluida */
     --font-size-sm: clamp(0.6rem, 0.17vw + 0.7rem, 0.8rem);
-    --font-size-md: clamp(0.7rem, 0.30vw + 0.8rem, 1rem);
+    --font-size-md: clamp(0.9rem, 0.50vw + 0.5rem, 1.6rem);
     --font-size-lg: clamp(1rem, 0.6vw + 1.1rem, 1.2rem);
     --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.2rem);
     --font-size-xxl: clamp(1.95rem, 1.56vw + 1.56rem, 2.8rem);
 }
 
 html, body {
-    position: relative;
+    /* position: relative; */
     padding: 0;
     background-color: rgb(255, 252, 253);
     margin: 0;
     overflow: hidden;
-    position: absolute;
+    /* position: absolute; */
     top: 0; left: 0;
     width: 100%;
     height: 100%;
@@ -24,14 +24,31 @@ html, body {
 
 #root{
     position: relative;
-    width: calc(100% - 4.5rem);
-    height: calc(100% - 5rem);
+    width: calc(100% - 3.5rem);
+    height: calc(100% - 4.1rem);
     /*display: flex;
     flex-wrap: wrap;*/
-    margin-left: 4.5rem;
-    margin-top: 5rem;
-    overflow-x: auto;
+
+    display: flex;
+    flex-direction: column;
+    margin-left: 3.5rem;
+    margin-top: 4.2rem;
+
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Garante que o container ocupe no mínimo a altura da tela */
+}
+#root-content{
+  flex: 1 0 auto;
+  position: relative;
+}
+
+
+
 .btn-roxo{
     color: white;
     background-color: rgb(198, 60, 244);
@@ -67,49 +84,54 @@ html, body {
     }
 }
 .btn-roxo:focus {
-    outline: none;
-    box-shadow: none;
-  }
+  outline: none;
+  box-shadow: none;
+}
+
+
 
 .animed-btn{
-    display: flex;
-    width: 2.7rem;
-    height: 2.5rem;
-    overflow: hidden;
+  display: flex;
+  width: 2.7rem;
+  height: 2.5rem;
+  overflow: hidden;
 
-    transition: width 0.4s ease, background-color 0.3s ease;
+  transition: width 0.4s ease, background-color 0.3s ease;
 }
 .btn-roxo .text {
-    opacity: 0;
-    white-space: nowrap;
-    transition: opacity 0.5s ease;
-  }
-  
-  .btn-roxo.expanded {
-    width: 12rem; /*tamanho final quando expandido*/
-    /* background-color: #4338ca; */
-  }
-  
-  .btn-roxo.expanded .text {
-    opacity: 1;
-  }
-  
-  .icon {
-    font-size: 1.2rem;
-  }
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.5s ease;
+}
+
+.btn-roxo.expanded {
+  width: 12rem; /*tamanho final quando expandido*/
+  /* background-color: #4338ca; */
+}
+
+.btn-roxo.expanded .text {
+  opacity: 1;
+}
+
+.icon {
+  font-size: 1.2rem;
+}
 
 .alert-roxo{
     color:  rgb(207, 4, 190);
     background-color: rgb(253, 224, 251);
     border-color: rgb(238, 86, 228);  
 }
+
+
+
 @media (max-width: 766px){
 
 
     #root{
         margin-left: 2.5rem !important;
-        margin-top: 4rem !important;
+        margin-top: 3rem !important;
         width: calc(100% - 2.5rem) !important;
-        height: calc(100% - 4rem) !important;
+        height: calc(100% - 3rem) !important;
     }
 }

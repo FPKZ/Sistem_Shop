@@ -54,7 +54,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
               <div className={`text-center mb-3 ${mobile ? "" : "h-25"}`}>
                 <img
                   className="img-thumbnail h-100 rounded"
-                  src={produto.img ||
+                  src={!produto.img ||
                      "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
                   }
                   style={mobile ? {maxHeight: "25dvh"}: {}}
@@ -183,7 +183,6 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
                       />
                     </Form.Group>
                   </Col>
-
                   <Col md={12} className="d-flex justify-content-end gap-2 mt-3 mb-3">
                     <Button variant="primary">Editar</Button>
                     <Button variant="danger">Excluir</Button>

@@ -1,0 +1,15 @@
+#footer {
+  left: 3.5rem;
+  /* bottom: 0; */
+  width: 100%;
+  padding: 1.5rem;
+  background: linear-gradient(
+    360deg,
+    rgba(206, 206, 206, 0.843),
+    rgba(255, 255, 255, 0)
+  );
+  flex-shrink: 0;
+}
+
+@media (max-width: 766px) {
+}
