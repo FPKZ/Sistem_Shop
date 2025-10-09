@@ -246,14 +246,6 @@ function CadastroModal({
                       categorias={categorias}
                       setCategoria={setCategoria}
                     />
-                    <li>
-                      <hr className="dropdown-divider"></hr>
-                    </li>
-                    <li>
-                      <a className="dropdown-item">
-                        Nova Categoria
-                      </a>
-                    </li>
                   </ul>
                 </div>
               </Col>
@@ -318,14 +310,6 @@ function CadastroModal({
                   />
                   <ul className="dropdown-menu w-100">
                     <Nota notas={notas} setNota={setNota} />
-                    <li>
-                      <hr className="dropdown-divider"></hr>
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="#">
-                        Nova Nota
-                      </a>
-                    </li>
                   </ul>
                 </div>
               </Col>

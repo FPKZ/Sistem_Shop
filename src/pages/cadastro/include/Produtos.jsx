@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import API from "@app/api";
+import { useNavigate } from "react-router-dom";
+import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
 
-export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
+export default function Produtos({cadastrarProduto, setModalCriar}) {
   const [categoria, setCategoria] = useState({});
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [modalCadastroNota, setModalCadastroNota] = useState(false)
   
 
   const [erros, setErros] = useState({});
@@ -114,7 +117,7 @@ export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
 
       //console.log(Object.fromEntries(finalFormData));
       const response = await cadastrarProduto(finalFormData);
-      setTela("")
+      useNavigate(-1)
       setModalCriar(true)
     }
   }
@@ -233,7 +236,7 @@ export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
                   <hr className="dropdown-divider"></hr>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <a className="dropdown-item" >
                     Nova Categoria
                   </a>
                 </li>
@@ -303,7 +306,7 @@ export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
                   <hr className="dropdown-divider"></hr>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <a className="dropdown-item" onClick={() => setModalCadastroNota(true)}>
                     Nova Nota
                   </a>
                 </li>
@@ -444,6 +447,7 @@ export default function Produtos({cadastrarProduto, setTela, setModalCriar}) {
           </button>
         </div>
       </form>
+      <CadastrarNotaModal visible={modalCadastroNota} onClose={() => setModalCadastroNota(false)} produts={false} />
     </div>
   );
 }

@@ -4,7 +4,8 @@
     "paths": {
       "@app/*": ["app/*"],
       "@components": ["components/*"],
-      "@tabelas": ["components/modal/Tabelas/*"]
+      "@tabelas": ["components/modal/Tabelas/*"],
+      "@hooks": ["hooks/*"],
     }
   }
 }

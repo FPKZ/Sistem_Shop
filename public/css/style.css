@@ -47,6 +47,27 @@ html, body {
   position: relative;
 }
 
+/* Breadcrumb com Chevron Pequeno */
+.breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
+  content: ""; /* Remove o divisor padrão */
+  display: inline-block;
+  
+  /* Aqui você controla o tamanho! */
+  width: 1rem;  /* 12px */
+  height: 1rem; /* 12px */
+
+  /* Ajustes de espaçamento e alinhamento */
+  margin: 0 0.7rem;
+  vertical-align: middle;
+
+  /* Define o ícone como imagem de fundo */
+  background-image: var(--bs-breadcrumb-divider, url("/assets/chevron-right.svg"));
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+
 
 
 .btn-roxo{
@@ -106,6 +127,7 @@ html, body {
 
 .btn-roxo.expanded {
   width: 12rem; /*tamanho final quando expandido*/
+  justify-content: center;
   /* background-color: #4338ca; */
 }
 

@@ -132,7 +132,7 @@ export default class API{
                 },
                 body: JSON.stringify(data)
             })
-            //console.log(response.status)
+            //console.log(response)
             return response
         } catch (error){
             console.error("Erro ao cadastrar cliente", error)

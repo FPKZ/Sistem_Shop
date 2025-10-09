@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <Vendas />,
         children: [
           { index: true, element: <TelaVendas /> },
-          { path: "NovaVenda", element: <NovaVenda /> },
+          { path: "Nova-Venda", element: <NovaVenda /> },
           { path: "Extorno", element: <Extorno /> },
           { path: "Devolucao", element: <Devolucao /> },
         ],

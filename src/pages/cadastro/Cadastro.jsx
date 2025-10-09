@@ -5,6 +5,7 @@ import Produtos from "./include/Produtos";
 import Clientes from "./include/Clientes";
 import Notas from "./include/Notas";
 import API from "../../app/api.js";
+import { Button } from "react-bootstrap";
 
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import utils from "@app/utils";
@@ -30,36 +31,24 @@ function Cadastro() {
 
   return (
     <div className="p-2 p-md-4">
-      <div className="d-flex justify-content-start flex-wrap flex-md-nowarp align-items-start pb-3 mb-3 gap-2 border-bottom">
-        <button
-          className="btn btn-roxo"
-          onClick={() => {
-            pathParts.length > 1 ? navigate(-1) : navigate('/')
-          }}
-        >
-          <i className="bi bi-chevron-left"></i>
-        </button>
+      <div className="d-flex justify-content-center flex-wrap flex-md-nowarp align-items-start pb-3 mb-3 gap-2 border-bottom position-relative">
+        <Button className="btn btn-roxo position-absolute start-0" onClick={() => {pathParts.length > 1 ? navigate(-1) : navigate('/')}}>
+            <i className="bi bi-chevron-left"></i>
+        </Button>
         <nav
-          className="d-flex justify-content-center align-items-center m-0"
-          style={{
-            "--bs-breadcrumb-divider": `url('/assets/chevron-right.svg')`,
-          }}
-          aria-label="breadcrumb"
+            className="d-flex justify-content-center align-items-center m-0"
+            aria-label="breadcrumb"
         >
-          <ol className="breadcrumb d-flex align-content-center m-0">
-            <li className="breadcrumb-item">
-              <h1 className="h2 m-0">{utils.capitalize(pathParts[0])}</h1>
-            </li>
-            {pathParts.length > 1 ? 
-              pathParts.map(tela => (
-                <h1 className="h2 breadcrumb-item m-0">{tela}</h1>
-              )).slice(1)
-             : ""}
-          </ol>
+            <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center m-0">
+            {pathParts.length &&
+                pathParts.map(tela => (
+                <h1 className="h3 breadcrumb-item m-0 d-flex align-items-center">{utils.capitalize(tela).replace('-', " ")}</h1>
+                ))}
+            </ol>
         </nav>
       </div>
       <div className="row row-cols-* g-2 g-md-4">
-        <Outlet />
+        <Outlet cadastrarProduto={cadastrarProduto} setModalCriar={setModalCriar} />
         {/* {!tela && (
           <>
             <Card

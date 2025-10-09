@@ -28,12 +28,19 @@ import {
 import API from "../../app/api.js"
 import util from "../../app/utils.js"
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import HoverBtn from '@components/HoverBtn';
+import ModalCliente from '@components/modal/CadastroCliente/CadastroClienteModal';
+import usePopStateModal from '@hooks/usePopStateModal';
 
 function Clientes() {
   const [clientes, setClientes] = useState([])
+  const [modalCliente, setModalCliente] = useState(false)
+
+  const { mobile } = useOutletContext()
 
   const navigate = useNavigate()
+  usePopStateModal([modalCliente],[setModalCliente])
 
   useEffect(() => {
     getClientes()
@@ -45,7 +52,6 @@ function Clientes() {
     console.log(c)
   }
 
-
   return (
     <div className='p-2 p-md-4'>
       <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center  pb-3 mb-3 border-bottom position-relative">
@@ -53,13 +59,13 @@ function Clientes() {
               <i className="bi bi-chevron-left"></i>
           </Button>
           <h1 className="h3 m-0">Clientes</h1>
+          <HoverBtn upClass={'position-absolute end-0'} func={setModalCliente} mobile={mobile}>Adicionar Cliente</HoverBtn>
       </div>
       <Card>
         <Card.Header className='d-flex justify-content-between'>
           <Card.Title className='m-0 d-flex align-items-center'>
             Clientes ({clientes.length})
           </Card.Title>
-          <Button className='btn-roxo'><i className='bi bi-plus-lg me-2'></i>Adicionar Cliente</Button>
         </Card.Header>
         <Card.Body className='p-0'>
           <Table responsive striped hover className='m-0'>
@@ -135,6 +141,7 @@ function Clientes() {
           </Table>
         </Card.Body>
       </Card>
+      <ModalCliente visible={modalCliente} onClose={() => setModalCliente(false)} mobile={mobile} />
     </div>
   );
 }

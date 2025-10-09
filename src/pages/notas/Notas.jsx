@@ -26,12 +26,15 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../../app/api.js"
+import API from "@app/api"
+import HoverBtn from "@components/HoverBtn"
+import CadastroNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 
 function Notas() {
   const [notas, setNotas] = useState([])
   const [selectNota, setselectNota] = useState(null);
   const [isModalOpem, setisModalOpem] = useState(false);
+  const [modalCadastroNota, setModalCadastroNota] = useState(false)
 
   const navigate = useNavigate()
   
@@ -130,9 +133,7 @@ function Notas() {
     console.log(n)
     setNotas(n)
   }
-
   
-
   return (
     <div className="p-2 p-md-4">
       <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center  pb-3 mb-3 border-bottom position-relative">
@@ -140,6 +141,7 @@ function Notas() {
               <i className="bi bi-chevron-left"></i>
           </Button>
           <h1 className="h3 m-0">Notas</h1>
+          <HoverBtn upClass={'position-absolute end-0'} func={setModalCadastroNota}>Adicionar Nota</HoverBtn>
       </div>
       {/* Main Table */}
       <Card className="medical-card">
@@ -147,7 +149,6 @@ function Notas() {
           <Card.Title className="mb-0 d-flex align-items-center">
             Notas ({notas.length})
           </Card.Title>
-          <Button className="btn-roxo"><i className="bi bi-plus-lg me-2"></i> Adicionar Nota</Button>
         </Card.Header>
         <Card.Body className="p-0">
           <Table responsive striped hover className="medical-table mb-0">
@@ -349,6 +350,7 @@ function Notas() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <CadastroNotaModal visible={modalCadastroNota} onClose={() => setModalCadastroNota(false)} produts={true} fullScrean={true}/>
     </div>
   );
 }

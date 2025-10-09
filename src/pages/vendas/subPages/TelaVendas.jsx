@@ -30,7 +30,7 @@ export default function TelaVendas(){
         <>
             <Row className="py-2 g-2 g-md-4">
                 <Col xs={12} sm={4} md={4}>
-                    <Card style={stily} onClick={() => navigate("NovaVenda")}>
+                    <Card style={stily} onClick={() => navigate("Nova-Venda")}>
                         <Card.Body className="d-flex gap-3 align-items-end">
                             <Card.Title className="p-0 m-0">
                                 <i className="bi bi-bag-plus-fill"></i>

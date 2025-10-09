@@ -1,10 +1,10 @@
+import { Form, Modal, Row, Col, Button } from "react-bootstrap"
 import { useState } from "react"
 import API from "@app/api"
 import utils from "@app/utils"
 import { useNavigate } from "react-router-dom"
-import { Button, Col } from "react-bootstrap"
 
-export default function Clientes(){
+export default function ModalCliente({visible, onClose}){
 
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
@@ -42,7 +42,7 @@ export default function Clientes(){
 
         if (name === "email") {
             newValue = value.trim();
-          }
+            }
 
         setFormValue({
             ...formValue,
@@ -74,7 +74,7 @@ export default function Clientes(){
     }
 
 
-     const handleSubimit = async (e) => {
+        const handleSubimit = async (e) => {
         e.preventDefault()
         const form = e.target;
 
@@ -93,29 +93,35 @@ export default function Clientes(){
         }
     }
 
+
     return(
-        <>
-            <div className="row w-100 p-3 d-flex gap-4">
-                <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3 justify-content-center align-content-center">
-                    <Col md={12} className="p-0">
-                        <label htmlFor="nome" className="form-label">Nome</label>
-                        <input type="text" className={`form-control ${validated ? (erros.nome ? `is-invalid` : `is-valid`) : "" }`} id="nome" name="nome" value={formValue.nome || ""} onChange={handleChange} placeholder="Nome" required/>
-                    </Col>
-                    <Col md={4} className="p-0">
-                        <label htmlFor="email" className="form-label">E-mail</label>
-                        <input type="email" className={`form-control ${validated ? (erros.email ? `is-invalid` : `is-valid`) : "" }`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" required/>
-                    </Col>
-                    <Col className="p-0">
-                        <label htmlFor="tell" className="form-label">Telefone</label>
-                        <input type="tel" className={`form-control ${validated ? (erros.telefone ? `is-invalid` : `is-valid`) : "" }`} id="tell" name="telefone" value={formValue.telefone || ""} onChange={handleChange} placeholder="Telefone" required/>
-                    </Col>
-                    <Col md={5} className="p-0">
-                        <label htmlFor="endereco" className="form-label">Endereço</label>
-                        <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
-                    </Col>
-                    <Button className="btn btn-roxo" type="submit">Adicionar</Button>
-                </form>
-            </div>
-        </>
+        <Form onSubmit={handleSubimit} noValidate >
+            <Modal show={visible} onHide={onClose}>
+                <Modal.Header closeButton> 
+                    <Modal.Title>Cadastrar Cliente</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row className="g-2">
+                        <Col md={12}>
+                            <label htmlFor="nome" className="form-label">Nome</label>
+                            <input type="text" className={`form-control ${validated ? (erros.nome ? `is-invalid` : `is-valid`) : "" }`} id="nome" name="nome" value={formValue.nome || ""} onChange={handleChange} placeholder="Nome" required/>
+                        </Col>
+                        <Col md={4}>
+                            <label htmlFor="email" className="form-label">E-mail</label>
+                            <input type="email" className={`form-control ${validated ? (erros.email ? `is-invalid` : `is-valid`) : "" }`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" required/>
+                        </Col>
+                        <Col>
+                            <label htmlFor="tell" className="form-label">Telefone</label>
+                            <input type="tel" className={`form-control ${validated ? (erros.telefone ? `is-invalid` : `is-valid`) : "" }`} id="tell" name="telefone" value={formValue.telefone || ""} onChange={handleChange} placeholder="Telefone" required/>
+                        </Col>
+                        <Col md={5}>
+                            <label htmlFor="endereco" className="form-label">Endereço</label>
+                            <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
+                        </Col>
+                        <Button className="btn btn-roxo" type="submit">Adicionar</Button>
+                    </Row>
+                </Modal.Body>
+            </Modal>
+        </Form>
     )
 }
