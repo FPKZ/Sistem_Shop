@@ -22,7 +22,7 @@ function Produtos() {
   const navigate = useNavigate()
 
   usePopStateModal(
-    [modalAddProduto, modalAddProduto],
+    [modalAddProduto, modalInfoProduto],
     [setModalAddProduto, setModalInfoProduto]
   )
   

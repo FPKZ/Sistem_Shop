@@ -11,6 +11,9 @@ export default async function clienteRoutes(fastify) {
               { model: NotaVenda, as: "pagamento"}
               ]
           },
+          ],
+          order: [
+            ["id", "ASC"]
           ]
           })
 

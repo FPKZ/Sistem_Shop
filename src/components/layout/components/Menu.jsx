@@ -26,7 +26,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
 
   function handleNavigate(path){
     navigate(path)
-    if(mobile) setMenuExpand(false)
+    setMenuExpand(false)
   }
 
   return (

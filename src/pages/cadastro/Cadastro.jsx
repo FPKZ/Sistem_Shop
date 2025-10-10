@@ -42,7 +42,7 @@ function Cadastro() {
             <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center m-0">
             {pathParts.length &&
                 pathParts.map(tela => (
-                <h1 className="h3 breadcrumb-item m-0 d-flex align-items-center">{utils.capitalize(tela).replace('-', " ")}</h1>
+                <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center">{utils.capitalize(tela).replace('-', " ")}</h1>
                 ))}
             </ol>
         </nav>

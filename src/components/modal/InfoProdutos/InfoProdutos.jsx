@@ -5,6 +5,7 @@ import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
 
 
 export default function ProdutoInfo({ visible, onClose, produto, mobile, tableShow = true }) {
+  if (!visible) return null;
   const [itemEstoque, setItemEstoque] = useState({});
   console.log(itemEstoque)
   const detailsRef = useRef(null)
@@ -28,7 +29,6 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
     }
   }, [itemEstoque])
   
-  if (!visible) return null;
   //console.log(produto)
   
   return (
