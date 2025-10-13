@@ -11,6 +11,9 @@ export default function Layout() {
   const [mobile, setMobile] = useState(window.innerWidth < 766);
 
   useEffect(() => {
+    
+    document.body.classList.add("layout-ativo");
+
     const handleResize = () => {
       setMobile(window.innerWidth < 766);
     };
@@ -19,6 +22,7 @@ export default function Layout() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      document.body.classList.remove("layout-ativo")
     };
   }, []);
 

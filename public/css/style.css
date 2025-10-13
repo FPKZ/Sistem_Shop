@@ -22,7 +22,17 @@ html, body {
     font-size: var(--font-size-md);
 }
 
-#root{
+#root-login{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.layout-ativo #root{
     position: relative;
     width: calc(100% - 3.5rem);
     height: calc(100% - 4.1rem);
@@ -150,7 +160,7 @@ html, body {
 @media (max-width: 766px){
 
 
-    #root{
+    .layout-ativo #root{
         margin-left: 2.5rem !important;
         margin-top: 3rem !important;
         width: calc(100% - 2.5rem) !important;

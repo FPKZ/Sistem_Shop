@@ -12,7 +12,7 @@ import usePopStateModal from "@hooks/usePopStateModal";
 
 function Produtos() {
   
-  const { mobile, setMobile } = useOutletContext()
+  const { mobile } = useOutletContext()
 
   const [produto, setProduto] = useState({})
   const [produtos, setProdutos] = useState([]);
@@ -47,14 +47,14 @@ function Produtos() {
     //   window.addEventListener('popstate', handlePopState)
     // }
 
-    const handleResize = () => {
-      setMobile(window.innerWidth < 768)
-    }
+    // const handleResize = () => {
+    //   setMobile(window.innerWidth < 768)
+    // }
 
-    window.addEventListener("resize", handleResize)
+    // window.addEventListener("resize", handleResize)
 
     return () => {
-      window.removeEventListener("resize", handleResize)
+      // window.removeEventListener("resize", handleResize)
       // window.removeEventListener("popstate", handlePopState)
     }
   }, [ modalAddProduto, modalInfoProduto ])

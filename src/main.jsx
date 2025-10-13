@@ -16,7 +16,8 @@ import {
   CadastroCliente,
   CadastroNota,
   CadastroProduto,
-  TelaCadastro
+  TelaCadastro,
+  Login
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
 
@@ -49,7 +50,9 @@ const router = createBrowserRouter([
       },
     ],
   },
+  { path: "login", element: <Login />}
 ]);
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
