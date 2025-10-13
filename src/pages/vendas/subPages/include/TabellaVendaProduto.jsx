@@ -98,10 +98,10 @@ function Produtos({ produtos, deleteList, setmodalInfoProduto, setProduto }) {
                         >
                             <Button variant="outline-danger" size="sm" onClick={() => deleteList?.(produto.id)}><i className="bi bi-trash3"></i></Button>
                         </OverlayTrigger>
-                        <Button variant="outline-secondary" size="sm" onClick={() => {
+                        {/* <Button variant="outline-secondary" size="sm" onClick={() => {
                             setmodalInfoProduto?.(true)
                             setProduto?.(produto)
-                        }}><i className="bi bi-three-dots"></i></Button>
+                        }}><i className="bi bi-three-dots"></i></Button> */}
                     </ButtonGroup>
                 </Col>
               </Row>

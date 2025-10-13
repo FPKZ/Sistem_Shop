@@ -109,10 +109,7 @@ PUT http://localhost:3333/nota/3
 Content-Type: application/json
 
 {
-    "codigo": "4",
-    "quantidade": 6,
-    "valor_total": 106.5,
-    "data": "2025-09-11 23:39:19.585 +00:00"
+    "fornecedor": "Gato Preto"
 }
 
 ###

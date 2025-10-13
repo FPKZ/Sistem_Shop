@@ -27,7 +27,7 @@ import {
 
 import API from "../../app/api.js"
 import util from "../../app/utils.js"
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import HoverBtn from '@components/HoverBtn';
 import ModalCliente from '@components/modal/CadastroCliente/CadastroClienteModal';
@@ -36,10 +36,45 @@ import usePopStateModal from '@hooks/usePopStateModal';
 function Clientes() {
   const [clientes, setClientes] = useState([])
   const [modalCliente, setModalCliente] = useState(false)
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterBranch, setFilterBranch] = useState('all');
-
+  // const [filterStatus, setFilterStatus] = useState('all');
+  // const [filterBranch, setFilterBranch] = useState('all');
+  
   const { mobile } = useOutletContext()
+
+  //ordenação
+  const [ filtro, setFiltro ] = useState();
+  const [ order, setOrder ] = useState({ chave: 'id', direcao: 'asc' });
+
+  const ClientesProcessados = useMemo(() => {
+    let dadosFiltrados = [...clientes];
+
+    if (filtro) {
+      dadosFiltrados = dadosFiltrados.filter(cliente => 
+        cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+        cliente.telefone.toString().includes(filtro)
+      );
+    }
+
+    dadosFiltrados.sort((a, b) => {
+      const valorA = a[order.chave];
+      const valorB = b[order.chave];
+  
+      if (valorA < valorB) return order.direcao === 'asc' ? -1 : 1;
+      if (valorA > valorB) return order.direcao === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return dadosFiltrados;
+  }, [clientes, filtro, order])
+
+  const requisitarOrdenacao = (chave) => {
+    let direcao = 'asc';
+    if (order.chave === chave && order.direcao === 'asc') {
+      direcao = 'desc';
+    }
+    setOrder({ chave, direcao });
+  }
+
 
   const navigate = useNavigate()
   usePopStateModal([modalCliente],[setModalCliente])
@@ -64,7 +99,7 @@ function Clientes() {
           <HoverBtn upClass={'position-absolute end-0'} func={setModalCliente} mobile={mobile}>Adicionar Cliente</HoverBtn>
       </div>
       {/* Filters */}
-      <Card className="medical-card mb-4">
+      {/* <Card className="medical-card mb-4">
         <Card.Header>
           <Card.Title className="mb-0">Filters</Card.Title>
         </Card.Header>
@@ -106,7 +141,7 @@ function Clientes() {
             </Col>
           </Row>
         </Card.Body>
-      </Card>
+      </Card> */}
       
       {/* Tabela Clientes */}
       <Card>
@@ -117,48 +152,23 @@ function Clientes() {
                 Clientes ({clientes.length})
               </Card.Title>
             </Col>
-              <Col md={2}>
-                <Form.Group className='d-flex'>
-                  <Form.Label className="align-items-end d-flex me-2">Id:</Form.Label>
-                  <Form.Select 
-                    value={filterStatus} 
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                  >
-                    <option value="all">Todos Ids</option>
-                    {clientes.map(status => (
-                      <option key={status.id} value={status.id}>{status.id}</option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={2}>
-                <Form.Group className='d-flex'>
-                  <Form.Label className="align-items-end d-flex me-2">Nome:</Form.Label>
-                  <Form.Select 
-                    value={filterBranch} 
-                    onChange={(e) => setFilterBranch(e.target.value)}
-                  >
-                    <option value="all">All Branches</option>
-                    {clientes.map(branch => (
-                      <option key={branch.id} value={branch.id}>{branch.nome}</option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={2} className="d-flex align-items-end">
-                <Button variant="outline-secondary" className="w-100">
-                  <ArrowUpDown size={16} className="me-2" />
-                  Sort
-                </Button>
-              </Col>
+            <Col xs={6} className='d-flex justify-content-end'>
+              <Form.Control 
+                type='text' 
+                placeholder='Filtrar por nome ou telefone...' 
+                value={filtro} 
+                onChange={(e) => setFiltro(e.target.value)} 
+                style={{ maxWidth: '250px' }} 
+              />
+            </Col>
           </Row>
         </Card.Header>
         <Card.Body className='p-0'>
           <Table responsive striped hover className='m-0'>
             <thead>
               <tr>
-                <th>Id</th>
-                <th>Nome</th>
+                <th onClick={() => requisitarOrdenacao('id')}>Id <ArrowUpDown size={14}/></th>
+                <th onClick={() => requisitarOrdenacao('nome')}>Nome <ArrowUpDown size={14}/></th>
                 <th>E-mail</th>
                 <th>Telefone</th>
                 <th>Endereço</th>
@@ -167,7 +177,7 @@ function Clientes() {
               </tr>
             </thead>
             <tbody>
-              {clientes.map((cliente) => (
+              {ClientesProcessados.map((cliente) => (
                 <tr key={cliente.id}>
                   <td>
                     <div>

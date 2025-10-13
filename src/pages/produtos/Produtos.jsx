@@ -70,7 +70,7 @@ function Produtos() {
     await API.deleteProduto(id)
     await getProduto()
   }
-
+  
   return (
     <div className="p-2 p-md-4 h-100 overflow-hidden">
       <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom position-relative">

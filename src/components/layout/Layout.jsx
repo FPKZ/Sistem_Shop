@@ -2,7 +2,7 @@ import Header from "./components/Header";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 import { Outlet, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import utils from "@app/utils";
 
@@ -30,6 +30,11 @@ export default function Layout() {
     }
   }, [menuExpand]);
 
+  const contextValue = useMemo(() => ({
+    mobile,
+    setMobile
+  }), [mobile]);
+
 
   const location = useLocation()
   const pathParts = location.pathname.split('/').filter(part => part)
@@ -48,7 +53,7 @@ export default function Layout() {
       />
       <div id="root-content">
         <main className="main pt-2 pt-md-0 ">
-          <Outlet context={{ mobile, setMobile }} />
+          <Outlet context={ contextValue } />
         </main>
       </div>
       <Footer />

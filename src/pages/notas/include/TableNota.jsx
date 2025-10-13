@@ -25,8 +25,46 @@ import {
   ArrowUpDown 
 } from 'lucide-react';
 
+import { useEffect, useState, useMemo } from "react";
+
 
 export default function TableNota({notas, setselectNota, setisModalOpem}){
+
+    //ordenação
+    const [ filtro, setFiltro ] = useState();
+    const [ order, setOrder ] = useState({ chave: 'id', direcao: 'asc' });
+
+    const DadosProcessados = useMemo(() => {
+    let dadosFiltrados = [...notas];
+
+    if (filtro) {
+        dadosFiltrados = dadosFiltrados.filter(dados => 
+        dados.fornecedor.toLowerCase().includes(filtro.toLowerCase()) ||
+        dados.codigo.toString().includes(filtro) || 
+        dados.valor_total.toString().includes(filtro)
+        );
+    }
+
+    dadosFiltrados.sort((a, b) => {
+        const valorA = a[order.chave];
+        const valorB = b[order.chave];
+    
+        if (valorA < valorB) return order.direcao === 'asc' ? -1 : 1;
+        if (valorA > valorB) return order.direcao === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    return dadosFiltrados;
+    }, [notas, filtro, order])
+
+    const requisitarOrdenacao = (chave) => {
+    let direcao = 'asc';
+    if (order.chave === chave && order.direcao === 'asc') {
+        direcao = 'desc';
+    }
+    setOrder({ chave, direcao });
+    }
+    
 
     
     const handleViewProfile = (trainee) => {
@@ -123,24 +161,31 @@ export default function TableNota({notas, setselectNota, setisModalOpem}){
             <Card.Title className="mb-0 d-flex align-items-center">
             Notas ({notas.length})
             </Card.Title>
+            <Form.Control 
+                type='text' 
+                placeholder='Filtrar por fornecedor, codigo ou valor...' 
+                value={filtro} 
+                onChange={(e) => setFiltro(e.target.value)} 
+                style={{ maxWidth: '250px' }} 
+            />
         </Card.Header>
         <Card.Body className="p-0">
             <Table responsive striped hover className="medical-table mb-0">
             <thead className="table-light">
                 <tr>
-                <th>Id</th>
-                <th>Fornecedor</th>
+                <th onClick={() => requisitarOrdenacao('id')}>Id</th>
+                <th onClick={() => requisitarOrdenacao('fornecedor')}>Fornecedor</th>
                 <th>Codigo</th>
-                <th>Data</th>
+                <th onClick={() => requisitarOrdenacao('data')}>Data</th>
                 <th>Qt. Produtos</th>
-                <th>Valor</th>
+                <th onClick={() => requisitarOrdenacao('valor_total')}>Valor</th>
                 <th>Produtos</th>
                 <th>Status</th>
                 <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {notas.map((nota) => (
+                {DadosProcessados.map((nota) => (
                 <tr key={nota.id}>
                     <td>
                     <div>
