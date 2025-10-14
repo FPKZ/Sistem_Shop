@@ -48,7 +48,7 @@ function Cadastro() {
         </nav>
       </div>
       <div className="row row-cols-* g-2 g-md-4">
-        <Outlet cadastrarProduto={cadastrarProduto} setModalCriar={setModalCriar} />
+        <Outlet context={{ cadastrarProduto, setModalCriar }} />
         {/* {!tela && (
           <>
             <Card

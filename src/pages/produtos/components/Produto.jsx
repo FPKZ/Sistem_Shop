@@ -1,6 +1,6 @@
 import util from "../../../app/utils.js"
 
-function Produto({produtos, setModalInfoProduto, setProduto, mobile}) {
+function Produto({produtos, setModalInfoProduto, setProduto}) {
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
             Nenhum produto cadastrado!
@@ -49,7 +49,7 @@ function Produto({produtos, setModalInfoProduto, setProduto, mobile}) {
                             <div className="card h-100 shadow-sm " style={{minHeight: "37dvh", cursor: "pointer"}}>
                                 <img 
                                     className="card-img-top img-fluid"
-                                    src={!produto.img ? `${import.meta.env.VITE_DATABASE_IMG}/uploads/${produto.img}` : "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"} 
+                                    src={produto.img || "src/assets/tube-spinner.svg"} 
                                     alt={produto.nome}
                                     
                                 />

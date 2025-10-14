@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import API from "@app/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
 
-export default function Produtos({cadastrarProduto, setModalCriar}) {
+export default function Produtos() {
   const [categoria, setCategoria] = useState({});
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [modalCadastroNota, setModalCadastroNota] = useState(false)
+
+  const { cadastrarProduto, setModalCriar } = useOutletContext()
   
 
   const [erros, setErros] = useState({});

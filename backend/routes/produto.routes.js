@@ -1,12 +1,6 @@
 import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize"
-import fs from "node:fs"
-//import util from "node:util"
-import { pipeline } from "node:stream/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
-import { fileURLToPath } from "node:url";
-
+import { put } from "@vercel/blob"
 //const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
@@ -107,27 +101,13 @@ export default async function produtoRoutes(fastify) {
       const data = await  request.parts()
       const body = {}
       let imgPath = null
-      let filename = null
       
       for await (const part of data){
         if(part.type === "file") {
-          // Cria um caminho absoluto para a pasta 'uploads' a partir da localização deste arquivo
-          const __filename = fileURLToPath(import.meta.url);
-          const __dirname = path.dirname(__filename);
-          const uploadDir = path.join(__dirname, "..", "uploads");
-
-          // Garante que o diretório de uploads exista
-          if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-          }
-
-          const uniqueSuffix = randomUUID()
-          filename = `${uniqueSuffix}-${part.filename}`
-          const uploadPath = path.join("backend", "uploads", filename)
-
-          await pipeline(part.file, fs.createWriteStream(uploadPath))
-
-          imgPath = filename
+          const blob = await put(part.filename, part.file, {
+            access: "public"
+          })
+          imgPath = blob.url // Salvamos a URL completa retornada pelo Vercel Blob
         } else {
           body[part.fieldname] = part.value
         }

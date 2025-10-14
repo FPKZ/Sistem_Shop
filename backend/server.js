@@ -15,10 +15,8 @@
 import { fastify } from "fastify";
 import cors from "@fastify/cors"
 import multipart from "@fastify/multipart"
-import staticPlugin from "@fastify/static"
-import { fileURLToPath } from "node:url";
-import path from "node:path"
 import process from "node:process"
+import "dotenv/config"
 import sequelize from "./database/sequelize.js";
 import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes, contaRoutes } from "./routes/routers.js";
 //import { request } from "node:http";
@@ -60,12 +58,6 @@ server.register(multipart, {
   }
 })
 
-const _filename = fileURLToPath(import.meta.url)
-const _dirme = path.dirname(_filename)
-server.register(staticPlugin, {
-  root: path.join(_dirme, "uploads"),
-  prefix: "/uploads/",
-})
 
 // GET http://localhost:3333/
 // POST http://localhost:3333/

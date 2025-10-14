@@ -55,7 +55,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
                 <img
                   className="img-thumbnail h-100 rounded"
                   src={!produto.img ||
-                     "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"
+                     "src/assets/tube-spinner.svg"
                   }
                   style={mobile ? {maxHeight: "25dvh"}: {}}
                   alt={produto.nome}
@@ -234,7 +234,7 @@ function Produtos({ produtos, setItemEstoque }) {
                 </Col>
                 <Col xs={2} className="p-0">
                   <img
-                    src={produto.img || "src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
+                    src={produto.img || "src/assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}

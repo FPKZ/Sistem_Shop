@@ -67,7 +67,7 @@ function Produtos({ produtos, deleteList, setmodalInfoProduto, setProduto }) {
                 </Col>
                 <Col xs={1} sm={1} className="p-0 d-flex">
                   <img
-                    src={!produto.produto.img || "../src/assets/la-pimienta-sado-tornozeleiras-tiras-amarrar-120-m-9199.jpg"}
+                    src={!produto.produto.img || "src/assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}
