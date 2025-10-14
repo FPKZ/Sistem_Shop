@@ -6,6 +6,7 @@ import ItemVendido from "./ItemVendido.js";
 import Venda from "./Venda.js";
 import Cliente from "./Cliente.js"
 import NotaVenda from "./NotaVenda.js"
+import Conta from "./Conta.js";
 
 Produto.belongsTo(Categoria, { foreignKey: 'categoria_id', as: 'categoria' });
 Categoria.hasMany(Produto, { foreignKey: 'categoria_id', as: 'produtos' });
@@ -36,5 +37,6 @@ export {
     ItemVendido,
     Cliente,
     NotaVenda,
-    Venda
+    Venda,
+    Conta
 };

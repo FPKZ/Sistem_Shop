@@ -6,3 +6,10 @@
     justify-content: center;
     background-color: #f0e9f0;
 }
+@media (max-width: 768px) {
+    .loginContainer {
+        padding: 20px;
+        align-items: normal;
+        justify-content: center;
+    }
+}

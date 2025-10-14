@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path"
 import process from "node:process"
 import sequelize from "./database/sequelize.js";
-import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes } from "./routes/routers.js";
+import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes, contaRoutes } from "./routes/routers.js";
 //import { request } from "node:http";
 
 const server = fastify({ logger: true, trustProxy: true })
@@ -85,6 +85,7 @@ server.register(clienteRoutes);
 server.register(notaRoutes);
 server.register(vendaRoutes);
 server.register(notaVendaRoutes);
+server.register(contaRoutes);
 
 
 async function start(){

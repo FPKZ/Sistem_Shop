@@ -17,45 +17,57 @@ import {
   CadastroNota,
   CadastroProduto,
   TelaCadastro,
-  Login
+  Login,
+  CadastroUser
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
+import ProtectedRoute from "./autentic/sistem/ProtectedRoute.jsx";
+import { AuthProvider } from "./autentic/sistem/AuthContext.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <App /> },
-      { path: "cadastro", element: <Cadastro />,
-        children: [
-          { index: true, element: <TelaCadastro /> },
-          { path: "produto", element: <CadastroProduto /> },
-          { path: "nota", element: <CadastroNota /> },
-          { path: "cliente", element: <CadastroCliente /> },
-        ]
-       },
-      { path: "clientes", element: <Clientes /> },
-      { path: "produtos", element: <Produtos /> },
-      { path: "notas", element: <Notas /> },
       {
-        path: "vendas",
-        element: <Vendas />,
+        element: <Layout />,
         children: [
-          { index: true, element: <TelaVendas /> },
-          { path: "Nova-Venda", element: <NovaVenda /> },
-          { path: "Extorno", element: <Extorno /> },
-          { path: "Devolucao", element: <Devolucao /> },
+          { index: true, element: <App /> },
+          { path: "cadastro", element: <Cadastro />,
+            children: [
+              { index: true, element: <TelaCadastro /> },
+              { path: "produto", element: <CadastroProduto /> },
+              { path: "nota", element: <CadastroNota /> },
+              { path: "cliente", element: <CadastroCliente /> },
+            ]
+           },
+          { path: "clientes", element: <Clientes /> },
+          { path: "produtos", element: <Produtos /> },
+          { path: "notas", element: <Notas /> },
+          {
+            path: "vendas",
+            element: <Vendas />,
+            children: [
+              { index: true, element: <TelaVendas /> },
+              { path: "Nova-Venda", element: <NovaVenda /> },
+              { path: "Extorno", element: <Extorno /> },
+              { path: "Devolucao", element: <Devolucao /> },
+            ],
+          },
         ],
-      },
-    ],
+      }
+    ],  
   },
-  { path: "login", element: <Login />}
+  { path: "login", element: <Login />},
+  { path: "cadastro-user", element: <CadastroUser /> }
+
 ]);
 
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );

@@ -214,4 +214,39 @@ export default class API{
             console.error("Erro ao deleter Nota Venda", error)
         }
     }
+
+    static async login(data){
+        try{
+            // console.log(data)
+            const response = await fetch(`${back}/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            })
+            const result = await response.json()
+            return result
+        }
+        catch(error){
+            console.error("Erro ao fazer login", error)
+        }
+    }
+
+    static async postConta(data){
+        try{
+            const response = await fetch(`${back}/conta`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            })
+            const result = await response.json()
+            return result
+        }
+        catch(error){
+            console.error("Erro ao cadastrar conta", error)
+        }
+    }
 }

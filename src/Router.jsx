@@ -11,7 +11,8 @@ import CadastroCliente from "./pages/cadastro/include/Clientes.jsx";
 import CadastroProduto from "./pages/cadastro/include/Produtos.jsx";
 import CadastroNota from "./pages/cadastro/include/Notas.jsx";
 import TelaCadastro from "./pages/cadastro/include/TelaCadastro.jsx"
-import Login from "./autentic/page/Login.jsx";
+import Login from "./autentic/page/login/Login.jsx";
+import CadastroUser from "./autentic/page/cadastro/CadastroUser.jsx";
 
 export {
   Cadastro,
@@ -27,5 +28,6 @@ export {
   CadastroNota,
   CadastroProduto,
   TelaCadastro,
-  Login
+  Login,
+  CadastroUser
 };
