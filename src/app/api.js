@@ -217,7 +217,7 @@ export default class API{
 
     static async login(data){
         try{
-            console.log(data)
+            // console.log(data)
             const response = await fetch(`${back}/login`, {
                 method: "POST",
                 headers: {
