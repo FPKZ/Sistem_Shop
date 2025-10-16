@@ -46,7 +46,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 {
                     produtos.map(produto => (
                         <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                            <div className="card h-100 shadow-sm " style={{minHeight: "37dvh", cursor: "pointer"}}>
+                            <div className="card h-100 shadow-sm " style={{minHeight: "320px", cursor: "pointer"}}>
                                 <img 
                                     className="card-img-top img-fluid"
                                     src={produto.img || "src/assets/tube-spinner.svg"} 

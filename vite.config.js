@@ -12,13 +12,17 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    hmr: {
+      host: 'localhost'
+    },
   },
   resolve: {
     alias: {
       '@app': path.resolve(__dirname, './src/app'),
       '@components': path.resolve(__dirname, './src/components'),
       '@tabelas': path.resolve(__dirname, './src/components/modal/Tabelas'),
-      '@hooks': path.resolve(__dirname, './src/hooks')
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@autentic-sistem': path.resolve(__dirname, './src/autentic/sistem')
     },
   },
 });

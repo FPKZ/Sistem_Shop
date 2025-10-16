@@ -69,7 +69,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                 </Col>
                 <Col xs={1} sm={2} className="p-0 d-flex">
                   <img
-                    src={!produtos.img || "src/assets/tube-spinner.svg"}
+                    src={produtos.img || "src/assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}

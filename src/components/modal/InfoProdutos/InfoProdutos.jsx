@@ -54,7 +54,7 @@ export default function ProdutoInfo({ visible, onClose, produto, mobile, tableSh
               <div className={`text-center mb-3 ${mobile ? "" : "h-25"}`}>
                 <img
                   className="img-thumbnail h-100 rounded"
-                  src={!produto.img ||
+                  src={produto.img ||
                      "src/assets/tube-spinner.svg"
                   }
                   style={mobile ? {maxHeight: "25dvh"}: {}}
@@ -234,7 +234,7 @@ function Produtos({ produtos, setItemEstoque }) {
                 </Col>
                 <Col xs={2} className="p-0">
                   <img
-                    src={produto.img || "src/assets/tube-spinner.svg"}
+                    src={produtos.img || "src/assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}

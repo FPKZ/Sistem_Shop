@@ -28,7 +28,7 @@ function Produtos() {
   
   const getProduto = async () => {
     const p = await API.getProduto()
-    console.log(p)
+    // console.log(p)
     setProdutos(p);
   }
 

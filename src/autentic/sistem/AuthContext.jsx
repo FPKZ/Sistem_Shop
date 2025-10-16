@@ -9,7 +9,11 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(null);
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     verificLogin()
+    // }, []);
+
+    const verificLogin = () => {
         const storedToken = localStorage.getItem("authToken");
         if (storedToken) {
             try{
@@ -25,8 +29,12 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem("authToken");
             }
         }
+        else{
+            setUser(null)
+        }
         setLoading(false);
-    }, []);
+        console.log("verificou")
+    }
 
     const login = async (data) => {
         try {
@@ -58,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated, verificLogin }}>
             {children}
         </AuthContext.Provider>
     );

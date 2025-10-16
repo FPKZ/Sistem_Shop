@@ -49,10 +49,10 @@ function Notas() {
 
   const getNotas = async () => {
     const n = await API.getNotas()
-    console.log(n)
+    // console.log(n)
     setNotas(n)
   }
-  console.log(selectNota)
+  // console.log(selectNota)
   return (
     <div className="p-2 p-md-4">
       <div className="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center  pb-3 mb-3 border-bottom position-relative">

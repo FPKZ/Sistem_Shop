@@ -98,7 +98,7 @@ export default function Login() {
     <div className={styles.loginContainer}>
         <Container>
             <Row className="justify-content-md-center mt-5">
-                <Col md={4}>
+                <Col sm={4} md={6} lg={4}>
                     <h2 className="text-center mb-4">Login</h2>
                     <Form onSubmit={handleSubmit} noValidate>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -116,7 +116,7 @@ export default function Login() {
                 </Col>
             </Row>
             <Row className="justify-content-md-center mt-3">
-                <Col md={4} className="text-center">
+                <Col sm={4} md={6} lg={4} className="text-center">
                     <span>Não tem uma conta? </span>
                     <Button variant="link" onClick={() => navigate("/cadastro-user")}>Cadastre-se</Button>
                 </Col>

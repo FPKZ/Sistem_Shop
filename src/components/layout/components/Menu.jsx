@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@autentic-sistem/AuthContext";
 
 export default function Menu({menuExpand, setMenuExpand , mobile}) {
   //const [menuExpand, setMenuExpand] = useState(false)
   const menuRef = useRef(null)
   const navigate = useNavigate()
+
+  const { logout } = useAuth()
   
   useEffect(() => {
     const menuElement = menuRef.current
@@ -29,6 +32,11 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
     setMenuExpand(false)
   }
 
+  const desconetc = async () => {
+    await setMenuExpand(false)
+    logout()
+  }
+
   return (
     <nav id="menu" ref={menuRef} className="d-flex flex-column vh-100 text-white p-0 z-3">
       <ul className="nav nav-pills flex-column mb-auto">
@@ -42,13 +50,17 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
         <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
         <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
       </ul>
+      <ul className="nav nav-pills flex-column position-relative">
+        <ItenMenu mobile={mobile} icon="box-arrow-in-left" onClick={() => desconetc()} classCuston={"w-100 position-absolute bottom-0"}>Sair</ItenMenu>
+
+      </ul>
     </nav>
   )
 }
 
-function ItenMenu({mobile, icon, children, ...rest}){
+function ItenMenu({mobile, icon, children, classCuston, ...rest}){
   return (
-    <li className="nav-item" {...rest} style={{cursor: "pointer"}}>
+    <li className={`nav-item ${classCuston}`} {...rest} style={{cursor: "pointer"}}>
       <a className="nav-link text-white d-flex align-items-center p-md-3 p-2 rounded-0">
         <i className={`bi bi-${icon} ${mobile ? "fs-5" : "fs-4"}`}></i>
         <span className="ms-3">{children}</span>
