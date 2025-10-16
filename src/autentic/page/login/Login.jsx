@@ -1,10 +1,11 @@
 import { Container, Col, Row, Form, Button, Alert } from "react-bootstrap";
 import styles from "../../../../public/css/login.module.css"
-import Footer from "./include/Footer.jsx";
+import Footer from "../include/Footer";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../sistem/AuthContext";
 
+import React, { useEffect } from 'react';
 
 export default function Login() {
 
@@ -15,6 +16,18 @@ export default function Login() {
     const navigate = useNavigate()
 
     const { login } = useAuth()
+
+
+    // ... dentro do componente CadastroUser
+    useEffect(() => {
+        // Adiciona a classe ao body quando o componente monta
+        document.body.classList.add('body-scroll-visible');
+
+        // Remove a classe do body quando o componente desmonta
+        return () => {
+            document.body.classList.remove('body-scroll-visible');
+        };
+    }, []); // O array vazio garante que o efeito rode apenas uma vez
 
     function handleChange(e){
         const { name, value, type } = e.target
@@ -96,9 +109,9 @@ export default function Login() {
   return (
     <>
     <div className={styles.loginContainer}>
-        <Container>
-            <Row className="justify-content-md-center mt-5">
-                <Col sm={4} md={6} lg={4}>
+        <Container className="mb-5">
+            <Row className="justify-content-center mt-5">
+                <Col sm={6} md={6} lg={4}>
                     <h2 className="text-center mb-4">Login</h2>
                     <Form onSubmit={handleSubmit} noValidate>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -115,14 +128,14 @@ export default function Login() {
                     </Form>
                 </Col>
             </Row>
-            <Row className="justify-content-md-center mt-3">
-                <Col sm={4} md={6} lg={4} className="text-center">
+            <Row className="justify-content-center mt-3">
+                <Col sm={6} md={6} lg={4} className="text-center">
                     <span>Não tem uma conta? </span>
                     <Button variant="link" onClick={() => navigate("/cadastro-user")}>Cadastre-se</Button>
                 </Col>
             </Row>
             <Erros erros={erros} />
-            <ContaTeste />
+            {/* <ContaTeste /> */}
         </Container>
         <Footer />
     </div>

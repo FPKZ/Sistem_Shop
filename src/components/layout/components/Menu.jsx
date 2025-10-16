@@ -38,7 +38,7 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
   }
 
   return (
-    <nav id="menu" ref={menuRef} className="d-flex flex-column vh-100 text-white p-0 z-3">
+    <nav id="menu" ref={menuRef} className="d-flex flex-column text-white p-0 z-3" style={{height: "100dvh"}}>
       <ul className="nav nav-pills flex-column mb-auto">
         {mobile && (
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>
@@ -50,17 +50,19 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
         <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
         <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
       </ul>
-      <ul className="nav nav-pills flex-column position-relative">
-        <ItenMenu mobile={mobile} icon="box-arrow-in-left" onClick={() => desconetc()} classCuston={"w-100 position-absolute bottom-0"}>Sair</ItenMenu>
-
-      </ul>
     </nav>
   )
 }
 
 function ItenMenu({mobile, icon, children, classCuston, ...rest}){
+
+  const style = {
+    cursor: "pointer",
+    ...rest.style
+  }
+
   return (
-    <li className={`nav-item ${classCuston}`} {...rest} style={{cursor: "pointer"}}>
+    <li className={`nav-item ${classCuston}`} {...rest} style={style}>
       <a className="nav-link text-white d-flex align-items-center p-md-3 p-2 rounded-0">
         <i className={`bi bi-${icon} ${mobile ? "fs-5" : "fs-4"}`}></i>
         <span className="ms-3">{children}</span>

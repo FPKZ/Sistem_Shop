@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
             try{
                 const decoded = jwtDecode(storedToken);
                 if(decoded.exp * 1000 > Date.now()) {
-                    setUser({ email: decoded.email });
+                    setUser( decoded );
                     setToken(storedToken);
                 } else{
                     localStorage.removeItem("authToken");
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
                 const { token, conta } = response;
                 localStorage.setItem("authToken", token);
                 const decoded = jwtDecode(token);
-                setUser({ email: decoded.email });
+                setUser({email: decoded.email, ...conta});
                 setToken(token);
                 return { ok: true };
             } else {

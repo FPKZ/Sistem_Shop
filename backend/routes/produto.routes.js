@@ -1,6 +1,7 @@
 import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize"
 import { put } from "@vercel/blob"
+import { randomUUID } from "crypto";
 //const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
@@ -104,7 +105,8 @@ export default async function produtoRoutes(fastify) {
       
       for await (const part of data){
         if(part.type === "file") {
-          const blob = await put(part.filename, part.file, {
+          const nomeUnico = `${randomUUID()}-${part.filename}`;
+          const blob = await put(nomeUnico, part.file, {
             access: "public"
           })
           imgPath = blob.url // Salvamos a URL completa retornada pelo Vercel Blob

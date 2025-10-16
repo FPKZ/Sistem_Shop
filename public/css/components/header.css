@@ -4,12 +4,22 @@
     width: calc(100% - 3.5rem);
     height: 4.2rem;
     background-color: rgb(183, 55, 225);
-
+    z-index: 2;
 }
 #header h1{
     font-size: 1.2rem;
     font-weight: 900;
     margin-top: 0.4rem;
+}
+
+.dropdown-toggle-no-caret::after {
+    display: none !important;
+}
+.profile-image {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    object-position: center;
 }
 
 @media (max-width: 766px){

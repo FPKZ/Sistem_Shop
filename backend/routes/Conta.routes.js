@@ -18,7 +18,7 @@ export default async function contaRoutes(fastify) {
             const senhaValida = await bcrypt.compare(senha, conta.senha);
 
             if(senhaValida) {
-                const token = jwt.sign({ id: conta.id, email: conta.email }, SECRET, { expiresIn: '1h' });
+                const token = jwt.sign({ id: conta.id, email: conta.email, nome: conta.nome, img: conta.img }, SECRET, { expiresIn: '1h' });
                 reply.send({ message: "Login bem-sucedido", conta, token, ok: true });
             } else {
                 reply.code(401).send({ error: "Credenciais inválidas" });

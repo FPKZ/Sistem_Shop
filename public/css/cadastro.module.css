@@ -1,13 +1,14 @@
-.loginContainer {
+.cadastro{
     position: relative;
     min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #f0e9f0;
+    overflow: auto !important;
 }
 @media (max-width: 768px) {
-    .loginContainer {
+    .cadastro {
         padding: 20px;
         align-items: normal;
         justify-content: center;
