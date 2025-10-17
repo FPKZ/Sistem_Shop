@@ -1,14 +1,14 @@
 // components/CadastroModal.jsx
 import API from "@app/api";
 import { useState, useEffect } from "react";
-import { Modal, Row, Col, Button } from "react-bootstrap";
+import { Modal, Row, Col, Button, Form } from "react-bootstrap";
 
 function CadastroModal({
   visible,
   onClose,
   cadastrarProduto,
   cadastroNota = false,
-  mobile
+  // mobile
 }) {
   const [formValue, setFormValue] = useState({});
   const [erros, setErros] = useState({});
@@ -105,38 +105,43 @@ function CadastroModal({
     const newErrors = validate(form);
     setErros(newErrors);
     setValidated(true);
-    //console.log(erros)
+    console.log(erros)
     //console.log(validated)
 
     if (Object.keys(newErrors).length === 0) {
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData.entries());
-      const data_refatorada = {
-        nome: data.nome,
-        descricao: data.descricao,
-        img: "teste",
-        categoria_id: data.categoria,
-        itens: [
-          {
-            codigo_barras: data.codigo_barras,
-            nota_id: data.nota,
-            tamanho: data.tamanho,
-            cor: data.cor,
-            marca: data.marca,
-            valor_compra: data.valor_compra,
-            valor_venda: data.valor_venda,
-            lucro: data.lucro,
-          },
-        ],
-      };
-      console.log(data_refatorada);
-      cadastrarProduto(data_refatorada);
+      // Usar o ESTADO ('formValue') como fonte da verdade, não o DOM.
+      const finalFormData = new FormData();
+      //console.log(formValue);
+
+      // Adiciona os campos simples ao FormData
+      finalFormData.append("nome", formValue.nome);
+      finalFormData.append("descricao", formValue.descricao);
+      finalFormData.append("img", formValue.img); // 'img' agora existe no estado
+      // console.log( finalFormData.get("img"))
+      finalFormData.append("categoria_id", categoria.id || "");
+
+      // Cria o objeto 'itens' a partir do estado
+      const itens = [
+        {
+          codigo_barras: formValue.codigo_barras,
+          nota_id: nota.id || "", // 'nota' é um estado separado
+          tamanho: formValue.tamanho,
+          cor: formValue.cor,
+          marca: formValue.marca,
+          valor_compra: formValue.valor_compra,
+          valor_venda: formValue.valor_venda,
+          lucro: formValue.lucro,
+        },
+      ];
+
+      finalFormData.set("itens", JSON.stringify(itens));
+      console.log(Object.fromEntries(finalFormData));
+      cadastrarProduto(finalFormData);
     }
   }
 
   return (
-    <form onSubmit={handleSubimit} noValidate>
-      <Modal
+    <Modal
         show={visible}
         onHide={onClose}
         size="xxl"
@@ -145,6 +150,7 @@ function CadastroModal({
         fullscreen="md-down"
         animation
       >
+      <Form onSubmit={handleSubimit} noValidate>
         <Modal.Header closeButton>
           <Modal.Title>Cadastrar Item</Modal.Title>
         </Modal.Header>
@@ -448,8 +454,8 @@ function CadastroModal({
             </Button>
           </Col>
         </Modal.Body>
-      </Modal>
-    </form>
+      </Form>
+    </Modal>
   );
 }
 

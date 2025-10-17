@@ -90,9 +90,9 @@ export default function Produtos() {
     //console.log(validated)
 
     if (Object.keys(newErrors).length === 0) {
-        // Usar o ESTADO ('formValue') como fonte da verdade, não o DOM.
-        const finalFormData = new FormData();
-        //console.log(formValue);
+      // Usar o ESTADO ('formValue') como fonte da verdade, não o DOM.
+      const finalFormData = new FormData();
+      //console.log(formValue);
 
       // Adiciona os campos simples ao FormData
       finalFormData.append("nome", formValue.nome);

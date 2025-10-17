@@ -3,13 +3,12 @@ import { useState, useEffect } from "react"
 import TabelaProdutos from "@components/modal/Tabelas/TabelaProduto";
 import CadastroModal from "@components/modal/CadastroProdutos/CadastroIntenModal";
 import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
+import { useOutletContext } from "react-router-dom";
 
 export default function Notas(){
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
-
-    const [mobile, setMobile] = useState( window.innerWidth < 900)
 
     const [itemEstoque, setItemEstoque] = useState({})
     const [produtos, setProdutos ] = useState([])
@@ -17,90 +16,14 @@ export default function Notas(){
     const [modalCadastroPrduto, setmodalCadastroPrduto ] = useState(false)
     const [modalInfoProduto, setmodalInfoProduto ] = useState(false)
 
+    const { mobile } = useOutletContext()
 
-    useEffect(() => {
-        const handleResize = () => {
-           setMobile(window.innerWidth < 900)
-        }
-        setProdutos({
-            id: 8,
-            nome: "algema",
-            img: "teste",
-            descricao: "wsadaSDASD",
-            createdAt: "2025-09-15T22:04:54.955Z",
-            updatedAt: "2025-09-15T22:04:54.955Z",
-            categoria_id: 3,
-            categoria: {
-                id: 3,
-                nome: "Acessorios",
-                descricao: "asdasad",
-                createdAt: "2025-09-15T14:32:55.040Z",
-                updatedAt: "2025-09-15T14:32:55.040Z"
-            },
-            itemEstoque: [
-                {
-                    id: 9,
-                    nome: "algemaaaaaa",
-                    tamanho: "21",
-                    cor: "#a3a3a3",
-                    marca: "gal",
-                    codigo_barras: "1231243124124124124124",
-                    valor_compra: 123,
-                    valor_venda: 12,
-                    lucro: 12,
-                    status: "Disponivel",
-                    createdAt: "2025-09-15T22:04:55.025Z",
-                    updatedAt: "2025-09-15T22:04:55.025Z",
-                    produto_id: 8,
-                    nota_id: 1,
-                    nota: {
-                        id: 1,
-                        codigo: "52346",
-                        quantidade: 15,
-                        valor_total: 150.5,
-                        data: "2025-09-11T23:39:19.585Z",
-                        createdAt: "2025-09-15T13:31:23.756Z",
-                        updatedAt: "2025-09-15T13:31:23.756Z"
-                    }
-                },
-                {
-                    id: 10,
-                    nome: "algema",
-                    tamanho: "21",
-                    cor: "#a3a3a3",
-                    marca: "gal",
-                    codigo_barras: "1231243124124124124124",
-                    valor_compra: 123,
-                    valor_venda: 12,
-                    lucro: 12,
-                    status: "Disponivel",
-                    createdAt: "2025-09-15T22:05:10.892Z",
-                    updatedAt: "2025-09-15T22:05:10.892Z",
-                    produto_id: 8,
-                    nota_id: 1,
-                    nota: {
-                        id: 1,
-                        codigo: "52346",
-                        quantidade: 15,
-                        valor_total: 150.5,
-                        data: "2025-09-11T23:39:19.585Z",
-                        createdAt: "2025-09-15T13:31:23.756Z",
-                        updatedAt: "2025-09-15T13:31:23.756Z"
-                    }
-                }
-            ]
-        })
-        window.addEventListener("resize", handleResize)
-
-        return () => {
-            window.removeEventListener("resize", handleResize)
-        }
-    },[])
 
     function cadastrarProduto(data){
         console.log(data)
         const p = produtos.concat(data)
         setProdutos(p)
+        setmodalCadastroPrduto(false)
     }
 
     function handleChange(e){
@@ -145,17 +68,28 @@ export default function Notas(){
         const newErrors = validate(form)
         setErros(newErrors)
         setValidated(true)
-        //console.log(erros)
-        //console.log(validated)
 
         if(Object.keys(newErrors).length === 0){
-            const data_refatorada = FormatData(e.target)
-            //cadastrarProduto(data_refatorada)
+            const dataToSend = {
+                codigo: formValue.codigo,
+                valor_total: formValue.valor_total,
+                data: formValue.data,
+                fornecedor: formValue.fornecedor,
+                quantidade: formValue.quantidade
+            };
+
+            if (produtos) {
+                dataToSend.itens = produtos;
+            }
+
+            console.log("Dados a serem enviados:", dataToSend);
+            // Aqui você faria a chamada para a API para cadastrar a nota
         }
     }
-    console.log(produtos)
-    console.log(itemEstoque)
-    console.log(modalInfoProduto)
+     console.log(produtos)
+     console.log(Object.fromEntries(produtos))
+    // console.log(itemEstoque)
+    // console.log(modalInfoProduto)
     return(
         <div className="row-col w-100 p-1 p-md-3 d-flex gap-4 justify-content-center">
             <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3">

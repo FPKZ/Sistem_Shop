@@ -152,13 +152,15 @@ export default function CadastroNotaModal({visible, onClose, produts = true, ful
 
         if(Object.keys(newErrors).length === 0){
             const data_refatorada = FormatData(e.target)
+            console.log(data_refatorada)
             //cadastrarProduto(data_refatorada)
         }
     }
 
     return (
-        <Form onSubmit={handleSubimit} noValidate>
-            <Modal show={visible} onHide={onClose} fullscreen={`${fullScrean && "sm-down"}`}>
+        <>
+        <Modal show={visible} onHide={onClose} fullscreen={`${fullScrean && "sm-down"}`}>
+            <Form onSubmit={handleSubimit} noValidate>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         Cadastrar Nota
@@ -202,9 +204,10 @@ export default function CadastroNotaModal({visible, onClose, produts = true, ful
                         </Col>
                     </Row>
                 </Modal.Body>
-            </Modal>
-            <CadastroModal visible={modalCadastroPrduto} onClose={() => setmodalCadastroPrduto(false)} cadastroNota={true} cadastrarProduto={cadastrarProduto}/>
-            <ProdutoInfo visible={modalInfoProduto} onClose={() => setmodalInfoProduto(false)} tableShow={false} produto={itemEstoque}/>
-        </Form>
+            </Form>
+        </Modal>
+        <CadastroModal visible={modalCadastroPrduto} onClose={() => setmodalCadastroPrduto(false)} cadastroNota={true} cadastrarProduto={cadastrarProduto}/>
+        <ProdutoInfo visible={modalInfoProduto} onClose={() => setmodalInfoProduto(false)} tableShow={false} produto={itemEstoque}/>
+        </>
     )
 }

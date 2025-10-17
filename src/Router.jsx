@@ -13,6 +13,8 @@ import CadastroNota from "./pages/cadastro/include/Notas.jsx";
 import TelaCadastro from "./pages/cadastro/include/TelaCadastro.jsx"
 import Login from "./autentic/page/login/Login.jsx";
 import CadastroUser from "./autentic/page/cadastro/CadastroUser.jsx";
+import PerfilPage from "./autentic/page/perfil/Perfil.jsx";
+import FerrramentasPage from "./autentic/page/ferramentas/Ferramentas.jsx";
 
 export {
   Cadastro,
@@ -29,5 +31,7 @@ export {
   CadastroProduto,
   TelaCadastro,
   Login,
-  CadastroUser
+  CadastroUser,
+  PerfilPage,
+  FerrramentasPage
 };

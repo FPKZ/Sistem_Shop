@@ -1,7 +1,6 @@
 import { Form, Modal, Row, Col, Button } from "react-bootstrap"
 import { useState } from "react"
 import API from "@app/api"
-import utils from "@app/utils"
 import { useNavigate } from "react-router-dom"
 
 export default function ModalCliente({visible, onClose}){
@@ -13,7 +12,7 @@ export default function ModalCliente({visible, onClose}){
     const navigate = useNavigate()
 
     function handleChange(e){
-        const { name, value, type } = e.target
+        const { name, value/*, type*/ } = e.target
         let newValue = value
 
         if(name === "telefone"){
@@ -95,8 +94,8 @@ export default function ModalCliente({visible, onClose}){
 
 
     return(
-        <Form onSubmit={handleSubimit} noValidate >
-            <Modal show={visible} onHide={onClose}>
+        <Modal show={visible} onHide={onClose}>
+            <Form onSubmit={handleSubimit} noValidate >
                 <Modal.Header closeButton> 
                     <Modal.Title>Cadastrar Cliente</Modal.Title>
                 </Modal.Header>
@@ -121,7 +120,7 @@ export default function ModalCliente({visible, onClose}){
                         <Button className="btn btn-roxo" type="submit">Adicionar</Button>
                     </Row>
                 </Modal.Body>
-            </Modal>
-        </Form>
+            </Form>
+        </Modal>
     )
 }

@@ -1,13 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@autentic-sistem/AuthContext";
 
 export default function Menu({menuExpand, setMenuExpand , mobile}) {
   //const [menuExpand, setMenuExpand] = useState(false)
   const menuRef = useRef(null)
   const navigate = useNavigate()
-
-  const { logout } = useAuth()
   
   useEffect(() => {
     const menuElement = menuRef.current
@@ -30,11 +27,6 @@ export default function Menu({menuExpand, setMenuExpand , mobile}) {
   function handleNavigate(path){
     navigate(path)
     setMenuExpand(false)
-  }
-
-  const desconetc = async () => {
-    await setMenuExpand(false)
-    logout()
   }
 
   return (

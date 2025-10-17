@@ -141,7 +141,7 @@ export default function Login() {
             </Row>
             <Erros erros={erros} />
             {/* <ContaTeste /> */}
-            <Timer stop={stop} setStop={setStop} />
+            {/* <Timer stop={stop} setStop={setStop} /> */}
         </Container>
         <Footer />
     </div>

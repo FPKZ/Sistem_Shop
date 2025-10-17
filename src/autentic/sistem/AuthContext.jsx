@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useContext } from "react";
 import API from "@app/api";
 import { jwtDecode } from "jwt-decode";
 
@@ -8,10 +8,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(null);
-
-    // useEffect(() => {
-    //     verificLogin()
-    // }, []);
 
     const verificLogin = () => {
         const storedToken = localStorage.getItem("authToken");

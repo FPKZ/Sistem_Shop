@@ -2,10 +2,10 @@
 import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@autentic-sistem/AuthContext";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
 
-  const [show, swtShow] = useState(false);
 
   const { logout, user } = useAuth()
   
@@ -59,17 +59,18 @@ export default function Header() {
 }
 
 
-function ProfileMenu({ user, imgSize, logout }) {
+function ProfileMenu({ user, logout }) {
 
-  const [show, swtShow] = useState(false);
+  const [show, setShow] = useState(false);
   const [imgSizeState, setImgSizeState] = useState(35)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const calcSize = () => {
       const userMenu = document.getElementById("user-menu");
       if (userMenu) {
-        setImgSizeState(userMenu.clientHeight - 5)
+        setImgSizeState(userMenu.clientHeight - 7)
       }
     };
 
@@ -85,8 +86,8 @@ function ProfileMenu({ user, imgSize, logout }) {
   },[])
 
   return (
-    <Dropdown align="end" show={show} onMouseEnter={() => swtShow(true)} onMouseLeave={() => swtShow(false)}>
-      <Dropdown.Toggle as="div" id="dropdown-custom-components" className="d-inline dropdown-toggle-no-caret">
+    <Dropdown align="end" show={show} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      <Dropdown.Toggle as="div" id="dropdown-custom-components" className="d-flex dropdown-toggle-no-caret" onClick={() => setShow(!show)} >
         <Figure className="d-flex m-0 p-0 align-items-center" style={{cursor: "pointer"}}>
           <Figure.Image
             className="m-0"
@@ -97,11 +98,11 @@ function ProfileMenu({ user, imgSize, logout }) {
           />
         </Figure>
       </Dropdown.Toggle>
-      <Dropdown.Menu align="end">
+      <Dropdown.Menu align="end" style={{marginTop: "-2px"}}>
         <Dropdown.ItemText className="text-center">{user.nome}</Dropdown.ItemText>
         <Dropdown.Divider />
-        <Dropdown.Item className="text-start">Perfil</Dropdown.Item>
-        <Dropdown.Item className="text-start">Configuração</Dropdown.Item>
+        <Dropdown.Item className="text-start" onClick={() => navigate("perfil")}>Perfil</Dropdown.Item>
+        <Dropdown.Item className="text-start"onClick={() => navigate("ferramentas")}>Ferramentas</Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item onClick={() => logout()}><i className="bi bi-power me-2"></i>Sair</Dropdown.Item>
       </Dropdown.Menu>

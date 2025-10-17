@@ -18,7 +18,9 @@ import {
   CadastroProduto,
   TelaCadastro,
   Login,
-  CadastroUser
+  CadastroUser,
+  PerfilPage,
+  FerrramentasPage
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./autentic/sistem/ProtectedRoute.jsx";
@@ -59,7 +61,9 @@ const router = createBrowserRouter([
     ],  
   },
   { path: "login", element: <Login />},
-  { path: "cadastro-user", element: <CadastroUser /> }
+  { path: "cadastro-user", element: <CadastroUser /> },
+  { path: "perfil", element: <PerfilPage /> },
+  { path: "ferramentas", element: <FerrramentasPage /> }
 
 ]);
 
