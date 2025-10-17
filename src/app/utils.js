@@ -20,6 +20,23 @@ const formatRelativeDate = (dataISO) => {
   return formatDistanceToNow(new Date(dataISO), { addSuffix: true, locale: ptBR })
 }
 
+// Timer
+function formatTimer(totalSeconds) {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+
+  return `${hh}:${mm}:${ss}`;
+}
+
+// Exemplo:
+// console.log(formatTimer(332));    // "00:05:32"
+// console.log(formatTimer(3672));   // "01:01:12"
+
 // 💰 Formata número como valor monetário BRL
 const formatMoney = (valor) => {
   if (isNaN(valor)) return 'R$ 0,00'
@@ -59,4 +76,4 @@ const removeAccents = (str) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 }
 
-export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents}
+export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer}

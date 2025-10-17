@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../sistem/AuthContext";
 
+import Timer from "./Timer";
+
 import React, { useEffect } from 'react';
 
 export default function Login() {
@@ -12,6 +14,8 @@ export default function Login() {
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
+
+    const [ stop, setStop ] = useState(false)
 
     const navigate = useNavigate()
 
@@ -82,8 +86,9 @@ export default function Login() {
             const formData = new FormData(e.target)
             const data = Object.fromEntries(formData.entries())
             // console.log(data)
-
+            setStop(!stop)
             const resposta = await login(data)
+            setStop(!stop)
             // console.log(resposta)
             
             if(resposta.ok){
@@ -136,6 +141,7 @@ export default function Login() {
             </Row>
             <Erros erros={erros} />
             {/* <ContaTeste /> */}
+            <Timer stop={stop} setStop={setStop} />
         </Container>
         <Footer />
     </div>
