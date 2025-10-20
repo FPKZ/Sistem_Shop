@@ -3,6 +3,18 @@
 const back = import.meta.env.VITE_BACKEND_URL
 
 export default class API{
+
+
+    static async initServer(){
+        try{
+            const response = await fetch(`${back}`)
+            console.log(response)
+            return response
+        } catch (err) {
+            console.error("Erro ao se comunicar com o Backend", err)
+        }
+    }
+
     //Produtos
     static async getProduto({item = "", nome = ""} = {}){
         try{

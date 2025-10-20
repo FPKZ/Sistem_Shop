@@ -1,0 +1,325 @@
+/* ========================================
+   BLACKOUT GAME LOADING SCREEN STYLES
+   ======================================== */
+
+/* Main Container */
+.loading-screen-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #111827 0%, #000000 50%, #111827 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Effects */
+.background-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.grid-background {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: slide 20s linear infinite;
+}
+
+.loading-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* ========================================
+   GAME LOGO STYLES
+   ======================================== */
+
+.game-logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-wrapper {
+  position: relative;
+}
+
+.logo-glow {
+  position: absolute;
+  inset: 0;
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: blur(8px);
+  opacity: 0.5;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.logo-text {
+  position: relative;
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+  margin: 0;
+}
+
+.logo-underline {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, #22d3ee 50%, transparent 100%);
+  margin-top: 0.5rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.logo-subtitle {
+  color: #9ca3af;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.logo-decorative {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0.6;
+}
+
+.ping-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.ping-1 {
+  background-color: #22d3ee;
+}
+
+.ping-2 {
+  background-color: #3b82f6;
+  animation-delay: 200ms;
+}
+
+.ping-3 {
+  background-color: #22d3ee;
+  animation-delay: 400ms;
+}
+
+/* ========================================
+   LOADING BAR STYLES
+   ======================================== */
+
+.loading-bar-container {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.loading-bar-track {
+  position: relative;
+  background-color: rgba(31, 41, 55, 0.5);
+  border-radius: 9999px;
+  height: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #374151;
+}
+
+.loading-bar-bg-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loading-bar-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #22d3ee 50%, #3b82f6 100%);
+  position: relative;
+  transition: width 75ms ease-out;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.loading-bar-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #60a5fa 100%);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  opacity: 0.75;
+}
+
+.loading-bar-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s ease-in-out infinite;
+  transform: skewX(-12deg);
+}
+
+.loading-bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.loading-bar-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.loading-bar-percentage {
+  color: #22d3ee;
+  font-weight: 600;
+}
+
+/* ========================================
+   LOADING FOOTER STYLES
+   ======================================== */
+
+.loading-footer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  margin: 0;
+}
+
+.loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 0.25rem;
+  height: 0.25rem;
+  background-color: #22d3ee;
+  border-radius: 50%;
+  animation: bounce 1s infinite;
+}
+
+.dot-1 {
+  animation-delay: 0ms;
+}
+
+.dot-2 {
+  animation-delay: 100ms;
+}
+
+.dot-3 {
+  animation-delay: 200ms;
+}
+
+/* ========================================
+   KEYFRAME ANIMATIONS
+   ======================================== */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (min-width: 768px) {
+  .logo-glow,
+  .logo-text {
+    font-size: 6rem;
+  }
+  
+  .logo-subtitle {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .loading-screen-container {
+    padding: 1rem;
+  }
+  
+  .logo-glow,
+  .logo-text {
+    font-size: 3rem;
+  }
+  
+  .logo-subtitle {
+    font-size: 1rem;
+  }
+  
+  .loading-content {
+    gap: 2rem;
+  }
+}

@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import API from "@app/api";
 import { jwtDecode } from "jwt-decode";
+import LoadingPage from "./LoadingPage"
 
 const AuthContext = createContext();
 
@@ -9,7 +10,12 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(null);
 
-    const verificLogin = () => {
+    useEffect(() => {
+        initServer()
+        console.log(loading)
+    },[])
+
+    const verificLogin = async () => {
         const storedToken = localStorage.getItem("authToken");
         if (storedToken) {
             try{
@@ -28,6 +34,7 @@ export const AuthProvider = ({ children }) => {
         else{
             setUser(null)
         }
+        // await initServer()
         setLoading(false);
         console.log("verificou")
     }
@@ -61,9 +68,18 @@ export const AuthProvider = ({ children }) => {
         return !!user;
     }
 
+    const initServer = async () => {
+        setLoading(true)
+        console.log("carregando")
+        const response = await API.initServer()
+        console.log("carregando")
+        setLoading(false)
+        console.log(response)
+    }
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated, verificLogin }}>
-            {children}
+        <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated, verificLogin, initServer }}>
+            {loading ? <LoadingPage /> :  children}
         </AuthContext.Provider>
     );
 }

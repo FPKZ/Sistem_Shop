@@ -1,6 +1,6 @@
 import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
-import { useState, useEffect } from "react"
-import TabelaProdutos from "@components/modal/Tabelas/TabelaProduto";
+import { useState } from "react"
+import TabelaProdutosNota from "./include/TabelaProdutosNota";
 import CadastroModal from "@components/modal/CadastroProdutos/CadastroIntenModal";
 import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { useOutletContext } from "react-router-dom";
@@ -113,13 +113,13 @@ export default function Notas(){
                     <label htmlFor="quantidade" className="form-label">Quantidade de produtos da nota</label>
                     <input type="number" className={`form-control ${validated ? (erros.quantidade ? `is-invalid` : `is-valid`): ""}`} name="quantidade" id="quantidade" onChange={handleChange} required/>
                 </div>
-                <div className="col-12 form-control d-flex flex-wrap mt-4 p-0" style={{height:  '400px'}}>
+                <div className="col-12 form-control d-flex flex-column mt-4 p-0" style={{height:  '400px'}}>
                     <div className="col-12 d-flex justify-content-between p-2 border-bottom">
                         <p className="align-content-center m-0">Produtos</p>
                         <button className="btn btn-light" type="button" onClick={() => setmodalCadastroPrduto(true)}>Adicionar Produto</button>
                     </div>
-                    <div className="col-12 d-flex flex-column gap-2 overflow-y-auto flex-grow-1" style={{height: "86%"}}>
-                        <TabelaProdutos mobile={mobile} produto={produtos} setItemEstoque={setItemEstoque}  setmodalInfoProduto={setmodalInfoProduto} />
+                    <div className="col-12 d-flex flex-column gap-2 overflow-y-auto flex-grow-1">
+                        <TabelaProdutosNota mobile={mobile} produto={produtos} setItemEstoque={setItemEstoque}  setmodalInfoProduto={setmodalInfoProduto} />
                     </div>
                 </div>
                 <button className="btn btn-roxo" type="submit">Adicionar</button>

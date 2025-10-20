@@ -19,6 +19,7 @@ import process from "node:process"
 import "dotenv/config"
 import sequelize from "./database/sequelize.js";
 import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes, contaRoutes } from "./routes/routers.js";
+import { setTimeout } from "node:timers/promises";
 //import { request } from "node:http";
 
 const server = fastify({ logger: true, trustProxy: true })
@@ -67,8 +68,13 @@ server.register(multipart, {
 server.get('/', async (request, reply) => {
   const ip = request.ip.replace('::ffff:', '');
   console.log("Ip Cliente: ", ip)
-  reply.send({message: "Olá ", clientIp: ip})
-  return 'Servidor rodando com Fastify e ES Modules!';
+
+  // const e = await setTimeout(5000, 'esperando')
+
+  // console.log(e)
+  // await esperar()
+  reply.code(200).send({message: "Olá ", clientIp: ip})
+  // return 'Servidor rodando com Fastify e ES Modules!';
 });
 
 server.register(produtoRoutes);

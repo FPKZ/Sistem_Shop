@@ -1,4 +1,4 @@
-import { Table, Card, Col, Row } from "react-bootstrap"
+import { Container, Table, Card, Col, Row } from "react-bootstrap"
 import utils from "@app/utils"
 
 import { useOutletContext } from "react-router-dom"
