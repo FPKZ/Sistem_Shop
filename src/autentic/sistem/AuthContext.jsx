@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         initServer()
-        console.log(loading)
     },[])
 
     const verificLogin = async () => {
@@ -36,7 +35,6 @@ export const AuthProvider = ({ children }) => {
         }
         // await initServer()
         setLoading(false);
-        console.log("verificou")
     }
 
     const login = async (data) => {
@@ -70,9 +68,7 @@ export const AuthProvider = ({ children }) => {
 
     const initServer = async () => {
         setLoading(true)
-        console.log("carregando")
         const response = await API.initServer()
-        console.log("carregando")
         setLoading(false)
         console.log(response)
     }
@@ -84,6 +80,7 @@ export const AuthProvider = ({ children }) => {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     return useContext(AuthContext);
 }

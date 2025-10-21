@@ -1,4 +1,6 @@
 
+#produtos
+
 #POST https://sistemshop-production.up.railway.app/produto
 POST http://localhost:3333/produto
 Content-Type: application/json
@@ -21,6 +23,22 @@ Content-Type: application/json
     
 
 }
+###
+#GET https://sistemshop-production.up.railway.app/produtos
+GET http://localhost:3333/produtos?itens=estoque&nome=
+###
+PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
+###
+DELETE https://sistemshop-production.up.railway.app/produto/5
+Content-Type: application/json
+
+{
+    "titulo": "video02",
+    "descricao": "adfasdasd",
+    "duracao": 120
+}
+
+# Notas
 
 ###
 POST http://localhost:3333/nota
@@ -32,6 +50,20 @@ Content-Type: application/json
     "valor_total": 150.5,
     "data": "2025-09-11 23:39:19.585 +00:00"
 }
+###
+GET http://localhost:3333/notas
+###
+PUT http://localhost:3333/nota/3
+Content-Type: application/json
+
+{
+    "fornecedor": "Gato Preto"
+}
+
+###
+DELETE http://localhost:3333/nota/3
+
+# Categorias
 
 ###
 POST http://localhost:3333/categoria
@@ -42,6 +74,22 @@ Content-Type: application/json
     "descricao": "asdasad"
 }
 ###
+GET http://localhost:3333/categorias
+
+###
+PUT http://localhost:3333/categoria/2
+Content-Type: application/json
+
+{
+    "nome": "Gel GA"
+}
+
+###
+DELETE http://localhost:3333/categoria/1
+
+# Cliente
+
+###
 POST http://localhost:3333/cliente
 Content-Type: application/json
 
@@ -51,6 +99,12 @@ Content-Type: application/json
     "telefone": "(13) 99741-1234",
     "endereco": "aksldjadaasdakjca"
 }
+###
+GET http://localhost:3333/clientes
+
+
+# Venda
+
 ###
 POST http://localhost:3333/venda
 Content-Type: application/json
@@ -66,6 +120,12 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:3333/vendas
+
+
+# Nota Venda
+
+###
 POST http://localhost:3333/notaVenda
 Content-Type: application/json
 
@@ -77,70 +137,10 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3333/conta
-Content-Type: application/json
-
-{
-    "email": "superUser@gmail.com",
-    "senha": "super432"
-}
-
-###
-#GET https://sistemshop-production.up.railway.app/produtos
-GET http://localhost:3333/produtos?itens=estoque&nome=
-
-
-###
-GET http://localhost:3333/notas
-
-###
-GET http://localhost:3333/categorias
-
-###
-GET http://localhost:3333/clientes
-###
-GET http://localhost:3333/vendas
-###
 GET http://localhost:3333/notasVendas
 
-###
-GET http://localhost:3333/contas
 
-###
-PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
-Content-Type: application/json
-
-{
-    "titulo": "video02",
-    "descricao": "adfasdasd",
-    "duracao": 120
-}
-
-###
-PUT http://localhost:3333/nota/3
-Content-Type: application/json
-
-{
-    "fornecedor": "Gato Preto"
-}
-
-###
-PUT http://localhost:3333/categoria/2
-Content-Type: application/json
-
-{
-    "nome": "Gel GA"
-}
-
-###
-DELETE https://sistemshop-production.up.railway.app/produto/5
-
-###
-DELETE http://localhost:3333/nota/3
-
-
-###
-DELETE http://localhost:3333/categoria/1
+# Conta
 
 ###
 POST http://localhost:3333/login
@@ -150,3 +150,49 @@ Content-Type: application/json
     "email": "superUser@gmail.com",
     "senha": "super432"
 }
+
+###
+POST http://localhost:3333/conta
+Content-Type: application/json
+
+{
+    "email": "superUser@gmail.com",
+    "senha": "super432"
+}
+
+
+###
+POST http://localhost:3333/register
+Content-Type: application/json
+
+{
+    "nome": "Luis",
+    "email": "felipe@gmail.com",
+    "senha": "12345"
+}
+
+###
+GET http://localhost:3333/pendentes
+
+###
+PUT http://localhost:3333/aprovar/3
+
+###
+DELETE http://localhost:3333/negar/2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

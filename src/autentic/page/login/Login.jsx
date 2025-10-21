@@ -1,7 +1,7 @@
 import { Container, Col, Row, Form, Button, Alert } from "react-bootstrap";
 import styles from "../../../../public/css/login.module.css"
 import Footer from "../include/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../sistem/AuthContext";
 
@@ -18,6 +18,7 @@ export default function Login() {
     const [ stop, setStop ] = useState(false)
 
     const navigate = useNavigate()
+    const location = useLocation();
 
     const { login } = useAuth()
 
@@ -92,7 +93,8 @@ export default function Login() {
             // console.log(resposta)
             
             if(resposta.ok){
-                navigate("/");
+                const from = location.state?.from?.pathname || "/";
+                navigate(from, { replace: true });
             } else {
                 setErros(resposta || { login: "Email ou senha inválidos" })
                 setValidated(true)

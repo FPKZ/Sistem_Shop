@@ -5,14 +5,13 @@ import { useAuth } from "./AuthContext";
 import { Container, Row, Col} from "react-bootstrap";
 
 export default function ProtectedRoute() {
-    const { isAutenticated, loading, verificLogin, initServer } = useAuth();
+    const { isAutenticated, loading, verificLogin } = useAuth();
     const location = useLocation()
 
     useEffect(() => {
         verificLogin()
     },[location])
 
-    console.log(loading)
 
     if (loading) {
         return (
@@ -25,6 +24,6 @@ export default function ProtectedRoute() {
             </Container>
         );
     } else {
-        return isAutenticated() ? <Outlet /> : <Navigate to="/login" />;
+        return isAutenticated() ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
     }
 }

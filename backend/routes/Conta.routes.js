@@ -1,7 +1,10 @@
 import { Conta } from "../database/models/index.js";
+import Solicitacao from "../database/models/Solicitacao.js";
+import pedidosRegistros from "../database/pedidos-registros.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// eslint-disable-next-line no-undef
 const SECRET = process.env.VITE_CRYPTO_KEY // Em produção, use uma variável de ambiente para armazenar o segredo
 
 export default async function contaRoutes(fastify) {
@@ -18,7 +21,7 @@ export default async function contaRoutes(fastify) {
             const senhaValida = await bcrypt.compare(senha, conta.senha);
 
             if(senhaValida) {
-                const token = jwt.sign({ id: conta.id, email: conta.email, nome: conta.nome, img: conta.img }, SECRET, { expiresIn: '1h' });
+                const token = jwt.sign({ id: conta.id, email: conta.email, nome: conta.nome, img: conta.img }, SECRET, { expiresIn: '4h' });
                 reply.send({ message: "Login bem-sucedido", conta, token, ok: true });
             } else {
                 reply.code(401).send({ error: "Credenciais inválidas" });
@@ -42,4 +45,68 @@ export default async function contaRoutes(fastify) {
             reply.code(500).send({ error: "Erro ao cadastrar conta" });
         }   
     });
+
+
+
+    fastify.post("/register", async (request, reply) => {
+        try{
+            await pedidosRegistros.sync()
+
+            const { nome, email, senha } = request.body
+            const novaSenha = await bcrypt.hash(senha, 10);
+
+            const novaSolicitacao = await Solicitacao.create({ nome, email, senha: novaSenha })
+            reply.code(200).send({ message: "Solicitação criada com sucesso!", novaSolicitacao})
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao cadastrar solicitação!"})
+        }
+    })
+
+    fastify.get("/pendentes", async (request, reply) => {
+        try{
+            const solicitacoes = await Solicitacao.findAll({
+                where: { status: "pendente" }
+            })
+
+            reply.code(200).send(solicitacoes)
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao buscar solicitações pendentes"})
+        }
+    })
+
+    fastify.put("/aprovar/:id", async (request, reply) => {
+        try{
+            const solicitacao = await Solicitacao.findByPk(request.params.id)
+            if(!solicitacao) return reply.code(404).send({ erro: "Solicitação não encontrada"})
+
+            const data = {
+                nome: solicitacao.nome,
+                email: solicitacao.email,
+                senha: solicitacao.senha
+            }
+            const novaConta = Conta.create(data)
+
+            await solicitacao.destroy()
+            reply.code(200).send({ message: "Solicitação aprovada!", novaConta})
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao aprovar a solicitação"})
+        }
+    })
+    
+    fastify.delete("/negar/:id", async (request, reply) => {
+        try{
+            const solicitacao = await Solicitacao.findByPk(request.params.id)
+            if(!solicitacao) return reply.code(404).send({ erro: "Solicitação não encontrada"})
+        
+            await solicitacao.destroy()
+            reply.code(200).send({ message: "Solicitação Negada!"})
+            
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao negar solicitação"})
+        }
+    })
 }
