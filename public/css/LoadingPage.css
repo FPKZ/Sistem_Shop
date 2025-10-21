@@ -5,7 +5,7 @@
 /* Main Container */
 .loading-screen-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #111827 0%, #000000 50%, #111827 100%);
+  background: linear-gradient(180deg, #1a0b2e 0%, #0a0118 50%, #1a0b2e 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,17 +19,17 @@
 .background-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+  background: radial-gradient(circle at center, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .grid-background {
   position: absolute;
   inset: 0;
-  opacity: 0.1;
+  opacity: 0.15;
   background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px);
+    linear-gradient(rgba(124, 58, 237, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.3) 1px, transparent 1px);
   background-size: 50px 50px;
   animation: slide 20s linear infinite;
 }
@@ -65,12 +65,12 @@
   inset: 0;
   font-size: 4rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #3b82f6 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #ec48bbd6 50%, #7c3aed 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: blur(8px);
-  opacity: 0.5;
+  filter: blur(10px);
+  opacity: 0.6;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -78,24 +78,24 @@
   position: relative;
   font-size: 4rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #3b82f6 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #ec48bbd6 50%, #7c3aed 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+  filter: drop-shadow(0 25px 25px rgba(124, 58, 237, 0.3));
   margin: 0;
 }
 
 .logo-underline {
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, transparent 0%, #22d3ee 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #d946ef 50%, transparent 100%);
   margin-top: 0.5rem;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .logo-subtitle {
-  color: #9ca3af;
+  color: #a78bfa;
   font-size: 1.25rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -116,16 +116,16 @@
 }
 
 .ping-1 {
-  background-color: #22d3ee;
+  background-color: #d946ef;
 }
 
 .ping-2 {
-  background-color: #3b82f6;
+  background-color: #7c3aed;
   animation-delay: 200ms;
 }
 
 .ping-3 {
-  background-color: #22d3ee;
+  background-color: #ec4899;
   animation-delay: 400ms;
 }
 
@@ -141,32 +141,32 @@
 
 .loading-bar-track {
   position: relative;
-  background-color: rgba(31, 41, 55, 0.5);
+  background-color: rgba(26, 11, 46, 0.6);
   border-radius: 9999px;
   height: 0.75rem;
   overflow: hidden;
-  border: 1px solid #374151;
+  border: 1px solid rgba(124, 58, 237, 0.3);
 }
 
 .loading-bar-bg-glow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 0.15) 50%, transparent 100%);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .loading-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6 0%, #22d3ee 50%, #3b82f6 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #d946ef 50%, #7c3aed 100%);
   position: relative;
   transition: width 75ms ease-out;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.5);
 }
 
 .loading-bar-glow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #60a5fa 0%, #67e8f9 50%, #60a5fa 100%);
+  background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 50%, #8b5cf6 100%);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   opacity: 0.75;
 }
@@ -187,12 +187,12 @@
 }
 
 .loading-bar-label {
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 0.875rem;
 }
 
 .loading-bar-percentage {
-  color: #22d3ee;
+  color: #d946ef;
   font-weight: 600;
 }
 
@@ -208,7 +208,7 @@
 }
 
 .loading-text {
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 0.875rem;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   margin: 0;
@@ -224,7 +224,7 @@
 .dot {
   width: 0.25rem;
   height: 0.25rem;
-  background-color: #22d3ee;
+  background-color: #d946ef;
   border-radius: 50%;
   animation: bounce 1s infinite;
 }

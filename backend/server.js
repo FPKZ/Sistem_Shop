@@ -69,7 +69,7 @@ server.get('/', async (request, reply) => {
   const ip = request.ip.replace('::ffff:', '');
   console.log("Ip Cliente: ", ip)
 
-  // const e = await setTimeout(5000, 'esperando')
+  // const e = await setTimeout(60000, 'esperando')
 
   // console.log(e)
   // await esperar()

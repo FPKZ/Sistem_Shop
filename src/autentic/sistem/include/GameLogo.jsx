@@ -7,12 +7,12 @@ export default function GameLogo() {
       <div className="logo-wrapper">
         {/* Glow effect background */}
         <h1 className="logo-glow">
-          BLACKOUT
+          ROMA 
         </h1>
         
         {/* Main text */}
         <h1 className="logo-text">
-          BLACKOUT
+          ROMA 
         </h1>
         
         {/* Underline accent */}
@@ -21,7 +21,7 @@ export default function GameLogo() {
       
       {/* Subtitle */}
       <p className="logo-subtitle">
-        Prepare for the darkness
+        Sexy Shop
       </p>
       
       {/* Decorative elements */}
