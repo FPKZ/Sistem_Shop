@@ -166,10 +166,13 @@ POST http://localhost:3333/register
 Content-Type: application/json
 
 {
-    "nome": "Luis",
-    "email": "felipe@gmail.com",
-    "senha": "12345"
+    "nome": "jorge",
+    "email": "jorge@gmail.com",
+    "senha": "jerg"
 }
+
+###
+GET http://localhost:3333/contas
 
 ###
 GET http://localhost:3333/pendentes

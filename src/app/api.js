@@ -261,4 +261,36 @@ export default class API{
             console.error("Erro ao cadastrar conta", error)
         }
     }
+
+
+    // funções de Adm
+
+    static async getSolicitacoes(){
+        try{
+            const response = await ( await fetch(`${back}/pendentes`, { method: "GET" })).json()
+            return response
+        } catch (err){
+            console.error("Erro ao buscar solicitações pendentes", err)
+        }
+    }
+
+    static async deleteSolicitacao(id){
+        try{
+            const response = await fetch(`${back}/negar/${id}`, { method: "DELETE"})
+            console.log(response)
+            return response
+        } catch(err) {
+            console.error("Erro ao recusar Solicitação", err)
+        }
+    }
+
+
+    static async getUsers(){
+        try{
+            const response = await ( await fetch(`${back}/contas`, { method: "GET" })).json()
+            return response
+        } catch (err){
+            console.error("Erro ao buscar Usuarios", err)
+        }
+    }
 }

@@ -8,6 +8,20 @@ import jwt from "jsonwebtoken";
 const SECRET = process.env.VITE_CRYPTO_KEY // Em produção, use uma variável de ambiente para armazenar o segredo
 
 export default async function contaRoutes(fastify) {
+
+    fastify.get("/contas", async (request, reply) => {
+        try{
+            const contas = await Conta.findAll()
+
+            if(!contas) return reply.code(404).send({message: "Nenhuma conta encontrada"})
+
+            reply.code(200).send(contas)
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao buscar Contas"})
+        }
+    })
+
     fastify.post("/login", async (request, reply) => {
         try {
             const { email, senha } = request.body;

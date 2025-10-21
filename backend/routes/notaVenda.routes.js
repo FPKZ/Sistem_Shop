@@ -4,14 +4,14 @@ export default async function notaVendaRoutes(fastify) {
     fastify.get("/notasVendas", async (request, reply) => {
         try{
             const notasVenda = await NotaVenda.findAll({
-            include: [
-                { model: Venda, as: "venda",
                 include: [
-                    { model: Cliente, as: "cliente" },
-                    { model: ItemVendido, as: "itensVendidos" }
+                    { model: Venda, as: "venda",
+                        include: [
+                            { model: Cliente, as: "cliente" },
+                            { model: ItemVendido, as: "itensVendidos" }
+                        ]
+                    }
                 ]
-                }
-            ]
             })
 
             reply.code(200).send(notasVenda)
