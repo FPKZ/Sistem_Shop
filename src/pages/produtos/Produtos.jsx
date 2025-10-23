@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Produto from "./components/Produto";
 import HoverBtn from "@components/HoverBtn";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
@@ -21,6 +21,8 @@ function Produtos() {
 
   const navigate = useNavigate()
 
+  
+
   usePopStateModal(
     [modalAddProduto, modalInfoProduto],
     [setModalAddProduto, setModalInfoProduto]
@@ -28,7 +30,7 @@ function Produtos() {
   
   const getProduto = async () => {
     const p = await API.getProduto()
-    // console.log(p)
+    console.log(p)
     setProdutos(p);
   }
 
