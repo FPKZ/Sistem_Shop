@@ -8,7 +8,7 @@ export default class API{
     static async initServer(){
         try{
             const response = await fetch(`${back}`)
-            console.log(response)
+            // console.log(response)
             return response
         } catch (err) {
             console.error("Erro ao se comunicar com o Backend", err)
@@ -271,6 +271,24 @@ export default class API{
             return response
         } catch (err){
             console.error("Erro ao buscar solicitações pendentes", err)
+        }
+    }
+
+    static async aproveSolicitacoes(id){
+        try{
+            const response = await fetch(`${back}/aprovar/${id}`, {method: "PUT"})
+            return response
+        } catch(err) {
+            console.error("Erro ao aprovar proposta", err)
+        }
+    }
+
+    static async deleteUser(id){
+        try{
+            const response = await fetch(`${back}/delete-user/${id}`, {method: "DELETE"})
+            return response
+        } catch(err){
+            console.error("Erro ao deletar usuario", err)
         }
     }
 

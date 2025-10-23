@@ -75,7 +75,7 @@ function ProfileMenu({ user, logout }) {
     };
 
     calcSize();
-    console.log(imgSizeState)
+    // console.log(imgSizeState)
 
     window.addEventListener('resize', () => calcSize());
     

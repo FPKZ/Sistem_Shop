@@ -152,7 +152,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3333/conta
+POST http://localhost:3333/cadastrar-conta
 Content-Type: application/json
 
 {

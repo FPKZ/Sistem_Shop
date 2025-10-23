@@ -19,7 +19,7 @@ import process from "node:process"
 import "dotenv/config"
 import sequelize from "./database/sequelize.js";
 import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes, contaRoutes } from "./routes/routers.js";
-import { setTimeout } from "node:timers/promises";
+// import { setTimeout } from "node:timers/promises";
 //import { request } from "node:http";
 
 const server = fastify({ logger: true, trustProxy: true })
