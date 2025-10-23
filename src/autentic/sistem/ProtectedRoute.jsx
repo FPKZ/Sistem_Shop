@@ -11,6 +11,7 @@ export default function ProtectedRoute() {
 
     useEffect(() => {
         verificLogin()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[location])
 
 

@@ -19,11 +19,16 @@ export default async function categoriaRoutes(fastify) {
     fastify.post("/categoria", async (request, reply) => {
         try{
             //const query = request.query.query
+
             
             const data = request.body
+            console.log(data)
+            const categoria_existente = await Categoria.findOne({ where: { nome: data.nome }})
+            if(categoria_existente) return reply.send({ message: "Categoria já existente!", ok: false})
+
             const novacategoria = await Categoria.create(data)
 
-            reply.code(201).send(novacategoria)
+            reply.code(201).send({message: "Categoria cadastrada com sucesso!", ok: true, novacategoria})
         } catch(err){
             console.log(err)
             reply.code(500).send({error: "Erro ao cadastrar categoria"})

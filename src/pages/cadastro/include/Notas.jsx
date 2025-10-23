@@ -3,6 +3,7 @@ import { useState } from "react"
 import TabelaProdutosNota from "./include/TabelaProdutosNota";
 import CadastroModal from "@components/modal/CadastroProdutos/CadastroIntenModal";
 import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
+
 import { useOutletContext } from "react-router-dom";
 
 export default function Notas(){
@@ -20,8 +21,17 @@ export default function Notas(){
 
 
     function cadastrarProduto(data){
-        console.log(data)
-        const p = produtos.concat(data)
+        const obj = Object.fromEntries(data.entries())
+         if (obj.itens && typeof obj.itens === 'string') {
+            try {
+                obj.itens = JSON.parse(obj.itens);
+            } catch (error) {
+                console.error("Erro ao tentar parsear os itens:", error);
+                // Lidar com o erro, caso a string não seja um JSON válido
+            }
+        }
+        // console.log(obj)
+        const p = produtos.concat(obj)
         setProdutos(p)
         setmodalCadastroPrduto(false)
     }
@@ -86,8 +96,8 @@ export default function Notas(){
             // Aqui você faria a chamada para a API para cadastrar a nota
         }
     }
-     console.log(produtos)
-     console.log(Object.fromEntries(produtos))
+    //  console.log(produtos)
+    //  console.log(Object.fromEntries(produtos))
     // console.log(itemEstoque)
     // console.log(modalInfoProduto)
     return(
