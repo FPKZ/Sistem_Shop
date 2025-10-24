@@ -1,5 +1,7 @@
+import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import util from "../../../app/utils.js"
 import { useState, useMemo } from "react";
+import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 
 function Produto({produtos, setModalInfoProduto, setProduto}) {
     //ordenação
@@ -71,19 +73,77 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 <button className="btn btn-secondary ms-2">Filtrar Produtos</button>
             </div> */}
             <div className="my-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
+                <div className="d-flex justify-content-between align-items-center">
+                    <div className="h5 text-center m-0">Produtos</div>
+                    <div className="d-flex gap-3 align-items-center">
+                        <div>
+                            <Button size="sm" variant="" ><Search size={15} /></Button>
+                        </div>
+                        <Dropdown>
+                            <Dropdown.Toggle variant="" className="dropdown-toggle-hidden-arrow d-flex justify-content-center align-items-center">
+                                <ListFilter size={15} />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Row className="m-0 p-0">
+                                    <Col xs={12}>
+                                        <Form.Group>
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="">
+                                                    Filtrar por: 
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={12}>
+                                        <Form.Group>
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="">
+                                                    Ordenar por: {order.chave}        
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item onClick={() => requisitarOrdenacao("id")}>
+                                                        <Dropdown.ItemText>id</Dropdown.ItemText>
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => requisitarOrdenacao("nome")}>
+                                                        <Dropdown.ItemText>Nome</Dropdown.ItemText>
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item>
+                                                        <Dropdown.ItemText>Nome</Dropdown.ItemText>
+                                                    </Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </Form.Group>
+                                    
+                                    </Col>
+                                </Row>
+                                
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <ButtonGroup>
+                            <Button size="sm" variant={`outline-secondary`}><LayoutGrid size={15} /></Button>
+                            <Button size="sm" variant={`secondary`}><LayoutList size={15} /></Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
+                {/* <div className="d-flex justify-content-center">
+                    <h1 className="h4">Filtrar por:</h1>
+                </div>
                 <div className="col-md-8 col-sm-12">
                     <input type="text" className="form-control h-100" placeholder="Buscar produtos..." value={filtro} onChange={(e) => setFiltro(e.target.value)}  />
                 </div>
                 <div className="col-md-4 col-sm-12 d-flex gap-3">
                     <button className="btn btn-secondary w-50">Buscar</button>
                     <button className="btn btn-secondary w-50">Limpar Filtros</button>
-                </div>
+                </div> */}
             </div>
             <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
                 {
                     DadosProcessados.map(produto => (
                         <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                            <div className="card h-100 shadow-sm " style={{minHeight: "320px", cursor: "pointer"}}>
+                            <div className="card h-100 shadow-sm " style={{minHeight: "280px", cursor: "pointer"}}>
                                 <img 
                                     className="card-img-top img-fluid"
                                     src={produto.img || "src/assets/tube-spinner.svg"} 

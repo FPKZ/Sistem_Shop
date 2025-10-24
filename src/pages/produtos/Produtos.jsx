@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Produto from "./components/Produto";
 import HoverBtn from "@components/HoverBtn";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";

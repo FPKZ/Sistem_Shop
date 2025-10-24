@@ -159,7 +159,15 @@ html, body {
     border-color: rgb(238, 86, 228);  
 }
 
+.dropdown-toggle-custom-arrow::after {
+  position: absolute;
+  right: 20px; /* Ajuste a posição horizontal */
+  top: 45%;   /* Ajuste a posição vertical */
+}
 
+.dropdown-toggle-hidden-arrow::after {
+  display: none;
+}
 
 @media (max-width: 766px){
 
