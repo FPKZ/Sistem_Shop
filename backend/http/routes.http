@@ -152,12 +152,13 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3333/conta
+POST https://sistem-shop.onrender.com/conta
 Content-Type: application/json
 
 {
-    "email": "superUser@gmail.com",
-    "senha": "super432"
+    "nome": "Jean",
+    "email": "jeanBruno@gmail.com",
+    "senha": "1234"
 }
 
 
@@ -172,7 +173,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3333/contas
+GET https://sistem-shop.onrender.com/contas
 
 ###
 GET http://localhost:3333/pendentes
