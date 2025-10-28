@@ -56,10 +56,10 @@ const router = createBrowserRouter([
               { path: "Devolucao", element: <Devolucao /> },
             ],
           },
+          { path: "perfil", element: <PerfilPage /> },
+          { path: "ferramentas", element: <FerrramentasPage /> }
         ],
       },
-      { path: "perfil", element: <PerfilPage /> },
-      { path: "ferramentas", element: <FerrramentasPage /> }
     ],  
   },
   { path: "login", element: <Login />},

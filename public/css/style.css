@@ -26,6 +26,10 @@ html, body {
   overflow: auto !important;
 }
 
+#root{
+  background-color: #fefdfe
+}
+
 #root-login{
     position: relative;
     width: 100dvw;
