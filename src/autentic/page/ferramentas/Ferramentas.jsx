@@ -5,6 +5,7 @@ import API from "@app/api"
 import utils from "@app/utils"
 import { Bell, Check, CheckCircle, Edit, PenBox, Search, Trash2, User, UserPlus, XCircle } from "lucide-react"
 import ToastCuston from "@components/ToastCuston"
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao"
 import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
 
@@ -25,6 +26,21 @@ export default function FerrramentasPage(){
     const [ toast, setToast ] = useState(false)
     const [ toastMesage, setToastMesage ] = useState("")
     // const navigate = useNavigate()
+
+    const camposFiltragem = [
+        "nome",
+        "email",
+        "cargo",
+        "createdAt"
+    ]
+
+    const {
+        filtro,
+        setFiltro,
+        order,
+        dadosProcessados,
+        requisitarOrdenacao
+    } = useFiltroOrdenacao(users, camposFiltragem)
 
     useEffect(() => {
         getSolicitacoes()
@@ -164,7 +180,7 @@ export default function FerrramentasPage(){
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {users.map(user => (
+                                        {dadosProcessados.map(user => (
                                             <tr key={user.id}>
                                                 <td>
                                                     <div className="d-flex align-items-center">

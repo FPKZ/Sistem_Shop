@@ -1,43 +1,23 @@
 import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import util from "../../../app/utils.js"
-import { useState, useMemo } from "react";
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 
 function Produto({produtos, setModalInfoProduto, setProduto}) {
-    //ordenação
-    const [ filtro, setFiltro ] = useState();
-    const [ order, setOrder ] = useState({ chave: 'id', direcao: 'asc' });
+    
+    const camposFiltragem = [
+        "nome",
+        "categoria.nome",
+        {path: "itemEstoque", subCampos: ["marca"]}
+    ]
 
-    const DadosProcessados = useMemo(() => {
-        let dadosFiltrados = [...produtos];
-
-        if (filtro) {
-            dadosFiltrados = dadosFiltrados.filter(dados => 
-            dados.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-            dados.categoria.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-            dados.itemEstoque.some((iten) => iten.marca.toLowerCase().includes(filtro.toLowerCase()))
-            );
-        }
-
-        dadosFiltrados.sort((a, b) => {
-            const valorA = a[order.chave];
-            const valorB = b[order.chave];
-        
-            if (valorA < valorB) return order.direcao === 'asc' ? -1 : 1;
-            if (valorA > valorB) return order.direcao === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        return dadosFiltrados;
-    }, [produtos, filtro, order])
-
-    const requisitarOrdenacao = (chave) => {
-        let direcao = 'asc';
-        if (order.chave === chave && order.direcao === 'asc') {
-            direcao = 'desc';
-        }
-        setOrder({ chave, direcao });
-    }
+    const {
+        filtro,
+        setFiltro,
+        order,
+        dadosProcessados,
+        requisitarOrdenacao
+    } = useFiltroOrdenacao(produtos, camposFiltragem)
 
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
@@ -61,7 +41,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
         }
     };
 
-    console.log(DadosProcessados)
+    console.log(dadosProcessados)
     return (
         <>
             {/* <div>
@@ -141,7 +121,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
             </div>
             <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
                 {
-                    DadosProcessados.map(produto => (
+                    dadosProcessados.map(produto => (
                         <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
                             <div className="card h-100 shadow-sm " style={{minHeight: "280px", cursor: "pointer"}}>
                                 <img 
