@@ -43,7 +43,7 @@ export async function editarUser(data){
 export async function deleteUser(id){
     try{
         const response = await fetch(`${back}/delete-user/${id}`, {method: "DELETE"})
-        return response
+        return await response.json()
     } catch(err){
         console.error("Erro ao deletar usuario", err)
     }
@@ -61,7 +61,7 @@ export async function getSolicitacoes(){
 export async function aproveSolicitacoes(id){
     try{
         const response = await fetch(`${back}/aprovar/${id}`, {method: "PUT"})
-        return response
+        return await response.json()
     } catch(err) {
         console.error("Erro ao aprovar proposta", err)
     }
@@ -71,7 +71,7 @@ export async function aproveSolicitacoes(id){
 export async function deleteSolicitacao(id){
     try{
         const response = await fetch(`${back}/negar/${id}`, { method: "DELETE"})
-        return response
+        return await response.json()
     } catch(err) {
         console.error("Erro ao recusar Solicitação", err)
     }

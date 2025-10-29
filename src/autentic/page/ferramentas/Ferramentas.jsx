@@ -1,9 +1,10 @@
-import { Container, Col, Row, Card, Table, Tabs, Tab, Button, ButtonGroup, Tooltip, OverlayTrigger, Modal, Badge, InputGroup, Form, Image, Pagination, FormGroup } from "react-bootstrap"
+import { Container, Col, Row, Card, Table, Tabs, Tab, Button, ButtonGroup, Tooltip, OverlayTrigger, Toast, Modal, Badge, InputGroup, Form, Image, Pagination, FormGroup } from "react-bootstrap"
 import { useState, useEffect } from "react"
 // import { useNavigate } from "react-router-dom"
 import API from "@app/api"
 import utils from "@app/utils"
 import { Bell, Check, CheckCircle, Edit, PenBox, Search, Trash2, User, UserPlus, XCircle } from "lucide-react"
+import ToastCuston from "@components/ToastCuston"
 import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
 
@@ -21,6 +22,8 @@ export default function FerrramentasPage(){
     const [ modalCadastroUser, setModalCadastroUser ] = useState(false)
     const [ modalInfoUser, setModalInfoUser ] = useState(false)
 
+    const [ toast, setToast ] = useState(false)
+    const [ toastMesage, setToastMesage ] = useState("")
     // const navigate = useNavigate()
 
     useEffect(() => {
@@ -30,32 +33,46 @@ export default function FerrramentasPage(){
 
     const getSolicitacoes = async () => {
         const solicit = await API.getSolicitacoes()
-        console.log(solicit)
         setSolicitacoes(solicit)
     }
 
     const getUsers = async () => {
         const u = await API.getUsers()
-        console.log(u)
         setUsers(u)
     }
 
 
     const deleteSolicitacao = async (solict) => {
         const response = await API.deleteSolicitacao(solict.id)
+        if(!response.ok){
+            setToastMesage(response.message || response.error)
+            setToast(true)
+            return
+        }
+        setToastMesage(response.message)
+        setToast(true)
         console.log(response)
         setAtt(!att)
     }
     
     const aproveSolicitacao = async (solict) => {
-        await API.aproveSolicitacoes(solict.id)
+        const response = await API.aproveSolicitacoes(solict.id)
+        if(!response.ok){
+            setToastMesage(response.message || response.error)
+            setToast(true)
+            return
+        }
+        setToastMesage(response.message)
+        setToast(true)
         setAtt(!att)
     }
 
 
 
     const deleteUser = async (user) => {
-        await API.deleteUser(user.id)
+        const response = await API.deleteUser(user.id)
+        setToastMesage(response.message || response.error)
+        setToast(true)
         await getUsers()
     }
 
@@ -70,11 +87,11 @@ export default function FerrramentasPage(){
         const form = e.target
         const result = new FormData(form)
         const data_refatorada = Object.fromEntries(result.entries())
-        console.log(data_refatorada)
         const response = await API.cadastrarUser(data_refatorada)
         if(!response.ok){
             console.log(response)
-            window.alert(response.message)
+            setToastMesage(response.message || response.error)
+            setToast(true)
             return
         }
         setModalCadastroUser(false)
@@ -87,7 +104,8 @@ export default function FerrramentasPage(){
         const data_refatorada = Object.fromEntries(form.entries())
         const response = await API.editarUser(data_refatorada)
         if(!response.ok){
-            window.alert(response.message)
+            setToastMesage(response.message || response.error)
+            setToast(true)
             return
         }
         setModalInfoUser(false)
@@ -177,7 +195,7 @@ export default function FerrramentasPage(){
                             </Card.Body>
                         </Card>
                     </Tab>
-                    <Tab eventKey={"requests"} title={<><Bell size={16} className="me-2" /> solicitaçoes de Acesso <Badge pill bg="danger">{solicitacoes.length}</Badge> </>}>
+                    <Tab eventKey={"requests"} title={<><Bell size={16} className="me-2" /> solicitaçoes de Acesso {solicitacoes.length ? (<Badge pill bg="danger">{solicitacoes.length}</Badge>) : ""} </>}>
                         <Card className="shadow-sm">
                             <Card.Body>
                                 <Table responsive hover>
@@ -314,6 +332,8 @@ export default function FerrramentasPage(){
                 </Form>
             </Modal.Body>
         </Modal>
+        {/* <Button onClick={() => setToast(true)} >toast</Button> */}
+        <ToastCuston visible={toast} onClose={() => setToast(false)} >{toastMesage}</ToastCuston>
     </>
     )
 }
