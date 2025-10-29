@@ -1,6 +1,6 @@
-import { Container, Col, Row, Card, Table, Tabs, Tab, Button, ButtonGroup, Tooltip, OverlayTrigger, Modal, Badge, InputGroup, Form, Image, Pagination } from "react-bootstrap"
+import { Container, Col, Row, Card, Table, Tabs, Tab, Button, ButtonGroup, Tooltip, OverlayTrigger, Modal, Badge, InputGroup, Form, Image, Pagination, FormGroup } from "react-bootstrap"
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import API from "@app/api"
 import utils from "@app/utils"
 import { Bell, Check, CheckCircle, Edit, PenBox, Search, Trash2, User, UserPlus, XCircle } from "lucide-react"
@@ -8,20 +8,25 @@ import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
 
 export default function FerrramentasPage(){
+
+    const [ att, setAtt ] = useState(false)
     
-    const [ tela, setTela ] = useState("usuarios")
     const [ solicitacoes, setSolicitacoes ] = useState([])
     const [ users, setUsers ] = useState([])
     
+    const [ userEdit, setUserEdit ] = useState({})
     const [ userDelet, setUserDelet ] = useState({})
-    const [ modal, setModal ] = useState(false)
+    
+    const [ modalDeletUser, setModalDeletUser ] = useState(false)
+    const [ modalCadastroUser, setModalCadastroUser ] = useState(false)
+    const [ modalInfoUser, setModalInfoUser ] = useState(false)
 
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
 
     useEffect(() => {
         getSolicitacoes()
         getUsers()
-    },[tela])
+    },[att])
 
     const getSolicitacoes = async () => {
         const solicit = await API.getSolicitacoes()
@@ -39,12 +44,12 @@ export default function FerrramentasPage(){
     const deleteSolicitacao = async (solict) => {
         const response = await API.deleteSolicitacao(solict.id)
         console.log(response)
-        await getSolicitacoes()
+        setAtt(!att)
     }
     
     const aproveSolicitacao = async (solict) => {
         await API.aproveSolicitacoes(solict.id)
-        await getSolicitacoes()
+        setAtt(!att)
     }
 
 
@@ -57,143 +62,49 @@ export default function FerrramentasPage(){
 
     const handleDeleteClick = async (user) => {
         setUserDelet(user)
-        setModal(true)
+        setModalDeletUser(true)
     }
-    
-    function TelaSolicitacao({solicitacoes}){
-        // console.log(solicitacoes)
 
-        const deleteSolicitacao = async (solict) => {
-            const response = await API.deleteSolicitacao(solict.id)
+    const handleSubmitCreate = async (e) => {
+        e.preventDefault()
+        const form = e.target
+        const result = new FormData(form)
+        const data_refatorada = Object.fromEntries(result.entries())
+        console.log(data_refatorada)
+        const response = await API.cadastrarUser(data_refatorada)
+        if(!response.ok){
             console.log(response)
-            await getSolicitacoes()
+            window.alert(response.message)
+            return
         }
-        
-        const aproveSolicitacao = async (solict) => {
-            await API.aproveSolicitacoes(solict.id)
-            await getSolicitacoes()
-        }
-    
-        return(
-            <Row className="p=0 m-0 border rounded-2 overflow-hidden">
-                <Row className="text-center bg-body-tertiary m-0 p-2">
-                    <Col><strong>Nome</strong></Col>
-                    <Col><strong>Email</strong></Col>
-                    <Col><strong>Ação</strong></Col>
-                </Row>
-                <Row className="p-0 m-0">
-                    {
-                        solicitacoes?.map((solict) => (
-                            <Row key={solict.id} className="text-center m-0 p-2 border-top">
-                                <Col className="d-flex gap-2 justify-content-center text-capitalize"><strong className="d-flex justify-content-center align-items-center">{solict.nome}</strong></Col>
-                                <Col className="d-flex gap-2 justify-content-center "><strong className="d-flex justify-content-center align-items-center">{solict.email}</strong></Col>
-                                <Col className="d-flex gap-2 justify-content-center">
-                                    <OverlayTrigger
-                                    placement="top"
-                                    overlay={
-                                        <Tooltip>Aceitar Cadastro</Tooltip>
-                                    }>
-                                        <Button variant="success" size="sm" onClick={() => aproveSolicitacao(solict)}>
-                                            <Check size={"15"} />
-                                        </Button>
-                                    </OverlayTrigger>
-                                    <OverlayTrigger
-                                    placement="top"
-                                    overlay={
-                                        <Tooltip>Recusar Cadastro</Tooltip>
-                                    }>
-                                        <Button variant="danger" size="sm" onClick={() => deleteSolicitacao(solict)}>
-                                            <Trash2 size={"15"} />
-                                        </Button>
-                                    </OverlayTrigger>
-                                </Col>
-                            </Row>
-                        ))
-                    }
-                </Row>
-            </Row>
-        )
+        setModalCadastroUser(false)
+        setAtt(!att)
     }
 
-    function TelaUsers({users}){
-
-        const [ userDelet, setUserDelet ] = useState({})
-        const [ modal, setModal ] = useState(false)
-
-
-        const deleteUser = async (user) => {
-            await API.deleteUser(user.id)
-            await getUsers()
+    const handleSubmitEdit = async (e) => {
+        e.preventDefault()
+        const form = new FormData(e.target)
+        const data_refatorada = Object.fromEntries(form.entries())
+        const response = await API.editarUser(data_refatorada)
+        if(!response.ok){
+            window.alert(response.message)
+            return
         }
-
-
-        const handleDeleteClick = async (user) => {
-            setUserDelet(user)
-            setModal(true)
-        }
-
-        return (
-            <Row className="p-0 m-0 border rounded-2 overflow-hidden">
-                <Row className="text-center bg-body-tertiary m-0 p-2 ">
-                    <Col><strong>Nome</strong></Col>
-                    <Col><strong>Cargo</strong></Col>
-                    <Col><strong>Ação</strong></Col>
-                </Row>
-                <Row className="p-0 m-0">
-                    {
-                        users?.map((user) => (
-                            <Row key={user.id} className="text-center m-0 p-2 border-top">
-                                <Col className="d-flex gap-2 justify-content-center text-capitalize"><strong className="d-flex justify-content-center align-items-center">{user.nome}</strong></Col>
-                                <Col className="d-flex gap-2 justify-content-center "><strong className="d-flex justify-content-center align-items-center">{user.cargo}</strong></Col>
-                                <Col className="d-flex gap-2 justify-content-center">
-                                    <OverlayTrigger
-                                    placement="top"
-                                    overlay={
-                                        <Tooltip>Editar Cargo</Tooltip>
-                                    }>
-                                        <Button variant="secondary" size="sm" >
-                                            <PenBox size={"15"} />
-                                        </Button>
-                                    </OverlayTrigger>
-                                    <OverlayTrigger
-                                    placement="top"
-                                    overlay={
-                                        <Tooltip>Excluir Usuario</Tooltip>
-                                    }>
-                                        <Button variant="danger" size="sm" onClick={() => handleDeleteClick(user)}>
-                                            <Trash2 size={"15"} />
-                                        </Button>
-                                    </OverlayTrigger>
-                                </Col>
-                            </Row>
-                        ))
-                    }
-                </Row>
-                <Modal show={modal} onHide={() => setModal(false)} size="sm" centered backdrop={false}>
-                    <Modal.Body className="d-flex flex-column justify-content-center align-items-center gap-3">
-                            <Row>
-                                <Modal.Title>Deseja excluir o usuario</Modal.Title>
-                            </Row>
-                            <Row><Modal.Title>{userDelet.nome}</Modal.Title></Row>
-                            <Row className="mt-3">
-                                <Col className="d-flex gap-2">
-                                    <Button variant="success" onClick={() => {deleteUser(userDelet); setModal(false)}}>Excluir</Button>
-                                    <Button variant="danger" onClick={() => setModal(false)}>Cancelar</Button>
-                                </Col>
-                            </Row>
-                    </Modal.Body>
-                </Modal>
-            </Row>
-        )
+        setModalInfoUser(false)
+        setAtt(!att)
     }
 
-    function Visor({tela, solicitacoes, users}){
-        switch(tela){
-            case "solicitacao":
-                return <TelaSolicitacao solicitacoes={solicitacoes} />
-            default:
-                return <TelaUsers users={users} />
-        }
+    const handleChange = async (e) => {
+        const { name, value } = e.target
+        setUserEdit((prev) => {
+            const updateValues = {
+                ...prev,
+                [name]: value,
+            }
+
+            return updateValues
+
+        })
     }
 
     return (<>
@@ -220,7 +131,7 @@ export default function FerrramentasPage(){
                                         <InputGroup.Text><Search size={16} /></InputGroup.Text>
                                         <Form.Control placeholder="Buscar usuário..." />
                                     </InputGroup>
-                                    <Button variant="primary" className="d-flex align-items-center">
+                                    <Button variant="" className="btn btn-roxo d-flex align-items-center" onClick={() => setModalCadastroUser(true)}>
                                         <UserPlus size={16} className="me-2" />
                                         Adicionar Usuário
                                     </Button>
@@ -249,20 +160,20 @@ export default function FerrramentasPage(){
                                                 <td>{user.cargo}</td>
                                                 <td>{utils.formatDateTime(user.createdAt)}</td>
                                                 <td>
-                                                    <Button variant="link" size="sm" className="text-secondary"><Edit size={16} /></Button>
+                                                    <Button variant="link" size="sm" className="text-secondary" onClick={() => {setUserEdit(user); setModalInfoUser(true)}}><Edit size={16} /></Button>
                                                     <Button variant="link" size="sm" className="text-danger" onClick={() => handleDeleteClick(user)}> <Trash2 size={16} /></Button>
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
-                                    <div className="d-flex justify-content-between align-items-center mt-4">
-                                        <span className="text-muted small">Mostrando 1 a 4 de 100</span>
-                                        <Pagination>
-                                            <Pagination.Prev />
-                                            <Pagination.Next />
-                                        </Pagination>
-                                    </div>
                                 </Table>
+                                <div className="d-flex justify-content-between align-items-center mt-4">
+                                    <span className="text-muted small">Mostrando 1 a 4 de 100</span>
+                                    <Pagination>
+                                        <Pagination.Prev />
+                                        <Pagination.Next />
+                                    </Pagination>
+                                </div>
                             </Card.Body>
                         </Card>
                     </Tab>
@@ -310,7 +221,44 @@ export default function FerrramentasPage(){
             </Container>
         </main>
 
-        <Modal show={modal} onHide={() => setModal(false)} size="sm" centered backdrop={false}>
+        <Modal show={modalInfoUser} onHide={() => setModalInfoUser(false)} size="sm" centered>
+            <Modal.Header className="border-0 mb-0" closeButton >
+                <Modal.Title>Editar Usuario</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="px-4">
+                <Form onSubmit={handleSubmitEdit}>
+                    <Row className="g-4">
+                        <Form.Control type="hidden" name="id" value={userEdit.id} onChange={handleChange} required/>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Nome:</Form.Label>
+                                <Form.Control type="text" name="nome" value={userEdit.nome} onChange={handleChange} required/>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Email:</Form.Label>
+                                <Form.Control type="text" name="email" value={userEdit.email} onChange={handleChange} required/>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Permissão:</Form.Label>
+                                <Form.Select type="text" name="cargo" value={userEdit.cargo} onChange={handleChange} required>
+                                    <option>User</option>
+                                    <option>Adm</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Button className="btn btn-roxo w-100" type="submit">Alterar</Button>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal.Body>
+        </Modal>
+
+        <Modal show={modalDeletUser} onHide={() => setModalDeletUser(false)} size="sm" centered backdrop={false}>
             <Modal.Body className="d-flex flex-column justify-content-center align-items-center gap-3">
                     <Row>
                         <Modal.Title>Deseja excluir o usuario</Modal.Title>
@@ -318,34 +266,54 @@ export default function FerrramentasPage(){
                     <Row><Modal.Title>{userDelet.nome}</Modal.Title></Row>
                     <Row className="mt-3">
                         <Col className="d-flex gap-2">
-                            <Button variant="success" onClick={() => {deleteUser(userDelet); setModal(false)}}>Excluir</Button>
-                            <Button variant="danger" onClick={() => setModal(false)}>Cancelar</Button>
+                            <Button variant="success" onClick={() => {deleteUser(userDelet); setModalDeletUser(false)}}>Excluir</Button>
+                            <Button variant="danger" onClick={() => setModalDeletUser(false)}>Cancelar</Button>
                         </Col>
                     </Row>
             </Modal.Body>
         </Modal>
 
-        {/* <div className="h-100">
-            <Row className="p-4">
-                <Col className="py-3 mb-4 d-flex align-items-center">
-                    <Button className="btn btn-roxo h-75" onClick={() => navigate(-1)}><i className="bi bi-chevron-left"></i></Button>
-                    <h1 className="ms-3">Ferramentas de Adiministrador</h1>
-                </Col>
-            </Row>
-            <Row className="h-75 p-4">
-                <Col md={2} className="p-2 py-0 border-end">
-                    <ButtonGroup vertical className="w-100 gap-3">
-                        <Button variant="" className="text-start" onClick={() => setTela("usuarios")}>Usuarios</Button>
-                        <Button variant="" className="text-start" onClick={() => setTela("solicitacao")}>Solicitação de Cadastro</Button>
-                        <Button variant="" className="text-start" onClick={() => setTela("usuarios")}>Usuarios</Button>
-                    </ButtonGroup>
-                </Col>
-                <Col md={10} className="p-2 px-3">
-                    <Visor tela={tela} solicitacoes={solicitacoes} users={users} />
-                </Col>
-            </Row>
-        </div> */}
+        <Modal show={modalCadastroUser} onHide={() => setModalCadastroUser(false)} size="sm" centered  >
+            <Modal.Header className="border-0 mb-0" closeButton >
+                <Modal.Title>Cadastrar Novo Usuario</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="px-4">
+                <Form onSubmit={handleSubmitCreate}>
+                    <Row className="g-4">
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Nome:</Form.Label>
+                                <Form.Control type="text" name="nome" placeholder="João da Silva" required/>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Email:</Form.Label>
+                                <Form.Control type="text" name="email" placeholder="joaoSilva@gmail.com" required/>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Senha:</Form.Label>
+                                <Form.Control type="senha" name="senha" placeholder="mudar123" required/>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Permissão:</Form.Label>
+                                <Form.Select type="text" name="cargo" required>
+                                    <option>User</option>
+                                    <option>Adm</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={12}>
+                            <Button className="btn btn-roxo w-100" type="submit">Cadastrar</Button>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal.Body>
+        </Modal>
     </>
     )
 }
-
