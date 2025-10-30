@@ -146,7 +146,10 @@ export default function GerenciamentoUsuario(){
         <main className="flex-grow-1 overflow-auto p-4 p-sm-6 p-md-8" >
             <Container fluid="xl">
                 <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between mb-4">
-                    <h2 className="h3 fw-bold mb-3 mb-sm-0" >Gerenciamento de Usuário</h2>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-white" >Gerenciamento de Usuário</h2>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie e modifique usuários</p>
+                    </div>
                     {/* <Button variant="primary" className="d-flex align-items-center position-relative">
                         <Bell size={16} className="me-2" />
                         Solicitaçoes Pendentes
