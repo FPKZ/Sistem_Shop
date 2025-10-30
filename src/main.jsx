@@ -20,7 +20,7 @@ import {
   Login,
   CadastroUser,
   PerfilPage,
-  FerrramentasPage
+  GerenciamentoUsuario
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./autentic/sistem/ProtectedRoute.jsx";
@@ -57,7 +57,7 @@ const router = createBrowserRouter([
             ],
           },
           { path: "perfil", element: <PerfilPage /> },
-          { path: "ferramentas", element: <FerrramentasPage /> }
+          { path: "ferramentas", element: <GerenciamentoUsuario /> }
         ],
       },
     ],  

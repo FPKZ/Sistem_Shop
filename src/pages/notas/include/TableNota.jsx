@@ -25,7 +25,7 @@ import {
   ArrowUpDown 
 } from 'lucide-react';
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 
 export default function TableNota({notas, setselectNota, setisModalOpem}){
@@ -72,10 +72,10 @@ export default function TableNota({notas, setselectNota, setisModalOpem}){
         setisModalOpem(true);
     };
 
-    const handleAssignCourse = (trainee) => {
-        setselectNota(trainee);
-        setIsAssignCourseOpen(true);
-    };
+    // const handleAssignCourse = (trainee) => {
+    //     setselectNota(trainee);
+    //     setIsAssignCourseOpen(true);
+    // };
 
     const getStatusBadge = (status) => {
         switch (status) {

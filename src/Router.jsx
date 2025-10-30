@@ -14,7 +14,7 @@ import TelaCadastro from "./pages/cadastro/include/TelaCadastro.jsx"
 import Login from "./autentic/page/login/Login.jsx";
 import CadastroUser from "./autentic/page/cadastro/CadastroUser.jsx";
 import PerfilPage from "./autentic/page/perfil/Perfil.jsx";
-import FerrramentasPage from "./autentic/page/ferramentas/Ferramentas.jsx";
+import GerenciamentoUsuario from "./autentic/page/ferramentas/GerenciamentoUsuario.jsx";
 
 export {
   Cadastro,
@@ -33,5 +33,5 @@ export {
   Login,
   CadastroUser,
   PerfilPage,
-  FerrramentasPage
+  GerenciamentoUsuario
 };

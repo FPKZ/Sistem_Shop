@@ -9,7 +9,7 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao"
 import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
 
-export default function FerrramentasPage(){
+export default function GerenciamentoUsuario(){
 
     const [ att, setAtt ] = useState(false)
     
@@ -37,9 +37,9 @@ export default function FerrramentasPage(){
     const {
         filtro,
         setFiltro,
-        order,
+        // order,
         dadosProcessados,
-        requisitarOrdenacao
+        // requisitarOrdenacao
     } = useFiltroOrdenacao(users, camposFiltragem)
 
     useEffect(() => {
@@ -163,7 +163,7 @@ export default function FerrramentasPage(){
                                 <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
                                     <InputGroup className="mb-3 mb-sm-0" style={{ maxWidth: "250px"}}>
                                         <InputGroup.Text><Search size={16} /></InputGroup.Text>
-                                        <Form.Control placeholder="Buscar usuário..." />
+                                        <Form.Control placeholder="Buscar usuário..." value={filtro} onChange={(e) => setFiltro(e.target.value)} />
                                     </InputGroup>
                                     <Button variant="" className="btn btn-roxo d-flex align-items-center" onClick={() => setModalCadastroUser(true)}>
                                         <UserPlus size={16} className="me-2" />
@@ -202,7 +202,7 @@ export default function FerrramentasPage(){
                                     </tbody>
                                 </Table>
                                 <div className="d-flex justify-content-between align-items-center mt-4">
-                                    <span className="text-muted small">Mostrando 1 a 4 de 100</span>
+                                    <span className="text-muted small">Mostrando {dadosProcessados.length} de {dadosProcessados.length}</span>
                                     <Pagination>
                                         <Pagination.Prev />
                                         <Pagination.Next />
