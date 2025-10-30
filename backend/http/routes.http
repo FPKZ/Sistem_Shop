@@ -28,15 +28,15 @@ Content-Type: application/json
 GET http://localhost:3333/produtos?itens=estoque&nome=
 ###
 PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
-###
-DELETE https://sistemshop-production.up.railway.app/produto/5
 Content-Type: application/json
-
 {
     "titulo": "video02",
     "descricao": "adfasdasd",
     "duracao": 120
 }
+###
+DELETE http://localhost:3333/produto/18
+
 
 # Notas
 

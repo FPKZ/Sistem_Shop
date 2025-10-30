@@ -16,13 +16,10 @@ export async function postNota(data){
     try{
         const response  = await fetch(`${back}/nota`, {
             method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
+            body: data
         })
         //console.log(response.status)
-        return response
+        return await response.json()
     } catch (error){
         console.error("Erro ao cadastrar nota", error)
     }

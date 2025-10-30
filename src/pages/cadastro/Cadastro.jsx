@@ -1,33 +1,16 @@
-import { useState, useEffect } from "react";
-import { Card } from "@components/Card";
-import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
-import Produtos from "./include/Produtos";
-import Clientes from "./include/Clientes";
-import Notas from "./include/Notas";
-import API from "../../app/api.js";
 import { Button } from "react-bootstrap";
 
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import utils from "@app/utils";
 
 function Cadastro() {
-  const [itensCriados, setItensCriados] = useState([]);
-  const [modalCriar, setModalCriar] = useState(false);
   const navigate = useNavigate();
   
   const location = useLocation()
   const pathParts = location.pathname.split('/').filter(part => part)
   // console.log(pathParts);
 
-  const cadastrarProduto = async (data) => {
-    try {
-      const response = await API.postProduto(data);
-      setItensCriados(response.itensEstoque);
-      return response;
-    } catch (error) {
-      console.error("erro ao cadastar", error);
-    }
-  };
+
 
   return (
     <div className="p-2 p-md-4">
@@ -48,7 +31,7 @@ function Cadastro() {
         </nav>
       </div>
       <div className="row row-cols-* g-2 g-md-4">
-        <Outlet context={{ cadastrarProduto, setModalCriar }} />
+        <Outlet context={{ }}  />
         {/* {!tela && (
           <>
             <Card
@@ -87,11 +70,6 @@ function Cadastro() {
         {tela === "Clientes" && <Clientes />}
         {tela === "Notas" && <Notas />} */}
       </div>
-      <ProdutosCriados
-        visible={modalCriar}
-        onClose={() => setModalCriar(false)}
-        itens={itensCriados}
-      />
     </div>
   );
 }

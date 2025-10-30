@@ -6,6 +6,7 @@ import { useOutletContext } from "react-router-dom"
 export default function TabelaProdutosNota({produto, setItemEstoque, width, custom, setmodalInfoProduto}){
 
     const { mobile } = useOutletContext()
+    console.log(produto)
 
     return (
          <>
@@ -33,11 +34,11 @@ export default function TabelaProdutosNota({produto, setItemEstoque, width, cust
 }
 
 function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
-  console.log(produtos)
+  // console.log(produtos)
   if(!produtos) return
   const itens = produtos.itens;
 
-  console.log(itens)
+  // console.log(itens)
     
   const getStatusBadge = (status) => {
     switch (status) {

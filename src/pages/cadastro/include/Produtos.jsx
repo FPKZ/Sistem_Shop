@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import API from "@app/api";
-import { useNavigate, useOutletContext } from "react-router-dom";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
+import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
+import ToastCuston from "@components/ToastCuston";
 
 export default function Produtos() {
   const [categoria, setCategoria] = useState({});
@@ -12,8 +13,9 @@ export default function Produtos() {
   const [modalCadastroNota, setModalCadastroNota] = useState(false)
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false)
 
-  const { cadastrarProduto, setModalCriar } = useOutletContext()
-  
+  const [modalCriar , setModalCriar] = useState(false)
+
+  const [ itensCriados, setItensCriados ] = useState(null)
 
   const [erros, setErros] = useState({});
   const [validated, setValidated] = useState(false);
@@ -31,7 +33,6 @@ export default function Produtos() {
     descricao: "",
   });
 
-  const navigate = useNavigate()
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -121,11 +122,15 @@ export default function Produtos() {
 
       finalFormData.set("itens", JSON.stringify(itens));
 
-      //console.log(Object.fromEntries(finalFormData));
+      console.log(Object.fromEntries(finalFormData));
       // eslint-disable-next-line no-unused-vars
-      const response = await cadastrarProduto(finalFormData);
-      navigate(-1)
-      setModalCriar(true)
+      const response = await API.postProduto(finalFormData)
+      // const response = await cadastrarProduto(finalFormData);
+      if(response.ok){
+        setItensCriados(response.itensEstoque)
+        setModalCriar(true)
+      }
+      console.log(response)
     }
   }
 
@@ -456,6 +461,11 @@ export default function Produtos() {
       </form>
       <CadastrarNotaModal visible={modalCadastroNota} onClose={() => setModalCadastroNota(false)} produts={false} />
       <CadastroCategoria visible={modalCadastroCategoria} onClose={() => setModalCadastroCategoia(false)} />
+      <ProdutosCriados
+          visible={modalCriar}
+          onClose={() => setModalCriar(false)}
+          itens={itensCriados}
+      />
     </div>
   );
 }
@@ -465,7 +475,9 @@ function Nota({ notas, setNota }) {
     <>
       {notas.map((nota) => (
         <li key={nota.id}>
-          <a className="dropdown-item" href="#" onClick={() => setNota(nota)}>
+          <a className="dropdown-item" 
+            style={{cursor: "pointer"}}
+            onClick={() => setNota(nota)}>
             {nota.codigo}
           </a>
         </li>
@@ -480,7 +492,7 @@ function Categoria({ categorias, setCategoria }) {
         <li key={categoria.id}>
           <a
             className="dropdown-item"
-            href="#"
+            style={{cursor: "pointer"}}
             onClick={() => setCategoria(categoria)}
           >
             {categoria.nome}
