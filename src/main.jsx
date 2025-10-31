@@ -58,7 +58,7 @@ const router = createBrowserRouter([
             ],
           },
           { path: "perfil", element: <PerfilPage /> },
-          { path: "ferramentas", element: <GerenciamentoUsuario /> }
+          { path: "usuarios", element: <GerenciamentoUsuario /> }
         ],
       },
     ],  

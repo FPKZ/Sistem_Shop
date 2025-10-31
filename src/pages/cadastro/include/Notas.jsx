@@ -163,7 +163,7 @@ export default function Notas(){
     // console.log(itemEstoque)
     // console.log(modalInfoProduto)
     return(
-        <div className="row-col w-100 p-1 p-md-3 d-flex gap-4 justify-content-center">
+        <div className="row-col w-100 p-3 pt-0 m-0 p-md-3 d-flex gap-4 justify-content-center">
             <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3">
                 <div className="col-sm col-md-12 p-0">
                     <label htmlFor="numeroNota"  className="form-label">Numero da Nota</label>

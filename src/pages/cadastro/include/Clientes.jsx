@@ -105,8 +105,8 @@ export default function Clientes(){
 
     return(
         <>
-            <div className="row w-100 p-3 d-flex gap-4">
-                <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3 justify-content-center align-content-center">
+            <form onSubmit={handleSubimit} noValidate className="">
+                <div className="row p-3 pt-0 m-0 gap-4">
                     <Col md={12} className="p-0">
                         <label htmlFor="nome" className="form-label">Nome</label>
                         <input type="text" className={`form-control ${validated ? (erros.nome ? `is-invalid` : `is-valid`) : "" }`} id="nome" name="nome" value={formValue.nome || ""} onChange={handleChange} placeholder="Nome" required/>
@@ -124,8 +124,8 @@ export default function Clientes(){
                         <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
                     </Col>
                     <Button className="btn btn-roxo" type="submit">Adicionar</Button>
-                </form>
-            </div>
+                </div>
+            </form>
         </>
     )
 }

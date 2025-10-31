@@ -2,22 +2,54 @@
 import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@autentic-sistem/AuthContext";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import utils from "@app/utils";
 
-export default function Header() {
+export default function Header({mobile}) {
 
-
+  const navigate = useNavigate()
   const { logout, user } = useAuth()
   
   let imgSize 
   
-  
+  const location = useLocation()
+  const pathParts = location.pathname.split('/').filter(part => part)
 
-  return (
-    <header id="header" className="p-0 px-3 text-white d-flex align-items-center justify-content-between">
-      <h1>Sistem Shop</h1>
+   const breadcrumbTitles = {
+    'usuarios': 'Usuários',
+    'Extorno': 'Estorno',
+    'Devolucao': 'Devolução',
+    // Adicione outras traduções conforme necessário
+  };
 
+  return (<>
+    <header id="header" className="p-0 px-3 d-flex align-items-center justify-content-between border-bottom">
+      <div className="d-flex justify-content-center flex-wrap flex-md-nowarp align-items-center gap-4 position-relative">
+        {pathParts.length > 0 ? (
+          <>
+          <Button className="btn btn-roxo " size={mobile && "sm"} onClick={() => {pathParts.length > 1 ? navigate(-1) : navigate('/')}}>
+              <i className="bi bi-chevron-left"></i>
+          </Button>
+          <nav
+              className="d-flex justify-content-center align-items-center"
+              aria-label="breadcrumb"
+          >
+              <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center m-0">
+                {mobile ? 
+                  <h1 className="h3 breadcrumb-item m-0 d-flex align-items-center fs-3">{breadcrumbTitles[0] || utils.capitalize(pathParts[0])}</h1>
+                  :
+                  pathParts.length &&
+                    pathParts.map(tela => (
+                    <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-3">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
+                  ))
+                }
+              </ol>
+          </nav>
+          </>
+        ) : ""}
+      </div>
       <div id="user-menu" className="d-flex align-items-center h-100">
+        <h1 className="me-3 m-0 fs-5">Sistem Shop</h1>
         <ProfileMenu user={user} imgSize={imgSize} logout={logout} />
         
         {/* <Dropdown align="end" show={show} onMouseEnter={() => swtShow(true)} onMouseLeave={() => swtShow(false)}>
@@ -55,6 +87,27 @@ export default function Header() {
         <Button variant="outline-light" onClick={() => logout()}>Sair</Button> */}
       </div>
     </header>
+    {mobile && 
+      pathParts.length > 1 ? (
+      <div className="mt-2">
+        <nav
+            className="d-flex justify-content-center align-items-center"
+            aria-label="breadcrumb"
+        >
+            <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center  m-0">
+                {pathParts.map(tela => {
+                  if(tela !== pathParts[0]){
+                    return (
+                      <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-6">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
+                    )
+                  }
+                })}
+              </ol>
+            </nav>
+          </div>
+      ) : ""
+    }
+  </>
   )
 }
 
@@ -109,7 +162,7 @@ function ProfileMenu({ user, logout }) {
         <Dropdown.ItemText className="text-center">{user.nome}</Dropdown.ItemText>
         <Dropdown.Divider />
         <Dropdown.Item className="text-start" onClick={() => navigate("perfil")}>Perfil</Dropdown.Item>
-        <Dropdown.Item className="text-start"onClick={() => navigate("ferramentas")}>Ferramentas</Dropdown.Item>
+        <Dropdown.Item className="text-start"onClick={() => navigate("usuarios")}>Ferramentas</Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item onClick={() => logout()}><i className="bi bi-power me-2"></i>Sair</Dropdown.Item>
       </Dropdown.Menu>

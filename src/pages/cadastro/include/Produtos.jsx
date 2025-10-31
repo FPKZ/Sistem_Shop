@@ -155,7 +155,7 @@ export default function Produtos() {
   };
 
   return (
-    <div className="row-cols-2 w-100 p-3 d-flex gap-4">
+    <div className="row-cols-2 w-100 p-3 pt-0 m-0 d-flex gap-4">
       <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
         <div className="row gap-4 mb-3 pb-4 border-bottom m-0">
           <div className="col-md-12 w-100 p-0">

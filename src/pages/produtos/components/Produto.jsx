@@ -3,7 +3,7 @@ import util from "../../../app/utils.js"
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 
-function Produto({produtos, setModalInfoProduto, setProduto}) {
+function Produto({produtos, setModalInfoProduto, setProduto, children}) {
     
     const camposFiltragem = [
         "nome",
@@ -52,9 +52,9 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 <button className="btn btn-secondary ms-2">Exportar Lista</button>
                 <button className="btn btn-secondary ms-2">Filtrar Produtos</button>
             </div> */}
-            <div className="my-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
+            <div className="mb-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
                 <div className="d-flex justify-content-between align-items-center">
-                    <div className="h5 text-center m-0">Produtos</div>
+                    <div className="h5 text-center fw-normal m-0">Produtos</div>
                     <div className="d-flex gap-3 align-items-center">
                         <div>
                             <Button size="sm" variant="" ><Search size={15} /></Button>
@@ -106,6 +106,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                             <Button size="sm" variant={`outline-secondary`}><LayoutGrid size={15} /></Button>
                             <Button size="sm" variant={`secondary`}><LayoutList size={15} /></Button>
                         </ButtonGroup>
+                    {children}
                     </div>
                 </div>
                 {/* <div className="d-flex justify-content-center">
