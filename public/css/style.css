@@ -183,3 +183,29 @@ html, body {
         height: calc(100% - 3rem) !important;
     }
 }
+
+.produto-card {
+  height: 100%;
+  min-height: clamp(260px, 30vw, 340px); /* adapta entre 260 e 340px */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.produto-img-wrapper {
+  width: 100%;
+  height: clamp(170px, 15vw, 180px); /* altura da imagem também se adapta */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.produto-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}

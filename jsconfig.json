@@ -6,7 +6,8 @@
       "@components": ["components/*"],
       "@tabelas": ["components/modal/Tabelas/*"],
       "@hooks": ["hooks/*"],
-      "@autentic-sistem": ["autentic/sistem/*"]
+      "@autentic-sistem": ["autentic/sistem/*"],
+      "@contexts": ["contexts/*"]
     }
   }
 }

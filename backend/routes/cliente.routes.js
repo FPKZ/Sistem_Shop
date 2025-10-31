@@ -27,12 +27,17 @@ export default async function clienteRoutes(fastify) {
   fastify.post("/cliente", async (request, reply) => {
     try{
       const data = request.body
+
+      const clienteExistente = await Cliente.findOne({ where: { email: data.email, nome: data.nome, telefone: data.telefone }})
+
+      if(clienteExistente) return reply.code(200).send({message: "Cliente já cadastrado!", clienteExistente, ok: false})
+
       const novoCliente = await Cliente.create(data)
   
-      reply.code(201).send(novoCliente)
+      reply.code(201).send({ message: "Cliente cadastrado com sucesso!", novoCliente, ok: true})
     } catch(err){
       console.log(err)
-      reply.code(500).send({error: "Erro ao cadastrar Cliente", err})
+      reply.code(500).send({error: "Erro ao cadastrar Cliente", err, ok: false})
     }
   })
 

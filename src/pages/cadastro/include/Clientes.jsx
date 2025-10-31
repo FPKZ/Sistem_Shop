@@ -1,8 +1,8 @@
 import { useState } from "react"
 import API from "@app/api"
-import utils from "@app/utils"
 import { useNavigate } from "react-router-dom"
 import { Button, Col } from "react-bootstrap"
+import { useToast } from "@contexts/ToastContext"
 
 export default function Clientes(){
 
@@ -11,8 +11,10 @@ export default function Clientes(){
     const [validated, setValidated] = useState(false)
 
     const navigate = useNavigate()
+    const { showToast } = useToast()
 
     function handleChange(e){
+        // eslint-disable-next-line no-unused-vars
         const { name, value, type } = e.target
         let newValue = value
 
@@ -89,7 +91,15 @@ export default function Clientes(){
             const data = Object.fromEntries(formData.entries())
             console.log(data)
             const responsta = await API.postClientes(data)
-            if(responsta.ok) navigate(-1)
+            console.log(responsta)
+            if(responsta.ok) {
+                showToast(responsta.message, "success")
+                navigate(-1)
+            }else {
+                if(responsta.message){
+                    showToast(responsta.message, "error")
+                }
+            }
         }
     }
 

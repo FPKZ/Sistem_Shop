@@ -12,8 +12,8 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
     ]
 
     const {
-        filtro,
-        setFiltro,
+        // filtro,
+        // setFiltro,
         order,
         dadosProcessados,
         requisitarOrdenacao
@@ -120,38 +120,34 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 </div> */}
             </div>
             <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
-                {
-                    dadosProcessados.map(produto => (
-                        <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                            <div className="card h-100 shadow-sm " style={{minHeight: "280px", cursor: "pointer"}}>
-                                <img 
-                                    className="card-img-top img-fluid"
-                                    src={produto.img || "src/assets/tube-spinner.svg"} 
-                                    alt={produto.nome}
-                                    
-                                />
-                                <div className="card-body p-2">
-                                    <h5 className="card-title">{produto.nome}</h5>
-                                    <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
-                                </div>
-                                <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2">
-                                    <div className={`col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end`}>
-                                        <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
-                                        <span className="text-muted small"> unidades</span>
-                                    </div>
-                                    <div className="col-6 d-flex justify-content-end align-items-center h-100">
-                                        {getEstoqueBadge(produto.itemEstoque.length)}
-                                    </div>
-                                </div>
-                                {/* <div className="card-footer d-flex justify-content-end p-2">
-                                    <button className="btn btn-outline-secondary btn-sm " onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                                        <i className="bi bi-three-dots"></i> Mais
-                                    </button>
-                                </div> */}
-                            </div>
+            {
+                dadosProcessados.map(produto => (
+                <div className="col" key={produto.id} onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
+                    <div className="card produto-card shadow-sm">
+                    <div className="produto-img-wrapper">
+                        <img
+                        className="card-img-top produto-img"
+                        src={produto.img || "src/assets/tube-spinner.svg"}
+                        alt={produto.nome}
+                        />
+                    </div>
+                    <div className="card-body p-2">
+                        <h5 className="card-title">{produto.nome}</h5>
+                        <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
+                    </div>
+                    <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2">
+                        <div className="col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end">
+                        <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
+                        <span className="text-muted small"> unidades</span>
                         </div>
-                    ))
-                }
+                        <div className="col-6 d-flex justify-content-end align-items-center h-100">
+                        {getEstoqueBadge(produto.itemEstoque.length)}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                ))
+            }
             </div>
         </>
     )

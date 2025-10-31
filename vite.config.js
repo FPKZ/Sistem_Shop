@@ -22,7 +22,8 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/components'),
       '@tabelas': path.resolve(__dirname, './src/components/modal/Tabelas'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@autentic-sistem': path.resolve(__dirname, './src/autentic/sistem')
+      '@autentic-sistem': path.resolve(__dirname, './src/autentic/sistem'),
+      "@contexts": path.resolve(__dirname, "./src/contexts")
     },
   },
 });

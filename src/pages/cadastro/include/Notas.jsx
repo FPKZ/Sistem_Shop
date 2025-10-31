@@ -8,109 +8,7 @@ import API from "@app/api";
 
 import { useOutletContext } from "react-router-dom";
 
-const ObjectText = {
-    "message": "Nota e produtos cadatrados com sucesso!",
-    "nota": {
-        "id": 4,
-        "codigo": "452345234523452",
-        "valor_total": 150,
-        "data": "2025-10-30T00:00:00.000Z",
-        "fornecedor": "gal",
-        "quantidade": 3,
-        "updatedAt": "2025-10-30T16:15:59.372Z",
-        "createdAt": "2025-10-30T16:15:59.372Z"
-    },
-    "produtos": [
-        {
-            "produto": {
-                "id": 19,
-                "nome": "fantasia diabinha",
-                "descricao": "asd",
-                "categoria_id": 1,
-                "img": "https://fzn0iexwimnmopem.public.blob.vercel-storage.com/f0e87eda-14b9-44a1-bb04-b5457a60e56e-imagem_2025-10-30_131433719.png",
-                "updatedAt": "2025-10-30T16:16:00.787Z",
-                "createdAt": "2025-10-30T16:16:00.787Z"
-            },
-            "itensEstoque": [
-                {
-                    "id": 57,
-                    "nome": "fantasia diabinha",
-                    "nota_id": 4,
-                    "tamanho": "1",
-                    "cor": null,
-                    "marca": "gal",
-                    "codigo_barras": "12312341241241",
-                    "valor_compra": 4,
-                    "valor_venda": 15,
-                    "lucro": 11,
-                    "produto_id": 19,
-                    "status": "Disponivel",
-                    "createdAt": "2025-10-30T16:16:00.803Z",
-                    "updatedAt": "2025-10-30T16:16:00.803Z"
-                }
-            ]
-        },
-        {
-            "produto": {
-                "id": 19,
-                "nome": "fantasia diabinha",
-                "img": "https://fzn0iexwimnmopem.public.blob.vercel-storage.com/f0e87eda-14b9-44a1-bb04-b5457a60e56e-imagem_2025-10-30_131433719.png",
-                "descricao": "asd",
-                "createdAt": "2025-10-30T16:16:00.787Z",
-                "updatedAt": "2025-10-30T16:16:00.787Z",
-                "categoria_id": 1
-            },
-            "itensEstoque": [
-                {
-                    "id": 58,
-                    "nome": "fantasia diabinha",
-                    "nota_id": 4,
-                    "tamanho": "1",
-                    "cor": null,
-                    "marca": "gal",
-                    "codigo_barras": "12312341241241",
-                    "valor_compra": 10,
-                    "valor_venda": 40,
-                    "lucro": 30,
-                    "produto_id": 19,
-                    "status": "Disponivel",
-                    "createdAt": "2025-10-30T16:16:02.057Z",
-                    "updatedAt": "2025-10-30T16:16:02.057Z"
-                }
-            ]
-        },
-        {
-            "produto": {
-                "id": 20,
-                "nome": "fantasia pm",
-                "descricao": "asd",
-                "categoria_id": 1,
-                "img": "https://fzn0iexwimnmopem.public.blob.vercel-storage.com/28ceb07d-ac94-4ce8-b283-07f822e9c788-imagem_2025-10-30_131530312.png",
-                "updatedAt": "2025-10-30T16:16:03.722Z",
-                "createdAt": "2025-10-30T16:16:03.722Z"
-            },
-            "itensEstoque": [
-                {
-                    "id": 59,
-                    "nome": "fantasia pm",
-                    "nota_id": 4,
-                    "tamanho": "1",
-                    "cor": null,
-                    "marca": "gal",
-                    "codigo_barras": "12312341241241",
-                    "valor_compra": 5,
-                    "valor_venda": 10,
-                    "lucro": 5,
-                    "produto_id": 20,
-                    "status": "Disponivel",
-                    "createdAt": "2025-10-30T16:16:03.733Z",
-                    "updatedAt": "2025-10-30T16:16:03.733Z"
-                }
-            ]
-        },
-    ],
-    "ok": true
-}
+import { useToast } from "@contexts/ToastContext";
 
 export default function Notas(){
     const [formValue, setFormValue] = useState({})
@@ -127,6 +25,8 @@ export default function Notas(){
     const [ itensCriados, setItensCriados ] = useState(null)
 
     const { mobile } = useOutletContext()
+
+    const { showToast } = useToast()
 
     useEffect(() => {
         setFormValue(prev => ({
@@ -247,6 +147,11 @@ export default function Notas(){
                     }
                     setItensCriados(itensCriados)
                     setModalCriar(true)
+                    showToast(response.message, "success")
+                } else {
+                    if(response.message){
+                        showToast(response.message, "error")
+                    }
                 }
                 
             }
