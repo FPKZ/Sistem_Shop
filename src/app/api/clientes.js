@@ -19,7 +19,7 @@ export async function postClientes(data){
             body: JSON.stringify(data)
         })
         //console.log(response)
-        return response
+        return await response.json()
     } catch (error){
         console.error("Erro ao cadastrar cliente", error)
     }

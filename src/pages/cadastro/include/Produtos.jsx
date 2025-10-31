@@ -3,7 +3,7 @@ import API from "@app/api";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
-import ToastCuston from "@components/ToastCuston";
+import { useToast } from "@contexts/ToastContext";
 
 export default function Produtos() {
   const [categoria, setCategoria] = useState({});
@@ -33,6 +33,7 @@ export default function Produtos() {
     descricao: "",
   });
 
+  const { showToast } = useToast()
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -123,14 +124,18 @@ export default function Produtos() {
       finalFormData.set("itens", JSON.stringify(itens));
 
       console.log(Object.fromEntries(finalFormData));
-      // eslint-disable-next-line no-unused-vars
+      
       const response = await API.postProduto(finalFormData)
       // const response = await cadastrarProduto(finalFormData);
       if(response.ok){
+        showToast(response.message, "success")
         setItensCriados(response.itensEstoque)
         setModalCriar(true)
+      } else {
+        if(response.message){
+          showToast(response.message, "error")
+        }
       }
-      console.log(response)
     }
   }
 
@@ -150,7 +155,7 @@ export default function Produtos() {
   };
 
   return (
-    <div className="row-cols-2 w-100 p-3 d-flex gap-4">
+    <div className="row-cols-2 w-100 p-3 pt-0 m-0 d-flex gap-4">
       <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
         <div className="row gap-4 mb-3 pb-4 border-bottom m-0">
           <div className="col-md-12 w-100 p-0">

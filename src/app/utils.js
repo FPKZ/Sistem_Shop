@@ -52,18 +52,24 @@ const formatNumber = (valor) => {
   return new Intl.NumberFormat('pt-BR').format(valor)
 }
 
-// 🔠 Capitaliza texto com limite e reticências
+// 🔠 Capitaliza cada palavra de um texto
 const capitalize = (str, maxLength = null) => {
-  if (!str) return ''
-  let trimmed = str.trim()
+  if (!str) return '';
+  
+  // Primeiro, substitui hífens por espaços
+  let processedStr = str.replace(/-/g, ' ');
 
-  const needsEllipsis = maxLength && trimmed.length > maxLength
-  if (needsEllipsis) {
-    trimmed = trimmed.slice(0, maxLength).trim() + '...'
+  // Lógica de reticências (se necessário)
+  if (maxLength && processedStr.length > maxLength) {
+    processedStr = processedStr.slice(0, maxLength).trim() + '...';
   }
 
-  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
-}
+  // Capitaliza cada palavra
+  return processedStr
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
 
 // 🧼 Remove espaços extras e quebra de linha
 const normalizeText = (str) => {

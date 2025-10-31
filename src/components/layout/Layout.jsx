@@ -1,10 +1,9 @@
 import Header from "./components/Header";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 
-import utils from "@app/utils";
 
 export default function Layout() {
   const [menuExpand, setMenuExpand] = useState(false);
@@ -39,9 +38,6 @@ export default function Layout() {
     setMobile
   }), [mobile]);
 
-
-  const location = useLocation()
-  const pathParts = location.pathname.split('/').filter(part => part)
 
   return (
     <>

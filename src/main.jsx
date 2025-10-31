@@ -25,6 +25,7 @@ import {
 import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./autentic/sistem/ProtectedRoute.jsx";
 import { AuthProvider } from "./autentic/sistem/AuthContext.jsx";
+import ToastProvider from "./contexts/ToastContext.jsx";
 
 const router = createBrowserRouter([
   {
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
             ],
           },
           { path: "perfil", element: <PerfilPage /> },
-          { path: "ferramentas", element: <GerenciamentoUsuario /> }
+          { path: "usuarios", element: <GerenciamentoUsuario /> }
         ],
       },
     ],  
@@ -71,7 +72,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
     </AuthProvider>
   </StrictMode>
 );

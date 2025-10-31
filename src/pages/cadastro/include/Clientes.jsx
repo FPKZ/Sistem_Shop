@@ -1,8 +1,8 @@
 import { useState } from "react"
 import API from "@app/api"
-import utils from "@app/utils"
 import { useNavigate } from "react-router-dom"
 import { Button, Col } from "react-bootstrap"
+import { useToast } from "@contexts/ToastContext"
 
 export default function Clientes(){
 
@@ -11,8 +11,10 @@ export default function Clientes(){
     const [validated, setValidated] = useState(false)
 
     const navigate = useNavigate()
+    const { showToast } = useToast()
 
     function handleChange(e){
+        // eslint-disable-next-line no-unused-vars
         const { name, value, type } = e.target
         let newValue = value
 
@@ -89,14 +91,22 @@ export default function Clientes(){
             const data = Object.fromEntries(formData.entries())
             console.log(data)
             const responsta = await API.postClientes(data)
-            if(responsta.ok) navigate(-1)
+            console.log(responsta)
+            if(responsta.ok) {
+                showToast(responsta.message, "success")
+                navigate(-1)
+            }else {
+                if(responsta.message){
+                    showToast(responsta.message, "error")
+                }
+            }
         }
     }
 
     return(
         <>
-            <div className="row w-100 p-3 d-flex gap-4">
-                <form onSubmit={handleSubimit} noValidate className="row d-flex flex-wrap w-100 gap-3 justify-content-center align-content-center">
+            <form onSubmit={handleSubimit} noValidate className="">
+                <div className="row p-3 pt-0 m-0 gap-4">
                     <Col md={12} className="p-0">
                         <label htmlFor="nome" className="form-label">Nome</label>
                         <input type="text" className={`form-control ${validated ? (erros.nome ? `is-invalid` : `is-valid`) : "" }`} id="nome" name="nome" value={formValue.nome || ""} onChange={handleChange} placeholder="Nome" required/>
@@ -114,8 +124,8 @@ export default function Clientes(){
                         <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
                     </Col>
                     <Button className="btn btn-roxo" type="submit">Adicionar</Button>
-                </form>
-            </div>
+                </div>
+            </form>
         </>
     )
 }

@@ -27,7 +27,7 @@ html, body {
 }
 
 #root{
-  background-color: #fefdfe
+  background-color: #faf7fa
 }
 
 #root-login{
@@ -50,7 +50,7 @@ html, body {
     display: flex;
     flex-direction: column;
     margin-left: 3.5rem;
-    margin-top: 4.2rem;
+    margin-top: 4.5rem;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -71,11 +71,11 @@ html, body {
   display: inline-block;
   
   /* Aqui você controla o tamanho! */
-  width: 1rem;  /* 12px */
+  width: 0.9rem;  /* 12px */
   height: 1rem; /* 12px */
 
   /* Ajustes de espaçamento e alinhamento */
-  margin: 0 0.7rem;
+  margin: 0 0.5rem;
   vertical-align: middle;
 
   /* Define o ícone como imagem de fundo */
@@ -85,6 +85,19 @@ html, body {
   background-size: contain;
 }
 
+@media (max-width: 766px){
+  /* Breadcrumb com Chevron Pequeno */
+  .breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
+    
+    /* Aqui você controla o tamanho! */
+    width: 0.8rem;  /* 12px */
+    height: 1rem; /* 12px */
+
+    /* Ajustes de espaçamento e alinhamento */
+    margin: 0 0.1rem;
+    vertical-align: middle;
+  }
+}
 
 
 
@@ -177,9 +190,35 @@ html, body {
 
 
     .layout-ativo #root{
-        margin-left: 2.5rem !important;
+        margin-left: 2.8rem !important;
         margin-top: 3rem !important;
         width: calc(100% - 2.5rem) !important;
         height: calc(100% - 3rem) !important;
     }
+}
+
+.produto-card {
+  height: 100%;
+  min-height: clamp(260px, 30vw, 340px); /* adapta entre 260 e 340px */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.produto-img-wrapper {
+  width: 100%;
+  height: clamp(170px, 15vw, 180px); /* altura da imagem também se adapta */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.produto-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
 }

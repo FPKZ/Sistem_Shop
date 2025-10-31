@@ -3,7 +3,7 @@ import util from "../../../app/utils.js"
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 
-function Produto({produtos, setModalInfoProduto, setProduto}) {
+function Produto({produtos, setModalInfoProduto, setProduto, children}) {
     
     const camposFiltragem = [
         "nome",
@@ -12,8 +12,8 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
     ]
 
     const {
-        filtro,
-        setFiltro,
+        // filtro,
+        // setFiltro,
         order,
         dadosProcessados,
         requisitarOrdenacao
@@ -52,9 +52,9 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 <button className="btn btn-secondary ms-2">Exportar Lista</button>
                 <button className="btn btn-secondary ms-2">Filtrar Produtos</button>
             </div> */}
-            <div className="my-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
+            <div className="mb-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
                 <div className="d-flex justify-content-between align-items-center">
-                    <div className="h5 text-center m-0">Produtos</div>
+                    <div className="h5 text-center fw-normal m-0">Produtos</div>
                     <div className="d-flex gap-3 align-items-center">
                         <div>
                             <Button size="sm" variant="" ><Search size={15} /></Button>
@@ -106,6 +106,7 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                             <Button size="sm" variant={`outline-secondary`}><LayoutGrid size={15} /></Button>
                             <Button size="sm" variant={`secondary`}><LayoutList size={15} /></Button>
                         </ButtonGroup>
+                    {children}
                     </div>
                 </div>
                 {/* <div className="d-flex justify-content-center">
@@ -120,38 +121,34 @@ function Produto({produtos, setModalInfoProduto, setProduto}) {
                 </div> */}
             </div>
             <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
-                {
-                    dadosProcessados.map(produto => (
-                        <div className="col" key={produto.id}  onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                            <div className="card h-100 shadow-sm " style={{minHeight: "280px", cursor: "pointer"}}>
-                                <img 
-                                    className="card-img-top img-fluid"
-                                    src={produto.img || "src/assets/tube-spinner.svg"} 
-                                    alt={produto.nome}
-                                    
-                                />
-                                <div className="card-body p-2">
-                                    <h5 className="card-title">{produto.nome}</h5>
-                                    <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
-                                </div>
-                                <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2">
-                                    <div className={`col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end`}>
-                                        <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
-                                        <span className="text-muted small"> unidades</span>
-                                    </div>
-                                    <div className="col-6 d-flex justify-content-end align-items-center h-100">
-                                        {getEstoqueBadge(produto.itemEstoque.length)}
-                                    </div>
-                                </div>
-                                {/* <div className="card-footer d-flex justify-content-end p-2">
-                                    <button className="btn btn-outline-secondary btn-sm " onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
-                                        <i className="bi bi-three-dots"></i> Mais
-                                    </button>
-                                </div> */}
-                            </div>
+            {
+                dadosProcessados.map(produto => (
+                <div className="col" key={produto.id} onClick={() => {setModalInfoProduto(true); setProduto(produto)}}>
+                    <div className="card produto-card shadow-sm">
+                    <div className="produto-img-wrapper">
+                        <img
+                        className="card-img-top produto-img"
+                        src={produto.img || "src/assets/tube-spinner.svg"}
+                        alt={produto.nome}
+                        />
+                    </div>
+                    <div className="card-body p-2">
+                        <h5 className="card-title">{produto.nome}</h5>
+                        <p className="card-text text-muted small">{util.capitalize(produto.descricao, 50)}</p>
+                    </div>
+                    <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2">
+                        <div className="col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end">
+                        <span className="fw-bold fs-5">{produto.itemEstoque.length || `0`}</span>
+                        <span className="text-muted small"> unidades</span>
                         </div>
-                    ))
-                }
+                        <div className="col-6 d-flex justify-content-end align-items-center h-100">
+                        {getEstoqueBadge(produto.itemEstoque.length)}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                ))
+            }
             </div>
         </>
     )
