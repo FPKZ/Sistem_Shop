@@ -58,12 +58,12 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "perfil", element: <PerfilPage /> },
+      { path: "ferramentas", element: <FerrramentasPage /> }
     ],  
   },
   { path: "login", element: <Login />},
   { path: "cadastro-user", element: <CadastroUser /> },
-  { path: "perfil", element: <PerfilPage /> },
-  { path: "ferramentas", element: <FerrramentasPage /> }
 
 ]);
 

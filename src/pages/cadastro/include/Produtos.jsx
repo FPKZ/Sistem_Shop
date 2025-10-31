@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "@app/api";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
+import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 
 export default function Produtos() {
   const [categoria, setCategoria] = useState({});
@@ -9,6 +10,7 @@ export default function Produtos() {
   const [notas, setNotas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [modalCadastroNota, setModalCadastroNota] = useState(false)
+  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false)
 
   const { cadastrarProduto, setModalCriar } = useOutletContext()
   
@@ -28,6 +30,8 @@ export default function Produtos() {
     lucro: "",
     descricao: "",
   });
+
+  const navigate = useNavigate()
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -118,8 +122,9 @@ export default function Produtos() {
       finalFormData.set("itens", JSON.stringify(itens));
 
       //console.log(Object.fromEntries(finalFormData));
+      // eslint-disable-next-line no-unused-vars
       const response = await cadastrarProduto(finalFormData);
-      useNavigate(-1)
+      navigate(-1)
       setModalCriar(true)
     }
   }
@@ -127,7 +132,7 @@ export default function Produtos() {
   useEffect(() => {
     GetNotas();
     GetCategorias();
-  }, []);
+  }, [modalCadastroCategoria, modalCadastroNota]);
 
   const GetCategorias = async () => {
     const categorias = await API.getCategoria();
@@ -238,7 +243,7 @@ export default function Produtos() {
                   <hr className="dropdown-divider"></hr>
                 </li>
                 <li>
-                  <a className="dropdown-item" >
+                  <a className="dropdown-item" href="#" onClick={() => setModalCadastroCategoia(true)}>
                     Nova Categoria
                   </a>
                 </li>
@@ -308,7 +313,7 @@ export default function Produtos() {
                   <hr className="dropdown-divider"></hr>
                 </li>
                 <li>
-                  <a className="dropdown-item" onClick={() => setModalCadastroNota(true)}>
+                  <a className="dropdown-item" href="#" onClick={() => setModalCadastroNota(true)}>
                     Nova Nota
                   </a>
                 </li>
@@ -450,6 +455,7 @@ export default function Produtos() {
         </div>
       </form>
       <CadastrarNotaModal visible={modalCadastroNota} onClose={() => setModalCadastroNota(false)} produts={false} />
+      <CadastroCategoria visible={modalCadastroCategoria} onClose={() => setModalCadastroCategoia(false)} />
     </div>
   );
 }

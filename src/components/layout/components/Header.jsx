@@ -66,6 +66,9 @@ function ProfileMenu({ user, logout }) {
 
   const navigate = useNavigate()
 
+  // 1. Detecta se o dispositivo suporta toque (mobile) ou não (desktop)
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
   useEffect(() => {
     const calcSize = () => {
       const userMenu = document.getElementById("user-menu");
@@ -75,7 +78,7 @@ function ProfileMenu({ user, logout }) {
     };
 
     calcSize();
-    console.log(imgSizeState)
+    // console.log(imgSizeState)
 
     window.addEventListener('resize', () => calcSize());
     
@@ -85,9 +88,13 @@ function ProfileMenu({ user, logout }) {
 
   },[])
 
+  const handleShowMenu = async () => {
+    if(isTouchDevice) setShow(!show)
+  }
+
   return (
     <Dropdown align="end" show={show} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-      <Dropdown.Toggle as="div" id="dropdown-custom-components" className="d-flex dropdown-toggle-no-caret" onClick={() => setShow(!show)} >
+      <Dropdown.Toggle as="div" id="dropdown-custom-components" className="d-flex dropdown-toggle-no-caret" onClick={() => handleShowMenu()} >
         <Figure className="d-flex m-0 p-0 align-items-center" style={{cursor: "pointer"}}>
           <Figure.Image
             className="m-0"

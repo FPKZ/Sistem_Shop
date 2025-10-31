@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import API from "@app/api";
 import { jwtDecode } from "jwt-decode";
-import LoadingPage from "./LoadingPage"
 
 const AuthContext = createContext();
 
@@ -63,19 +62,20 @@ export const AuthProvider = ({ children }) => {
     };
 
     const isAutenticated = () => {
+        // console.log(user)
         return !!user;
     }
 
     const initServer = async () => {
         setLoading(true)
-        const response = await API.initServer()
+        await API.initServer()
         setLoading(false)
-        console.log(response)
+        // console.log(response)
     }
 
     return (
         <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated, verificLogin, initServer }}>
-            {loading ? <LoadingPage /> :  children}
+            {children}
         </AuthContext.Provider>
     );
 }

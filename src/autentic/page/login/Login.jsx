@@ -4,6 +4,7 @@ import Footer from "../include/Footer";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../sistem/AuthContext";
+import Erros from "@components/Erros";
 
 import Timer from "./Timer";
 
@@ -35,6 +36,7 @@ export default function Login() {
     }, []); // O array vazio garante que o efeito rode apenas uma vez
 
     function handleChange(e){
+        // eslint-disable-next-line no-unused-vars
         const { name, value, type } = e.target
         let newValue = value
 
@@ -56,10 +58,11 @@ export default function Login() {
         const elements = form.querySelectorAll("[name]")
         
         elements.forEach((e) => {
+            // eslint-disable-next-line no-unused-vars
             const { name, value, required, type } = e
 
             if(required && !value.trim()){
-                newErrors[name] = "Campo obrigatório!"
+                newErrors[name] = `Campo ${name} obrigatório!`
             }
 
             if (name === "email" && value && !emailRegex.test(value)) {
@@ -96,7 +99,7 @@ export default function Login() {
                 const from = location.state?.from?.pathname || "/";
                 navigate(from, { replace: true });
             } else {
-                setErros(resposta || { login: "Email ou senha inválidos" })
+                setErros(resposta || { login: "Email ou senha inválidos", email: "skip", senha: "skip" })
                 setValidated(true)
             }
             
@@ -149,31 +152,6 @@ export default function Login() {
     </div>
     </>
   );
-}
-
-function Erros({ erros }) {
-    // console.log(erros)
-    return (
-        Object.keys(erros).length > 0 && (
-            <Row className="justify-content-md-center mt-3">
-                <Col md={4} className="text-center">
-                    <Alert variant="danger"  role="alert">
-                        <ul className="mb-0">
-                            {Object.keys(erros).map((key) => {
-                                if(!erros[key]){
-                                    return null
-                                }else{
-                                    return (
-                                        <li key={key}>{erros[key]}</li>
-                                    )
-                                }
-                            })}
-                        </ul>
-                    </Alert>
-                </Col>
-            </Row>
-        )
-    )
 }
 
 function ContaTeste(){

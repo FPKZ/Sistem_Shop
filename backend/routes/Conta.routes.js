@@ -47,7 +47,20 @@ export default async function contaRoutes(fastify) {
         }
     });
 
-    fastify.post("/conta", async (request, reply) => {
+    fastify.delete("/delete-user/:id", async (request, reply) => {
+        try{
+            const conta = await Conta.findByPk(request.params.id)
+            if(!conta) return reply.code(404).send({ message: "Conta não encontrada"})
+
+            await conta.destroy()
+            reply.code(200).send({ message: "Conta deletada com sucesso"})
+        } catch(err) {
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao deletar conta"})
+        }
+    })
+
+    fastify.post("/cadastrar-conta", async (request, reply) => {
         try {
             const data = request.body;
             data.senha = await bcrypt.hash(data.senha, 10); // Hash da senha antes de salvar

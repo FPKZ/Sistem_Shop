@@ -1,4 +1,4 @@
-import { Container, Table, Card, Col, Row } from "react-bootstrap"
+import { Container, Table, Card, Col, Row, Badge } from "react-bootstrap"
 import utils from "@app/utils"
 
 import { useOutletContext } from "react-router-dom"
@@ -23,7 +23,9 @@ export default function TabelaProdutosNota({produto, setItemEstoque, width, cust
 
                 {/* Container dos Cards com Rolagem */}
                 <div className={`flex-grow-1 p-0 overflow-hidden ${mobile ? "" : "overflow-y-auto"}`}>
-                <Produtos produtos={produto} setItemEstoque={setItemEstoque}  setmodalInfoProduto={setmodalInfoProduto} />
+                  {produto.map((prod) => (
+                    <Produtos produtos={prod} setItemEstoque={setItemEstoque}  setmodalInfoProduto={setmodalInfoProduto} />
+                  ))}
                 </div>
             </Col>
         </>
@@ -31,11 +33,12 @@ export default function TabelaProdutosNota({produto, setItemEstoque, width, cust
 }
 
 function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
-  //console.log(produtos)
+  console.log(produtos)
   if(!produtos) return
-  const itens = produtos.itemEstoque;
+  const itens = produtos.itens;
 
-  
+  console.log(itens)
+    
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Disponivel':
@@ -69,15 +72,15 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               <Row className="px-2 py-1">
                 <Col xs={1} sm={2} className="p-0 d-flex">
                   <img
-                    src={produtos.img || "src/assets/tube-spinner.svg"}
-                    alt={produto.nome}
+                    src={URL.createObjectURL(produtos.img) || "src/assets/tube-spinner.svg"}
+                    alt={produtos.nome}
                     className="img-fluid rounded"
                     style={{maxHeight: "40px"}}
                   />
                 </Col>
                 <Col xs={4} sm={3} className="p-2 m-0 text-truncate d-flex align-items-center">
                   <span>
-                    {produto.nome}
+                    {produtos.nome}
                   </span>
                 </Col>
                 <Col xs={2} className="p-0 m-0 d-flex align-items-center overflow-hidden">

@@ -37,7 +37,7 @@ export default async function produtoRoutes(fastify) {
           }
         ]
       })
-      console.log(produtos)
+      // console.log(produtos)
       return reply.code(200).send(produtos)
     }
     else if(query.itens === "estoque"){
@@ -53,7 +53,7 @@ export default async function produtoRoutes(fastify) {
           }
         ]
       })
-      console.log(produtos)
+      // console.log(produtos)
       return reply.code(200).send(produtos)
     }
     else if(query.nome && query.nome !== " "){

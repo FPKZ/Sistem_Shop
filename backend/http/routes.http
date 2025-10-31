@@ -152,7 +152,7 @@ Content-Type: application/json
 }
 
 ###
-POST https://sistem-shop.onrender.com/conta
+POST http://localhost:3333/cadastrar-conta
 Content-Type: application/json
 
 {

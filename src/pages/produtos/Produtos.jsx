@@ -21,6 +21,8 @@ function Produtos() {
 
   const navigate = useNavigate()
 
+  
+
   usePopStateModal(
     [modalAddProduto, modalInfoProduto],
     [setModalAddProduto, setModalInfoProduto]
@@ -28,7 +30,7 @@ function Produtos() {
   
   const getProduto = async () => {
     const p = await API.getProduto()
-    // console.log(p)
+    console.log(p)
     setProdutos(p);
   }
 

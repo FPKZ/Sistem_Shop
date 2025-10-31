@@ -141,16 +141,6 @@ export default function TableNota({notas, setselectNota, setisModalOpem}){
             </ProgressBar>
         </div>
         )
-        
-        switch(disponiveis.length){
-            case 0:
-                return 100
-            case itens.length:
-                return 0
-            default:
-                return (vendidos.length / itens.length) * 100
-            console.log(12)
-        }
       }
 
     return(
