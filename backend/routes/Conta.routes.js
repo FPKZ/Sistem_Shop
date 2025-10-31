@@ -47,29 +47,45 @@ export default async function contaRoutes(fastify) {
         }
     });
 
+    fastify.put("/editar-user/:id", async (request, reply) =>{
+        try{
+            const conta = await Conta.findByPk(request.params.id)
+            if(!conta) return reply.code(404).send({ message: "Usuario não encontrado!", ok: false})
+
+            await conta.update(request.body)
+
+            reply.code(200).send({ message: "Usuario alterado com sucesso!", conta, ok: true})
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao alterar usuario", ok: false})
+        }
+    })
+
     fastify.delete("/delete-user/:id", async (request, reply) => {
         try{
             const conta = await Conta.findByPk(request.params.id)
-            if(!conta) return reply.code(404).send({ message: "Conta não encontrada"})
+            if(!conta) return reply.code(404).send({ message: "Conta não encontrada", ok: false})
 
             await conta.destroy()
-            reply.code(200).send({ message: "Conta deletada com sucesso"})
+            reply.code(200).send({ message: "Conta deletada com sucesso", ok: true})
         } catch(err) {
             console.log(err)
-            reply.code(500).send({ error: "Erro ao deletar conta"})
+            reply.code(500).send({ error: "Erro ao deletar conta", ok: true})
         }
     })
 
     fastify.post("/cadastrar-conta", async (request, reply) => {
         try {
             const data = request.body;
+            const conta = await Conta.findOne({ where: { email: data.email}})
+            if(conta) return reply.code(500).send({ message: "Usuario já existe", ok: false})
             data.senha = await bcrypt.hash(data.senha, 10); // Hash da senha antes de salvar
 
             const novaConta = await Conta.create(data);
-            reply.code(201).send(novaConta);
+            reply.code(201).send({novaConta, ok: true});
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Erro ao cadastrar conta" });
+            reply.code(500).send({ error: "Erro ao cadastrar conta", ok: false });
         }   
     });
 
@@ -106,7 +122,7 @@ export default async function contaRoutes(fastify) {
     fastify.put("/aprovar/:id", async (request, reply) => {
         try{
             const solicitacao = await Solicitacao.findByPk(request.params.id)
-            if(!solicitacao) return reply.code(404).send({ erro: "Solicitação não encontrada"})
+            if(!solicitacao) return reply.code(404).send({ message: "Solicitação não encontrada", ok: false})
 
             const data = {
                 nome: solicitacao.nome,
@@ -116,24 +132,24 @@ export default async function contaRoutes(fastify) {
             const novaConta = Conta.create(data)
 
             await solicitacao.destroy()
-            reply.code(200).send({ message: "Solicitação aprovada!", novaConta})
+            reply.code(200).send({ message: "Solicitação aprovada!", novaConta, ok: true})
         } catch(err) {
             console.log(err)
-            reply.code(500).send({ error: "Erro ao aprovar a solicitação"})
+            reply.code(500).send({ error: "Erro ao aprovar a solicitação", ok: false})
         }
     })
     
     fastify.delete("/negar/:id", async (request, reply) => {
         try{
             const solicitacao = await Solicitacao.findByPk(request.params.id)
-            if(!solicitacao) return reply.code(404).send({ erro: "Solicitação não encontrada"})
+            if(!solicitacao) return reply.code(404).send({ erro: "Solicitação não encontrada", ok: false})
         
             await solicitacao.destroy()
-            reply.code(200).send({ message: "Solicitação Negada!"})
+            reply.code(200).send({ message: "Solicitação Negada!", ok: true})
             
         } catch(err) {
             console.log(err)
-            reply.code(500).send({ error: "Erro ao negar solicitação"})
+            reply.code(500).send({ error: "Erro ao negar solicitação", ok: false})
         }
     })
 }

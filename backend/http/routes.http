@@ -28,15 +28,15 @@ Content-Type: application/json
 GET http://localhost:3333/produtos?itens=estoque&nome=
 ###
 PUT https://sistemshop-production.up.railway.app/produto/afd7014d-8d78-4f9c-b97e-2692613129db
-###
-DELETE https://sistemshop-production.up.railway.app/produto/5
 Content-Type: application/json
-
 {
     "titulo": "video02",
     "descricao": "adfasdasd",
     "duracao": 120
 }
+###
+DELETE http://localhost:3333/produto/18
+
 
 # Notas
 
@@ -156,9 +156,10 @@ POST http://localhost:3333/cadastrar-conta
 Content-Type: application/json
 
 {
-    "nome": "Jean",
-    "email": "jeanBruno@gmail.com",
-    "senha": "1234"
+    "nome": "jorge",
+    "email": "superUser@gmail.com",
+    "senha": "super432",
+    "cargo": "Adm"
 }
 
 
@@ -173,7 +174,7 @@ Content-Type: application/json
 }
 
 ###
-GET https://sistem-shop.onrender.com/contas
+GET http://localhost:3333/contas
 
 ###
 GET http://localhost:3333/pendentes

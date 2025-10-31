@@ -464,7 +464,9 @@ function Nota({ notas, setNota }) {
     <>
       {notas.map((nota) => (
         <li key={nota.id}>
-          <a className="dropdown-item" onClick={() => setNota(nota)}>
+          <a className="dropdown-item" 
+            style={{cursor: "pointer"}}
+            onClick={() => setNota(nota)}>
             {nota.codigo}
           </a>
         </li>
@@ -479,6 +481,7 @@ function Categoria({ categorias, setCategoria }) {
         <li key={categoria.id}>
           <a
             className="dropdown-item"
+            style={{cursor: "pointer"}}
             onClick={() => setCategoria(categoria)}
           >
             {categoria.nome}

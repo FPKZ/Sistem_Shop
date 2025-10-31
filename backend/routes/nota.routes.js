@@ -1,4 +1,5 @@
 import { Nota, ItemEstoque } from "../database/models/index.js";
+import { CadastroProduto, toBuffer } from "./produto.routes.js";
 
 export default async function notaRoutes(fastify) {
     fastify.get("/notas", async (request, reply) => {
@@ -18,13 +19,54 @@ export default async function notaRoutes(fastify) {
 
     fastify.post("/nota", async (request, reply) => {
         try{
-            const data = request.body
-            const novanota = await Nota.create(data)
+            const parts = await request.parts()
+            const body = {}
+            const imgFiles = {}
+            console.log(parts)
+            for await (const part of parts){
+                if(part.type === "file"){
+                    const buffer = await toBuffer(part.file)
+                    imgFiles[part.fieldname] = { buffer: buffer, filename: part.filename }
+                    console.log("a")
+                } else {
+                    console.log("b")
+                    body[part.fieldname] = part.value
+                }
+            }
 
-            reply.code(201).send(novanota)
+            const { codigo, valor_total, data, fornecedor, quantidade } = body
+
+            console.log(body)
+            const novaNota = await Nota.create({
+                codigo,
+                valor_total,
+                data,
+                fornecedor,
+                quantidade
+            })
+            
+            if(!body.itens && body.itens.length === 0) return reply.code(201).send({ message: "Nota cadastrada com sucesso!", novaNota, ok: true})
+
+            const produtoParaCadastrar = JSON.parse(body.itens)
+            const resultadosCadastro = []
+
+            for(const produtoData of produtoParaCadastrar){
+                if(produtoData.itens && produtoData.itens.length > 0){
+                    produtoData.itens[0].nota_id = novaNota.id
+                }
+
+                const imgKey = `imagem_${produtoData.frontId}`
+                const imgFile = imgFiles[imgKey]
+                
+                const result = await CadastroProduto(produtoData,imgFile)
+                resultadosCadastro.push(result)
+
+            }
+
+            reply.code(201).send({ message: "Nota e produtos cadatrados com sucesso!", nota: novaNota, produtos: resultadosCadastro, ok: true})
         } catch(err){
             console.log(err)
-        reply.code(500).send({error: "Erro ao cadastrar nota"})
+        reply.code(500).send({error: "Erro ao cadastrar nota", ok: false})
         }
     })
     fastify.put("/nota/:id", async (request, reply) => {

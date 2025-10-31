@@ -2,6 +2,8 @@ import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.
 import { Op } from "sequelize"
 import { put } from "@vercel/blob"
 import { randomUUID } from "crypto";
+import { Buffer } from "buffer";
+import "dotenv/config"
 //const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
@@ -99,61 +101,30 @@ export default async function produtoRoutes(fastify) {
       //const query = request.query.query
       //console.log(query)
 
-      const data = await  request.parts()
+      const data = await request.parts()
       const body = {}
-      let imgPath = null
+      let imgFile = null
       
       for await (const part of data){
         if(part.type === "file") {
-          const nomeUnico = `${randomUUID()}-${part.filename}`;
-          const blob = await put(nomeUnico, part.file, {
-            access: "public"
-          })
-          imgPath = blob.url // Salvamos a URL completa retornada pelo Vercel Blob
+          const buffer = await toBuffer(part.file)
+          imgFile = { buffer: buffer, filename: part.filename }
+          console.log(`Arquivo processado: ${part.filename}`)
         } else {
           body[part.fieldname] = part.value
         }
       }
 
-      body.img = imgPath
+      body.itens = JSON.parse(body.itens)
 
-      const itens = JSON.parse(body.itens)
-
-      const { nome, descricao, categoria_id } = body
-  
-      let produto = await Produto.findOne({ where: { nome: nome }})
-  
-      if(!produto){
-        produto = await Produto.create({nome, descricao, categoria_id, img: body.img})
-      }
-      
-      let itensCriados = []
-
-      if(itens && itens.length > 0){
-        const NovoItem = await itens.map(item => ({
-          nome,
-          nota_id: item.nota_id,
-          tamanho: item.tamanho,
-          cor: item.cor,
-          marca: item.marca,
-          codigo_barras: item.codigo_barras,
-          valor_compra: item.valor_compra,
-          valor_venda: item.valor_venda,
-          lucro: item.lucro,
-          produto_id: produto.id,
-          status: "Disponivel"
-        }))
-        console.log(NovoItem)
-        itensCriados = await ItemEstoque.bulkCreate(NovoItem, { returning: true})
-      }
-  
+      const result = await CadastroProduto(body, imgFile)
   
       //const novoProduto = await Produto.create(data)
   
-      reply.code(201).send({ message: "Estoque atualizado com sucesso!", produto, itensEstoque: itensCriados })
+      reply.code(201).send({ message: "Estoque atualizado com sucesso!", ...result, ok: true })
     } catch(err){
       console.log(err)
-      reply.code(500).send({ error: 'Erro ao cadastrar produtos' })
+      reply.code(500).send({ error: 'Erro ao cadastrar produtos', ok: false })
     }
   })
 
@@ -195,4 +166,51 @@ export default async function produtoRoutes(fastify) {
       reply.code(500).send({ error: 'Erro ao deletar produto' })
     }
   })
+}
+
+export async function CadastroProduto(produtoData, imgFile){
+  let imgPath = null
+  if (imgFile && imgFile.buffer){
+    const nomeUnico = `${randomUUID()}-${imgFile.filename}`;
+    const blob = await put(nomeUnico, imgFile.buffer, {
+      access: "public"
+    })
+    imgPath = blob.url // Salvamos a URL completa retornada pelo Vercel Blob
+  }
+
+  const { nome, descricao, categoria_id, itens } = produtoData
+
+  let produto = await Produto.findOne({ where: { nome: nome}})
+
+  if(!produto){
+    produto = await Produto.create({ nome, descricao, categoria_id, itens, img: imgPath })
+  }
+
+  let itensCriados = []
+  if (itens && itens.length > 0){
+    const novosItens = itens.map(item => ({
+      nome,
+      nota_id: item.nota_id,
+      tamanho: item.tamanho,
+      cor: item.cor,
+      marca: item.marca,
+      codigo_barras: item.codigo_barras,
+      valor_compra: item.valor_compra,
+      valor_venda: item.valor_venda,
+      lucro: item.lucro,
+      produto_id: produto.id,
+      status: "Disponivel"
+    }))
+    itensCriados = await ItemEstoque.bulkCreate(novosItens, { returning: true })
+  }
+
+  return { produto, itensEstoque: itensCriados }
+}
+
+export async function toBuffer(stream) {
+  const chunks = []
+  for await (const chunk of stream){
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks)
 }
