@@ -6,7 +6,9 @@ const Nota = sequelize.define('Nota', {
     codigo: DataTypes.STRING,
     quantidade: DataTypes.INTEGER,
     valor_total: DataTypes.FLOAT,
-    data: DataTypes.DATE
+    data: DataTypes.DATE,
+    data_vencimento: DataTypes.DATE,
+    status: DataTypes.STRING
 }, {
     tableName: 'Notas'
 })

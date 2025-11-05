@@ -88,9 +88,13 @@ import {
   Badge,
   Pagination,
   Dropdown,
-  ProgressBar // 1. IMPORTE O PROGRESSBAR
+  ProgressBar, // 1. IMPORTE O PROGRESSBAR
+  InputGroup,
+  FormControl,
+  Card
 } from 'react-bootstrap';
-import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
+import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import API from "@app/api";
 import utils from "@app/utils";
@@ -100,16 +104,33 @@ import CadastroNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
 import InvoiceDetailModal from "./include/InvoiceDetailModal"; // <-- 1. IMPORTE O NOVO MODAL
 
 import ModalNota from "./include/ModalNota";
+import HoverBtn from "@components/HoverBtn";
 
 export default function Notas() {
   const [notas, setNotas] = useState([]);
   const [selectNota, setSelectNota] = useState(null);
   const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
   const [isModalCadastroOpen, setIsModalCadastroOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('Todas');
   
   const { mobile } = useOutletContext();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+
+  const camposFiltragem = [
+      "codigo",
+      "fornecedor",
+      "status",
+      "data"
+  ]
+
+  const {
+      // filtro,
+      setFiltro,
+      order,
+      dadosProcessados,
+      setOrdem,
+      // requisitarOrdenacao
+  } = useFiltroOrdenacao(notas, camposFiltragem)
 
   useEffect(() => {
     getNotas();
@@ -124,17 +145,44 @@ export default function Notas() {
     setSelectNota(nota);
     setIsModalDetailOpen(true);
   };
+
+  const handleBtnFilter = (filter) => {
+    // const legenda = {
+    //   "Todas": "",
+    //   "Pagas": "pago",
+    //   "Vencidas": "vencido",
+    //   "Pendentes": "pendente"
+    // }
+
+
+    setActiveFilter(filter)
+    setFiltro(filter === "Todas" ? "" : filter.toLocaleLowerCase())
+  }
   
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Paid':
-        return { bg: 'success-light', text: 'success', label: 'Pago' };
-      case 'Pending':
-        return { bg: 'warning-light', text: 'warning', label: 'Pendente' };
-      case 'Overdue':
-        return { bg: 'danger-light', text: 'danger', label: 'Vencido' };
+  const getStatusBadge = (status, full = false) => {
+    switch (full) {
+      case true:
+        switch (status) {
+          case 'pago':
+            return { bg: 'success', text: '', label: 'Pago' };
+          case 'pendente':
+            return { bg: 'warning', text: '', label: 'Pendente' };
+          case 'vencido':
+            return { bg: 'danger', text: '', label: 'Vencido' };
+          default:
+            return { bg: 'secondary', text: '', label: 'Desconhecido' };
+        }
       default:
-        return { bg: 'secondary-light', text: 'secondary', label: 'Desconhecido' };
+        switch (status) {
+          case 'pago':
+            return { bg: 'success-light', text: 'success', label: 'Pago' };
+          case 'pendente':
+            return { bg: 'warning-light', text: 'warning', label: 'Pendente' };
+          case 'vencido':
+            return { bg: 'danger-light', text: 'danger', label: 'Vencido' };
+          default:
+            return { bg: 'secondary-light', text: 'secondary', label: 'Desconhecido' };
+        }
     }
   };
 
@@ -162,92 +210,114 @@ export default function Notas() {
         </td>
     )
   }
-  console.log(notas)
+  console.log(dadosProcessados)
   return (
-    <Container fluid className="py-4 px-2 px-md-4">
+    <Container fluid className="py-4 m-0 px-0">
       {/* Cabeçalho da Página */}
       <Row className="mb-4 align-items-center">
-        <Col>
+        <Col xs={9}>
           <h2 className="h3 mb-1">Notas Fiscais</h2>
           <p className="text-muted mb-0">Gerencie e acompanhe suas notas fiscais em um só lugar.</p>
         </Col>
-        <Col xs="auto">
-          <Button variant="primary" onClick={() => setIsModalCadastroOpen(true)}>
+        <Col xs={3} className="d-flex justify-content-end position-relative overflow-visible">
+        {mobile ? (
+          <HoverBtn mobile={mobile} func={setIsModalCadastroOpen}>
+            Cadastrar Nota
+          </HoverBtn>
+        ) : (
+          <Button className="btn btn-roxo" onClick={() => setIsModalCadastroOpen(true)}>
             <Plus size={18} className="me-2" />
-            Adicionar Nova Nota
+            Cadastrar Nota
           </Button>
+        )}
         </Col>
       </Row>
 
       {/* Filtros e Ações */}
       <Row className="mb-4 align-items-center">
-        <Col md={8} className="mb-2 mb-md-0">
-          <ButtonGroup>
-            {['All', 'Paid', 'Pending', 'Overdue'].map(filter => (
+        <Col md={12} className="mb-3 d-flex position-relative aling-items-center">
+              <FormControl type="text" placeholder="Digite sua busca..." onChange={(e) => setFiltro(e.target.value)} />
+              <Search size={15} className="position-absolute end-0 me-4 mt-2" />
+        </Col>
+        <Col xs={6} md={6} className="mb-0 mb-md-0 d-flex ">
+          <ButtonGroup size={mobile ? "sm": ""}>
+            {['Todas', 'Pago', 'Pendente', 'Vencido'].map(filter => (
               <Button
                 key={filter}
                 variant={activeFilter === filter ? 'primary' : 'outline-secondary'}
-                onClick={() => setActiveFilter(filter)}
+                className={`fw-medium ${activeFilter === filter ? 'btn-roxo' : 'outline-secondary'}`}
+                onClick={() => handleBtnFilter(filter)}
               >
                 {filter}
               </Button>
             ))}
           </ButtonGroup>
         </Col>
-        <Col md={4} className=" d-flex justify-content-end">
-            <Dropdown>
-              <Dropdown.Toggle variant="outline-secondary" id="dropdown-sort">
-                <ArrowUpDown size={16} className="me-2" />
-                Ordenar por Data
+        <Col xs={6} md={6} className=" d-flex justify-content-end gap-3">
+            <Dropdown align={"end"}>
+              <Dropdown.Toggle variant="" className="fw-medium dropdown-toggle-hidden-arrow align-items-end d-flex" id="dropdown-sort">
+                <span className="d-none d-md-inline">Ordenar por: {order.direcao === "asc" ? "Mais Recente" : "Mais Antigo"}</span>
+                <ArrowUpDown size={16} className="ms-md-2" />
               </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item href="#">Mais Recente</Dropdown.Item>
-                <Dropdown.Item href="#">Mais Antigo</Dropdown.Item>
+              <Dropdown.Menu className="w-100">
+                <Dropdown.Item href="#" onClick={() => setOrdem("asc")}>Mais Recente</Dropdown.Item>
+                <Dropdown.Item href="#" onClick={() => setOrdem("desc")}>Mais Antigo</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
         </Col>
       </Row>
 
-      {/* Tabela de Notas */}
-      <Row>
-        <Col>
-          <div className="table-responsive">
-            <Table hover className="align-middle" >
-              <thead className="table-light">
-                <tr>
-                  <th>Código</th>
-                  <th>Fornecedor</th>
-                  <th>Emissão</th>
-                  <th>Vencimento</th>
-                  <th>Status</th>
-                  <th className="text-end">Valor</th>
-                  <th className="text-center">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {notas.map((nota) => {
-                  const status = getStatusBadge('Pending');
-                  // Dados de exemplo para a barra de progresso. Você precisará conectar isso aos seus dados reais.
-                  const progress = { paid: 60, pending: 25, overdue: 15 };
+      {/* Lista de Notas */}
+      {dadosProcessados.length > 0 ? (
+        <>
+          {/* Cabeçalho da Lista (visível em telas maiores) */}
+          <Row className="d-none d-md-flex text-muted fw-bold mb-2 px-3">
+            <Col md={2}>Código</Col>
+            <Col md={3}>Fornecedor</Col>
+            <Col md={2} className="text-center">Emissão</Col>
+            <Col md={2} className="text-center">Vencimento</Col>
+            <Col md={1} className="text-center">Status</Col>
+            <Col md={1} className="text-end">Valor</Col>
+            <Col md={1} className="text-center">Ações</Col>
+          </Row>
 
-                  return (
-                    // 2. ADICIONE position: 'relative' À LINHA DA TABELA
-                    <tr 
-                      key={nota.id} 
-                      style={{ cursor: 'pointer', position: 'relative', height: "4.5rem" }} 
-                      onClick={() => handleShowDetails(nota)}
-                    >
-                      <td className="fw-bold">#{nota.codigo}</td>
-                      <td>{nota.fornecedor || 'N/A'}</td>
-                      <td>{utils.formatDate(nota.data)}</td>
-                      <td>{utils.formatDate(nota.data_vencimento) || "N/A"}</td>
-                      <td>
+          {/* Itens da Lista */}
+          <div className="list-container">
+            {dadosProcessados.map((nota) => {
+              const status = getStatusBadge(nota.status);
+              return (
+                <Card key={nota.id} className="mb-2 shadow-sm" style={{ cursor: 'pointer' }} onClick={() => handleShowDetails(nota)}>
+                  <Card.Body className="p-3">
+                    <Row className="align-items-center">
+                      <Col xs={6} md={2} className="mb-2 mb-md-0">
+                        <span className="d-md-none text-muted small">Código: </span>
+                        <span className="fw-bold">{nota.codigo}</span>
+                      </Col>
+                      <Col xs={4} md={3} className="mb-2 mb-md-0">
+                        <span className="d-md-none text-muted small">Fornecedor: </span>
+                        {nota.fornecedor || 'N/A'}
+                      </Col>
+                      <Col xs={2} md={2} className="d-md-none text-end">
+                        <span className="text-muted small">Qn. Produtos: </span>
+                        {nota.itensNota.length || "N/A"}
+                      </Col>
+                      <Col xs={6} md={2} className="text-md-center mb-2 mb-md-0">
+                        <span className="d-md-none text-muted small">Emissão: </span>
+                        {utils.formatDate(nota.data)}
+                      </Col>
+                      <Col xs={6} md={2} className="text-md-center mb-2 mb-md-0">
+                        <span className="d-md-none text-muted small">Vencimento: </span>
+                        {utils.formatDate(nota.data_vencimento) || "N/A"}
+                      </Col>
+                      <Col xs={6} md={1} className="text-md-center mb-2 mb-md-0">
                         <Badge bg={status.bg} text={status.text} pill>{status.label}</Badge>
-                      </td>
-                      <td className="text-end">{utils.formatMoney(nota.valor_total)}</td>
-                      <td className="text-center">
+                      </Col>
+                      <Col xs={6} md={1} className="text-end fw-bold mb-2 mb-md-0">
+                        {utils.formatMoney(nota.valor_total)}
+                      </Col>
+                      <Col xs={12} md={1} className="text-md-center d-none d-md-block">
                         <Dropdown onClick={(e) => e.stopPropagation()}>
-                          <Dropdown.Toggle as="a" variant="link" className="text-muted" id={`dropdown-nota-${nota.id}`}>
+                          <Dropdown.Toggle as="a" variant="link" className="dropdown-toggle-hidden-arrow text-muted p-0" id={`dropdown-nota-${nota.id}`}>
                             <MoreVertical size={20} />
                           </Dropdown.Toggle>
                           <Dropdown.Menu align="end">
@@ -256,26 +326,32 @@ export default function Notas() {
                             <Dropdown.Item>Baixar PDF</Dropdown.Item>
                           </Dropdown.Menu>
                         </Dropdown>
-                      </td>
-                      {/* 3. ADICIONE A BARRA DE PROGRESSO ABSOLUTAMENTE POSICIONADA */}
-                      {nota.itensNota.length === 0 ? (
-                        <td style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: '3px' }}>
-                          <ProgressBar style={{ height: '3px', borderRadius: "100px" }}>
-                            <ProgressBar variant="secondary" now={100} key={1} />
-                          </ProgressBar>
-                        </td>
-                      ) : calcItens(nota.itensNota)}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                  {/* Barra de Progresso */}
+                  <div style={{ height: '4px' }}>
+                    {nota.itensNota.length === 0 ? (
+                      <ProgressBar style={{ height: '4px', borderBottomLeftRadius: 'calc(0.375rem - 1px)', borderBottomRightRadius: 'calc(0.375rem - 1px)' }}>
+                        <ProgressBar variant="secondary" now={100} key={1} />
+                      </ProgressBar>
+                    ) : calcItens(nota.itensNota)}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
-        </Col>
-      </Row>
+        </>
+      ) : (
+        <div className="alert alert-roxo text-center mt-4" role="alert">
+          <p className="fw-medium fs-4 m-0">Nenhuma nota encontrada!</p>
+        </div>
+      )}
+
+      
 
       {/* Paginação */}
-      <Row className="mt-4 justify-content-center">
+      {/* <Row className="mt-4 justify-content-center">
         <Col xs="auto">
           <Pagination>
             <Pagination.Prev><ChevronLeft size={13} /></Pagination.Prev>
@@ -287,7 +363,7 @@ export default function Notas() {
             <Pagination.Next><ChevronRight size={13} /></Pagination.Next>
           </Pagination>
         </Col>
-      </Row>
+      </Row> */}
 
       {/* Modais */}
       {/* <ModalNota 
