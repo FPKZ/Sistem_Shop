@@ -8,7 +8,7 @@ export default function Vendas(){
 
     
     return(
-        <Container fluid className="p-2 p-md-4">
+        <Container fluid className="p-md-0 p-0 m-0">
             <Outlet context={{ mobile }}/>
         </Container>
     )

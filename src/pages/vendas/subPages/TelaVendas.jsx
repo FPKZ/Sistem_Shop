@@ -28,7 +28,7 @@ export default function TelaVendas(){
     console.log(vendas)
     return (
         <>
-            <Row className="py-2 g-2 g-md-4">
+            <Row className="py-2 px-0 m-0 g-2 g-md-4">
                 <Col xs={12} sm={4} md={4}>
                     <Card style={stily} onClick={() => navigate("Nova-Venda")}>
                         <Card.Body className="d-flex gap-3 align-items-end">
@@ -60,8 +60,8 @@ export default function TelaVendas(){
                     </Card>
                 </Col>
             </Row>
-            <Row className="py-2">
-                <Col md={8}>
+            <Row className="py-2 g-2 g-md-4 px-0 m-0">
+                <Col md={8} className="">
                     <TabelaVendas vendas={vendas}/>
                 </Col>
                 <Col>

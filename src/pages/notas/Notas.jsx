@@ -214,14 +214,14 @@ export default function Notas() {
   return (
     <Container fluid className="py-4 m-0 px-0">
       {/* Cabeçalho da Página */}
-      <Row className="mb-4 align-items-center">
+      <Row className="mb-4 align-items-center position-relative">
         <Col xs={9}>
           <h2 className="h3 mb-1">Notas Fiscais</h2>
           <p className="text-muted mb-0">Gerencie e acompanhe suas notas fiscais em um só lugar.</p>
         </Col>
-        <Col xs={3} className="d-flex justify-content-end position-relative overflow-visible">
+        <Col xs={3} className="d-flex justify-content-end position-relative overflow-visible h-100">
         {mobile ? (
-          <HoverBtn mobile={mobile} func={setIsModalCadastroOpen}>
+          <HoverBtn mobile={mobile} func={setIsModalCadastroOpen} upClass="position-absolute bottom-0">
             Cadastrar Nota
           </HoverBtn>
         ) : (

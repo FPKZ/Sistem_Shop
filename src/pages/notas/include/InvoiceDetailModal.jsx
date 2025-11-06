@@ -43,7 +43,7 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
         <Modal.Title as="h5">Nota Fiscal #{selectNota.codigo}</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body className="p-4">
+      <Modal.Body className="p-md-4">
         {/* Seção de Detalhes (sem alterações) */}
         <Row className="gy-4 mb-4">
           <Col xs={6} md={6} lg={4}>
@@ -72,7 +72,7 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
           </Col>
         </Row>
 
-        <hr className="my-4" />
+        <hr className="my-md-4" />
 
         {/* Seção de Produtos (COM A ALTERAÇÃO) */}
         {/* Seção de Produtos */}
@@ -91,7 +91,7 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
 
           {/* Container com Scroll para a Lista de Itens */}
           {selectNota.itensNota.length > 0 ? (
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <div style={{ maxHeight: '40dvh', overflowY: 'auto' }}>
               {selectNota.itensNota?.map(item => (
                 <Card key={item.id} className={`border-bottom py-2 px-2 my-2 overflow-hidden ${getStatsItem(item.status)}`}>
                   <Card.Body>
