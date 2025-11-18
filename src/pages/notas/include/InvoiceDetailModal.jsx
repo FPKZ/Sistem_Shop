@@ -1,39 +1,111 @@
-import { Modal, Row, Col, Button, Badge, Table, Card, Alert } from "react-bootstrap";
-import { X, Edit, Printer } from 'lucide-react';
-import utils from "@app/utils"; // Importando suas funções utilitárias
+import { Modal, Row, Col, Button, Badge, Card, Alert } from "react-bootstrap";
+import { Edit, Printer } from 'lucide-react';
+import { useEffect } from "react";
+import utils from "@app/utils";
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
-const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
-  // Se não houver nota selecionada, não renderize nada.
-  if (!selectNota) {
-    return null;
-  }
+// --- NOVO COMPONENTE PARA LISTAR OS ITENS ---
+const InvoiceItems = ({ itens }) => {
+  const camposFiltragem = ["status"];
 
-  // Mapeia o status para a cor do Badge (exemplo, ajuste conforme necessário)
-  const getStatusBadge = (status) => {
-    // Você pode expandir essa lógica baseada no status real da nota
+  const {
+    dadosProcessados,
+    requisitarOrdenacao
+  } = useFiltroOrdenacao(itens, camposFiltragem);
 
-    switch (status){
-      case "pago":
-        return { variant: "success", label: "Pago"}
-      case "pendente":
-        return { variant: "warning", label: "Pendente"}
-      case "vencido":
-        return { variant: "danger", label: "Vencido"}
+  useEffect(() => {
+    // Ordena por 'status' assim que o componente é montado
+    requisitarOrdenacao("status");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // A dependência vazia garante que isso rode apenas uma vez
+
+  const getStatsItem = (status) => {
+    switch (status) {
+      case "Vendido":
+        return "bg-danger-subtle";
+      case "Reservado":
+        return "bg-warning-subtle";
       default:
-        return { variant: 'secondary', label: 'Desconhecido' }   
+        return ""; // Para 'Disponível' ou outros status
     }
   };
 
-  const getStatsItem = (status) => {
-    switch (status){
-      case "Vendido":
-        return "bg-danger-subtle"
-      case "Reservado":
-        return "bg-warning-subtle"
-      default:
-        return ""
-    }
+  return (
+    <div className="d-flex flex-column flex-grow-1" style={{ minHeight: '0' }}>
+      <h5 className="mb-3">Produtos na Nota</h5>
+
+      {itens.length > 0 ? (
+        <div style={{ overflowY: 'auto' }}>
+          {/* Cabeçalho da Lista */}
+          <Row className="d-none d-md-flex text-muted fw-bold px-0 py-2 m-0 bg-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+            <Col md={1} className="text-center">#id</Col>
+            <Col md={4}>Produto</Col>
+            <Col md={3} className="text-center">Marca</Col>
+            <Col md={2} className="text-center">Qnt.</Col>
+            <Col md={2} className="text-end">V. Produto</Col>
+          </Row>
+
+          {/* Lista de Itens */}
+          {dadosProcessados?.map(item => (
+            <Card key={item.id} className={`border-bottom py-2 px-2 my-2 overflow-hidden ${getStatsItem(item.status)}`}>
+              <Card.Body>
+                <Row className="align-items-center g-1">
+                  <Col xs={3} md={1} className="mb-2 mb-md-0 text-end text-md-start order-2 order-md-0">
+                    <span className="d-md-none fw-semibold small">#id: </span>
+                    <span className="fw-bolder">{item.id}</span>
+                  </Col>
+                  <Col xs={9} md={4} className="mb-2 mb-md-0 order-0 order-md-0">
+                    <span className="d-md-none text-muted small">Produto: </span>
+                    <span>{item.nome}</span>
+                  </Col>
+                  <Col xs={6} md={0} className="text-start text-md-center order-5 d-md-none mb-2 mb-md-0">
+                    <span className="d-md-none text-muted small">Status: </span>
+                    <span>{item.status}</span>
+                  </Col>
+                  <Col xs={9} md={3} className="text-start text-md-center mb-2 mb-md-0 order-3 order-md-3">
+                    <span className="d-md-none text-muted small">Marca: </span>
+                    <span>{item.marca}</span>
+                  </Col>
+                  <Col xs={3} md={2} className="text-end text-md-center mb-2 mb-md-0 order-4">
+                    <span className="d-md-none text-muted small">Qtd: </span>
+                    <span>1</span>
+                  </Col>
+                  <Col xs={6} md={2} className="text-end text-md-end mb-2 mb-md-0 order-last">
+                    <span className="d-md-none text-muted small">V. Compra: </span>
+                    <span>{utils.formatMoney(item.valor_compra)}</span>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Alert className="alert-roxo text-center fs-5 fw-medium ms-1 me-4 mt-3 w-100">Nenhum Produto cadastrado!!!</Alert>
+      )}
+    </div>
+  );
+};
+
+
+// --- COMPONENTE PRINCIPAL DO MODAL ---
+const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile }) => {
+
+  if (!selectNota) {
+    return null; // Retorna null se não houver nota, evitando a chamada de hooks
   }
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "pago":
+        return { variant: "success", label: "Pago" };
+      case "pendente":
+        return { variant: "warning", label: "Pendente" };
+      case "vencido":
+        return { variant: "danger", label: "Vencido" };
+      default:
+        return { variant: 'secondary', label: 'Desconhecido' };
+    }
+  };
 
   const status = getStatusBadge(selectNota.status);
 
@@ -43,8 +115,8 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
         <Modal.Title as="h5">Nota Fiscal #{selectNota.codigo}</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body className="p-md-4">
-        {/* Seção de Detalhes (sem alterações) */}
+      <Modal.Body className="p-md-4 pb-0 pb-md-0 d-flex flex-column" style={{ maxHeight: `${mobile ? "100dvh" : "70dvh"}` }}>
+        {/* Seção de Detalhes */}
         <Row className="gy-4 mb-4">
           <Col xs={6} md={6} lg={4}>
             <p className="text-muted mb-1 small">Fornecedor</p>
@@ -74,77 +146,20 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota }) => {
 
         <hr className="my-md-4" />
 
-        {/* Seção de Produtos (COM A ALTERAÇÃO) */}
-        {/* Seção de Produtos */}
-        <div>
-          <h5 className="mb-3">Produtos na Nota</h5>
-          
-          {/* Cabeçalho da Lista (visível em telas maiores) */}
-          <Row className="d-none d-md-flex text-muted fw-bold mb-2 px-2 bg-light py-2 rounded-top me-3" style={{ position: 'sticky', top: 0, zIndex: 1, marginLeft: "0.1rem" }}>
-            <Col md={1}>#id</Col>
-            <Col md={3}>Produto</Col>
-            <Col md={2} className="text-center">Quantidade</Col>
-            <Col md={2} className="text-end">V. Compra</Col>
-            <Col md={2} className="text-end">V. Venda</Col>
-            <Col md={2} className="text-end">Total</Col>
-          </Row>
-
-          {/* Container com Scroll para a Lista de Itens */}
-          {selectNota.itensNota.length > 0 ? (
-            <div style={{ maxHeight: '40dvh', overflowY: 'auto' }}>
-              {selectNota.itensNota?.map(item => (
-                <Card key={item.id} className={`border-bottom py-2 px-2 my-2 overflow-hidden ${getStatsItem(item.status)}`}>
-                  <Card.Body>
-                    <Row className="align-items-center">
-                      <Col xs={2} md={1} className="mb-2 mb-md-0 text-end text-md-start ">
-                        <span className="d-md-none fw-semibold small">#id: </span>
-                        <span className="fw-bolder">{item.id}</span>
-                      </Col>
-                      <Col xs={10} md={3} className="mb-2 mb-md-0 order-first order-md-0">
-                        <span className="d-md-none text-muted small">Produto: </span>
-                        <span>{item.nome}</span>
-                      </Col>
-                      <Col xs={6} md={2} className="text-md-center mb-2 mb-md-0">
-                        <span className="d-md-none text-muted small">Qtd: </span>
-                        <span>1</span>
-                      </Col>
-                      <Col xs={6} md={2} className="text-end text-md-center d-md-none mb-2 mb-md-0">
-                        <span className="d-md-none text-muted small">Status: </span>
-                        <span>{item.status}</span>
-                      </Col>
-                      <Col xs={4} md={2} className="text-start text-md-end mb-2 mb-md-0">
-                        <span className="d-md-none text-muted small">V. Compra: </span>
-                        <span>{utils.formatMoney(item.valor_compra)}</span>
-                      </Col>
-                      <Col xs={4} md={2} className="text-end mb-2 mb-md-0">
-                        <span className="d-md-none text-muted small">V. Venda: </span>
-                        <span>{utils.formatMoney(item.valor_venda)}</span>
-                      </Col>
-                      <Col xs={4} md={2} className="text-end fw-medium">
-                        <span className="d-md-none text-muted small">Total: </span>
-                        <span>{utils.formatMoney(item.valor_compra)}</span>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Alert className="alert-roxo text-center fs-5 fw-medium ms-1 me-4 mt-3">Nenhum Produto cadastrado!!!</Alert>
-          )}
-        </div>
+        {/* Renderiza o novo componente apenas quando há itens */}
+        {selectNota.itensNota && <InvoiceItems itens={selectNota.itensNota} />}
 
       </Modal.Body>
 
-      {/* Rodapé do Modal (sem alterações) */}
-      <Modal.Footer className="bg-light">
+      {/* Rodapé do Modal */}
+      <Modal.Footer className="bg-light justify-content-between">
         <Button variant="secondary" onClick={onClose}>
           Fechar
         </Button>
-        <Button variant="outline-primary">
+        {/* <Button variant="outline-primary">
           <Edit size={16} className="me-2" />
           Editar Nota
-        </Button>
+        </Button> */}
         <Button variant="primary">
           <Printer size={16} className="me-2" />
           Imprimir
