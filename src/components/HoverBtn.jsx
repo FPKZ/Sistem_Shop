@@ -8,19 +8,17 @@ export default function HoverBtn({mobile, upClass, children, func}){
     return (
     <Button type="button" className={`btn-roxo animed-btn ${upClass} ${hovered ? "expanded" : ""}`}
         onClick={() => {
-
-        if(mobile){
-            if(hovered){
-            func?.(true)
-            setHovered?.(false)
+            if(mobile){
+                if(hovered){
+                    func?.(true)
+                    setHovered?.(false)
+                } else {
+                    setHovered?.(true)
+                    setTimeout(() => setHovered?.(false), 3000)
+                }
             } else {
-            setHovered?.(true)
-            setTimeout(() => setHovered?.(false), 3000)
+                func?.(true)
             }
-        } else {
-            func?.(true)
-        }
-
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}>

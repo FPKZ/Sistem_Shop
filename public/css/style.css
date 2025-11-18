@@ -50,7 +50,7 @@ html, body {
     display: flex;
     flex-direction: column;
     margin-left: 3.5rem;
-    margin-top: 4.5rem;
+    margin-top: 4.1rem;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -190,7 +190,7 @@ html, body {
 
 
     .layout-ativo #root{
-        margin-left: 2.8rem !important;
+        margin-left: 2.5rem !important;
         margin-top: 3rem !important;
         width: calc(100% - 2.5rem) !important;
         height: calc(100% - 3rem) !important;

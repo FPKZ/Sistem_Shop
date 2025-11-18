@@ -1,237 +1,145 @@
-import { format } from "date-fns"
-import { 
-  Table, 
-  Card, 
-  Badge, 
-  Button, 
-  ButtonGroup, 
-  ProgressBar, 
-  Form, 
-  Row, 
+import {
+  Row,
   Col,
-  Modal
+  Badge,
+  Dropdown,
+  ProgressBar, // 1. IMPORTE O PROGRESSBAR
+  Card
 } from 'react-bootstrap';
-import { 
-  GraduationCap, 
-  User, 
-  MapPin, 
-  BookOpen, 
-  Award, 
-  Plus, 
-  Edit, 
-  Eye, 
-  UserCheck, 
-  Download, 
-  ArrowUpDown 
-} from 'lucide-react';
+import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
 
-import { useState, useMemo } from "react";
+import utils from "@app/utils";
 
 
-export default function TableNota({notas, setselectNota, setisModalOpem}){
+export default function TableNota({notas, handleShowDetails, mobile}){
 
-    //ordenação
-    const [ filtro, setFiltro ] = useState();
-    const [ order, setOrder ] = useState({ chave: 'id', direcao: 'asc' });
-
-    const DadosProcessados = useMemo(() => {
-    let dadosFiltrados = [...notas];
-
-    if (filtro) {
-        dadosFiltrados = dadosFiltrados.filter(dados => 
-        dados.fornecedor.toLowerCase().includes(filtro.toLowerCase()) ||
-        dados.codigo.toString().includes(filtro) || 
-        dados.valor_total.toString().includes(filtro)
-        );
-    }
-
-    dadosFiltrados.sort((a, b) => {
-        const valorA = a[order.chave];
-        const valorB = b[order.chave];
-    
-        if (valorA < valorB) return order.direcao === 'asc' ? -1 : 1;
-        if (valorA > valorB) return order.direcao === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    return dadosFiltrados;
-    }, [notas, filtro, order])
-
-    const requisitarOrdenacao = (chave) => {
-    let direcao = 'asc';
-    if (order.chave === chave && order.direcao === 'asc') {
-        direcao = 'desc';
-    }
-    setOrder({ chave, direcao });
-    }
-    
-
-    
-    const handleViewProfile = (trainee) => {
-        setselectNota(trainee);
-        setisModalOpem(true);
-    };
-
-    // const handleAssignCourse = (trainee) => {
-    //     setselectNota(trainee);
-    //     setIsAssignCourseOpen(true);
-    // };
-
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'Pago':
-            return <Badge bg="success">Pago</Badge>;
-            case 'Pendente':
-            return <Badge bg="warning">Pendente</Badge>;
-            case 'Vencido':
-            return <Badge bg="danger">Vencido</Badge>;
+    const getStatusBadge = (status, full = false) => {
+        switch (full) {
+        case true:
+            switch (status) {
+            case 'pago':
+                return <Badge bg="success-light" text="" pill>Pago</Badge>
+            case 'pendente':
+                return <Badge bg="warning" text="" pill>Pendente</Badge>
+            case 'vencido':
+                return <Badge bg="danger" text="" pill>Vencido</Badge>
             default:
-            return <Badge bg="secondary">{status}</Badge>;
+                return <Badge bg="secondary" text="" pill>Desconhecido</Badge>
+            }
+        default:
+            switch (status) {
+            case 'pago':
+                return <Badge bg="success-light" text="success" pill>Pago</Badge>
+            case 'pendente':
+                return <Badge bg="warning-light" text="warning" pill>Pendente</Badge>
+            case 'vencido':
+                return <Badge bg="danger-light" text="danger" pill>Vencido</Badge>
+            default:
+                return <Badge bg="secondary-light" text="secondary" pill>Desconhecido</Badge>
+            }
         }
     };
-    
+
     const calcItens = (itens) => { 
-        if(itens.length === 0) return
+        const progressBarHeigth = mobile ? "6px" : "3px"
+        if(itens.length === 0) {
+            return (
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: progressBarHeigth }}>
+                    <ProgressBar style={{ height: progressBarHeigth, borderRadius: "0" }}>
+                        <ProgressBar variant="secondary" now={100} key={1} />
+                    </ProgressBar>
+                </div>
+            )
+        }
         const disponiveis = Object.values(itens).filter(i => i.status === "Disponivel") || 0
         const vendidos = Object.values(itens).filter(i => i.status === "Vendido") || 0
         const reservados = Object.values(itens).filter(i => i.status === "Reservado") || 0
-    
+
         const contItens = {
-          "disponivel": (disponiveis.length / itens.length) * 100,
-          "vendidos": (vendidos.length / itens.length) * 100,
-          "reservados": (reservados.length / itens.length) * 100,
-          "total": itens.length
+        "disponivel": (disponiveis.length / itens.length) * 100,
+        "vendidos": (vendidos.length / itens.length) * 100,
+        "reservados": (reservados.length / itens.length) * 100,
+        "total": itens.length
         }
-    
+
         return (
-          <div>
-            <div className="d-flex justify-content-between mb-1">
-                <small className="d-flex align-items-center text-secondary">
-                  <div className="me-1 rounded" style={{ width: 12, height: 12, backgroundColor: '#dc3545' }}></div>
-                  Vendidos
-                </small>
-                <small className="d-flex align-items-center text-secondary">
-                  <div className="me-1 rounded" style={{ width: 12, height: 12, backgroundColor: '#ffc107' }}></div>
-                  Reservados
-                </small>
-                <small className="d-flex align-items-center text-secondary">
-                  <div className="me-1 rounded" style={{ width: 12, height: 12, backgroundColor: '#0d6efd' }}></div>
-                  Disponíveis
-                </small>
-            </div>
-            <ProgressBar>
-              <ProgressBar 
-                  now={contItens.vendidos}
-                  label={`${contItens.vendidos}%`}
-                  variant="danger"
-                  key={1}
-              />
-              <ProgressBar 
-                  now={contItens.reservados}
-                  label={`${contItens.reservados}%`}
-                  variant="warning"
-                  key={2}
-              />
-              <ProgressBar 
-                  now={contItens.disponivel}
-                  label={`${contItens.disponivel}%`}
-                  variant="primary"
-                  key={3}
-              />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: progressBarHeigth }}>
+            <ProgressBar style={{ height: progressBarHeigth, borderRadius: "0" }}>
+                <ProgressBar variant="success" now={contItens.disponivel} key={1} />
+                <ProgressBar variant="warning" now={contItens.reservados} key={2} />
+                <ProgressBar variant="danger" now={contItens.vendidos} key={3} />
             </ProgressBar>
-        </div>
+            </div>
         )
-      }
+    }
 
     return(
         <>
-        {/* Main Table */}
-        <Card className="medical-card">
-        <Card.Header className="d-flex justify-content-between">
-            <Card.Title className="mb-0 d-flex align-items-center">
-            Notas ({notas.length})
-            </Card.Title>
-            <Form.Control 
-                type='text' 
-                placeholder='Filtrar por fornecedor, codigo ou valor...' 
-                value={filtro} 
-                onChange={(e) => setFiltro(e.target.value)} 
-                style={{ maxWidth: '250px' }} 
-            />
-        </Card.Header>
-        <Card.Body className="p-0">
-            <Table responsive striped hover className="medical-table mb-0">
-            <thead className="table-light">
-                <tr>
-                <th onClick={() => requisitarOrdenacao('id')}>Id</th>
-                <th onClick={() => requisitarOrdenacao('fornecedor')}>Fornecedor</th>
-                <th>Codigo</th>
-                <th onClick={() => requisitarOrdenacao('data')}>Data</th>
-                <th>Qt. Produtos</th>
-                <th onClick={() => requisitarOrdenacao('valor_total')}>Valor</th>
-                <th>Produtos</th>
-                <th>Status</th>
-                <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {DadosProcessados.map((nota) => (
-                <tr key={nota.id}>
-                    <td>
-                    <div>
-                        <strong className="text-dark d-block">{nota.id}</strong>
+            {/* Cabeçalho da Lista (visível em telas maiores) */}
+            <Row className="d-none d-md-flex text-muted fw-bold mb-2 px-3">
+                <Col md={2}>Código</Col>
+                <Col md={3}>Fornecedor</Col>
+                <Col md={2} className="text-center">Emissão</Col>
+                <Col md={2} className="text-center">Vencimento</Col>
+                <Col md={1} className="text-center">Status</Col>
+                <Col md={1} className="text-end">Valor</Col>
+                <Col md={1} className="text-center">Ações</Col>
+            </Row>
+    
+            {/* Itens da Lista */}
+            <div className="list-container">
+                {notas.map((nota) => (
+                    <Card key={nota.id} className="mb-2 shadow-sm" style={{ cursor: 'pointer', overflow: "hidden" }} onClick={() => handleShowDetails(nota)}>
+                    <Card.Body className="p-3">
+                        <Row className="align-items-center">
+                        <Col xs={6} md={2} className="mb-2 mb-md-0">
+                            <span className="d-md-none text-muted small">Código: </span>
+                            <span className="fw-bold">{nota.codigo}</span>
+                        </Col>
+                        <Col xs={6} md={3} className="mb-2 mb-md-0">
+                            <span className="d-md-none text-muted small">Fornecedor: </span>
+                            {nota.fornecedor || 'N/A'}
+                        </Col>
+                        {/* <Col xs={2} md={2} className="d-md-none text-end">
+                            <span className="text-muted small">Qn. Prdts: </span>
+                            {nota.itensNota.length || "N/A"}
+                        </Col> */}
+                        <Col xs={6} md={2} className="text-md-center mb-2 mb-md-0">
+                            <span className="d-md-none text-muted small">Emissão: </span>
+                            {utils.formatDate(nota.data)}
+                        </Col>
+                        <Col xs={6} md={2} className="text-md-center mb-2 mb-md-0">
+                            <span className="d-md-none text-muted small">Vencimento: </span>
+                            {utils.formatDate(nota.data_vencimento) || "N/A"}
+                        </Col>
+                        <hr className="my-md-2 d-md-none" />
+                        <Col xs={6} md={1} className="text-md-center mb-2 mb-md-0">
+                            {getStatusBadge(nota.status)}
+                        </Col>
+                        <Col xs={6} md={1} className="text-end fw-bold mb-2 mb-md-0">
+                            {utils.formatMoney(nota.valor_total)}
+                        </Col>
+                        <Col xs={12} md={1} className="text-md-center d-none d-md-block">
+                            <Dropdown onClick={(e) => e.stopPropagation()}>
+                            <Dropdown.Toggle as="a" variant="link" className="dropdown-toggle-hidden-arrow text-muted p-0" id={`dropdown-nota-${nota.id}`}>
+                                <MoreVertical size={20} />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu align="end">
+                                <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item>
+                                <Dropdown.Item>Editar</Dropdown.Item>
+                                <Dropdown.Item>Baixar PDF</Dropdown.Item>
+                            </Dropdown.Menu>
+                            </Dropdown>
+                        </Col>
+                        </Row>
+                    </Card.Body>
+                    {/* Barra de Progresso */}
+                    <div style={{ height: '4px' }}>
+                        {calcItens(nota.itensNota)}
                     </div>
-                    </td>
-                    <td>
-                    <div className="d-flex align-items-center">
-                        <span className="text-secondary">{nota.fornecedor || "fornecedor aleatorio"}</span>
-                    </div>
-                    </td>
-                    <td>
-                    <div className="d-flex align-items-center">
-                        <span className="text-secondary">{nota.codigo}</span>
-                    </div>
-                    </td>
-                    <td>
-                    <div>
-                        <span className="text-dark d-block">{format(new Date(nota.data), "dd/MM/yyyy HH:mm")}</span>
-                    </div>
-                    </td>
-                    <td className="text-secondary">{nota.itensNota.length}</td>
-                    <td className='text-secondary'>{new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                    }).format(nota.valor_total)}
-                    </td>
-                    <td style={{minWidth: '120px'}}>
-                    {nota.itensNota.length === 0 ? (
-                        <div>Nota não contem Produtos</div>
-                    ) : calcItens(nota.itensNota)}
-                    </td>
-                    <td>{getStatusBadge("pago")}</td>
-                    <td>
-                    <ButtonGroup size="sm">
-                        <Button 
-                        variant="outline-secondary" 
-                        onClick={() => handleViewProfile(nota)}
-                        title="View Profile"
-                        >
-                        <Eye size={16} />
-                        </Button>
-                        <Button 
-                        variant="outline-warning"
-                        title="Edit"
-                        >
-                        <Edit size={16} />
-                        </Button>
-                    </ButtonGroup>
-                    </td>
-                </tr>
+                    </Card>
                 ))}
-            </tbody>
-            </Table>
-        </Card.Body>
-        </Card>
+            </div>
         </>
     )
 }

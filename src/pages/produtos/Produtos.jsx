@@ -72,7 +72,7 @@ function Produtos() {
   }
   
   return (
-    <div className="p-2 p-md-4 h-100 overflow-hidden">
+    <div className="p-md-4 h-100 overflow-hidden">
       <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
         <HoverBtn mobile={mobile} func={setModalAddProduto}>Adicionar Produto</HoverBtn>
       </Produto>

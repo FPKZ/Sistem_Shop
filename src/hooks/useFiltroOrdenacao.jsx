@@ -52,11 +52,18 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
         }
         setOrder({chave, direcao})
     }
+
+    const setOrdem = (direcao) => {
+        const chave = order.chave
+        setOrder({chave, direcao})
+    }
+
     return {
         filtro,
         setFiltro,
         order,
         dadosProcessados,
+        setOrdem,
         requisitarOrdenacao,
     }
 }

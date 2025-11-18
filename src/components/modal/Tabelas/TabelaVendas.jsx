@@ -5,7 +5,7 @@ import utils from "@app/utils"
 export default function TabelaClientes({vendas}){
 
     return (
-        <Card className="p-0">
+        <Card className="p-0 m-0">
             <Card.Header className="d-flex justify-content-between align-items-center">
                 <Card.Title>
                     Vendas totais ({vendas ? vendas.length : 0})

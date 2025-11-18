@@ -5,7 +5,7 @@ function Cadastro() {
   // console.log(pathParts);
 
   return (
-    <div className="p-2 p-md-4">
+    <div className="p- p-md-4">
       <div className="row row-cols-* g-2 g-md-4">
         <Outlet context={{ }}  />
       </div>
