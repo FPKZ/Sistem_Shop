@@ -11,7 +11,8 @@ import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } fr
 import utils from "@app/utils";
 
 
-export default function TableNota({notas, handleShowDetails, mobile}){
+export default function TableNota({notas, handleShowDetails, mobile, handleBuy}){
+
 
     const getStatusBadge = (status, full = false) => {
         switch (full) {
@@ -41,11 +42,11 @@ export default function TableNota({notas, handleShowDetails, mobile}){
     };
 
     const calcItens = (itens) => { 
-        const progressBarHeigth = mobile ? "6px" : "3px"
+        const progressBarHeigth = mobile ? "6px" : "4px"
         if(itens.length === 0) {
             return (
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: progressBarHeigth }}>
-                    <ProgressBar style={{ height: progressBarHeigth, borderRadius: "0" }}>
+                    <ProgressBar style={{ height: progressBarHeigth,  borderEndEndRadius: "5px", borderEndStartRadius: "5px", borderTopRightRadius: "0", borderTopLeftRadius: "0" }}>
                         <ProgressBar variant="secondary" now={100} key={1} />
                     </ProgressBar>
                 </div>
@@ -126,19 +127,17 @@ export default function TableNota({notas, handleShowDetails, mobile}){
                             </Dropdown.Toggle>
                             <Dropdown.Menu align="end" renderOnMount>
                                 <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item>
-                                <Dropdown.Item>Editar</Dropdown.Item>
                                 <Dropdown.Item>Baixar PDF</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>
                             </Dropdown.Menu>
                             </Dropdown>
                         </Col>
                         </Row>
                     </Card.Body>
-                    <Card.Footer className='border-0 p-0 m-0' style={{height: "4px", overflow: "hidden" }}>
-                        {/* Barra de Progresso */}
-                        <div style={{ height: '4px' }}>
-                            {calcItens(nota.itensNota)}
-                        </div>
-                    </Card.Footer>
+                    {/* Barra de Progresso */}
+                    <div>
+                        {calcItens(nota.itensNota)}
+                    </div>
                     </Card>
                 ))}
             </div>

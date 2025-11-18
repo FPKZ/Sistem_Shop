@@ -1,5 +1,5 @@
 import { Modal, Row, Col, Button, Badge, Card, Alert } from "react-bootstrap";
-import { Edit, Printer } from 'lucide-react';
+import { DollarSign, Edit, Printer } from 'lucide-react';
 import { useEffect } from "react";
 import utils from "@app/utils";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
@@ -88,7 +88,7 @@ const InvoiceItems = ({ itens }) => {
 
 
 // --- COMPONENTE PRINCIPAL DO MODAL ---
-const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile }) => {
+const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy }) => {
 
   if (!selectNota) {
     return null; // Retorna null se não houver nota, evitando a chamada de hooks
@@ -111,7 +111,7 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile }) => {
 
   return (
     <Modal show={visible} onHide={onClose} size="xl" fullscreen="md-down" centered>
-      <Modal.Header closeButton>
+      <Modal.Header closeButton >
         <Modal.Title as="h5">Nota Fiscal #{selectNota.codigo}</Modal.Title>
       </Modal.Header>
 
@@ -160,10 +160,23 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile }) => {
           <Edit size={16} className="me-2" />
           Editar Nota
         </Button> */}
-        <Button variant="primary">
-          <Printer size={16} className="me-2" />
-          Imprimir
-        </Button>
+        <div className="d-flex gap-2">
+          <Button variant="primary">
+            <Printer size={16} className="me-2" />
+            Imprimir
+          </Button>
+          {selectNota.status === "pendente" && 
+            <Button 
+              variant="success"
+              onClick={() => {
+                handleBuy(selectNota.id)
+                onClose()
+                }}>
+              <DollarSign size={16} />
+              Pago
+            </Button>
+          }
+        </div>
       </Modal.Footer>
     </Modal>
   );

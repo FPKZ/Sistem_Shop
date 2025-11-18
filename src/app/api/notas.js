@@ -25,6 +25,22 @@ export async function postNota(data){
     }
 }
 
+export async function putNota(id, data){
+    try{
+        const response = await fetch(`${back}/nota/${id}`, {
+            method: "PUT",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        })
+
+        return await response.json()
+    } catch (err){
+        console.error("Erro ao editar nota", err)
+    }
+}
+
 export async function deleteNotas(id){
     try{
         await fetch(`${back}/nota/${id}`, {method: "DELETE"})

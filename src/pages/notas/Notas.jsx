@@ -57,6 +57,12 @@ export default function Notas() {
     setNotas(n);
   };
 
+  const handleBuy = async (id) => {
+    const response = await API.putNota(id, { status: "pago"})
+    console.log(response)
+    await getNotas()
+  }
+
   const handleShowDetails = (nota) => {
     setSelectNota(nota);
     setIsModalDetailOpen(true);
@@ -134,7 +140,7 @@ export default function Notas() {
       </Row>
 
       {/* Lista de Notas */}
-      {dadosProcessados.length > 0 ? <TableNota notas={dadosProcessados} handleShowDetails={handleShowDetails} mobile={mobile} /> : (
+      {dadosProcessados.length > 0 ? <TableNota notas={dadosProcessados} handleShowDetails={handleShowDetails} mobile={mobile} handleBuy={handleBuy} /> : (
         <div className="alert alert-roxo text-center mt-4" role="alert">
           <p className="fw-medium fs-4 m-0">Nenhuma nota encontrada!</p>
         </div>
@@ -170,6 +176,7 @@ export default function Notas() {
         onClose={() => setIsModalDetailOpen(false)} 
         selectNota={selectNota} 
         mobile={mobile}
+        handleBuy={handleBuy}
       />
       {isModalCadastroOpen && (
         <CadastroNotaModal 
