@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import utils from "@app/utils";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
+// 1. Importe a nova função
+import { gerarPDFNota } from '@app/generatePDF'; 
+
 // --- NOVO COMPONENTE PARA LISTAR OS ITENS ---
 const InvoiceItems = ({ itens }) => {
   const camposFiltragem = ["status"];
@@ -94,6 +97,35 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
     return null; // Retorna null se não houver nota, evitando a chamada de hooks
   }
 
+  // 2. Crie a função que chama o gerador de PDF
+  const handlePrintCustom = () => {
+    // 3. Monte o objeto de configuração para a nota de recebimento
+    const config = {
+      tipo: 'recebimento',
+      dadosNota: {
+        codigo: selectNota.codigo,
+        data: selectNota.data,
+        fornecedor: selectNota.fornecedor,
+        valor_total: selectNota.valor_total,
+      },
+      colunas: [
+        { header: '#ID', dataKey: 'id' },
+        { header: 'Produto', dataKey: 'nome' },
+        { header: 'Marca', dataKey: 'marca' },
+        { header: 'Qtd.', dataKey: 'quantidade' }, // Supondo que tenha a quantidade
+        { header: 'Valor Compra', dataKey: 'valor_compra' },
+      ],
+      dadosItens: selectNota.itensNota.map(item => ({
+        ...item,
+        quantidade: 1 // Adicione a quantidade correta se tiver
+      })),
+      nomeArquivo: `nota-recebimento-${selectNota.codigo}.pdf`,
+    };
+
+    // 4. Chame a função
+    gerarPDFNota(config);
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "pago":
@@ -165,7 +197,7 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
           Editar Nota
         </Button> */}
         <div className="d-flex gap-2">
-          <Button variant="primary">
+          <Button variant="primary" onClick={handlePrintCustom}>
             <Printer size={16} className="me-2" />
             Imprimir
           </Button>
