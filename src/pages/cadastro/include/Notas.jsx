@@ -109,6 +109,7 @@ export default function Notas(){
             finalFormData.append("codigo", formValue.codigo);
             finalFormData.append("valor_total", formValue.valor_total);
             finalFormData.append("data", formValue.data);
+            finalFormData.append("data_vencimento", formValue.data_vencimento);
             finalFormData.append("fornecedor", formValue.fornecedor);
             finalFormData.append("quantidade", formValue.quantidade);
 
@@ -176,6 +177,10 @@ export default function Notas(){
                 <div className="col-sm col-md-2 p-0">
                     <label htmlFor="data" className="form-label">Data da nota</label>
                     <input type="date" className={`form-control ${validated ? (erros.data ? `is-invalid` : `is-valid`): ""}`} name="data" id="data" onChange={handleChange} required/>
+                </div>
+                <div className="col-sm col-md-2 p-0">
+                    <label htmlFor="data_vencimento" className="form-label">Vencimento</label>
+                    <input type="date" className={`form-control ${validated ? (erros.data_vencimento ? `is-invalid` : `is-valid`): ""}`} name="data_vencimento" id="data_vencimento" onChange={handleChange} required/>
                 </div>
                 <div className="col-sm col-md p-0">
                     <label htmlFor="fornecedor" className="form-label">Fornecedor</label>

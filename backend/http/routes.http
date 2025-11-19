@@ -177,14 +177,6 @@ Content-Type: application/json
 GET http://localhost:3333/contas
 
 ###
-PUT http://localhost:3333/editar-user/3
-Content-Type: application/json
-
-{
-    "nome": "Luis Felipe"
-}
-
-###
 GET http://localhost:3333/pendentes
 
 ###

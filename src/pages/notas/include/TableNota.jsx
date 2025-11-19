@@ -11,7 +11,8 @@ import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } fr
 import utils from "@app/utils";
 
 
-export default function TableNota({notas, handleShowDetails, mobile}){
+export default function TableNota({notas, handleShowDetails, mobile, handleBuy}){
+
 
     const getStatusBadge = (status, full = false) => {
         switch (full) {
@@ -41,11 +42,11 @@ export default function TableNota({notas, handleShowDetails, mobile}){
     };
 
     const calcItens = (itens) => { 
-        const progressBarHeigth = mobile ? "6px" : "3px"
+        const progressBarHeigth = mobile ? "6px" : "4px"
         if(itens.length === 0) {
             return (
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: progressBarHeigth }}>
-                    <ProgressBar style={{ height: progressBarHeigth, borderRadius: "0" }}>
+                    <ProgressBar style={{ height: progressBarHeigth,  borderEndEndRadius: "5px", borderEndStartRadius: "5px", borderTopRightRadius: "0", borderTopLeftRadius: "0" }}>
                         <ProgressBar variant="secondary" now={100} key={1} />
                     </ProgressBar>
                 </div>
@@ -64,7 +65,7 @@ export default function TableNota({notas, handleShowDetails, mobile}){
 
         return (
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 0, height: progressBarHeigth }}>
-            <ProgressBar style={{ height: progressBarHeigth, borderRadius: "0" }}>
+            <ProgressBar style={{ height: progressBarHeigth, borderEndEndRadius: "5px", borderEndStartRadius: "5px", borderTopRightRadius: "0", borderTopLeftRadius: "0" }}>
                 <ProgressBar variant="success" now={contItens.disponivel} key={1} />
                 <ProgressBar variant="warning" now={contItens.reservados} key={2} />
                 <ProgressBar variant="danger" now={contItens.vendidos} key={3} />
@@ -78,25 +79,25 @@ export default function TableNota({notas, handleShowDetails, mobile}){
             {/* Cabeçalho da Lista (visível em telas maiores) */}
             <Row className="d-none d-md-flex text-muted fw-bold mb-2 px-3">
                 <Col md={2}>Código</Col>
-                <Col md={3}>Fornecedor</Col>
+                <Col md={2}>Fornecedor</Col>
                 <Col md={2} className="text-center">Emissão</Col>
                 <Col md={2} className="text-center">Vencimento</Col>
                 <Col md={1} className="text-center">Status</Col>
-                <Col md={1} className="text-end">Valor</Col>
+                <Col md={2} className="text-center">Valor</Col>
                 <Col md={1} className="text-center">Ações</Col>
             </Row>
     
             {/* Itens da Lista */}
             <div className="list-container">
                 {notas.map((nota) => (
-                    <Card key={nota.id} className="mb-2 shadow-sm" style={{ cursor: 'pointer', overflow: "hidden" }} onClick={() => handleShowDetails(nota)}>
+                    <Card key={nota.id} className="mb-2 shadow-sm" style={{ cursor: 'pointer'}} onClick={() => handleShowDetails(nota)}>
                     <Card.Body className="p-3">
                         <Row className="align-items-center">
                         <Col xs={6} md={2} className="mb-2 mb-md-0">
                             <span className="d-md-none text-muted small">Código: </span>
                             <span className="fw-bold">{nota.codigo}</span>
                         </Col>
-                        <Col xs={6} md={3} className="mb-2 mb-md-0">
+                        <Col xs={6} md={2} className="mb-2 mb-md-0">
                             <span className="d-md-none text-muted small">Fornecedor: </span>
                             {nota.fornecedor || 'N/A'}
                         </Col>
@@ -116,7 +117,7 @@ export default function TableNota({notas, handleShowDetails, mobile}){
                         <Col xs={6} md={1} className="text-md-center mb-2 mb-md-0">
                             {getStatusBadge(nota.status)}
                         </Col>
-                        <Col xs={6} md={1} className="text-end fw-bold mb-2 mb-md-0">
+                        <Col xs={6} md={2} className="text-center fw-bold mb-2 mb-md-0">
                             {utils.formatMoney(nota.valor_total)}
                         </Col>
                         <Col xs={12} md={1} className="text-md-center d-none d-md-block">
@@ -124,17 +125,17 @@ export default function TableNota({notas, handleShowDetails, mobile}){
                             <Dropdown.Toggle as="a" variant="link" className="dropdown-toggle-hidden-arrow text-muted p-0" id={`dropdown-nota-${nota.id}`}>
                                 <MoreVertical size={20} />
                             </Dropdown.Toggle>
-                            <Dropdown.Menu align="end">
+                            <Dropdown.Menu align="end" renderOnMount>
                                 <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item>
-                                <Dropdown.Item>Editar</Dropdown.Item>
                                 <Dropdown.Item>Baixar PDF</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>
                             </Dropdown.Menu>
                             </Dropdown>
                         </Col>
                         </Row>
                     </Card.Body>
                     {/* Barra de Progresso */}
-                    <div style={{ height: '4px' }}>
+                    <div>
                         {calcItens(nota.itensNota)}
                     </div>
                     </Card>

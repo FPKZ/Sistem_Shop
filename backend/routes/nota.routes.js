@@ -34,15 +34,17 @@ export default async function notaRoutes(fastify) {
                 }
             }
 
-            const { codigo, valor_total, data, fornecedor, quantidade } = body
+            const { codigo, valor_total, data, fornecedor, quantidade, data_vencimento } = body
 
             console.log(body)
             const novaNota = await Nota.create({
                 codigo,
                 valor_total,
                 data,
+                data_vencimento,
                 fornecedor,
-                quantidade
+                quantidade,
+                status: "pendente"
             })
             
             if(!body.itens && body.itens.length === 0) return reply.code(201).send({ message: "Nota cadastrada com sucesso!", novaNota, ok: true})
