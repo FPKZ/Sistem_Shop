@@ -76,7 +76,7 @@ export default function Notas() {
   }
   
   
-  console.log(dadosProcessados)
+  // console.log(dadosProcessados)
   return (
     <Container fluid className="py-4 m-0 px-0">
       {/* Cabeçalho da Página */}
