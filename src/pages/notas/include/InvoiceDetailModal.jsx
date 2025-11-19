@@ -118,27 +118,31 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
       <Modal.Body className="p-md-4 pb-0 pb-md-0 d-flex flex-column" style={{ maxHeight: `${mobile ? "100dvh" : "70dvh"}` }}>
         {/* Seção de Detalhes */}
         <Row className="gy-4 mb-4">
-          <Col xs={6} md={6} lg={4}>
+          <Col xs={8} md={6} lg={6} className="order-0">
             <p className="text-muted mb-1 small">Fornecedor</p>
             <p className="fw-medium mb-0">{selectNota.fornecedor}</p>
           </Col>
-          <Col xs={3} md={6} lg={4}>
-            <p className="text-muted mb-1 small">Data de Emissão</p>
+          <Col xs={2} md={3} lg={2} className="order-1 text-start">
+            <p className="text-muted mb-1 small">Emissão</p>
             <p className="fw-medium mb-0">{utils.formatDate(selectNota.data)}</p>
           </Col>
-          <Col xs={3} md={6} lg={4}>
-            <p className="text-muted mb-1 small">Quantidade de Itens</p>
+          <Col xs={2} md={3} lg={2} className="order-2 text-end">
+            <p className="text-muted mb-1 small">Vencimento</p>
+            <p className="fw-medium mb-0">{utils.formatDate(selectNota.data_vencimento) || "N/A"}</p>
+          </Col>
+          <Col xs={3} md={2} lg={2} className="order-4 order-lg-3 text-end">
+            <p className="text-muted mb-1 small">Qnt. Prod.</p>
             <p className="fw-medium mb-0">{selectNota.quantidade}</p>
           </Col>
-          <Col xs={6} md={6} lg={4}>
+          <Col xs={9} md={10} lg={8} className="order-3 order-lg-4">
             <p className="text-muted mb-1 small">Código da Nota</p>
             <p className="fw-medium mb-0">{selectNota.codigo}</p>
           </Col>
-          <Col xs={3} md={6} lg={4}>
+          <Col xs={6} md={6} lg={2} className="order-5">
             <p className="text-muted mb-1 small">Status</p>
             <Badge bg={status.variant} pill>{status.label}</Badge>
           </Col>
-          <Col xs={3} md={6} lg={4}>
+          <Col xs={6} md={6} lg={2} className="order-last text-end">
             <p className="text-muted mb-1 small">Valor Total</p>
             <p className="fw-bold mb-0">{utils.formatMoney(selectNota.valor_total)}</p>
           </Col>
