@@ -23,7 +23,7 @@ export default function Header({mobile}) {
   };
 
   return (<>
-    <header id="header" className="p-0 px-3 d-flex align-items-center justify-content-between border-bottom">
+    <header id="header" className="p-0 px-3 d-flex align-items-center justify-content-between">
       <div className="d-flex justify-content-center flex-wrap flex-md-nowarp align-items-center gap-4 position-relative">
         {pathParts.length > 0 ? (
           <>
