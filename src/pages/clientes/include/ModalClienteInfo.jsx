@@ -4,8 +4,6 @@ import { useEffect } from "react";
 import utils from "@app/utils";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
-// 1. Importe a nova função
-import { gerarPDFNota } from '@app/generatePDF'; 
 
 // --- NOVO COMPONENTE PARA LISTAR OS ITENS ---
 const InvoiceItems = ({ itens }) => {
@@ -91,40 +89,11 @@ const InvoiceItems = ({ itens }) => {
 
 
 // --- COMPONENTE PRINCIPAL DO MODAL ---
-const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy }) => {
+const InvoiceDetailModal = ({ visible, onClose, selectCliente, mobile, handleBuy }) => {
 
-  if (!selectNota) {
+  if (!selectCliente) {
     return null; // Retorna null se não houver nota, evitando a chamada de hooks
   }
-
-  // 2. Crie a função que chama o gerador de PDF
-  const handlePrintCustom = () => {
-    // 3. Monte o objeto de configuração para a nota de recebimento
-    const config = {
-      tipo: 'recebimento',
-      dadosNota: {
-        codigo: selectNota.codigo,
-        data: selectNota.data,
-        fornecedor: selectNota.fornecedor,
-        valor_total: selectNota.valor_total,
-      },
-      colunas: [
-        { header: '#ID', dataKey: 'id' },
-        { header: 'Produto', dataKey: 'nome' },
-        { header: 'Marca', dataKey: 'marca' },
-        { header: 'Qtd.', dataKey: 'quantidade' }, // Supondo que tenha a quantidade
-        { header: 'Valor Compra', dataKey: 'valor_compra' },
-      ],
-      dadosItens: selectNota.itensNota.map(item => ({
-        ...item,
-        quantidade: 1 // Adicione a quantidade correta se tiver
-      })),
-      nomeArquivo: `nota-recebimento-${selectNota.codigo}.pdf`,
-    };
-
-    // 4. Chame a função
-    gerarPDFNota(config);
-  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -139,36 +108,36 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
     }
   };
 
-  const status = getStatusBadge(selectNota.status);
+  const status = getStatusBadge(selectCliente.status);
 
   return (
     <Modal show={visible} onHide={onClose} size="xl" fullscreen="md-down" centered>
       <Modal.Header closeButton >
-        <Modal.Title as="h5">Nota Fiscal #{selectNota.codigo}</Modal.Title>
+        <Modal.Title as="h5">Informações do Cliente{selectCliente.codigo}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="p-md-4 pb-0 pb-md-0 d-flex flex-column" style={{ maxHeight: `${mobile ? "100dvh" : "70dvh"}` }}>
         {/* Seção de Detalhes */}
         <Row className="gy-4 mb-4">
           <Col xs={8} md={6} lg={6} className="order-0">
-            <p className="text-muted mb-1 small">Fornecedor</p>
-            <p className="fw-medium mb-0">{selectNota.fornecedor}</p>
+            <p className="text-muted mb-1 small">Nome</p>
+            <p className="fw-medium mb-0">{selectCliente.nome}</p>
           </Col>
           <Col xs={2} md={3} lg={2} className="order-1 text-start">
             <p className="text-muted mb-1 small">Emissão</p>
-            <p className="fw-medium mb-0">{utils.formatDate(selectNota.data)}</p>
+            <p className="fw-medium mb-0">{utils.formatDate(selectCliente.data)}</p>
           </Col>
           <Col xs={2} md={3} lg={2} className="order-2 text-end">
             <p className="text-muted mb-1 small">Vencimento</p>
-            <p className="fw-medium mb-0">{utils.formatDate(selectNota.data_vencimento) || "N/A"}</p>
+            <p className="fw-medium mb-0">{utils.formatDate(selectCliente.data_vencimento) || "N/A"}</p>
           </Col>
           <Col xs={3} md={2} lg={2} className="order-4 order-lg-3 text-end">
             <p className="text-muted mb-1 small">Qnt. Prod.</p>
-            <p className="fw-medium mb-0">{selectNota.quantidade}</p>
+            <p className="fw-medium mb-0">{selectCliente.quantidade}</p>
           </Col>
           <Col xs={9} md={10} lg={8} className="order-3 order-lg-4">
             <p className="text-muted mb-1 small">Código da Nota</p>
-            <p className="fw-medium mb-0">{selectNota.codigo}</p>
+            <p className="fw-medium mb-0">{selectCliente.codigo}</p>
           </Col>
           <Col xs={6} md={6} lg={2} className="order-5">
             <p className="text-muted mb-1 small">Status</p>
@@ -176,14 +145,14 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
           </Col>
           <Col xs={6} md={6} lg={2} className="order-last text-end">
             <p className="text-muted mb-1 small">Valor Total</p>
-            <p className="fw-bold mb-0">{utils.formatMoney(selectNota.valor_total)}</p>
+            <p className="fw-bold mb-0">{utils.formatMoney(selectCliente.valor_total)}</p>
           </Col>
         </Row>
 
         <hr className="my-md-4" />
 
         {/* Renderiza o novo componente apenas quando há itens */}
-        {selectNota.itensNota && <InvoiceItems itens={selectNota.itensNota} />}
+        {selectCliente.itensNota && <InvoiceItems itens={selectCliente.itensNota} />}
 
       </Modal.Body>
 
@@ -197,15 +166,15 @@ const InvoiceDetailModal = ({ visible, onClose, selectNota, mobile, handleBuy })
           Editar Nota
         </Button> */}
         <div className="d-flex gap-2">
-          <Button variant="primary" onClick={handlePrintCustom}>
+          {/* <Button variant="primary" onClick={handlePrintCustom}>
             <Printer size={16} className="me-2" />
             Imprimir
-          </Button>
-          {selectNota.status === "pendente" && 
+          </Button> */}
+          {selectCliente.status === "pendente" && 
             <Button 
               variant="success"
               onClick={() => {
-                handleBuy(selectNota.id)
+                handleBuy(selectCliente.id)
                 onClose()
                 }}>
               <DollarSign size={16} />
