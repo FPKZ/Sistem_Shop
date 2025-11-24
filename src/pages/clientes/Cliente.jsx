@@ -43,28 +43,27 @@ import {
   Trash2,
   Search,
   ArrowUpDown,
-  MoreVertical
+  MoreVertical,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 
 import API from "../../app/api.js"
-import util from "../../app/utils.js"
-import { useEffect, useState, useMemo } from 'react';
+// import util from "../../app/utils.js"
+import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-// import HoverBtn from '@components/HoverBtn';
-import ModalCliente from '@components/modal/CadastroCliente/CadastroClienteModal';
+import HoverBtn from '@components/HoverBtn';
+import ModalCadastroCliente from '@components/modal/CadastroCliente/CadastroClienteModal';
 import usePopStateModal from '@hooks/usePopStateModal';
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
 function Clientes() {
   const [clientes, setClientes] = useState([])
-  const [modalCliente, setModalCliente] = useState(false)
-  // const [filterStatus, setFilterStatus] = useState('all');
-  // const [filterBranch, setFilterBranch] = useState('all');
-  
-  const { mobile } = useOutletContext()
+  const [modalCadastroCliente, setModalCadastroCliente] = useState(false)
+  const [ modalCLienteInfo, setModalClienteInfo ] = useState(false)
+  const [ infoCLiente, setInfoCLiente ] = useState(null)
 
-  //ordenação
-  const [ filtroStatus, setFiltroStatus ] = useState("Todos")
+  const { mobile } = useOutletContext()
 
    const camposFiltragem = [
       "id",
@@ -78,13 +77,13 @@ function Clientes() {
       setFiltro,
       order,
       dadosProcessados,
-      setOrdem,
+      // setOrdem,
       requisitarOrdenacao
   } = useFiltroOrdenacao(clientes, camposFiltragem)
 
 
 
-  usePopStateModal([modalCliente],[setModalCliente])
+  usePopStateModal([modalCadastroCliente],[setModalCadastroCliente])
 
   useEffect(() => {
     getClientes()
@@ -98,90 +97,120 @@ function Clientes() {
       console.error("Erro ao buscar clientes:", error);
     }
   }
-  // <HoverBtn upClass={'position-absolute end-0'} func={setModalCliente} mobile={mobile}>Adicionar Cliente</HoverBtn>
+
+  const handleModalCliente = (cliente) => {
+    setInfoCLiente(cliente)
+    setModalClienteInfo(true)
+  }
+
   return (
     <div className=''>
       
       <div className='p-3 p-md-4'>
-      <Card className='border-0 shadow-sm p-3'>
+      <Card className='border-0 shadow-sm p-3 rounded-4'>
         <Card.Body>
-          <div className='d-flex flex-row justify-content-between align-items-start gap-4 mb-4'>
+          <div className='d-flex flex-row position-relative justify-content-between align-items-start gap-4 mb-4'>
             <div>
               <h2 className='h4 fw-semibold'>Clientes Cadastrados</h2>
               <p className='text-muted small'>Gerencie e acompanhe seus clientes.</p>
             </div>
-            <Button variant="primary" onClick={() => setModalCliente(true)} className='d-flex align-items-center gap-2'>
-              <Plus size={16} />
-              Cadastrar Cliente
-            </Button>
+            {mobile ? 
+              <HoverBtn upClass={'position-absolute end-0'} func={setModalCadastroCliente} mobile={mobile}>Adicionar Cliente</HoverBtn>
+            : 
+              <Button onClick={() => setModalCadastroCliente(true)} className='btn-roxo d-flex align-items-center gap-2'>
+                <Plus size={16} />
+                Cadastrar Cliente
+              </Button>
+            }
           </div>
 
-          <div className='d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4'>
-            <InputGroup className='flex-grow-1'>
-              <InputGroup.Text>
-                <Search size={16} className='text-muted' />
-              </InputGroup.Text>
-              <Form.Control 
-                type='text' 
-                placeholder='Buscar por nome, e-mail...' 
-                value={filtro} 
-                onChange={(e) => setFiltro(e.target.value)}
-                className='border-start-0'
-              />
-            </InputGroup>
-            {/* <ButtonGroup size='' className=''>
-              <Button variant={filtroStatus === 'Todos' ? 'secondary' : 'outline-secondary'} onClick={() => setFiltroStatus('Todos')}>Todos</Button>
-              <Button variant={filtroStatus === 'Ativos' ? 'secondary' : 'outline-secondary'} onClick={() => setFiltroStatus('Ativos')}>Ativos</Button>
-              <Button variant={filtroStatus === 'Inativos' ? 'secondary' : 'outline-secondary'} onClick={() => setFiltroStatus('Inativos')}>Inativos</Button>
-            </ButtonGroup> */}
-          </div>
+          <Row className='mb-4 g-3'>
+            <Col md={10}>
+              <InputGroup className='flex-grow-1 h-100 rounded-4'>
+                <InputGroup.Text>
+                  <Search size={16} className='text-muted' />
+                </InputGroup.Text>
+                <Form.Control 
+                  type='text' 
+                  placeholder='Buscar por nome, telefone...' 
+                  value={filtro} 
+                  onChange={(e) => setFiltro(e.target.value)}
+                  className='border-start-0'
+                />
+              </InputGroup>
+            </Col>
+            <Col md={2}>
+              <Button className='btn-roxo w-100' onClick={() => requisitarOrdenacao("")}>
+                Limpar Filtros
+              </Button>
+            </Col>
+          </Row>
           <div>
-            <Row>
-              <Col xs={1}>Id</Col>
-              <Col md={3}>Nome</Col>
-              <Col md={3}>E-mail</Col>
-              <Col md={2}>Telefone</Col>
-              <Col md={2}>Endereço</Col>
-              <Col md={1}>Ações</Col>
-            </Row>
+            <Card className='rounded-4'>
+              <Card.Header className='border-0'>
+                <Row className='py-2'>
+                  <Col xs={1}>
+                    <span className={`d-flex gap-1 ${order.chave === "id" ? "fw-bold" : ""}`} onClick={() => requisitarOrdenacao("id")} style={{ cursor: "pointer" }}>
+                      Id
+                      {order.chave === "id" ? order.direcao === "desc" ? <ArrowUp size={17} /> : <ArrowDown size={17} /> : ""}
+                    </span>
+                  </Col>
+                  <Col md={4}>
+                    <span className={`d-flex gap-1 ${order.chave === "nome" ? "fw-bold" : ""}`} onClick={() => requisitarOrdenacao("nome")} style={{ cursor: "pointer" }}>
+                      Nome
+                      {order.chave === "nome" ? order.direcao === "desc" ? <ArrowUp size={17} /> : <ArrowDown size={17} />  : ""}
+                    </span>
+                  </Col>
+                  <Col md={2}>Telefone</Col>
+                  <Col md={3}>Endereço</Col>
+                  <Col md={1} className='m-0 p-0'>
+                    <span className={`d-flex gap-1 ${order.chave === "vendas" ? "fw-bold" : ""}`} onClick={() => requisitarOrdenacao("vendas")} style={{ cursor: "pointer" }}>
+                      Vendas
+                      {order.chave === "vendas" ? order.direcao === "desc" ? <ArrowUp size={17} /> : <ArrowDown size={17} />  : ""}
+                    </span>
+                  </Col>
+                  <Col md={1}>Ações</Col>
+                </Row>
+              </Card.Header>
+              <div className='list-container'>
+                {dadosProcessados.map((cliente) => (
+                    <Card.Body key={cliente.id} className='border-top'>
+                      <Row>
+                        <Col xs={1}>
+                          <span>{cliente.id}</span>
+                        </Col>
+                        <Col md={4}>
+                          <p  className='text-truncate m-0'>{cliente.nome}</p>
+                        </Col>
+                        <Col md={2}>
+                          <span>{cliente.telefone}</span>
+                        </Col>
+                        <Col md={3}>
+                          <p className="text-muted text-truncate m-0">
+                            {cliente.endereco}
+                          </p>
+                        </Col>
+                        <Col md={1} className='text-center'>
+                          <span>{cliente.vendas.length}</span>
+                        </Col>
+                        <Col md={1} className='text-center'>
+                          <Dropdown onClick={(e) => e.stopPropagation()} >
+                            <Dropdown.Toggle as="a" variant="link" className="dropdown-toggle-hidden-arrow text-muted p-0" id={`dropdown-nota-${cliente.id}`}>
+                                <MoreVertical size={20} style={{ cursor: "pointer"}}/>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu align="end" renderOnMount>
+                                {/* <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item> */}
+                                <Dropdown.Item onClick={() => handleModalCliente(cliente)}>Sobre</Dropdown.Item>
+                                {/* {nota.status !== "pago" && <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>} */}
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                ))}
+              </div>
+            </Card>
 
-            <div className='list-container'>
-              {dadosProcessados.map((cliente) => (
-                <Card key={cliente.id}>
-                  <Card.Body>
-                    <Row>
-                      <Col xs={1}>
-                        <span>{cliente.id}</span>
-                      </Col>
-                      <Col md={3}>
-                        <span>{cliente.nome}</span>
-                      </Col>
-                      <Col md={3}>
-                        <span>{cliente.email}</span>
-                      </Col>
-                      <Col md={2}>
-                        <span>{cliente.telefone}</span>
-                      </Col>
-                      <Col md={2}>
-                        <span>{cliente.endereco}</span>
-                      </Col>
-                      <Col md={1}>
-                        <Dropdown onClick={(e) => e.stopPropagation()}>
-                          <Dropdown.Toggle as="a" variant="link" className="dropdown-toggle-hidden-arrow text-muted p-0" id={`dropdown-nota-${cliente.id}`}>
-                              <MoreVertical size={20} />
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu align="end" renderOnMount>
-                              {/* <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item> */}
-                              <Dropdown.Item>Baixar PDF</Dropdown.Item>
-                              {/* {nota.status !== "pago" && <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>} */}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              ))}
-            </div>
           </div>
           {/* <div className='table-responsive'>
             <Table hover className='m-0 '>
@@ -231,7 +260,7 @@ function Clientes() {
           </div> */}
         </Card.Body>
       </Card>
-      <ModalCliente visible={modalCliente} onClose={() => setModalCliente(false)} mobile={mobile} />
+      <ModalCadastroCliente visible={modalCadastroCliente} onClose={() => setModalCadastroCliente(false)} mobile={mobile} />
     </div>
       
       {/* Tabela Clientes */}
