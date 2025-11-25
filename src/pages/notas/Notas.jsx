@@ -15,6 +15,10 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { useOutletContext } from "react-router-dom";
 import API from "@app/api";
 
+//paginação
+import { usePagination } from "@hooks/usePagination";
+import PaginationButtons from "@components/Pagination/PaginationButtons";
+
 // Seus modais existentes
 import CadastroNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 import InvoiceDetailModal from "./include/InvoiceDetailModal"; // <-- 1. IMPORTE O NOVO MODAL
@@ -47,6 +51,19 @@ export default function Notas() {
       setOrdem,
       // requisitarOrdenacao
   } = useFiltroOrdenacao(notas, camposFiltragem)
+
+  const {
+    currentItems,
+    currentPage,
+    totalPages,
+    // itemsPerPage,
+    handlePageChange,
+    // handleItemsPerPageChange,
+    // indexOfFirstItem,
+    // indexOfLastItem,
+    // totalItems
+  } = usePagination(dadosProcessados);
+
 
   useEffect(() => {
     getNotas();
@@ -140,7 +157,7 @@ export default function Notas() {
       </Row>
 
       {/* Lista de Notas */}
-      {dadosProcessados.length > 0 ? <TableNota notas={dadosProcessados} handleShowDetails={handleShowDetails} mobile={mobile} handleBuy={handleBuy} /> : (
+      {currentItems.length > 0 ? <TableNota notas={currentItems} handleShowDetails={handleShowDetails} mobile={mobile} handleBuy={handleBuy} /> : (
         <div className="alert alert-roxo text-center mt-4" role="alert">
           <p className="fw-medium fs-4 m-0">Nenhuma nota encontrada!</p>
         </div>
@@ -149,27 +166,14 @@ export default function Notas() {
       
 
       {/* Paginação */}
-      {/* <Row className="mt-4 justify-content-center">
-        <Col xs="auto">
-          <Pagination>
-            <Pagination.Prev><ChevronLeft size={13} /></Pagination.Prev>
-            <Pagination.Item active>{1}</Pagination.Item>
-            <Pagination.Item>{2}</Pagination.Item>
-            <Pagination.Item>{3}</Pagination.Item>
-            <Pagination.Ellipsis />
-            <Pagination.Item>{10}</Pagination.Item>
-            <Pagination.Next><ChevronRight size={13} /></Pagination.Next>
-          </Pagination>
-        </Col>
-      </Row> */}
+      <div className="mt-4">
+        <PaginationButtons
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+      </div>
 
-      {/* Modais */}
-      {/* <ModalNota 
-        visible={isModalDetailOpen} 
-        onClose={() => setIsModalDetailOpen(false)} 
-        mobile={mobile} 
-        selectNota={selectNota} 
-      /> */}
       {/* 2. SUBSTITUA O MODAL AQUI */}
       <InvoiceDetailModal 
         visible={isModalDetailOpen} 
