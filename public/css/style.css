@@ -1,78 +1,86 @@
 :root {
-    /* Tipografia Fluida */
-    --font-size-sm: clamp(0.6rem, 0.17vw + 0.7rem, 0.8rem);
-    --font-size-md: clamp(0.9rem, 0.50vw + 0.5rem, 1.6rem);
-    --font-size-lg: clamp(1rem, 0.6vw + 1.1rem, 1.2rem);
-    --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.2rem);
-    --font-size-xxl: clamp(1.95rem, 1.56vw + 1.56rem, 2.8rem);
+  /* Tipografia Fluida */
+  --font-size-sm: clamp(0.6rem, 0.17vw + 0.7rem, 0.8rem);
+  --font-size-md: clamp(0.9rem, 0.50vw + 0.5rem, 1.6rem);
+  --font-size-lg: clamp(1rem, 0.6vw + 1.1rem, 1.2rem);
+  --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.2rem);
+  --font-size-xxl: clamp(1.95rem, 1.56vw + 1.56rem, 2.8rem);
 }
 
-html, body {
-    /* position: relative; */
-    padding: 0;
-    background-color: #F3F4F6;
-    margin: 0;
-    overflow: hidden;
-    /* position: absolute; */
-    top: 0; left: 0;
-    width: 100dvw;
-    height: 100dvh;
-    gap: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: var(--font-size-md);
+html,
+body {
+  /* position: relative; */
+  padding: 0;
+  background-color: #F3F4F6;
+  margin: 0;
+  overflow: hidden;
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+  width: 100dvw;
+  height: 100dvh;
+  gap: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: var(--font-size-md);
 }
 
 .body-scroll-visible {
   overflow: auto !important;
 }
 
-#root{
+#root {
   background-color: #faf7fa
 }
 
-#root-login{
-    position: relative;
-    width: 100dvw;
-    height: 100dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+#root-login {
+  position: relative;
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
-.layout-ativo #root{
-    position: relative;
-    width: calc(100% - 3.5rem);
-    height: calc(100% - 4.5rem);
-    /*display: flex;
+.layout-ativo #root {
+  position: relative;
+  width: calc(100% - 3.5rem);
+  height: calc(100% - 4.5rem);
+  /*display: flex;
     flex-wrap: wrap;*/
 
-    display: flex;
-    flex-direction: column;
-    margin-left: 3.5rem;
-    margin-top: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  margin-left: 3.5rem;
+  margin-top: 4.5rem;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
 .layout-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Garante que o container ocupe no mínimo a altura da tela */
+  min-height: 100vh;
+  /* Garante que o container ocupe no mínimo a altura da tela */
 }
-#root-content{
+
+#root-content {
   flex: 1 0 auto;
   position: relative;
 }
 
 /* Breadcrumb com Chevron Pequeno */
-.breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
-  content: ""; /* Remove o divisor padrão */
+.breadcrumb-sm-chevron .breadcrumb-item+.breadcrumb-item::before {
+  content: "";
+  /* Remove o divisor padrão */
   display: inline-block;
-  
+
   /* Aqui você controla o tamanho! */
-  width: 0.9rem;  /* 12px */
-  height: 1rem; /* 12px */
+  width: 0.9rem;
+  /* 12px */
+  height: 1rem;
+  /* 12px */
 
   /* Ajustes de espaçamento e alinhamento */
   margin: 0 0.5rem;
@@ -85,13 +93,16 @@ html, body {
   background-size: contain;
 }
 
-@media (max-width: 766px){
+@media (max-width: 766px) {
+
   /* Breadcrumb com Chevron Pequeno */
-  .breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
-    
+  .breadcrumb-sm-chevron .breadcrumb-item+.breadcrumb-item::before {
+
     /* Aqui você controla o tamanho! */
-    width: 0.8rem;  /* 12px */
-    height: 1rem; /* 12px */
+    width: 0.8rem;
+    /* 12px */
+    height: 1rem;
+    /* 12px */
 
     /* Ajustes de espaçamento e alinhamento */
     margin: 0 0.1rem;
@@ -101,19 +112,20 @@ html, body {
 
 
 
-.btn-roxo{
-    color: white;
-    background-color: rgb(198, 60, 244);
-    border-color: rgb(198, 60, 244);
-    font-weight: 600;
+.btn-roxo {
+  color: white;
+  background-color: rgb(198, 60, 244);
+  border-color: rgb(198, 60, 244);
+  font-weight: 600;
 
-    -webkit-tap-highlight-color: transparent;
-    -webkit-appearance: none;
-    appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
 
-    outline: none;
-    box-shadow: none;
+  outline: none;
+  box-shadow: none;
 }
+
 .btn-roxo:focus,
 .btn-roxo:focus-visible,
 .btn-roxo:focus:active {
@@ -123,18 +135,21 @@ html, body {
   color: white;
   border-color: rgb(198, 60, 244);
 }
+
 .btn-roxo:active {
-    color:  rgb(207, 4, 190) !important;
-    background-color: rgb(253, 224, 251) !important;
-    border-color: rgb(238, 86, 228) !important;
+  color: rgb(207, 4, 190) !important;
+  background-color: rgb(253, 224, 251) !important;
+  border-color: rgb(238, 86, 228) !important;
 }
-@media (hover: hover){
-    .btn-roxo:hover{
-        color:  rgb(207, 4, 190);
-        background-color: rgb(253, 224, 251);
-        border-color: rgb(238, 86, 228);
-    }
+
+@media (hover: hover) {
+  .btn-roxo:hover {
+    color: rgb(207, 4, 190);
+    background-color: rgb(253, 224, 251);
+    border-color: rgb(238, 86, 228);
+  }
 }
+
 .btn-roxo:focus {
   outline: none;
   box-shadow: none;
@@ -142,7 +157,7 @@ html, body {
 
 
 
-.animed-btn{
+.animed-btn {
   display: flex;
   width: 2.7rem;
   height: 2.5rem;
@@ -150,6 +165,7 @@ html, body {
 
   transition: width 0.4s ease, background-color 0.3s ease;
 }
+
 .btn-roxo .text {
   opacity: 0;
   white-space: nowrap;
@@ -157,7 +173,8 @@ html, body {
 }
 
 .btn-roxo.expanded {
-  width: 12rem; /*tamanho final quando expandido*/
+  width: 12rem;
+  /*tamanho final quando expandido*/
   justify-content: center;
   /* background-color: #4338ca; */
 }
@@ -170,36 +187,39 @@ html, body {
   font-size: 1.2rem;
 }
 
-.alert-roxo{
-    color:  rgb(207, 4, 190);
-    background-color: rgb(253, 224, 251);
-    border-color: rgb(238, 86, 228);  
+.alert-roxo {
+  color: rgb(207, 4, 190);
+  background-color: rgb(253, 224, 251);
+  border-color: rgb(238, 86, 228);
 }
 
 .dropdown-toggle-custom-arrow::after {
   position: absolute;
-  right: 20px; /* Ajuste a posição horizontal */
-  top: 45%;   /* Ajuste a posição vertical */
+  right: 20px;
+  /* Ajuste a posição horizontal */
+  top: 45%;
+  /* Ajuste a posição vertical */
 }
 
 .dropdown-toggle-hidden-arrow::after {
   display: none;
 }
 
-@media (max-width: 766px){
+@media (max-width: 766px) {
 
 
-    .layout-ativo #root{
-        margin-left: 2.5rem !important;
-        margin-top: 3rem !important;
-        width: calc(100% - 2.5rem) !important;
-        height: calc(100% - 3rem) !important;
-    }
+  .layout-ativo #root {
+    margin-left: 2.5rem !important;
+    margin-top: 3rem !important;
+    width: calc(100% - 2.5rem) !important;
+    height: calc(100% - 3rem) !important;
+  }
 }
 
 .produto-card {
   height: 100%;
-  min-height: clamp(260px, 30vw, 340px); /* adapta entre 260 e 340px */
+  min-height: clamp(260px, 30vw, 340px);
+  /* adapta entre 260 e 340px */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -209,7 +229,8 @@ html, body {
 
 .produto-img-wrapper {
   width: 100%;
-  height: clamp(170px, 15vw, 180px); /* altura da imagem também se adapta */
+  height: clamp(170px, 15vw, 180px);
+  /* altura da imagem também se adapta */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,4 +242,55 @@ html, body {
   max-height: 100%;
   object-fit: contain;
   object-position: center;
+}
+
+/* Paginação Roxa Circular */
+.pagination-roxo .page-item {
+  margin: 0 4px;
+}
+
+.pagination-roxo .page-link {
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: #6c757d;
+  /* Cor padrão (cinza/muted) */
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-roxo .page-item.active .page-link {
+  background-color: #C63CF4;
+  color: white;
+  box-shadow: 0 4px 10px rgba(198, 60, 244, 0.3);
+}
+
+.pagination-roxo .page-link:hover:not(.active) {
+  background-color: #f3e5f5;
+  /* Roxo bem claro no hover */
+  color: #C63CF4;
+}
+
+.pagination-roxo .page-link:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Ajuste para setas de navegação */
+.pagination-roxo .page-item:first-child .page-link,
+.pagination-roxo .page-item:last-child .page-link {
+  background-color: transparent;
+  font-size: 1.2rem;
+  color: #adb5bd;
+}
+
+.pagination-roxo .page-item:first-child .page-link:hover,
+.pagination-roxo .page-item:last-child .page-link:hover {
+  color: #C63CF4;
+  background-color: transparent;
 }
