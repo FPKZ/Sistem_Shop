@@ -32,7 +32,7 @@ const PaginationControl = ({
 
   return (
     <div
-      className={`d-flex flex-column align-items-center mt-3 gap-3 ${className}`}
+      className={`d-flex flex-column mt-3 gap-3 ${className}`}
     >
       <PaginationButtons
         currentPage={currentPage}
