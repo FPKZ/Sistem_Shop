@@ -9,6 +9,12 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao"
 import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
 
+import Solicitacoes from "./include/Solicitacoes"
+
+//paginação
+import { usePagination } from "@hooks/usePagination"
+import PaginationButtons from "@components/Pagination/PaginationButtons"
+
 export default function GerenciamentoUsuario(){
 
     const [ att, setAtt ] = useState(false)
@@ -41,6 +47,18 @@ export default function GerenciamentoUsuario(){
         dadosProcessados,
         // requisitarOrdenacao
     } = useFiltroOrdenacao(users, camposFiltragem)
+
+    const {
+    currentItems,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    handlePageChange,
+    handleItemsPerPageChange,
+    indexOfFirstItem,
+    indexOfLastItem,
+    totalItems
+  } = usePagination(dadosProcessados, 10);
 
     useEffect(() => {
         getSolicitacoes()
@@ -183,7 +201,7 @@ export default function GerenciamentoUsuario(){
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {dadosProcessados.map(user => (
+                                        {currentItems.map(user => (
                                             <tr key={user.id}>
                                                 <td>
                                                     <div className="d-flex align-items-center">
@@ -204,56 +222,24 @@ export default function GerenciamentoUsuario(){
                                         ))}
                                     </tbody>
                                 </Table>
-                                <div className="d-flex justify-content-between align-items-center mt-4">
-                                    <span className="text-muted small">Mostrando {dadosProcessados.length} de {dadosProcessados.length}</span>
-                                    <Pagination>
-                                        <Pagination.Prev />
-                                        <Pagination.Next />
-                                    </Pagination>
+                                <div className="mt-4 mb-2">
+                                    <PaginationButtons
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        handlePageChange={handlePageChange}
+                                        itemsPerPage={itemsPerPage}
+                                        handleItemsPerPageChange={handleItemsPerPageChange}
+                                        indexOfFirstItem={indexOfFirstItem}
+                                        indexOfLastItem={indexOfLastItem}
+                                        totalItems={totalItems}
+                                    />
                                 </div>
                             </Card.Body>
                         </Card>
                     </Tab>
                     <Tab eventKey={"requests"} title={<><Bell size={16} className="me-2" /> solicitaçoes de Acesso {solicitacoes.length ? (<Badge pill bg="danger">{solicitacoes.length}</Badge>) : ""} </>}>
-                        <Card className="shadow-sm">
-                            <Card.Body>
-                                <Table responsive hover>
-                                    <thead>
-                                        <tr>
-                                            <th>Usuário</th>
-                                            <th>Data da Solicitação</th>
-                                            <th className="text-center">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {solicitacoes.map(solicit => (
-                                            <tr key={solicit.id}>
-                                                <td>
-                                                    <div className="d-flex align-items-center">
-                                                        <Image src="https://cdn-icons-png.flaticon.com/512/149/149071.png" roundedCircle width="40" height="40" className="me-3" />
-                                                        <div>
-                                                            <div className="fw-bold">{solicit.nome}</div>
-                                                            <div className="text-muted small">{solicit.email}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{utils.formatDateTime(solicit.createdAt)}</td>
-                                                <td className="text-center">
-                                                    <Button variant="success" size="sm" className="me-2 d-inline-flex align-items-center" onClick={() => aproveSolicitacao(solicit)}>
-                                                        <CheckCircle size={16} className="me-1" /> Aprovar
-                                                    </Button>
-                                                    <Button variant="danger" size="sm" className="d-inline-flex align-items-center" onClick={() => deleteSolicitacao(solicit)}>
-                                                        <XCircle size={16} className="me-1" /> Rejeitar
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </Card.Body>
-                        </Card>
+                        <Solicitacoes solicitacoes={solicitacoes} aproveSolicitacao={aproveSolicitacao} deleteSolicitacao={deleteSolicitacao}/>
                     </Tab>
-
                 </Tabs>
             </Container>
         </main>
