@@ -112,9 +112,7 @@ Content-Type: application/json
 {
     "cliente_id": 1,
     "itensVendidos": [
-        {"itemEstoque_id": 34, "valor_produto": 45.00},
-        {"itemEstoque_id": 35, "valor_produto": 45.00},
-        {"itemEstoque_id": 36, "valor_produto": 45.00}
+        {"itemEstoque_id": 15, "valor_produto": 45.00}
     ],
     "status": "finalizada"
 }
