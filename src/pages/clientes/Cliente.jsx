@@ -6,6 +6,7 @@ import {
   Col,
   InputGroup,
   Dropdown,
+  Badge,
 } from "react-bootstrap";
 import {
   Plus,
@@ -29,12 +30,13 @@ import usePopStateModal from "@hooks/usePopStateModal";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
 import PaginationControl from "@components/Pagination/PaginationControl";
+import ClientDetailsModal from "./include/ClientDetailsModal";
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [modalCadastroCliente, setModalCadastroCliente] = useState(false);
-  // const [modalCLienteInfo, setModalClienteInfo] = useState(false);
-  // const [infoCLiente, setInfoCLiente] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(true);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   const { mobile } = useOutletContext();
 
@@ -82,10 +84,10 @@ function Clientes() {
     }
   };
 
-  // const handleModalCliente = (cliente) => {
-  //   setInfoCLiente(cliente);
-  //   setModalClienteInfo(true);
-  // };
+  const handleShowDetails = (cliente) => {
+    setSelectedClient(cliente);
+    setShowDetailsModal(true);
+  };
 
   return (
     <div className="">
@@ -228,9 +230,17 @@ function Clientes() {
                   {currentItems.map((cliente) => (
                     <div
                       key={cliente.id}
-                      className={`${mobile ? "card rounded-3" : ""}`}
+                      className={`${mobile ? "card rounded-3 overflow-hidden" : ""}`}
                     >
-                      <Card.Body className={`${mobile ? "" : "border-top"}`}>
+                      <Card.Body className={`${mobile ? "" : "border-top"}`} onClick={() => mobile && handleShowDetails(cliente)}>
+                        <div
+                          className="position-absolute top-0 start-0 h-100 rounded-0 d-md-none"
+                          style={{
+                            width: "0.2rem",
+                            //adicionar forma de colorir de acordo com vendas pendentes, concluidas, não pagas etc
+                            backgroundColor: `${cliente.vendas.length > 0 ? "var(--bs-success)" : "var(--bs-secondary)"}`, // Example: use a CSS variable for conditional coloring
+                          }}
+                        ></div>
                         <Row className="g-2">
                           <Col
                             xs={2}
@@ -252,15 +262,21 @@ function Clientes() {
                             className="d-flex justify-content-between order-2"
                           >
                             <span className="d-md-none">Telefone: </span>
-                            <span className="text-muted">{cliente.telefone}</span>
+                            <span className="text-muted">
+                              {cliente.telefone}
+                            </span>
                           </Col>
-                          <Col xs={12} md={3} className="d-flex justify-content-between order-3">
+                          <Col
+                            xs={12}
+                            md={3}
+                            className="d-flex justify-content-between d-none d-md-block order-3"
+                          >
                             <span className="d-md-none">Endereço: </span>
                             <p className="text-muted text-truncate m-0">
                               {cliente.endereco}
                             </p>
                           </Col>
-                          <hr className="d-md-none order-4" />
+                          <hr className="d-md-none order-4 my-2" />
                           <Col
                             xs={12}
                             md={1}
@@ -288,7 +304,7 @@ function Clientes() {
                               <Dropdown.Menu align="end" renderOnMount>
                                 {/* <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item> */}
                                 <Dropdown.Item
-                                  // onClick={() => handleModalCliente(cliente)}
+                                  onClick={() => handleShowDetails(cliente)}
                                 >
                                   Sobre
                                 </Dropdown.Item>
@@ -320,6 +336,12 @@ function Clientes() {
         <ModalCadastroCliente
           visible={modalCadastroCliente}
           onClose={() => setModalCadastroCliente(false)}
+          mobile={mobile}
+        />
+        <ClientDetailsModal
+          show={showDetailsModal}
+          onHide={() => setShowDetailsModal(false)}
+          cliente={selectedClient}
           mobile={mobile}
         />
       </div>
