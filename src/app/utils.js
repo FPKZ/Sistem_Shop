@@ -38,12 +38,12 @@ function formatTimer(totalSeconds) {
 // console.log(formatTimer(3672));   // "01:01:12"
 
 // 💰 Formata número como valor monetário BRL
-const formatMoney = (valor) => {
-  if (isNaN(valor)) return 'R$ 0,00'
-  return new Intl.NumberFormat('pt-BR', {
+const formatMoney = (valor, config = {
     style: 'currency',
     currency: 'BRL',
-  }).format(valor)
+  }) => {
+  if (isNaN(valor)) return 'R$ 0,00'
+  return new Intl.NumberFormat('pt-BR', config).format(valor)
 }
 
 // 🔢 Formata número com separadores (ex: 1.000.000)
