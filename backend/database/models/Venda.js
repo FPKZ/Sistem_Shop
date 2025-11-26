@@ -9,6 +9,7 @@ const Venda = sequelize.define('Venda', {
         allowNull: false
     },
     status: DataTypes.STRING,
+    total: DataTypes.DECIMAL,
 }, {
     tableName: 'Vendas'
 });
