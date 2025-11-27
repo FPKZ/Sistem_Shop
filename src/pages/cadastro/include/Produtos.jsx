@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
 import API from "@app/api";
-import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal"
+import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useToast } from "@contexts/ToastContext";
@@ -10,12 +11,12 @@ export default function Produtos() {
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [modalCadastroNota, setModalCadastroNota] = useState(false)
-  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false)
+  const [modalCadastroNota, setModalCadastroNota] = useState(false);
+  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
 
-  const [modalCriar , setModalCriar] = useState(false)
+  const [modalCriar, setModalCriar] = useState(false);
 
-  const [ itensCriados, setItensCriados ] = useState(null)
+  const [itensCriados, setItensCriados] = useState(null);
 
   const [erros, setErros] = useState({});
   const [validated, setValidated] = useState(false);
@@ -26,14 +27,14 @@ export default function Produtos() {
     marca: "",
     tamanho: "",
     codigo_barras: "",
-    entrada_estoque: "",
     valor_compra: "",
     valor_venda: "",
     lucro: "",
     descricao: "",
+    quantidade: 1,
   });
 
-  const { showToast } = useToast()
+  const { showToast } = useToast();
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -66,6 +67,7 @@ export default function Produtos() {
       return updatedValues;
     });
   }
+
   function validate(form) {
     let newErrors = {};
 
@@ -92,49 +94,53 @@ export default function Produtos() {
     const newErrors = validate(form);
     setErros(newErrors);
     setValidated(true);
-    //console.log(erros)
-    //console.log(validated)
 
     if (Object.keys(newErrors).length === 0) {
-      // Usar o ESTADO ('formValue') como fonte da verdade, não o DOM.
-      const finalFormData = new FormData();
-      //console.log(formValue);
+      const quantidade = parseInt(formValue.quantidade) || 1;
+      let allItensCriados = [];
 
-      // Adiciona os campos simples ao FormData
-      finalFormData.append("nome", formValue.nome);
-      finalFormData.append("descricao", formValue.descricao);
-      finalFormData.append("img", formValue.img); // 'img' agora existe no estado
-      console.log( finalFormData.get("img"))
-      finalFormData.append("categoria_id", categoria.id || "");
+      for (let i = 0; i < quantidade; i++) {
+        const finalFormData = new FormData();
 
-      // Cria o objeto 'itens' a partir do estado
-      const itens = [
-        {
-          codigo_barras: formValue.codigo_barras,
-          nota_id: nota.id || "", // 'nota' é um estado separado
-          tamanho: formValue.tamanho,
-          cor: formValue.cor,
-          marca: formValue.marca,
-          valor_compra: formValue.valor_compra,
-          valor_venda: formValue.valor_venda,
-          lucro: formValue.lucro,
-        },
-      ];
+        finalFormData.append("nome", formValue.nome);
+        finalFormData.append("descricao", formValue.descricao);
+        finalFormData.append("img", formValue.img);
+        finalFormData.append("categoria_id", categoria.id || "");
 
-      finalFormData.set("itens", JSON.stringify(itens));
+        const itens = [
+          {
+            codigo_barras: formValue.codigo_barras,
+            nota_id: nota.id || "",
+            tamanho: formValue.tamanho,
+            cor: formValue.cor,
+            marca: formValue.marca,
+            valor_compra: formValue.valor_compra,
+            valor_venda: formValue.valor_venda,
+            lucro: formValue.lucro,
+          },
+        ];
 
-      console.log(Object.fromEntries(finalFormData));
-      
-      const response = await API.postProduto(finalFormData)
-      // const response = await cadastrarProduto(finalFormData);
-      if(response.ok){
-        showToast(response.message, "success")
-        setItensCriados(response.itensEstoque)
-        setModalCriar(true)
-      } else {
-        if(response.message){
-          showToast(response.message, "error")
+        finalFormData.set("itens", JSON.stringify(itens));
+
+        const response = await API.postProduto(finalFormData);
+        if (response.ok) {
+          if (response.itensEstoque) {
+            allItensCriados = allItensCriados.concat(response.itensEstoque);
+          }
+        } else {
+          if (response.message) {
+            showToast(response.message, "error");
+          }
         }
+      }
+
+      if (allItensCriados.length > 0) {
+        showToast(
+          `${allItensCriados.length} produtos criados com sucesso!`,
+          "success"
+        );
+        setItensCriados(allItensCriados);
+        setModalCriar(true);
       }
     }
   }
@@ -146,7 +152,6 @@ export default function Produtos() {
 
   const GetCategorias = async () => {
     const categorias = await API.getCategoria();
-    //console.log(categorias)
     setCategorias(categorias);
   };
   const GetNotas = async () => {
@@ -155,63 +160,93 @@ export default function Produtos() {
   };
 
   return (
-    <div className="row-cols-2 w-100 p-3 pt-0 m-0 d-flex gap-4">
-      <form onSubmit={handleSubimit} noValidate className="row-cols-1 w-100 ">
-        <div className="row gap-4 mb-3 pb-4 border-bottom m-0">
-          <div className="col-md-12 w-100 p-0">
-            <label htmlFor="nomeProduto" className="form-label">
-              Nome
-            </label>
-            <input
-              className={`form-control ${
+    <div className="w-100 p-3 pt-0 m-0">
+      <Form onSubmit={handleSubimit} noValidate>
+        <Row className="g-3 mb-3 pb-4 border-bottom">
+          {/* Nome */}
+          <Col xs={12}>
+            <Form.Label htmlFor="nomeProduto">Nome</Form.Label>
+            <Form.Control
+              className={
                 validated ? (erros.nome ? "is-invalid" : "is-valid") : ""
-              }`}
+              }
               name="nome"
               id="nomeProduto"
               type="text"
-              placeholder="nome"
+              placeholder="Nome do produto"
               value={formValue.nome}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="col-md-4 p-0">
-            <label htmlFor="imgProduto" className="form-label">
-              Imagem
-            </label>
-            <input
-              className={`form-control ${
+          </Col>
+
+          {/* Imagem */}
+          <Col xs={10} md={4}>
+            <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
+            <Form.Control
+              className={
                 validated ? (erros.img ? "is-invalid" : "is-valid") : ""
-              }`}
+              }
               name="img"
               id="imgProduto"
               type="file"
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="col-md-1 p-0">
-            <label htmlFor="corProduto" className="form-label">
-              Cor
-            </label>
-            <input
-              className="form-control form-control-color"
+          </Col>
+
+          {/* Cor */}
+          <Col xs={2} md={1} className="d-flex flex-column align-items-center">
+            <Form.Label htmlFor="corProduto">Cor</Form.Label>
+            <Form.Control
+              className="form-control-color"
               name="cor"
               id="corProduto"
               type="color"
-              placeholder="Cor"
               value={formValue.cor}
               onChange={handleChange}
             />
-          </div>
-          <div className="col-md-2 p-0">
-            <label htmlFor="marcaProduto" className="form-label">
-              Marca
-            </label>
-            <input
-              className={`form-control ${
+          </Col>
+
+          {/* Categoria */}
+          <Col xs={12} md={3}>
+            <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-secondary"
+                className={`w-100 d-flex justify-content-between align-items-center ${
+                  validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""
+                }`}
+              >
+                {categoria.nome || "Selecione a Categoria"}
+              </Dropdown.Toggle>
+              <Form.Control
+                id="categoriaProduto"
+                type="hidden"
+                name="categoria"
+                value={categoria.id || ""}
+                required
+              />
+              <Dropdown.Menu className="w-100">
+                <Categoria
+                  categorias={categorias}
+                  setCategoria={setCategoria}
+                />
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={() => setModalCadastroCategoia(true)}>
+                  Nova Categoria
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Col>
+          
+          {/* Marca */}
+          <Col xs={6} md={2}>
+            <Form.Label htmlFor="marcaProduto">Marca</Form.Label>
+            <Form.Control
+              className={
                 validated ? (erros.marca ? "is-invalid" : "is-valid") : ""
-              }`}
+              }
               name="marca"
               id="marcaProduto"
               type="text"
@@ -220,54 +255,15 @@ export default function Produtos() {
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="col-md p-0 d-flex flex-column">
-            <label htmlFor="categoriaProduto" className="form-label">
-              Categoria
-            </label>
-            <div className="btn-group">
-              <button
-                type="button"
-                className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${
-                  validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""
-                }`}
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {categoria.nome || "Selecione a Categoria"}
-              </button>
-              <input
-                className={`form-control `}
-                id="categoriaProduto"
-                type="hidden"
-                name="categoria"
-                value={categoria.id || ""}
-                required
-              />
-              <ul className="dropdown-menu w-100">
-                <Categoria
-                  categorias={categorias}
-                  setCategoria={setCategoria}
-                />
-                <li>
-                  <hr className="dropdown-divider"></hr>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#" onClick={() => setModalCadastroCategoia(true)}>
-                    Nova Categoria
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="col-md p-0">
-            <label htmlFor="tamanhoProduto" className="form-label">
-              Tamanho
-            </label>
-            <input
-              className={`form-control ${
+          </Col>
+
+          {/* Tamanho */}
+          <Col xs={6} md={2}>
+            <Form.Label htmlFor="tamanhoProduto">Tamanho</Form.Label>
+            <Form.Control
+              className={
                 validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""
-              }`}
+              }
               name="tamanho"
               id="tamanhoProduto"
               type="number"
@@ -276,116 +272,90 @@ export default function Produtos() {
               placeholder="Tamanho"
               required
             />
-          </div>
-          {/* <div class="col-md-4">
-                        <label for="inputState" class="form-label">State</label>
-                        <select id="inputState" class="form-select">
-                        <option selected>Choose...</option>
-                        <option><hr></hr></option>
-                        <option>...</option>
-                        </select>
-                    </div> */}
-        </div>
-        <div className="row gap-5  m-0 pb-4 mb-3 border-bottom">
-          <div className="col-md-4 d-flex flex-column p-0 m-0">
-            <label htmlFor="notaProduto" className="form-label">
-              Nota
-            </label>
-            <div className="dropdown-center">
-              <button
-                type="button"
-                className={`dropdown-toggle form-control d-flex justify-content-between align-items-center ${
+          </Col>
+        </Row>
+
+        <Row className="g-3 mb-3 pb-4 border-bottom">
+          {/* Nota */}
+          <Col xs={12} md={5}>
+            <Form.Label htmlFor="notaProduto">Nota</Form.Label>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-secondary"
+                className={`w-100 d-flex justify-content-between align-items-center ${
                   validated ? (erros.nota ? "is-invalid" : "is-valid") : ""
                 }`}
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
               >
                 {nota.codigo || "Selecione a Nota"}
-              </button>
-              <input
-                className={`form-control ${
-                  validated
-                    ? erros.notaProduto
-                      ? "is-invalid"
-                      : "is-valid"
-                    : ""
-                }`}
+              </Dropdown.Toggle>
+              <Form.Control
                 id="notaProduto"
                 type="hidden"
                 name="nota"
                 value={nota.id || ""}
-                onChange={handleChange}
                 required
               />
-              <ul className="dropdown-menu w-100">
+              <Dropdown.Menu className="w-100">
                 <Nota notas={notas} setNota={setNota} />
-                <li>
-                  <hr className="dropdown-divider"></hr>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#" onClick={() => setModalCadastroNota(true)}>
-                    Nova Nota
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="col-md-5 p-0">
-            <label htmlFor="codigoBarras" className="form-label">
-              Codigo de Barras
-            </label>
-            <input
-              className={`form-control ${
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={() => setModalCadastroNota(true)}>
+                  Nova Nota
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Col>
+
+          {/* Código de Barras */}
+          <Col xs={10} md={6}>
+            <Form.Label htmlFor="codigoBarras">Código de Barras</Form.Label>
+            <Form.Control
+              className={
                 validated
                   ? erros.codigo_barras
                     ? "is-invalid"
                     : "is-valid"
                   : ""
-              }`}
+              }
               name="codigo_barras"
               id="codigoBarras"
-              type="text"
-              placeholder="Codigo de Barras"
+              type="number"
+              placeholder="Código de Barras"
               value={formValue.codigo_barras}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="col-md-2 p-0 m-0">
-            <label htmlFor="entradaEstoqueProduto" className="form-label">
-              Entrada
-            </label>
-            <input
-              className={`form-control ${
-                validated
-                  ? erros.entrada_estoque
-                    ? "is-invalid"
-                    : "is-valid"
-                  : ""
-              }`}
-              name="entrada_estoque"
-              id="entradaEstoqueProduto"
+          </Col>
+
+          {/* Quantidade */}
+          <Col xs={2} md={1}>
+            <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
+            <Form.Control
+              name="quantidade"
+              id="quantidadeProduto"
               type="number"
-              placeholder="Quantidade"
-              value={formValue.entrada_estoque}
+              placeholder="1"
+              min="1"
+              value={formValue.quantidade}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="col-md p-0 m-0">
-            <label htmlFor="valorCompraProduto" className="form-label">
-              Valor de Compra
-            </label>
-            <div className="input-group">
-              <span className="input-group-text">R$</span>
-              <input
-                className={`form-control ${
+          </Col>
+
+          {/* Valor de Compra */}
+          <Col xs={4} md={4}>
+            <Form.Label htmlFor="valorCompraProduto">
+              Vlr. Compra
+            </Form.Label>
+            <InputGroup>
+              <InputGroup.Text>R$</InputGroup.Text>
+              <Form.Control
+                className={
                   validated
                     ? erros.valor_compra
                       ? "is-invalid"
                       : "is-valid"
                     : ""
-                }`}
+                }
                 name="valor_compra"
                 id="valorCompraProduto"
                 type="number"
@@ -394,22 +364,22 @@ export default function Produtos() {
                 onChange={handleChange}
                 required
               />
-            </div>
-          </div>
-          <div className="col-md p-0 m-0">
-            <label htmlFor="valorVendaProduto" className="form-label">
-              Valor de Venda
-            </label>
-            <div className="input-group">
-              <span className="input-group-text">R$</span>
-              <input
-                className={`form-control ${
+            </InputGroup>
+          </Col>
+
+          {/* Valor de Venda */}
+          <Col xs={4} md={4}>
+            <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
+            <InputGroup>
+              <InputGroup.Text>R$</InputGroup.Text>
+              <Form.Control
+                className={
                   validated
                     ? erros.valor_venda
                       ? "is-invalid"
                       : "is-valid"
                     : ""
-                }`}
+                }
                 name="valor_venda"
                 id="valorVendaProduto"
                 type="number"
@@ -418,18 +388,18 @@ export default function Produtos() {
                 onChange={handleChange}
                 required
               />
-            </div>
-          </div>
-          <div className="col-md p-0 m-0">
-            <label htmlFor="LucroProduto" className="form-label">
-              Lucro
-            </label>
-            <div className="input-group">
-              <span className="input-group-text">R$</span>
-              <input
-                className={`form-control ${
+            </InputGroup>
+          </Col>
+
+          {/* Lucro */}
+          <Col xs={4} md={4}>
+            <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
+            <InputGroup>
+              <InputGroup.Text>R$</InputGroup.Text>
+              <Form.Control
+                className={
                   validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
-                }`}
+                }
                 name="lucro"
                 id="LucroProduto"
                 type="number"
@@ -438,38 +408,52 @@ export default function Produtos() {
                 onChange={handleChange}
                 required
               />
-            </div>
-          </div>
-        </div>
-        <div className="col-md-12 mb-3">
-          <label htmlFor="descricaoProduto" className="form-label">
-            Descrição
-          </label>
-          <input
-            className={`form-control ${
-              validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""
-            }`}
-            name="descricao"
-            type="text"
-            id="descricaoProduto"
-            placeholder="Descrição"
-            value={formValue.descricao}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-md-12">
-          <button className="btn btn-roxo w-100" type="submit">
-            Salvar
-          </button>
-        </div>
-      </form>
-      <CadastrarNotaModal visible={modalCadastroNota} onClose={() => setModalCadastroNota(false)} produts={false} />
-      <CadastroCategoria visible={modalCadastroCategoria} onClose={() => setModalCadastroCategoia(false)} />
+            </InputGroup>
+          </Col>
+        </Row>
+
+        {/* Descrição */}
+        <Row className="g-3 mb-3">
+          <Col xs={12}>
+            <Form.Label htmlFor="descricaoProduto">Descrição</Form.Label>
+            <Form.Control
+              className={
+                validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""
+              }
+              name="descricao"
+              type="text"
+              id="descricaoProduto"
+              placeholder="Descrição"
+              value={formValue.descricao}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        {/* Botão Salvar */}
+        <Row>
+          <Col xs={12}>
+            <Button className="btn-roxo w-100" type="submit">
+              Salvar
+            </Button>
+          </Col>
+        </Row>
+      </Form>
+
+      <CadastrarNotaModal
+        visible={modalCadastroNota}
+        onClose={() => setModalCadastroNota(false)}
+        produts={false}
+      />
+      <CadastroCategoria
+        visible={modalCadastroCategoria}
+        onClose={() => setModalCadastroCategoia(false)}
+      />
       <ProdutosCriados
-          visible={modalCriar}
-          onClose={() => setModalCriar(false)}
-          itens={itensCriados}
+        visible={modalCriar}
+        onClose={() => setModalCriar(false)}
+        itens={itensCriados}
       />
     </div>
   );
@@ -479,30 +463,24 @@ function Nota({ notas, setNota }) {
   return (
     <>
       {notas.map((nota) => (
-        <li key={nota.id}>
-          <a className="dropdown-item" 
-            style={{cursor: "pointer"}}
-            onClick={() => setNota(nota)}>
-            {nota.codigo}
-          </a>
-        </li>
+        <Dropdown.Item key={nota.id} onClick={() => setNota(nota)}>
+          {nota.codigo}
+        </Dropdown.Item>
       ))}
     </>
   );
 }
+
 function Categoria({ categorias, setCategoria }) {
   return (
     <>
       {categorias.map((categoria) => (
-        <li key={categoria.id}>
-          <a
-            className="dropdown-item"
-            style={{cursor: "pointer"}}
-            onClick={() => setCategoria(categoria)}
-          >
-            {categoria.nome}
-          </a>
-        </li>
+        <Dropdown.Item
+          key={categoria.id}
+          onClick={() => setCategoria(categoria)}
+        >
+          {categoria.nome}
+        </Dropdown.Item>
       ))}
     </>
   );

@@ -1,16 +1,16 @@
-// components/CadastroModal.jsx
+// components/CadastroIntenModalNew.jsx
 import API from "@app/api";
 import { useState, useEffect } from "react";
 import { Modal, Row, Col, Button, Form } from "react-bootstrap";
 
-function CadastroModal({
+function CadastroIntenModal({
   visible,
   onClose,
   cadastrarProduto,
   cadastroNota = false,
   // mobile
 }) {
-  const [formValue, setFormValue] = useState({});
+  const [formValue, setFormValue] = useState({ quantidade: 1 });
   const [erros, setErros] = useState({});
   const [validated, setValidated] = useState(false);
 
@@ -24,7 +24,9 @@ function CadastroModal({
       const timer = setTimeout(() => {
         setValidated(false);
         setErros({});
-        setFormValue({});
+        setFormValue({ quantidade: 1 });
+        setNota({});
+        setCategoria({});
       }, 200);
       return () => clearTimeout(timer);
     }
@@ -35,17 +37,14 @@ function CadastroModal({
 
   const GetCategorias = async () => {
     const data = await API.getCategoria();
-    //console.log(data)
     setCategorias(data);
   };
   const GetNotas = async () => {
     const data = await API.getNotas();
-    //console.log(data)
     setNotas(data);
   };
 
   if (!visible) return null;
-  //console.log(notas)
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -98,58 +97,58 @@ function CadastroModal({
     return newErrors;
   }
 
-  function handleSubimit(e) {
+  async function handleSubimit(e) {
     e.preventDefault();
     const form = e.target;
 
     const newErrors = validate(form);
     setErros(newErrors);
     setValidated(true);
-    console.log(erros)
-    //console.log(validated)
 
     if (Object.keys(newErrors).length === 0) {
-      // Usar o ESTADO ('formValue') como fonte da verdade, não o DOM.
-      const finalFormData = new FormData();
-      //console.log(formValue);
+      const quantidade = parseInt(formValue.quantidade) || 1;
 
-      // Adiciona os campos simples ao FormData
-      finalFormData.append("nome", formValue.nome);
-      finalFormData.append("descricao", formValue.descricao);
-      finalFormData.append("img", formValue.img); // 'img' agora existe no estado
-      // console.log( finalFormData.get("img"))
-      finalFormData.append("categoria_id", categoria.id || "");
+      for (let i = 0; i < quantidade; i++) {
+        const finalFormData = new FormData();
 
-      // Cria o objeto 'itens' a partir do estado
-      const itens = [
-        {
-          codigo_barras: formValue.codigo_barras,
-          nota_id: nota.id || "", // 'nota' é um estado separado
-          tamanho: formValue.tamanho,
-          cor: formValue.cor,
-          marca: formValue.marca,
-          valor_compra: formValue.valor_compra,
-          valor_venda: formValue.valor_venda,
-          lucro: formValue.lucro,
-        },
-      ];
+        finalFormData.append("nome", formValue.nome);
+        finalFormData.append("descricao", formValue.descricao);
+        finalFormData.append("img", formValue.img);
+        finalFormData.append("categoria_id", categoria.id || "");
 
-      finalFormData.set("itens", JSON.stringify(itens));
-      console.log(Object.fromEntries(finalFormData));
-      cadastrarProduto(finalFormData);
+        const itens = [
+          {
+            codigo_barras: formValue.codigo_barras,
+            nota_id: nota.id || "",
+            tamanho: formValue.tamanho,
+            cor: formValue.cor,
+            marca: formValue.marca,
+            valor_compra: formValue.valor_compra,
+            valor_venda: formValue.valor_venda,
+            lucro: formValue.lucro,
+          },
+        ];
+
+        finalFormData.set("itens", JSON.stringify(itens));
+
+        // Se for a última iteração, podemos fechar o modal (dependendo da implementação do pai)
+        // Mas aqui apenas chamamos a função.
+        await cadastrarProduto(finalFormData);
+      }
+      onClose(); // Fecha o modal após o loop
     }
   }
 
   return (
     <Modal
-        show={visible}
-        onHide={onClose}
-        size="xxl"
-        dialogClassName="modal-xxl"
-        centered
-        fullscreen="md-down"
-        animation
-      >
+      show={visible}
+      onHide={onClose}
+      size="xl"
+      dialogClassName="modal-xxl"
+      centered
+      fullscreen="md-down"
+      animation
+    >
       <Form onSubmit={handleSubimit} noValidate>
         <Modal.Header closeButton>
           <Modal.Title>Cadastrar Item</Modal.Title>
@@ -168,7 +167,7 @@ function CadastroModal({
                 id="nomeProduto"
                 type="text"
                 placeholder="nome"
-                value={formValue.nome}
+                value={formValue.nome || ""}
                 onChange={handleChange}
                 required
               />
@@ -198,7 +197,7 @@ function CadastroModal({
                 id="corProduto"
                 type="color"
                 placeholder="Cor"
-                value={formValue.cor}
+                value={formValue.cor || "#000000"}
                 onChange={handleChange}
               />
             </Col>
@@ -214,7 +213,7 @@ function CadastroModal({
                 id="marcaProduto"
                 type="text"
                 placeholder="Marca"
-                value={formValue.marca}
+                value={formValue.marca || ""}
                 onChange={handleChange}
                 required
               />
@@ -267,20 +266,12 @@ function CadastroModal({
                 name="tamanho"
                 id="tamanhoProduto"
                 type="number"
-                value={formValue.tamanho}
+                value={formValue.tamanho || ""}
                 onChange={handleChange}
                 placeholder="Tamanho"
                 required
               />
             </Col>
-            {/* <div class="col-md-4">
-                                        <label for="inputState" class="form-label">State</label>
-                                        <select id="inputState" class="form-select">
-                                        <option selected>Choose...</option>
-                                        <option><hr></hr></option>
-                                        <option>...</option>
-                                        </select>
-                                    </div> */}
           </Row>
           <Row className="g-2 m-0 pb-4 mb-3 border-bottom">
             {!cadastroNota && (
@@ -334,32 +325,33 @@ function CadastroModal({
                 }`}
                 name="codigo_barras"
                 id="codigoBarras"
-                type="text"
+                type="number"
                 placeholder="Codigo de Barras"
-                value={formValue.codigo_barras}
+                value={formValue.codigo_barras || ""}
                 onChange={handleChange}
                 required
               />
             </Col>
             <Col>
-              <label htmlFor="entradaEstoqueProduto" className="form-label">
-                Entrada
+              <label htmlFor="quantidadeProduto" className="form-label">
+                Qnt.
               </label>
               <input
                 className={`form-control ${
                   validated
-                    ? erros.entrada_estoque
+                    ? erros.quantidade
                       ? "is-invalid"
                       : "is-valid"
                     : ""
                 }`}
-                name="entrada_estoque"
-                id="entradaEstoqueProduto"
+                name="quantidade"
+                id="quantidadeProduto"
                 type="number"
                 placeholder="Quantidade"
-                value={formValue.entrada_estoque}
+                value={formValue.quantidade}
                 onChange={handleChange}
                 required
+                min="1"
               />
             </Col>
             <Col xs={4} md={4}>
@@ -443,7 +435,7 @@ function CadastroModal({
               type="text"
               id="descricaoProduto"
               placeholder="Descrição"
-              value={formValue.descricao}
+              value={formValue.descricao || ""}
               onChange={handleChange}
               required
             />
@@ -464,9 +456,11 @@ function Nota({ notas, setNota }) {
     <>
       {notas.map((nota) => (
         <li key={nota.id}>
-          <a className="dropdown-item" 
-            style={{cursor: "pointer"}}
-            onClick={() => setNota(nota)}>
+          <a
+            className="dropdown-item"
+            style={{ cursor: "pointer" }}
+            onClick={() => setNota(nota)}
+          >
             {nota.codigo}
           </a>
         </li>
@@ -481,7 +475,7 @@ function Categoria({ categorias, setCategoria }) {
         <li key={categoria.id}>
           <a
             className="dropdown-item"
-            style={{cursor: "pointer"}}
+            style={{ cursor: "pointer" }}
             onClick={() => setCategoria(categoria)}
           >
             {categoria.nome}
@@ -492,4 +486,4 @@ function Categoria({ categorias, setCategoria }) {
   );
 }
 
-export default CadastroModal;
+export default CadastroIntenModal;
