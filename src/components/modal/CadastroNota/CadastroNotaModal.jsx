@@ -147,6 +147,8 @@ export default function CadastroNotaModal({ visible, onClose }) {
           // Se não houver produtos criados (ex: nota sem produtos), apenas fecha ou limpa
           onClose();
         }
+      } else {
+        showToast(response.message, "error");
       }
     }
   };

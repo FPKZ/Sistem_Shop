@@ -144,7 +144,6 @@ function CadastroIntenModal({
       show={visible}
       onHide={onClose}
       size="xl"
-      dialogClassName="modal-xxl"
       centered
       fullscreen="md-down"
       animation
@@ -440,12 +439,12 @@ function CadastroIntenModal({
               required
             />
           </Col>
-          <Col className="pt-3 end-0">
-            <Button className="btn btn-roxo w-100" type="submit">
-              Salvar
-            </Button>
-          </Col>
         </Modal.Body>
+        <Modal.Footer>
+          <Button className="btn btn-roxo w-100" type="submit">
+            Salvar
+          </Button>
+        </Modal.Footer>
       </Form>
     </Modal>
   );

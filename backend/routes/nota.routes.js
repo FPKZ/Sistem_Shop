@@ -10,6 +10,15 @@ export default async function notaRoutes(fastify) {
             ]
             })
 
+            notas.map(async nota => {
+                if(nota.status === "pendente"){
+                    if(new Date(nota.data_vencimento) < new Date()){
+                        nota.status = "vencido"
+                    }
+                    await nota.update({status: nota.status})
+                }
+            })
+
             reply.send(notas)
         } catch(err){
             console.log(err)
@@ -35,6 +44,9 @@ export default async function notaRoutes(fastify) {
             }
 
             const { codigo, valor_total, data, fornecedor, quantidade, data_vencimento } = body
+
+            const NotaExistente = await Nota.findOne({ where: { codigo } })
+            if(NotaExistente) return reply.code(400).send({ error: "Nota ja cadastrada", ok: false })
 
             console.log(body)
             const novaNota = await Nota.create({

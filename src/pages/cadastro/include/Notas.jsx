@@ -67,9 +67,7 @@ export default function Notas() {
       .substr(2, 9)}`; // ID único
 
     // console.log(obj)
-    const p = produtos.concat(obj);
-    setProdutos(p);
-    setmodalCadastroPrduto(false);
+    setProdutos((prev) => prev.concat(obj));
   }
 
   function handleChange(e) {
@@ -172,6 +170,8 @@ export default function Notas() {
             showToast(response.message, "error");
           }
         }
+      } else {
+        showToast(response.message, "error");
       }
       // console.log(response)
     }
@@ -181,151 +181,162 @@ export default function Notas() {
   // console.log(itemEstoque)
   // console.log(modalInfoProduto)
   return (
-    <div className="row-col w-100 p-3 pt-0 m-0 p-md-3 d-flex gap-4 justify-content-center">
-      <form
-        onSubmit={handleSubimit}
-        noValidate
-        className="row d-flex flex-wrap w-100 gap-3"
-      >
-        <div className="col-sm col-md-12 p-0">
-          <label htmlFor="numeroNota" className="form-label">
-            Numero da Nota
-          </label>
-          <input
-            type="text"
-            className={`form-control ${
-              validated ? (erros.codigo ? `is-invalid` : `is-valid`) : ""
-            }`}
-            name="codigo"
-            id="numeroNota"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-sm col-md-2 p-0">
-          <label htmlFor="valor_total" className="form-label">
-            Valor da Nota
-          </label>
-          <input
-            type="number"
-            className={`form-control ${
-              validated ? (erros.valor_total ? `is-invalid` : `is-valid`) : ""
-            }`}
-            name="valor_total"
-            id="valor_total"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-sm col-md-2 p-0">
-          <label htmlFor="data" className="form-label">
-            Data da nota
-          </label>
-          <input
-            type="date"
-            className={`form-control ${
-              validated ? (erros.data ? `is-invalid` : `is-valid`) : ""
-            }`}
-            name="data"
-            id="data"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-sm col-md-2 p-0">
-          <label htmlFor="data_vencimento" className="form-label">
-            Vencimento
-          </label>
-          <input
-            type="date"
-            className={`form-control ${
-              validated
-                ? erros.data_vencimento
-                  ? `is-invalid`
-                  : `is-valid`
-                : ""
-            }`}
-            name="data_vencimento"
-            id="data_vencimento"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-sm col-md p-0">
-          <label htmlFor="fornecedor" className="form-label">
-            Fornecedor
-          </label>
-          <input
-            type="text"
-            className={`form-control ${
-              validated ? (erros.fornecedor ? `is-invalid` : `is-valid`) : ""
-            }`}
-            name="fornecedor"
-            id="fornecedor"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-sm col-md-3 p-0">
-          <label htmlFor="quantidade" className="form-label">
-            Quantidade de produtos da nota
-          </label>
-          <input
-            type="number"
-            className={`form-control ${
-              validated ? (erros.quantidade ? `is-invalid` : `is-valid`) : ""
-            }`}
-            name="quantidade"
-            id="quantidade"
-            value={
-              formValue.quantidade || (incluirProdutos ? produtos.length : "")
-            }
-            onChange={handleChange}
-            readOnly={incluirProdutos}
-            required
-          />
-        </div>
+    <div className="w-100 p-3">
+      <Form onSubmit={handleSubimit} noValidate>
+        <Row className="g-3">
+          {/* Linha 1: Numero, Data, Vencimento */}
+          <Col xs={12} md={8}>
+            <label htmlFor="numeroNota" className="form-label">
+              Numero da Nota
+            </label>
+            <input
+              type="number"
+              className={`form-control ${
+                validated ? (erros.codigo ? `is-invalid` : `is-valid`) : ""
+              }`}
+              name="codigo"
+              id="numeroNota"
+              onChange={handleChange}
+              required
+            />
+          </Col>
+          <Col xs={6} md={2}>
+            <label htmlFor="data" className="form-label">
+              Data da nota
+            </label>
+            <input
+              type="date"
+              className={`form-control ${
+                validated ? (erros.data ? `is-invalid` : `is-valid`) : ""
+              }`}
+              name="data"
+              id="data"
+              onChange={handleChange}
+              required
+            />
+          </Col>
+          <Col xs={6} md={2}>
+            <label htmlFor="data_vencimento" className="form-label">
+              Vencimento
+            </label>
+            <input
+              type="date"
+              className={`form-control ${
+                validated
+                  ? erros.data_vencimento
+                    ? `is-invalid`
+                    : `is-valid`
+                  : ""
+              }`}
+              name="data_vencimento"
+              id="data_vencimento"
+              onChange={handleChange}
+              required
+            />
+          </Col>
 
-        <div className="col-12 d-flex align-items-center gap-2 mt-2">
-          <Form.Check
-            type="switch"
-            id="custom-switch-page"
-            label="Incluir Produtos na Nota"
-            checked={incluirProdutos}
-            onChange={(e) => setIncluirProdutos(e.target.checked)}
-          />
-        </div>
+          {/* Linha 2: Fornecedor, Valor Total, Qnt */}
+          <Col xs={12} md={6}>
+            <label htmlFor="fornecedor" className="form-label">
+              Fornecedor
+            </label>
+            <input
+              type="text"
+              className={`form-control ${
+                validated ? (erros.fornecedor ? `is-invalid` : `is-valid`) : ""
+              }`}
+              name="fornecedor"
+              id="fornecedor"
+              onChange={handleChange}
+              required
+            />
+          </Col>
+          <Col xs={6} md={3}>
+            <label htmlFor="valor_total" className="form-label">
+              Valor da Nota
+            </label>
+            <input
+              type="number"
+              className={`form-control ${
+                validated ? (erros.valor_total ? `is-invalid` : `is-valid`) : ""
+              }`}
+              name="valor_total"
+              id="valor_total"
+              onChange={handleChange}
+              required
+            />
+          </Col>
+          <Col xs={6} md={3}>
+            <label htmlFor="quantidade" className="form-label">
+              Qnt. Produtos
+            </label>
+            <input
+              type="number"
+              className={`form-control ${
+                validated && !incluirProdutos
+                  ? erros.quantidade
+                    ? `is-invalid`
+                    : `is-valid`
+                  : ""
+              }`}
+              name="quantidade"
+              id="quantidade"
+              value={
+                formValue.quantidade || (incluirProdutos ? produtos.length : "")
+              }
+              onChange={handleChange}
+              readOnly={incluirProdutos}
+              required
+            />
+          </Col>
+
+          {/* Toggle Incluir Produtos */}
+          <Col xs={12} className="d-flex align-items-center gap-2 mt-2">
+            <Form.Check
+              type="switch"
+              id="custom-switch-page"
+              label="Incluir Produtos na Nota"
+              checked={incluirProdutos}
+              onChange={(e) => setIncluirProdutos(e.target.checked)}
+            />
+          </Col>
+        </Row>
 
         {incluirProdutos && (
-          <div
-            className="col-12 form-control d-flex flex-column mt-2 p-0"
-            style={{ height: "400px" }}
-          >
-            <div className="col-12 d-flex justify-content-between p-2 border-bottom">
-              <p className="align-content-center m-0">Produtos</p>
+          <div className="d-flex flex-column flex-grow-1 overflow-hidden mt-3 border rounded" style={{ height: "400px" }}>
+            <div className="d-flex justify-content-between p-2 border-bottom bg-light flex-shrink-0">
+              <p className="align-content-center m-0 fw-bold">
+                Produtos da Nota
+              </p>
               <button
-                className="btn btn-light"
+                className="btn btn-sm btn-outline-primary"
                 type="button"
                 onClick={() => setmodalCadastroPrduto(true)}
               >
-                Adicionar Produto
+                + Adicionar Produto
               </button>
             </div>
-            <div className="col-12 d-flex flex-column gap-2 overflow-y-auto flex-grow-1">
-              <TabelaProdutosNota
-                mobile={mobile}
-                produto={produtos}
-                setItemEstoque={setItemEstoque}
-                setmodalInfoProduto={setmodalInfoProduto}
-              />
+            <div className="flex-grow-1 overflow-y-auto bg-white">
+              {produtos.length > 0 ? (
+                <TabelaProdutosNota
+                  mobile={mobile}
+                  produto={produtos}
+                  setItemEstoque={setItemEstoque}
+                  setmodalInfoProduto={setmodalInfoProduto}
+                />
+              ) : (
+                <div className="d-flex justify-content-center align-items-center h-100 text-muted p-4">
+                  Nenhum produto adicionado
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        <button className="btn btn-roxo" type="submit">
+        <Button className="btn-roxo mt-3 w-100" type="submit">
           Adicionar
-        </button>
-      </form>
+        </Button>
+      </Form>
       <CadastroModal
         visible={modalCadastroPrduto}
         onClose={() => setmodalCadastroPrduto(false)}

@@ -6,6 +6,8 @@ import API from "../../app/api.js"
 import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { useOutletContext } from "react-router-dom";
 import usePopStateModal from "@hooks/usePopStateModal";
+import { useToast } from "@contexts/ToastContext";
+import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 
 // import "../../../public/css/produtos/produtos.css"
 
@@ -18,6 +20,10 @@ function Produtos() {
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
 
+  const [itensCriados, setItensCriados] = useState(null);
+  const [modalCriar, setModalCriar] = useState(false);
+
+  const { showToast } = useToast();
 
   
 
@@ -62,12 +68,26 @@ function Produtos() {
   
 
   const cadastroProduto = async (data) => {
-    await API.postProduto(data)
+    const response = await API.postProduto(data)
+    if(response.ok){
+      setModalCriar(true);
+      setItensCriados(response.produtos);
+      showToast(response.message, "success")
+    }
+    else{
+      showToast(response.message, "error")
+    } 
     await getProduto()
   }
 
   const deleteProduto = async (id) => {
-    await API.deleteProduto(id)
+    const response = await API.deleteProduto(id)
+    if(response.ok){
+      showToast(response.message, "success")
+    }
+    else{
+      showToast(response.message, "error")
+    }
     await getProduto()
   }
   
@@ -88,6 +108,12 @@ function Produtos() {
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}
         produto={produto}
+        mobile={mobile}
+      />
+      <ProdutosCriados 
+        visible={modalCriar}
+        onClose={() => setModalCriar(false)}
+        itensCriados={itensCriados}
         mobile={mobile}
       />
     </div>
