@@ -11,7 +11,7 @@ import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } fr
 import utils from "@app/utils";
 
 
-export default function TableNota({notas, handleShowDetails, mobile, handleBuy}){
+export default function TableNota({notas, handleShowDetails, mobile, handleBuy, handlePrintCustom}){
 
 
     const getStatusBadge = (status, full = false) => {
@@ -127,7 +127,7 @@ export default function TableNota({notas, handleShowDetails, mobile, handleBuy})
                             </Dropdown.Toggle>
                             <Dropdown.Menu align="end" renderOnMount>
                                 <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item>
-                                <Dropdown.Item>Baixar PDF</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handlePrintCustom(nota)}>Baixar PDF</Dropdown.Item>
                                 {nota.status !== "pago" && <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>}
                             </Dropdown.Menu>
                             </Dropdown>

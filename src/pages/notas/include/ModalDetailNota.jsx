@@ -11,39 +11,10 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import utils from "@app/utils";
-import { gerarPDFNota } from "@app/generatePDF";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
-const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy }) => {
+const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy, handlePrintCustom }) => {
   if (!selectNota) return null;
-
-  const handlePrintCustom = () => {
-    const config = {
-      tipo: "recebimento",
-      dadosNota: {
-        codigo: selectNota.codigo,
-        data: selectNota.data,
-        fornecedor: selectNota.fornecedor,
-        valor_total: selectNota.valor_total,
-      },
-      colunas: [
-        { header: "#ID", dataKey: "id" },
-        { header: "Produto", dataKey: "nome" },
-        { header: "Marca", dataKey: "marca" },
-        { header: "Qtd.", dataKey: "quantidade" },
-        { header: "Valor Compra", dataKey: "valor_compra" },
-      ],
-      dadosItens: selectNota.itensNota
-        ? selectNota.itensNota.map((item) => ({
-            ...item,
-            quantidade: 1,
-          }))
-        : [],
-      nomeArquivo: `nota-recebimento-${selectNota.codigo}.pdf`,
-    };
-
-    gerarPDFNota(config);
-  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -224,7 +195,7 @@ const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy }) => {
           Fechar
         </Button>
         <div className="d-flex gap-2">
-          <Button variant="primary" onClick={handlePrintCustom}>
+          <Button variant="primary" onClick={() => handlePrintCustom(selectNota)}>
             <Printer size={16} className="me-2" />
             Imprimir
           </Button>
