@@ -40,6 +40,15 @@ export async function editarUser(data){
     }
 }
 
+export async function resetSenha(id){
+    try{
+        const response = await fetch(`${back}/reset-senha/${id}`, {method: "PUT"})
+        return await response.json()
+    } catch(err){
+        console.error("Erro ao resetar senha", err)
+    }
+}
+
 export async function deleteUser(id){
     try{
         const response = await fetch(`${back}/delete-user/${id}`, {method: "DELETE"})
@@ -74,5 +83,20 @@ export async function deleteSolicitacao(id){
         return await response.json()
     } catch(err) {
         console.error("Erro ao recusar Solicitação", err)
+    }
+}
+
+export async function registerUser(data){
+    try{
+        const response = await fetch(`${back}/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        })
+        return await response.json()
+    } catch(err) {
+        console.error("Erro ao registrar usuario", err)
     }
 }

@@ -1,76 +1,85 @@
-import { ButtonGroup, Card, Table, Button } from "react-bootstrap";
-import utils from "@app/utils"
+import { ButtonGroup, Table, Button, Badge } from "react-bootstrap";
+import utils from "@app/utils";
 
+export default function TabelaClientes({ vendas, onView }) {
+  const getStatusBadge = (status) => {
+    switch (status?.toLowerCase()) {
+      case "concluida":
+        return "success";
+      case "pendente":
+        return "warning";
+      case "cancelada":
+        return "danger";
+      case "devolvida":
+        return "info";
+      default:
+        return "secondary";
+    }
+  };
 
-export default function TabelaClientes({vendas}){
-
-    return (
-        <Card className="p-0 m-0">
-            <Card.Header className="d-flex justify-content-between align-items-center">
-                <Card.Title>
-                    Vendas totais ({vendas ? vendas.length : 0})
-                </Card.Title>
-            </Card.Header>
-            <Card.Body className="p-0">
-                <Table>
-                    <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>cliente</th>
-                            <th>Data</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            vendas.map(venda => (
-                                <tr key={venda.id}>
-                                    <td>
-                                        <div>
-                                            <strong>{venda.id}</strong>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <span>{venda.cliente.nome}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <span>{utils.formatDate(venda.data_venda)}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <span>{utils.capitalize(venda.status)}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <ButtonGroup size="sm">
-                                                <Button 
-                                                    variant="outline-secondary" 
-                                                    onClick={() => handleViewProfile(nota)}
-                                                    title="View Venda"
-                                                >
-                                                    <i className="bi bi-eye"></i>
-                                                </Button>
-                                                <Button
-                                                    variant="outline-success"
-                                                >
-                                                    <i className="bi bi-basket2"></i>
-                                                </Button>
-                                            </ButtonGroup>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            ))
-                        }
-                    </tbody>
-                </Table>
-            </Card.Body>
-        </Card>
-    )
+  return (
+    <div className="table-responsive">
+      <Table hover className="align-middle mb-0">
+        <thead className="bg-light">
+          <tr>
+            <th className="border-0 text-secondary small text-uppercase">ID</th>
+            <th className="border-0 text-secondary small text-uppercase">
+              Cliente
+            </th>
+            <th className="border-0 text-secondary small text-uppercase">
+              Data
+            </th>
+            <th className="border-0 text-secondary small text-uppercase">
+              Valor
+            </th>
+            <th className="border-0 text-secondary small text-uppercase">
+              Status
+            </th>
+            <th className="border-0 text-secondary small text-uppercase text-end">
+              Ações
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {vendas && vendas.length > 0 ? (
+            vendas.map((venda) => (
+              <tr key={venda.id}>
+                <td className="fw-bold">#{venda.id}</td>
+                <td>{venda.cliente?.nome || "Cliente N/A"}</td>
+                <td>{utils.formatDate(venda.data_venda)}</td>
+                <td className="fw-bold text-dark">
+                  {utils.formatMoney(venda.valor_total)}
+                </td>
+                <td>
+                  <Badge
+                    bg={getStatusBadge(venda.status)}
+                    className="fw-normal"
+                  >
+                    {utils.capitalize(venda.status)}
+                  </Badge>
+                </td>
+                <td className="text-end">
+                  <Button
+                    variant="light"
+                    size="sm"
+                    className="text-primary btn-icon"
+                    onClick={() => onView(venda)}
+                    title="Visualizar Detalhes"
+                  >
+                    <i className="bi bi-eye"></i>
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center py-4 text-muted">
+                Nenhuma venda encontrada.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </div>
+  );
 }

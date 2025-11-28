@@ -7,7 +7,7 @@ import { usePagination } from "@hooks/usePagination"
 import PaginationButtons from "@components/Pagination/PaginationButtons"
 
 export default function Solicitacoes({solicitacoes, aproveSolicitacao, deleteSolicitacao}){
-    console.log(solicitacoes)
+    // console.log(solicitacoes)
     const {
         currentItems,
         currentPage,

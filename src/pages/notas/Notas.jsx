@@ -25,6 +25,8 @@ import ModalDetailNota from "./include/ModalDetailNota"; // <-- 1. IMPORTE O NOV
 import TableNota from "./include/TableNota";
 import HoverBtn from "@components/HoverBtn";
 
+import { gerarPDFNota } from "@app/generatePDF";
+
 export default function Notas() {
   const [notas, setNotas] = useState([]);
   const [selectNota, setSelectNota] = useState(null);
@@ -88,6 +90,35 @@ export default function Notas() {
 
     setActiveFilter(filter);
     setFiltro(filter === "Todas" ? "" : filter.toLocaleLowerCase());
+  };
+
+  const handlePrintCustom = (selectNota) => {
+    console.log(selectNota)
+    const config = {
+      tipo: "recebimento",
+      dadosNota: {
+        codigo: selectNota.codigo,
+        data: selectNota.data,
+        fornecedor: selectNota.fornecedor,
+        valor_total: selectNota.valor_total,
+      },
+      colunas: [
+        { header: "#ID", dataKey: "id" },
+        { header: "Produto", dataKey: "nome" },
+        { header: "Marca", dataKey: "marca" },
+        { header: "Qtd.", dataKey: "quantidade" },
+        { header: "Valor Compra", dataKey: "valor_compra" },
+      ],
+      dadosItens: selectNota.itensNota
+        ? selectNota.itensNota.map((item) => ({
+            ...item,
+            quantidade: 1,
+          }))
+        : [],
+      nomeArquivo: `nota-recebimento-${selectNota.codigo}.pdf`,
+    };
+
+    gerarPDFNota(config);
   };
 
   // console.log(dadosProcessados)
@@ -188,6 +219,7 @@ export default function Notas() {
           handleShowDetails={handleShowDetails}
           mobile={mobile}
           handleBuy={handleBuy}
+          handlePrintCustom={handlePrintCustom}
         />
       ) : (
         <div className="alert alert-roxo text-center mt-4" role="alert">
@@ -211,6 +243,7 @@ export default function Notas() {
         selectNota={selectNota}
         mobile={mobile}
         handleBuy={handleBuy}
+        handlePrintCustom={handlePrintCustom}
       />
       {isModalCadastroOpen && (
         <CadastroNotaModal

@@ -3,7 +3,10 @@ import styles from "../../../../public/css/cadastro.module.css"
 import Footer from "../include/Footer";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../../sistem/AuthContext";
+import API from "@app/api";
+import { useToast } from "@contexts/ToastContext";
+
+import Erros from "@components/Erros";
 
 import React, { useEffect } from 'react';
 
@@ -15,7 +18,7 @@ export default function CadastroUser() {
 
     const navigate = useNavigate()
 
-    const { login } = useAuth()
+    const { showToast } = useToast()
 
     // ... dentro do componente CadastroUser
     useEffect(() => {
@@ -29,6 +32,7 @@ export default function CadastroUser() {
     }, []); // O array vazio garante que o efeito rode apenas uma vez
 
     function handleChange(e){
+        // eslint-disable-next-line no-unused-vars
         const { name, value, type } = e.target
         let newValue = value
 
@@ -50,12 +54,15 @@ export default function CadastroUser() {
         const elements = form.querySelectorAll("[name]")
         
         elements.forEach((e) => {
+            // eslint-disable-next-line no-unused-vars
             const { name, value, required, type } = e
 
             if(required && !value.trim()){
                 newErrors[name] = `Campo ${name} obrigatório!`
             }
-
+            if (name === "nome" && value && value.length < 3) {
+                newErrors[name] = "O nome deve ter pelo menos 3 caracteres";
+            }
             if (name === "email" && value && !emailRegex.test(value)) {
                 newErrors[name] = "Não é um e-mail válido";
             }
@@ -82,14 +89,27 @@ export default function CadastroUser() {
             const data = Object.fromEntries(formData.entries())
             // console.log(data)
 
-            const resposta = await login(data)
+            if(data.senha !== data.confirmSenha){
+                setErros({ confirmSenha: "As senhas não coincidem" })
+                setValidated(true)
+                return
+            }
+
+            const resposta = await API.registerUser(data)
             // console.log(resposta)
             
             if(resposta.ok){
+                showToast(resposta.message, "success")
                 navigate("/");
             } else {
-                setErros(resposta || { login: "Email ou senha inválidos" })
-                setValidated(true)
+                if(resposta.error.email){
+                    setErros(resposta.error)
+                    showToast(resposta.error.email, "error")
+                } else {
+                    showToast(resposta.message, "error")
+                    setErros(resposta || { login: "Email ou senha inválidos" })
+                    setValidated(true)
+                }
             }
             
             // if (data.email === autentc.email && data.senha === autentc.senha){
@@ -153,29 +173,4 @@ export default function CadastroUser() {
             <Footer />
         </div>
     );
-}
-
-function Erros({ erros }) {
-    // console.log(erros)
-    return (
-        Object.keys(erros).length > 0 && (
-            <Row className="justify-content-md-center mt-3">
-                <Col md={4} className="text-center">
-                    <Alert variant="danger"  role="alert">
-                        <ul className="mb-0">
-                            {Object.keys(erros).map((key) => {
-                                if(!erros[key]){
-                                    return null
-                                }else{
-                                    return (
-                                        <li key={key}>{erros[key]}</li>
-                                    )
-                                }
-                            })}
-                        </ul>
-                    </Alert>
-                </Col>
-            </Row>
-        )
-    )
 }
