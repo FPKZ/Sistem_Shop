@@ -44,7 +44,7 @@ const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy, handlePrintC
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    console.log(dadosProcessados);
+    // console.log(dadosProcessados);
 
     return (
       <ListGroup
