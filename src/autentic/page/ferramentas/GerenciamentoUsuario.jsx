@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import API from "@app/api"
 import utils from "@app/utils"
 import { Bell, Check, CheckCircle, Edit, PenBox, Search, Trash2, User, UserPlus, XCircle } from "lucide-react"
-import ToastCuston from "@components/ToastCuston"
+import { useToast } from "@contexts/ToastContext"
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao"
 import "../../../../public/css/components/footer.css"
 import "../../../../public/css/sistem/ferramentas.css"
@@ -29,8 +29,11 @@ export default function GerenciamentoUsuario(){
     const [ modalCadastroUser, setModalCadastroUser ] = useState(false)
     const [ modalInfoUser, setModalInfoUser ] = useState(false)
 
-    const [ toast, setToast ] = useState(false)
-    const [ toastMesage, setToastMesage ] = useState("")
+    const [ modalSenha, setModalSenha ] = useState(false)
+
+
+    const { showToast } = useToast()
+
     // const navigate = useNavigate()
 
     const camposFiltragem = [
@@ -79,25 +82,20 @@ export default function GerenciamentoUsuario(){
     const deleteSolicitacao = async (solict) => {
         const response = await API.deleteSolicitacao(solict.id)
         if(!response.ok){
-            setToastMesage(response.message || response.error)
-            setToast(true)
+            showToast(response.message || response.error, "error")
             return
         }
-        setToastMesage(response.message)
-        setToast(true)
-        console.log(response)
+        showToast(response.message, "success")
         setAtt(!att)
     }
     
     const aproveSolicitacao = async (solict) => {
         const response = await API.aproveSolicitacoes(solict.id)
         if(!response.ok){
-            setToastMesage(response.message || response.error)
-            setToast(true)
+            showToast(response.message || response.error, "error")
             return
         }
-        setToastMesage(response.message)
-        setToast(true)
+        showToast(response.message, "success")
         setAtt(!att)
     }
 
@@ -105,8 +103,11 @@ export default function GerenciamentoUsuario(){
 
     const deleteUser = async (user) => {
         const response = await API.deleteUser(user.id)
-        setToastMesage(response.message || response.error)
-        setToast(true)
+        if(!response.ok){
+            showToast(response.message || response.error, "error")
+            return
+        }
+        showToast(response.message, "success")
         await getUsers()
     }
 
@@ -123,11 +124,10 @@ export default function GerenciamentoUsuario(){
         const data_refatorada = Object.fromEntries(result.entries())
         const response = await API.cadastrarUser(data_refatorada)
         if(!response.ok){
-            console.log(response)
-            setToastMesage(response.message || response.error)
-            setToast(true)
+            showToast(response.message || response.error, "error")
             return
         }
+        showToast(response.message, "success")
         setModalCadastroUser(false)
         setAtt(!att)
     }
@@ -138,10 +138,10 @@ export default function GerenciamentoUsuario(){
         const data_refatorada = Object.fromEntries(form.entries())
         const response = await API.editarUser(data_refatorada)
         if(!response.ok){
-            setToastMesage(response.message || response.error)
-            setToast(true)
+            showToast(response.message || response.error, "error")
             return
         }
+        showToast(response.message, "success")
         setModalInfoUser(false)
         setAtt(!att)
     }
@@ -157,6 +157,22 @@ export default function GerenciamentoUsuario(){
             return updateValues
 
         })
+    }
+
+    const handleModalSenha = (user) => {
+        setUserEdit(user)
+        setModalSenha(true)
+    }
+
+    const resetSenha = async () => {
+        const response = await API.resetSenha(userEdit.id)
+        if(!response.ok){
+            showToast(response.message || response.error, "error")
+            return
+        }
+        showToast(response.message, "success")
+        setModalSenha(false)
+        setAtt(!att)
     }
 
     return (<>
@@ -244,7 +260,7 @@ export default function GerenciamentoUsuario(){
             </Container>
         </main>
 
-        <Modal show={modalInfoUser} onHide={() => setModalInfoUser(false)} size="sm" centered>
+        <Modal show={modalInfoUser} onHide={() => setModalInfoUser(false)} size="md" centered>
             <Modal.Header className="border-0 mb-0" closeButton >
                 <Modal.Title>Editar Usuario</Modal.Title>
             </Modal.Header>
@@ -265,6 +281,9 @@ export default function GerenciamentoUsuario(){
                             </Form.Group>
                         </Col>
                         <Col xs={12}>
+                            <Button size="sm" className="btn-roxo w-100" onClick={() => handleModalSenha(userEdit)}>Resetar Senha</Button>
+                        </Col>
+                        <Col xs={12}>
                             <Form.Group>
                                 <Form.Label>Permissão:</Form.Label>
                                 <Form.Select type="text" name="cargo" value={userEdit.cargo} onChange={handleChange} required>
@@ -281,7 +300,22 @@ export default function GerenciamentoUsuario(){
             </Modal.Body>
         </Modal>
 
-        <Modal show={modalDeletUser} onHide={() => setModalDeletUser(false)} size="sm" centered backdrop={false}>
+        <Modal show={modalSenha} onHide={() => setModalSenha(false)} size="md" centered backdrop={false}>
+            <Modal.Body className="d-flex flex-column justify-content-center align-items-center gap-3">
+                    <Row>
+                        <Modal.Title>Deseja resetar a senha do usuario?</Modal.Title>
+                    </Row>
+                    <Row><Modal.Title>{userDelet.nome}</Modal.Title></Row>
+                    <Row className="mt-3">
+                        <Col className="d-flex gap-2">
+                            <Button variant="success" onClick={() => resetSenha()}>Resetar</Button>
+                            <Button variant="danger" onClick={() => setModalSenha(false)}>Cancelar</Button>
+                        </Col>
+                    </Row>
+            </Modal.Body>
+        </Modal>
+
+        <Modal show={modalDeletUser} onHide={() => setModalDeletUser(false)} size="md" centered backdrop={false}>
             <Modal.Body className="d-flex flex-column justify-content-center align-items-center gap-3">
                     <Row>
                         <Modal.Title>Deseja excluir o usuario</Modal.Title>
@@ -296,7 +330,7 @@ export default function GerenciamentoUsuario(){
             </Modal.Body>
         </Modal>
 
-        <Modal show={modalCadastroUser} onHide={() => setModalCadastroUser(false)} size="sm" centered  >
+        <Modal show={modalCadastroUser} onHide={() => setModalCadastroUser(false)} size="md" centered  >
             <Modal.Header className="border-0 mb-0" closeButton >
                 <Modal.Title>Cadastrar Novo Usuario</Modal.Title>
             </Modal.Header>
@@ -338,7 +372,6 @@ export default function GerenciamentoUsuario(){
             </Modal.Body>
         </Modal>
         {/* <Button onClick={() => setToast(true)} >toast</Button> */}
-        <ToastCuston visible={toast} onClose={() => setToast(false)} >{toastMesage}</ToastCuston>
     </>
     )
 }

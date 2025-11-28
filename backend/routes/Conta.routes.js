@@ -28,7 +28,7 @@ export default async function contaRoutes(fastify) {
             const conta = await Conta.findOne({ where: { email } });
 
             if(!conta) {
-                reply.code(401).send({ error: "Credenciais inválidas" });
+                reply.code(401).send({ error: "Credenciais inválidas", ok: false });
                 return
             }
             
@@ -38,12 +38,12 @@ export default async function contaRoutes(fastify) {
                 const token = jwt.sign({ id: conta.id, email: conta.email, nome: conta.nome, img: conta.img }, SECRET, { expiresIn: '4h' });
                 reply.send({ message: "Login bem-sucedido", conta, token, ok: true });
             } else {
-                reply.code(401).send({ error: "Credenciais inválidas" });
+                reply.code(401).send({ error: "Credenciais inválidas", ok: false });
             }
 
         } catch (err) {
             console.log(err);
-            reply.code(500).send({ error: "Erro ao processar login" });
+            reply.code(500).send({ error: "Erro ao processar login", ok: false });
         }
     });
 
@@ -58,6 +58,23 @@ export default async function contaRoutes(fastify) {
         } catch(err){
             console.log(err)
             reply.code(500).send({ error: "Erro ao alterar usuario", ok: false})
+        }
+    })
+    fastify.put("/reset-senha/:id", async (request, reply) => {
+        try{
+            const conta = await Conta.findByPk(request.params.id)
+            if(!conta) return reply.code(404).send({ message: "Usuario não encontrado!", ok: false})
+            
+            const senha = "mudar123"
+
+            const senhaHash = await bcrypt.hash(senha, 10)
+
+            await conta.update({ senha: senhaHash })
+
+            reply.code(200).send({ message: "Senha alterada com sucesso!", conta: {senha: senha, ...conta}, ok: true})
+        } catch(err){
+            console.log(err)
+            reply.code(500).send({ error: "Erro ao alterar senha", ok: false})
         }
     })
 
@@ -96,13 +113,16 @@ export default async function contaRoutes(fastify) {
             await pedidosRegistros.sync()
 
             const { nome, email, senha } = request.body
+            const conta = await Conta.findOne({ where: { email } })
+            if(conta) return reply.code(500).send({ message: "Usuario já existe", ok: false, error: { email: "Email ja cadastrado"}})
+
             const novaSenha = await bcrypt.hash(senha, 10);
 
             const novaSolicitacao = await Solicitacao.create({ nome, email, senha: novaSenha })
-            reply.code(200).send({ message: "Solicitação criada com sucesso!", novaSolicitacao})
+            reply.code(200).send({ message: "Pedido de registro realizado com sucesso!", novaSolicitacao, ok: true})
         } catch(err) {
             console.log(err)
-            reply.code(500).send({ error: "Erro ao cadastrar solicitação!"})
+            reply.code(500).send({ error: "Erro ao realizar pedido de registro!", ok: false})
         }
     })
 
@@ -127,7 +147,8 @@ export default async function contaRoutes(fastify) {
             const data = {
                 nome: solicitacao.nome,
                 email: solicitacao.email,
-                senha: solicitacao.senha
+                senha: solicitacao.senha,
+                cargo: "User"
             }
             const novaConta = Conta.create(data)
 
