@@ -199,7 +199,7 @@ const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy, handlePrintC
             <Printer size={16} className="me-2" />
             Imprimir
           </Button>
-          {selectNota.status === "pendente" && (
+          {selectNota.status === "pendente" || selectNota.status === "vencido" ? (
             <Button
               variant="success"
               onClick={() => {
@@ -210,7 +210,7 @@ const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy, handlePrintC
               <DollarSign size={16} className="me-2" />
               Pagar
             </Button>
-          )}
+          ) : null}
         </div>
       </Modal.Footer>
     </Modal>

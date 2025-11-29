@@ -2,6 +2,8 @@ import { Form, Modal, Row, Col, Button } from "react-bootstrap"
 import { useState } from "react"
 import API from "@app/api"
 import { useNavigate } from "react-router-dom"
+import { useToast } from "@contexts/ToastContext"
+import { useLoadRequest } from "@hooks/useLoadRequest"
 
 export default function ModalCliente({visible, onClose}){
 
@@ -10,9 +12,12 @@ export default function ModalCliente({visible, onClose}){
     const [validated, setValidated] = useState(false)
 
     const navigate = useNavigate()
+    const { showToast } = useToast()    
+    const [ isLoading, request ] = useLoadRequest()
 
     function handleChange(e){
-        const { name, value/*, type*/ } = e.target
+        // eslint-disable-next-line no-unused-vars
+        const { name, value, type } = e.target
         let newValue = value
 
         if(name === "telefone"){
@@ -41,7 +46,7 @@ export default function ModalCliente({visible, onClose}){
 
         if (name === "email") {
             newValue = value.trim();
-            }
+          }
 
         setFormValue({
             ...formValue,
@@ -73,7 +78,7 @@ export default function ModalCliente({visible, onClose}){
     }
 
 
-        const handleSubimit = async (e) => {
+     const handleSubimit = async (e) => {
         e.preventDefault()
         const form = e.target;
 
@@ -86,9 +91,25 @@ export default function ModalCliente({visible, onClose}){
         if(Object.keys(newErrors).length === 0){
             const formData = new FormData(e.target)
             const data = Object.fromEntries(formData.entries())
-            console.log(data)
-            const responsta = await API.postClientes(data)
-            if(responsta.ok) navigate(-1)
+
+            await request(async () => {
+                try{
+                    const responsta = await API.postClientes(data)
+
+                    if(responsta.ok) {
+                        showToast(responsta.message, "success")
+                        navigate(-1)
+                    }else {
+                        if(responsta.message){
+                            showToast(responsta.message || responsta.error, "error")
+                        }
+                    }
+                } catch(err){
+                    console.error(err)
+                    showToast(err, "error")
+                }
+            })
+            
         }
     }
 
@@ -107,7 +128,7 @@ export default function ModalCliente({visible, onClose}){
                         </Col>
                         <Col md={4}>
                             <label htmlFor="email" className="form-label">E-mail</label>
-                            <input type="email" className={`form-control ${validated ? (erros.email ? `is-invalid` : `is-valid`) : "" }`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" required/>
+                            <input type="email" className={`form-control`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" />
                         </Col>
                         <Col>
                             <label htmlFor="tell" className="form-label">Telefone</label>
@@ -115,7 +136,7 @@ export default function ModalCliente({visible, onClose}){
                         </Col>
                         <Col md={5}>
                             <label htmlFor="endereco" className="form-label">Endereço</label>
-                            <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
+                            <input type="text" className={`form-control`} id="endereco" name="endereco" placeholder="Endereco" />
                         </Col>
                         <Button className="btn btn-roxo" type="submit">Adicionar</Button>
                     </Row>

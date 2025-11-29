@@ -128,7 +128,7 @@ export default function TableNota({notas, handleShowDetails, mobile, handleBuy, 
                             <Dropdown.Menu align="end" renderOnMount>
                                 <Dropdown.Item onClick={() => handleShowDetails(nota)}>Ver Detalhes</Dropdown.Item>
                                 <Dropdown.Item onClick={() => handlePrintCustom(nota)}>Baixar PDF</Dropdown.Item>
-                                {nota.status !== "pago" && <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>}
+                                {nota.status !== "pago" ? <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item> : nota.status === "vencido" ? <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item> : null}
                             </Dropdown.Menu>
                             </Dropdown>
                         </Col>
