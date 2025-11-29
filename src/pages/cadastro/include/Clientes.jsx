@@ -3,6 +3,7 @@ import API from "@app/api"
 import { useNavigate } from "react-router-dom"
 import { Button, Col } from "react-bootstrap"
 import { useToast } from "@contexts/ToastContext"
+import { useLoadRequest } from "@hooks/useLoadRequest"
 
 export default function Clientes(){
 
@@ -11,7 +12,8 @@ export default function Clientes(){
     const [validated, setValidated] = useState(false)
 
     const navigate = useNavigate()
-    const { showToast } = useToast()
+    const { showToast } = useToast()    
+    const [ isLoading, request ] = useLoadRequest()
 
     function handleChange(e){
         // eslint-disable-next-line no-unused-vars
@@ -89,17 +91,25 @@ export default function Clientes(){
         if(Object.keys(newErrors).length === 0){
             const formData = new FormData(e.target)
             const data = Object.fromEntries(formData.entries())
-            console.log(data)
-            const responsta = await API.postClientes(data)
-            console.log(responsta)
-            if(responsta.ok) {
-                showToast(responsta.message, "success")
-                navigate(-1)
-            }else {
-                if(responsta.message){
-                    showToast(responsta.message, "error")
+
+            await request(async () => {
+                try{
+                    const responsta = await API.postClientes(data)
+
+                    if(responsta.ok) {
+                        showToast(responsta.message, "success")
+                        navigate(-1)
+                    }else {
+                        if(responsta.message){
+                            showToast(responsta.message || responsta.error, "error")
+                        }
+                    }
+                } catch(err){
+                    console.error(err)
+                    showToast(err, "error")
                 }
-            }
+            })
+            
         }
     }
 
@@ -113,7 +123,7 @@ export default function Clientes(){
                     </Col>
                     <Col md={4} className="p-0">
                         <label htmlFor="email" className="form-label">E-mail</label>
-                        <input type="email" className={`form-control ${validated ? (erros.email ? `is-invalid` : `is-valid`) : "" }`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" required/>
+                        <input type="email" className={`form-control`} id="email" name="email" value={formValue.email || ""} onChange={handleChange} placeholder="E-mail" />
                     </Col>
                     <Col className="p-0">
                         <label htmlFor="tell" className="form-label">Telefone</label>
@@ -121,9 +131,9 @@ export default function Clientes(){
                     </Col>
                     <Col md={5} className="p-0">
                         <label htmlFor="endereco" className="form-label">Endereço</label>
-                        <input type="text" className={`form-control ${validated ? (erros.endereco ? `is-invalid` : `is-valid`) : "" }`} id="endereco" name="endereco" placeholder="Endereco" required/>
+                        <input type="text" className={`form-control`} id="endereco" name="endereco" placeholder="Endereco" />
                     </Col>
-                    <Button className="btn btn-roxo" type="submit">Adicionar</Button>
+                    <Button variant="outline-secondary" className="btn btn-roxo" disabled={isLoading} type="submit">Adicionar</Button>
                 </div>
             </form>
         </>

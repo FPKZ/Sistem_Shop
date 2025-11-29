@@ -5,6 +5,7 @@ import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useToast } from "@contexts/ToastContext";
+import { useLoadRequest } from "@hooks/useLoadRequest";
 
 export default function Produtos() {
   const [categoria, setCategoria] = useState({});
@@ -16,7 +17,7 @@ export default function Produtos() {
 
   const [modalCriar, setModalCriar] = useState(false);
 
-  const [itensCriados, setItensCriados] = useState(null);
+  const [itensCriados, setItensCriados] = useState([]);
 
   const [erros, setErros] = useState({});
   const [validated, setValidated] = useState(false);
@@ -35,6 +36,8 @@ export default function Produtos() {
   });
 
   const { showToast } = useToast();
+
+  const [ isLoading, request] = useLoadRequest();
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
@@ -122,16 +125,23 @@ export default function Produtos() {
 
         finalFormData.set("itens", JSON.stringify(itens));
 
-        const response = await API.postProduto(finalFormData);
-        if (response.ok) {
-          if (response.itensEstoque) {
-            allItensCriados = allItensCriados.concat(response.itensEstoque);
+        await request(async () => {
+          try{
+            const response = await API.postProduto(finalFormData);
+            
+            if (response.ok) {
+              if (response.itensEstoque) {
+                allItensCriados = allItensCriados.concat(response.itensEstoque);
+              }
+            } else {
+              if (response.message) {
+                showToast(response.message, "error");
+              }
+            }
+          } catch (error) {
+            console.log(error);
           }
-        } else {
-          if (response.message) {
-            showToast(response.message, "error");
-          }
-        }
+        })
       }
 
       if (allItensCriados.length > 0) {
@@ -184,14 +194,10 @@ export default function Produtos() {
           <Col xs={10} md={4}>
             <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
             <Form.Control
-              className={
-                validated ? (erros.img ? "is-invalid" : "is-valid") : ""
-              }
               name="img"
               id="imgProduto"
               type="file"
               onChange={handleChange}
-              required
             />
           </Col>
 
@@ -266,7 +272,7 @@ export default function Produtos() {
               }
               name="tamanho"
               id="tamanhoProduto"
-              type="number"
+              type="text"
               value={formValue.tamanho}
               onChange={handleChange}
               placeholder="Tamanho"
@@ -434,8 +440,8 @@ export default function Produtos() {
         {/* Botão Salvar */}
         <Row>
           <Col xs={12}>
-            <Button className="btn-roxo w-100" type="submit">
-              Salvar
+            <Button variant="outline-secondary" className="btn-roxo w-100" disabled={isLoading} type="submit">
+              Cadastrar
             </Button>
           </Col>
         </Row>

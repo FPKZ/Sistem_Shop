@@ -4,6 +4,7 @@ import { put } from "@vercel/blob"
 import { randomUUID } from "crypto";
 import { Buffer } from "buffer";
 import "dotenv/config"
+import { setTimeout } from "timers/promises"
 //const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
@@ -98,8 +99,6 @@ export default async function produtoRoutes(fastify) {
 
   fastify.post("/produto", async (request, reply) => {
     try{
-      //const query = request.query.query
-      //console.log(query)
 
       const data = await request.parts()
       const body = {}

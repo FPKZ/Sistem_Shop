@@ -59,7 +59,7 @@ export async function postCategoria(data){
             body: JSON.stringify(data)
         })
         //console.log(response.status)
-        return response
+        return await response.json()
     } catch (error){
         console.error("Erro ao cadastrar categoria", error)
     }

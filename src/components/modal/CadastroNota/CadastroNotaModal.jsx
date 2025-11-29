@@ -7,6 +7,7 @@ import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import API from "@app/api";
 import { useToast } from "@contexts/ToastContext";
 import { useOutletContext } from "react-router-dom";
+import { useLoadRequest } from "@hooks/useLoadRequest";
 
 export default function CadastroNotaModal({ visible, onClose }) {
   const [formValue, setFormValue] = useState({});
@@ -25,6 +26,8 @@ export default function CadastroNotaModal({ visible, onClose }) {
   const [itensCriados, setItensCriados] = useState(null);
 
   const { showToast } = useToast();
+
+  const [isLoading, request] = useLoadRequest();
 
   // Update formValue.quantidade when produtos changes IF incluirProdutos is true
   useEffect(() => {
@@ -127,29 +130,34 @@ export default function CadastroNotaModal({ visible, onClose }) {
           }
         });
       }
-
       // console.log("Dados a serem enviados:", Object.fromEntries(finalFormData));
-      const response = await API.postNota(finalFormData);
-
-      if (response.ok) {
-        if (response.produtos) {
-          let itensCriados = [];
-          for (const itens of response.produtos) {
-            itensCriados = itensCriados.concat(itens.itensEstoque);
+      await request(async () => {
+        try {
+          const response = await API.postNota(finalFormData);
+          
+          if (response.ok) {
+            if (response.produtos) {
+              let itensCriados = [];
+              for (const itens of response.produtos) {
+                itensCriados = itensCriados.concat(itens.itensEstoque);
+              }
+              setItensCriados(itensCriados);
+              setModalCriar(true);
+              showToast(response.message, "success");
+            } else {
+              if (response.message) {
+                showToast(response.message, "success");
+              }
+              // Se não houver produtos criados (ex: nota sem produtos), apenas fecha ou limpa
+              onClose();
+            }
+          } else {
+            showToast(response.message || response.error, "error");
           }
-          setItensCriados(itensCriados);
-          setModalCriar(true);
-          showToast(response.message, "success");
-        } else {
-          if (response.message) {
-            showToast(response.message, "error");
-          }
-          // Se não houver produtos criados (ex: nota sem produtos), apenas fecha ou limpa
-          onClose();
+        } catch (error) {
+          console.log(error);
         }
-      } else {
-        showToast(response.message, "error");
-      }
+      })
     }
   };
 
@@ -162,10 +170,10 @@ export default function CadastroNotaModal({ visible, onClose }) {
         size="xl"
         centered
         contentClassName={`${
-          mobile ? "h-100" : produtos.length > 0 ? "h-75" : "h-0"
+          mobile ? "h-100" : produtos.length > 0 ? "h-90" : "h-0"
         }`} // Altura total para permitir flex
         dialogClassName={`${
-          mobile ? "h-100" : produtos.length > 0 ? "h-75" : "h-0"
+          mobile ? "h-100" : produtos.length > 0 ? "h-90" : "h-0"
         }`} // Altura total para o dialog
       >
         <Form
@@ -342,7 +350,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
             <div className="mt-3 flex-shrink-0">
               <button
                 className="btn btn-roxo w-100"
-                disabled={modalCadastroPrduto}
+                disabled={isLoading || modalCadastroPrduto}
                 type="submit"
               >
                 Salvar Nota

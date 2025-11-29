@@ -18,9 +18,10 @@ import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import API from "@app/api";
 
-import { useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useToast } from "@contexts/ToastContext";
+import { useLoadRequest } from "@hooks/useLoadRequest";
 
 export default function Notas() {
   const [formValue, setFormValue] = useState({});
@@ -37,9 +38,10 @@ export default function Notas() {
 
   const [itensCriados, setItensCriados] = useState(null);
 
-  const { mobile } = useOutletContext();
-
   const { showToast } = useToast();
+  const [isLoading, request] = useLoadRequest();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (incluirProdutos) {
@@ -154,26 +156,40 @@ export default function Notas() {
 
       console.log("Dados a serem enviados:", Object.fromEntries(finalFormData));
       // Aqui você faria a chamada para a API para cadastrar a nota
-      const response = await API.postNota(finalFormData);
-      // const response = ObjectText
-      if (response.ok) {
-        if (response.produtos) {
-          let itensCriados = [];
-          for (const itens of response.produtos) {
-            itensCriados = itensCriados.concat(itens.itensEstoque);
+      await request(async () => {
+        try{
+          const response = await API.postNota(finalFormData);
+
+          if(!response.ok){
+            showToast(response.message || response.error, "error");
+            return
           }
-          setItensCriados(itensCriados);
-          setModalCriar(true);
-          showToast(response.message, "success");
-        } else {
-          if (response.message) {
-            showToast(response.message, "error");
+
+          // const response = ObjectText
+          if (response.ok) {
+            if (response.produtos) {
+              let itensCriados = [];
+              for (const itens of response.produtos) {
+                itensCriados = itensCriados.concat(itens.itensEstoque);
+              }
+              setItensCriados(itensCriados);
+              setModalCriar(true);
+              showToast(response.message || response.error, "success");
+              navigate(-1)
+            } else {
+              if (response.message) {
+                showToast(response.message || response.error, "success");
+                navigate(-1)
+              }
+            }
+          } else {
+            showToast(response.message || response.error, "error");
           }
+          // console.log(response)
+        } catch(err){
+          console.log(err)
         }
-      } else {
-        showToast(response.message, "error");
-      }
-      // console.log(response)
+      })
     }
   };
   //  console.log(produtos)
@@ -319,7 +335,6 @@ export default function Notas() {
             <div className="flex-grow-1 overflow-y-auto bg-white">
               {produtos.length > 0 ? (
                 <TabelaProdutosNota
-                  mobile={mobile}
                   produto={produtos}
                   setItemEstoque={setItemEstoque}
                   setmodalInfoProduto={setmodalInfoProduto}
@@ -333,7 +348,7 @@ export default function Notas() {
           </div>
         )}
 
-        <Button className="btn-roxo mt-3 w-100" type="submit">
+        <Button variant="outline-secondary" className="btn-roxo mt-3 w-100" disabled={isLoading || modalCadastroPrduto} type="submit">
           Adicionar
         </Button>
       </Form>

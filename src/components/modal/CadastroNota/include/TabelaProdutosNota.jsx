@@ -1,5 +1,6 @@
 import { Container, Card, Col, Row, Badge } from "react-bootstrap";
 import utils from "@app/utils";
+import img from "@assets/logo.svg?url";
 
 export default function TabelaProdutosNota({
   produto,
@@ -99,22 +100,22 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               className="rounded border d-flex align-items-center justify-content-center mx-auto"
               style={{ width: "40px", height: "40px", overflow: "hidden" }}
             >
-              {produtos.img ? (
-                <img
-                  src={
-                    typeof produtos.img === "string"
+              <img
+                src={
+                  produtos.img
+                    ? typeof produtos.img === "string"
                       ? produtos.img
                       : URL.createObjectURL(produtos.img)
-                  }
-                  alt={produtos.nome}
-                  className="img-fluid"
-                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                />
-              ) : (
-                <span className="text-muted" style={{ fontSize: "0.6rem" }}>
-                  Sem img
-                </span>
-              )}
+                    : img
+                }
+                onError={(e) => {
+                  e.target.onerror = null; // Previne loop infinito
+                  e.target.src = img;
+                }}
+                alt={produtos.nome}
+                className="img-fluid"
+                style={{ objectFit: "cover", width: "100%", height: "100%" }}
+              />
             </div>
           </Col>
 
@@ -124,7 +125,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               {produtos.nome}
             </div>
             <div className="text-muted small text-truncate">
-              {itemDetalhe.marca} - {itemDetalhe.cor} - {itemDetalhe.tamanho}
+              {itemDetalhe.marca} - {/*{itemDetalhe.cor} -*/}  {itemDetalhe.tamanho}
             </div>
           </Col>
 

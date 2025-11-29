@@ -23,7 +23,8 @@ export default defineConfig({
       '@tabelas': path.resolve(__dirname, './src/components/modal/Tabelas'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@autentic-sistem': path.resolve(__dirname, './src/autentic/sistem'),
-      "@contexts": path.resolve(__dirname, "./src/contexts")
+      "@contexts": path.resolve(__dirname, "./src/contexts"),
+      "@assets": path.resolve(__dirname, "./public/assets")
     },
   },
 });

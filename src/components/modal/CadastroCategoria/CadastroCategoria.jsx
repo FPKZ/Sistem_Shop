@@ -2,6 +2,7 @@ import { Button, Form, Modal, Row } from "react-bootstrap";
 import { useState } from "react";
 import API from "@app/api";
 import Erros from "@components/Erros";
+import { useLoadRequest } from "@hooks/useLoadRequest";
 
 
 export default function CadastroCategoria({ visible, onClose }){
@@ -9,6 +10,7 @@ export default function CadastroCategoria({ visible, onClose }){
     const [formValue, setFormValue] = useState({})
     const [erros, setErros] = useState({})
     const [validated, setValidated] = useState(false)
+    const [isLoading, request] = useLoadRequest()
 
     function handleChange(e){
         const { name, value } = e.target
@@ -48,16 +50,19 @@ export default function CadastroCategoria({ visible, onClose }){
         if(Object.keys(newErrors).length === 0){
             const data = new FormData(e.target)
             const data_refatorada = Object.fromEntries(data.entries())
-            console.log(data_refatorada)
-            const resp = await API.postCategoria(data_refatorada)
-            const response = await (resp).json()
-            console.log(response)
-            if (!response.ok){
-                setErros({error: response.message, nome: "skip", descricao: "skip"})
-            }
-            if(response.ok){
-                onClose()
-            }
+            await request( async () => {
+                try{
+                    const response = await API.postCategoria(data_refatorada)
+                    if (!response.ok){
+                        setErros({error: response.message, nome: "skip", descricao: "skip"})
+                    }
+                    if(response.ok){
+                        onClose()
+                    }
+                } catch (error){
+                    console.error("Erro ao cadastrar categoria", error)
+                }
+            })
         }
     }
     
@@ -78,7 +83,7 @@ export default function CadastroCategoria({ visible, onClose }){
                             <Form.Control type="text" className={`form-control ${validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""}`} name="descricao" onChange={handleChange} required />
                         </Form.Group>
                         <Form.Group>
-                            <Button className="btn btn-roxo w-100" type="submit">Cadastrar</Button>
+                            <Button variant="outline-secondary" className="btn btn-roxo w-100" type="submit">Cadastrar</Button>
                         </Form.Group>
                     </Row>
                 </Modal.Body>
