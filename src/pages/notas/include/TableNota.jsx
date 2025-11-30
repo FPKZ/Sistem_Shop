@@ -90,7 +90,7 @@ export default function TableNota({notas, handleShowDetails, mobile, handleBuy, 
             {/* Itens da Lista */}
             <div className="list-container">
                 {notas.map((nota) => (
-                    <Card key={nota.id} className="mb-2 shadow-sm" style={{ cursor: 'pointer'}} onClick={() => handleShowDetails(nota)}>
+                    <Card key={nota.id} className="mb-2 shadow-sm hover:scale-102 transition cursor-pointer" onClick={() => handleShowDetails(nota)}>
                     <Card.Body className="p-3">
                         <Row className="align-items-center">
                         <Col xs={6} md={2} className="mb-2 mb-md-0">

@@ -230,7 +230,7 @@ function Clientes() {
                   {currentItems.map((cliente) => (
                     <div
                       key={cliente.id}
-                      className={`${mobile ? "card rounded-3 overflow-hidden" : ""}`}
+                      className={`hover:bg-gray-100 transition cursor-pointer ${mobile ? "card rounded-3 overflow-hidden" : ""}`}
                     >
                       <Card.Body className={`${mobile ? "" : "border-top"}`} onClick={() => mobile && handleShowDetails(cliente)}>
                         <div

@@ -283,7 +283,7 @@ export default function Produtos() {
 
         <Row className="g-3 mb-3 pb-4 border-bottom">
           {/* Nota */}
-          <Col xs={12} md={5}>
+          <Col xs={12} md={4}>
             <Form.Label htmlFor="notaProduto">Nota</Form.Label>
             <Dropdown>
               <Dropdown.Toggle
@@ -333,7 +333,7 @@ export default function Produtos() {
           </Col>
 
           {/* Quantidade */}
-          <Col xs={2} md={1}>
+          <Col xs={2} md={2}>
             <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
             <Form.Control
               name="quantidade"

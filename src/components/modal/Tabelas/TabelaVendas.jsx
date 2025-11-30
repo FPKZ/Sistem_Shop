@@ -1,7 +1,13 @@
-import { ButtonGroup, Table, Button, Badge } from "react-bootstrap";
+import { Row, Col, Button, Badge } from "react-bootstrap";
 import utils from "@app/utils";
+import { EyeIcon } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
 
-export default function TabelaClientes({ vendas, onView }) {
+export default function TabelaVendas({ vendas, onView }) {
+
+  const { mobile } = useOutletContext();
+
+  console.log(vendas);
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
       case "concluida":
@@ -18,68 +24,103 @@ export default function TabelaClientes({ vendas, onView }) {
   };
 
   return (
-    <div className="table-responsive">
-      <Table hover className="align-middle mb-0">
-        <thead className="bg-light">
-          <tr>
-            <th className="border-0 text-secondary small text-uppercase">ID</th>
-            <th className="border-0 text-secondary small text-uppercase">
-              Cliente
-            </th>
-            <th className="border-0 text-secondary small text-uppercase">
-              Data
-            </th>
-            <th className="border-0 text-secondary small text-uppercase">
-              Valor
-            </th>
-            <th className="border-0 text-secondary small text-uppercase">
-              Status
-            </th>
-            <th className="border-0 text-secondary small text-uppercase text-end">
-              Ações
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {vendas && vendas.length > 0 ? (
-            vendas.map((venda) => (
-              <tr key={venda.id}>
-                <td className="fw-bold">#{venda.id}</td>
-                <td>{venda.cliente?.nome || "Cliente N/A"}</td>
-                <td>{utils.formatDate(venda.data_venda)}</td>
-                <td className="fw-bold text-dark">
-                  {utils.formatMoney(venda.valor_total)}
-                </td>
-                <td>
-                  <Badge
-                    bg={getStatusBadge(venda.status)}
-                    className="fw-normal"
-                  >
-                    {utils.capitalize(venda.status)}
-                  </Badge>
-                </td>
-                <td className="text-end">
-                  <Button
-                    variant="light"
-                    size="sm"
-                    className="text-primary btn-icon"
-                    onClick={() => onView(venda)}
-                    title="Visualizar Detalhes"
-                  >
-                    <i className="bi bi-eye"></i>
-                  </Button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center py-4 text-muted">
-                Nenhuma venda encontrada.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+    <div className=" d-flex flex-column gap-2">
+      {/* Header - Only visible on desktop */}
+      <Row className="tabela-vendas-header d-none d-md-flex bg-light py-2 px-3 mb-2 rounded">
+        <Col md={1} className="text-secondary small text-uppercase fw-bold">
+          ID
+        </Col>
+        <Col md={3} className="text-secondary small text-uppercase fw-bold">
+          Cliente
+        </Col>
+        <Col md={2} className="text-secondary small text-uppercase fw-bold">
+          Data
+        </Col>
+        <Col md={2} className="text-secondary small text-uppercase fw-bold">
+          Valor
+        </Col>
+        <Col md={2} className="text-secondary small text-uppercase fw-bold">
+          Status
+        </Col>
+        <Col md={2} className="text-secondary small text-uppercase fw-bold text-end">
+          Ações
+        </Col>
+      </Row>
+
+      {/* Body */}
+      {vendas && vendas.length > 0 ? (
+        vendas.map((venda) => (
+          <Row
+            key={venda.id}
+            className="tabela-vendas-row align-items-center py-3 px-2 px-md-3 mb-2 border rounded g-2 hover:scale-105 transition cursor-pointer"
+            onClick={() => onView(venda)}
+          >
+            {/* ID */}
+            <Col xs={2} md={1} className="mb-2 mb-md-0 order-1 order-md-0 text-end text-md-start">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                ID:
+              </span>
+              <span className="fw-bold">#{venda.id}</span>
+            </Col>
+
+            {/* Cliente */}
+            <Col xs={10} md={3} className="mb-2 mb-md-0 order-first order-md-0">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                Cliente:
+              </span>
+              <span>{venda.cliente?.nome || "Cliente N/A"}</span>
+            </Col>
+
+            {/* Data */}
+            <Col xs={4} md={2} className="mb-2 mb-md-0 order-3 order-md-0 text-center text-md-start">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                Data:
+              </span>
+              <span>{utils.formatDate(venda.data_venda)}</span>
+            </Col>
+
+            {/* Valor */}
+            <Col xs={4} md={2} className="mb-2 mb-md-0 order-4 order-md-0 text-end text-md-start">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                Valor:
+              </span>
+              <span className="fw-bold text-dark">
+                {utils.formatMoney(venda.total)}
+              </span>
+            </Col>
+
+            {/* Status */}
+            <Col xs={4} md={2} className="mb-2 mb-md-0 order-2 order-md-0">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                Status:
+              </span>
+              <Badge bg={getStatusBadge(venda.status)} className="fw-normal">
+                {utils.capitalize(venda.status)}
+              </Badge>
+            </Col>
+
+            {/* Ações */}
+            <Col xs={12} md={2} className="text-md-end order-last order-md-0">
+              <Button
+                variant="light"
+                size="sm"
+                className={`text-info text-center btn-icon ${mobile ? "w-100" : ""}`}
+                onClick={() => onView(venda)}
+                title="Visualizar Detalhes"
+              >
+                <EyeIcon size={20} color="#00bfff" />
+                <span className="d-md-none ms-2">Visualizar Detalhes</span>
+              </Button>
+            </Col>
+          </Row>
+        ))
+      ) : (
+        <Row>
+          <Col className="text-center py-4 text-muted">
+            Nenhuma venda encontrada.
+          </Col>
+        </Row>
+      )}
     </div>
   );
 }

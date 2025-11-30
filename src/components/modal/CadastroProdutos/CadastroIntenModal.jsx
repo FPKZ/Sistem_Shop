@@ -293,7 +293,7 @@ function CadastroIntenModal({
 
           <Row className="g-3 mb-3 pb-4 border-bottom">
              {!cadastroNota && (
-                 <Col xs={12} md={5}>
+                 <Col xs={12} md={4}>
                     <Form.Label htmlFor="notaProduto">Nota</Form.Label>
                     <Dropdown>
                         <Dropdown.Toggle
@@ -318,7 +318,7 @@ function CadastroIntenModal({
                  </Col>
              )}
              
-             <Col xs={10} md={!cadastroNota ? 6 : 10}>
+             <Col xs={10} md={!cadastroNota ? 6 : 9}>
                 <Form.Label htmlFor="codigoBarras">Código de Barras</Form.Label>
                 <Form.Control
                     className={validated ? (erros.codigo_barras ? "is-invalid" : "is-valid") : ""}
@@ -332,14 +332,13 @@ function CadastroIntenModal({
                 />
              </Col>
              
-             <Col xs={2} md={1}>
+             <Col xs={2} md={!cadastroNota ? 2 : 3}>
                 <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
                 <Form.Control
                     name="quantidade"
                     id="quantidadeProduto"
-                    type="number"
-                    placeholder="1"
-                    min="1"
+                    type="text"
+                    placeholder="G"
                     value={formValue.quantidade}
                     onChange={handleChange}
                     required

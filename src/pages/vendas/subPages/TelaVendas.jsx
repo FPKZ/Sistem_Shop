@@ -27,10 +27,13 @@ import {
 } from "recharts";
 import ModalDetalhesVenda from "./include/ModalDetalhesVenda";
 
+import { usePagination } from "@hooks/usePagination";
+import PaginationButtons from "@components/Pagination/PaginationButtons";
+import ItemsPerPageSelector from "@components/Pagination/ItemsPerPageSelector";
+
 const cardStyle = {
   cursor: "pointer",
-  fontSize: "0.9rem",
-  transition: "transform 0.2s",
+  fontSize: "0.9rem"
 };
 
 export default function TelaVendas() {
@@ -42,8 +45,19 @@ export default function TelaVendas() {
   const [showModal, setShowModal] = useState(false);
 
   // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const {
+    currentItems,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    handlePageChange,
+    // handleItemsPerPageChange,
+    // indexOfFirstItem,
+    // indexOfLastItem,
+    // totalItems,
+    setCurrentPage,
+    setItemsPerPage,
+  } = usePagination(vendas);
 
   useEffect(() => {
     getVendas();
@@ -106,11 +120,6 @@ export default function TelaVendas() {
     return Object.values(grouped).slice(-7);
   }, [vendas]);
 
-  // Pagination Logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = vendas.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(vendas.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -138,7 +147,7 @@ export default function TelaVendas() {
       <Row className="mb-4 g-3">
         <Col xs={12} sm={4}>
           <Card
-            className="h-100 border-0 shadow-sm text-white"
+            className="h-100 border-0 shadow-sm text-white hover:scale-105 transition cursor-pointer"
             style={{
               ...cardStyle,
               background: "linear-gradient(45deg, #6f42c1, #8d5bd6)",
@@ -156,7 +165,7 @@ export default function TelaVendas() {
         </Col>
         <Col xs={6} sm={4}>
           <Card
-            className="h-100 border-0 shadow-sm"
+            className="h-100 border-0 shadow-sm hover:scale-105 transition cursor-pointer"
             style={{ ...cardStyle, borderLeft: "4px solid #dc3545" }}
             onClick={() => navigate("Extorno")}
           >
@@ -171,7 +180,7 @@ export default function TelaVendas() {
         </Col>
         <Col xs={6} sm={4}>
           <Card
-            className="h-100 border-0 shadow-sm"
+            className="h-100 border-0 shadow-sm hover:scale-105 transition cursor-pointer"
             style={{ ...cardStyle, borderLeft: "4px solid #ffc107" }}
             onClick={() => navigate("Devolucao")}
           >
@@ -197,12 +206,12 @@ export default function TelaVendas() {
                   <span className="text-muted small">Exibir:</span>
                   <Form.Select
                     size="sm"
-                    style={{ width: "70px" }}
                     value={itemsPerPage}
                     onChange={(e) => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
+                    className="rounded-4 text-center"
                   >
                     <option value="5">5</option>
                     <option value="10">10</option>
@@ -214,29 +223,13 @@ export default function TelaVendas() {
               <TabelaVendas vendas={currentItems} onView={handleViewVenda} />
 
               {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-center mt-4">
-                  <Pagination>
-                    <Pagination.Prev
-                      onClick={() => paginate(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    />
-                    {[...Array(totalPages)].map((_, idx) => (
-                      <Pagination.Item
-                        key={idx + 1}
-                        active={idx + 1 === currentPage}
-                        onClick={() => paginate(idx + 1)}
-                      >
-                        {idx + 1}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next
-                      onClick={() => paginate(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
-                </div>
-              )}
+              <div className="my-2">
+                <PaginationButtons
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={paginate}
+                />
+              </div>
             </Card.Body>
           </Card>
         </Col>

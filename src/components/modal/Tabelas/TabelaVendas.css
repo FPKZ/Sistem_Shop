@@ -1,0 +1,47 @@
+.tabela-vendas-container {
+  width: 100%;
+}
+
+.tabela-vendas-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabela-vendas-row {
+  transition: all 0.2s ease-in-out;
+  background-color: #fff;
+}
+
+.tabela-vendas-row:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Mobile styles */
+@media (max-width: 767.98px) {
+  .tabela-vendas-row {
+    border-left: 4px solid #0d6efd !important;
+  }
+
+  .tabela-vendas-row .col-12 {
+    display: flex;
+    align-items: center;
+  }
+
+  .tabela-vendas-row .btn {
+    justify-content: center;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .tabela-vendas-row {
+    border-left: 3px solid transparent !important;
+  }
+
+  .tabela-vendas-row:hover {
+    border-left-color: #0d6efd !important;
+  }
+}
