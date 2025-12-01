@@ -50,7 +50,7 @@ export default function TelaVendas() {
     currentPage,
     totalPages,
     itemsPerPage,
-    handlePageChange,
+    // handlePageChange,
     // handleItemsPerPageChange,
     // indexOfFirstItem,
     // indexOfLastItem,
@@ -76,26 +76,41 @@ export default function TelaVendas() {
   };
 
   // Dashboard Stats
+  // O hook useMemo é usado para "memorizar" o resultado do cálculo das estatísticas.
+  // Ele só executará esse bloco de código novamente se a variável 'vendas' mudar, melhorando a performance.
   const stats = useMemo(() => {
+    // Conta o total de vendas verificando o tamanho do array 'vendas'.
     const totalVendas = vendas.length;
+
+    // Calcula a receita total somando o valor de todas as vendas.
+    // O método .reduce percorre cada item (curr) e soma ao acumulador (acc).
     const totalReceita = vendas.reduce(
-      (acc, curr) => acc + (Number(curr.valor_total) || 0),
-      0
+      // Converte o valor_total para número; se falhar, usa 0.
+      (acc, curr) => acc + (Number(curr.total) || 0),
+      0 // Valor inicial do acumulador é 0.
     );
+
+    // Filtra o array de vendas para encontrar apenas as com status "concluida" e conta quantas são (.length).
     const vendasConcluidas = vendas.filter(
       (v) => v.status === "concluida"
     ).length;
+
+    // Filtra e conta vendas que estão "pendente" OU "aguardando pagamento".
     const vendasPendentes = vendas.filter(
       (v) => v.status === "pendente" || v.status === "aguardando pagamento"
-    ).length; // Assuming these statuses exist
+    ).length; 
+
+    // Filtra e conta vendas que foram "devolvida" OU são "estorno".
     const devolucoes = vendas.filter(
       (v) => v.status === "devolvida" || v.status === "estorno"
-    ).length; // Assuming these statuses exist
-    // Mocking overdue for now as we don't have due date in simple view, or assuming 'atrasado' status
+    ).length; 
+
+    // Filtra e conta vendas que estão com status "atrasado".
     const pagamentosAtrasados = vendas.filter(
       (v) => v.status === "atrasado"
     ).length;
 
+    // Retorna um objeto com todas as estatísticas calculadas acima para ser usado no componente.
     return {
       totalVendas,
       totalReceita,
@@ -104,31 +119,44 @@ export default function TelaVendas() {
       devolucoes,
       pagamentosAtrasados,
     };
-  }, [vendas]);
+  }, [vendas]); // Lista de dependências: recalcula se 'vendas' mudar.
 
-  // Chart Data
+  // Prepara os dados para serem exibidos em um gráfico, também memorizado com useMemo.
   const chartData = useMemo(() => {
+    // Agrupa as vendas por data usando .reduce.
     const grouped = vendas.reduce((acc, curr) => {
+      // Formata a data da venda e pega apenas a primeira parte (a data em si), ignorando a hora.
       const date = utils.formatDate(curr.data_venda).split(" ")[0];
+      
+      // Se essa data ainda não existe no acumulador, cria um objeto inicial para ela.
       if (!acc[date]) {
         acc[date] = { name: date, vendas: 0, receita: 0 };
       }
+      // Incrementa a contagem de vendas para essa data.
       acc[date].vendas += 1;
-      acc[date].receita += Number(curr.valor_total) || 0;
-      return acc;
-    }, {});
+      // Soma o valor total da venda à receita dessa data.
+      acc[date].receita += Number(curr.total) || 0;
+      
+      return acc; // Retorna o acumulador atualizado.
+    }, {}); // Começa com um objeto vazio.
+
+    // Transforma o objeto agrupado em um array de valores e pega apenas os últimos 7 itens (últimos 7 dias/registros).
     return Object.values(grouped).slice(-7);
-  }, [vendas]);
+  }, [vendas]); // Recalcula se 'vendas' mudar.
+  console.log(chartData);
 
-
+  // Define uma função simples para atualizar o estado da página atual (usado na paginação).
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Verifica se a aplicação está em estado de carregamento (loading).
   if (loading) {
+    // Se estiver carregando, retorna um componente visual de "Loading" (Spinner) centralizado na tela.
     return (
       <div
         className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
+        style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
       >
+        {/* Componente de Spinner (rodinha girando) do Bootstrap */}
         <Spinner animation="border" variant="primary" />
       </div>
     );

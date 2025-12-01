@@ -1,222 +1,444 @@
-import TabelaProduto from "./include/TabellaVendaProduto"
-import ModalDesconto from "./include/ModalDesconto"
-import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
-import { Row, Col, Card, Button, Form, Accordion, ButtonGroup, AccordionButton, useAccordionButton, Tooltip, OverlayTrigger } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { Row, Col, Card, Button, Form, Table, Badge } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import utils from "@app/utils";
+import API from "@app/api";
+import ModalSelecionarCliente from "./include/ModalSelecionarCliente";
+import ModalAdicionarProduto from "./include/ModalAdicionarProduto";
+import ModalAdicionarPagamento from "./include/ModalAdicionarPagamento";
+import { Trash, Trash2, Trash2Icon, TrashIcon } from "lucide-react";
 
-import util from "@app/utils"
-import API from "@app/api"
+export default function NovaVenda() {
+  const navigate = useNavigate();
 
-export default function NovaVenda(){
-    const [clientes, setClientes] = useState([])
-    const [cliente, setCliente] = useState({})
-    const [produtos, setProdutos] = useState([])
-    const [produto, setProduto] = useState({})
-    const [listaVenda, setListaVenda] = useState([])
+  const [clientes, setClientes] = useState([]);
+  const [cliente, setCliente] = useState(null);
+  const [produtos, setProdutos] = useState([]);
+  const [listaVenda, setListaVenda] = useState([]);
 
-    const [modalDesconto, setModalDesconto] = useState(false)
-    const [modalInfoProduto, setmodalInfoProduto] = useState(false)
-    
-    const navigate = new useNavigate()
+  const [showModalCliente, setShowModalCliente] = useState(false);
+  const [showModalProduto, setShowModalProduto] = useState(false);
 
-    useEffect(() => {
-        getClientes()
-        getProdutos()
-        // clienteSet()
-    },[])
+  const [pagamentos, setPagamentos] = useState([]);
+  const [showModalPagamento, setShowModalPagamento] = useState(false);
 
+  const [desconto, setDesconto] = useState(0);
 
-    const getClientes = async () => {
-        const c = await API.getClientes()
-        setClientes(c)
-        //setCliente(c[0])
-    }
-    const getProdutos = async () => {
-        const p = await API.getProduto({item: "estoque"})
-        // console.log(p)
-        setProdutos(p)
-    }
-    const addLista = async (data) => {
-        // const novaList = listaVenda.concat(data)
-        setListaVenda(listaVenda => [...listaVenda, data])
-    }
-    const deleteList = async (id) => {
-        const novaList = listaVenda.filter(item => item.id !== id)
-        setListaVenda(novaList)
-    }
-    const test = async () => {
-        // console.log("exec")
-        for(let i = 0; i < 5; i++){
-            await addLista(produtos[i])
-        }
-    }
-    const clienteSet = async () => {
-        // const c = clientes[0]
-        // console.log(c)
-        // setCliente(c)
-    }
+  useEffect(() => {
+    getClientes();
+    getProdutos();
+  }, []);
 
-    function SomaProdutos({listaVenda}){
-        if(!listaVenda) return
-        const valorTotal = listaVenda.reduce((soma, item) => {
-            return soma + item.valor_venda
-        }, 0)
+  
 
-        return (
-            <>
-            {util.formatMoney(valorTotal)}
-            </>
+  const getClientes = async () => {
+    const c = await API.getClientes();
+    setClientes(c || []);
+  };
+
+  const getProdutos = async () => {
+    const p = await API.getProduto({ item: "estoque" });
+    setProdutos(p || []);
+  };
+
+  const handleAdicionarProduto = (produto) => {
+    // Verificar se produto já está na lista
+    const produtoExistente = listaVenda.find((item) => item.id === produto.id);
+
+    if (produtoExistente) {
+      // Atualizar quantidade
+      setListaVenda(
+        listaVenda.map((item) =>
+          item.id === produto.id
+            ? { ...item, quantidade: item.quantidade + produto.quantidade }
+            : item
         )
+      );
+    } else {
+      // Adicionar novo produto
+      setListaVenda([...listaVenda, produto]);
     }
-    
-    function AbrirToggle({children, eventKey = "0", ...rest}) {
-        const click = useAccordionButton(eventKey)
-        
-        return (
-            <Button {...rest} onClick={click}>
-                {children}
-            </Button>
-        )
+  };
+
+  const handleRemoverProduto = (id) => {
+    setListaVenda(listaVenda.filter((item) => item.id !== id));
+  };
+
+  const handleAlterarQuantidade = (id, novaQuantidade) => {
+    if (novaQuantidade < 1) return;
+
+    const produto = produtos.find((p) => p.id === id);
+    if (novaQuantidade > produto.estoque) {
+      alert("Quantidade maior que o estoque disponível!");
+      return;
     }
 
-    // console.log(clientes)
-    console.log(produto)
-    // console.log(listaVenda)
-    return(
-        <>
-            <Row className="g-3">
-                <Col xs={12}>
-                    <Card>
-                        <Card.Header className="d-flex justify-content-between px-2">
-                            <Card.Title className="m-0 align-content-center">
-                                Cliente
-                            </Card.Title>
-                            <div className="d-flex gap-2">
-                                <Button className="btn-roxo" onClick={() => setCliente(clientes[0])}>{!cliente.id ? "Adicnionar" : "Alterar"}</Button>
-                            </div>
-                        </Card.Header>
-                        {cliente.id && (
+    setListaVenda(
+      listaVenda.map((item) =>
+        item.id === id ? { ...item, quantidade: novaQuantidade } : item
+      )
+    );
+  };
 
-                            <Card.Body className="p-0">
-                                <Accordion flush >
-                                    <Card border="0">
-                                        <Card.Header className="d-flex justify-content-between bg-transparent">
-                                            <div>
-                                                {cliente.nome}
-                                            </div>
-                                            <ButtonGroup size="sm">
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip-top">Visualizar</Tooltip>
-                                                    }
-                                                >
-                                                    <AbrirToggle  variant="outline-secondary"><i className="bi bi-eye"></i></AbrirToggle>
-                                                </OverlayTrigger>
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip-top">
-                                                            Alterar Cliente
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <Button  variant="outline-warning"><i className="bi bi-pencil"></i></Button>
-                                                </OverlayTrigger>
-                                            </ButtonGroup>
-                                        </Card.Header>
-                                        <Accordion.Collapse eventKey="0" className="p-3">
-                                            <Row>
-                                                <Col md={8}>
-                                                    <Form.Group>
-                                                        <Form.Label>Nome</Form.Label>
-                                                        <Form.Control type="text" value={cliente.nome} disabled />
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col md={4}>
-                                                    <Form.Group>
-                                                        <Form.Label>Telefone</Form.Label>
-                                                        <Form.Control type="text" value={cliente.telefone} disabled />
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col md={5}>
-                                                    <Form.Group>
-                                                        <Form.Label>Email</Form.Label>
-                                                        <Form.Control type="text" value={cliente.email} disabled />
-                                                    </Form.Group>
-                                                </Col>
-                                                <Col>
-                                                    <Form.Group>
-                                                        <Form.Label>Endereço</Form.Label>
-                                                        <Form.Control type="text" value={cliente.endereco} disabled />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                        </Accordion.Collapse>
-                                    </Card>
-                                </Accordion>
-                            </Card.Body>
-                        )}
-                    </Card>
-                </Col>
-                <Col md={8}>
-                <Card>
-                    <Card.Header className="d-flex justify-content-between p-2 align-items-center">
-                        <Card.Title className="m-0">Itens Vendidos ({listaVenda.length || 0})</Card.Title>
-                        <Button className="btn-roxo" onClick={test}><i className="bi bi-plus-lg me-2"></i> Adicionar Item</Button>
-                    </Card.Header>
-                    <Card.Body className="p-0">
-                        <TabelaProduto produto={listaVenda} setmodalInfoProduto={setmodalInfoProduto} setProduto={setProduto} deleteList={deleteList}/>
-                    </Card.Body>
-                </Card>
-                </Col>
-                <Col>
-                    <Card>
-                        <Card.Header className="bg-light bg-opacity-25 p-3">
-                            <Card.Title className="m-0">Detalhes da Venda</Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            <div className="d-flex justify-content-between">
-                                <Card.Text>Forma de Pagamento: </Card.Text>
-                                <Card.Text>{"Dinheiro"}</Card.Text>
+  const calcularSubtotal = () => {
+    return listaVenda.reduce(
+      (total, item) => total + item.valor_venda * item.quantidade,
+      0
+    );
+  };
+
+  const calcularTotal = () => {
+    return calcularSubtotal() - desconto;
+  };
+
+  const handleAdicionarPagamento = (pagamento) => {
+    setPagamentos([...pagamentos, pagamento]);
+    setShowModalPagamento(false);
+  };
+
+  const handleRemoverPagamento = (index) => {
+    const newPagamentos = [...pagamentos];
+    newPagamentos.splice(index, 1);
+    setPagamentos(newPagamentos);
+  };
+
+  const handleFinalizarVenda = async () => {
+    if (!cliente) {
+      alert("Selecione um cliente!");
+      return;
+    }
+
+    if (listaVenda.length === 0) {
+      alert("Adicione pelo menos um produto!");
+      return;
+    }
+
+    // Aqui você implementaria a lógica de salvar a venda
+    const venda = {
+      cliente_id: cliente.id,
+      data_venda: new Date().toISOString(),
+      forma_pagamento: pagamentos,
+      desconto: desconto,
+      valor_total: calcularTotal(),
+      status: "concluida",
+      itens: listaVenda.map((item) => ({
+        produto_id: item.id,
+        quantidade: item.quantidade,
+        valor_unitario: item.valor_venda,
+      })),
+    };
+
+    console.log("Venda a ser salva:", venda);
+
+    // await API.putVenda(venda);
+    alert("Venda finalizada com sucesso!");
+    navigate("/vendas");
+  };
+  const sobra = calcularTotal() - pagamentos.map((pagamento) => pagamento.valor_pagamento).reduce((total, valor) => total + valor, 0)
+  return (
+    <>
+      <div className="mb-4">
+        <h2 className="fw-bold text-dark">Nova Venda</h2>
+        <span className="text-muted">
+          Registre uma nova venda para o cliente
+        </span>
+      </div>
+
+      <Row className="g-4">
+        {/* Coluna Esquerda: Cliente e Produtos */}
+        <Col lg={8}>
+          {/* Card Cliente */}
+          <Card className="border-0 shadow-sm mb-3">
+            <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center py-3">
+              <h5 className="mb-0">Cliente</h5>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setShowModalCliente(true)}
+              >
+                <i className="bi bi-person-plus me-2"></i>
+                {cliente ? "Alterar Cliente" : "Selecionar Cliente"}
+              </Button>
+            </Card.Header>
+            {cliente && (
+              <Card.Body>
+                <Row>
+                  <Col md={6}>
+                    <div className="mb-2">
+                      <small className="text-muted">Nome</small>
+                      <div className="fw-bold">{cliente.nome}</div>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className="mb-2">
+                      <small className="text-muted">Telefone</small>
+                      <div>{cliente.telefone || "N/A"}</div>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className="mb-2">
+                      <small className="text-muted">Email</small>
+                      <div className="small">{cliente.email || "N/A"}</div>
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            )}
+            {!cliente && (
+              <Card.Body className="text-center py-4 text-muted">
+                <i className="bi bi-person fs-1 d-block mb-2 opacity-25"></i>
+                Nenhum cliente selecionado
+              </Card.Body>
+            )}
+          </Card>
+
+          {/* Card Produtos */}
+          <Card className="border-0 shadow-sm">
+            <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center py-3">
+              <h5 className="mb-0">Produtos ({listaVenda.length})</h5>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setShowModalProduto(true)}
+                disabled={!cliente}
+              >
+                <i className="bi bi-plus-lg me-2"></i>
+                Adicionar Produto
+              </Button>
+            </Card.Header>
+            <Card.Body className="p-0">
+              {listaVenda.length > 0 ? (
+                <div className="table-responsive">
+                  <Table hover className="align-middle mb-0">
+                    <thead className="bg-light">
+                      <tr>
+                        <th className="border-0">Produto</th>
+                        <th className="border-0">Preço Un.</th>
+                        <th className="border-0" style={{ width: "150px" }}>
+                          Quantidade
+                        </th>
+                        <th className="border-0">Subtotal</th>
+                        <th className="border-0 text-end">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listaVenda.map((item) => (
+                        <tr key={item.id}>
+                          <td>
+                            <div className="fw-bold">{item.nome}</div>
+                            <small className="text-muted">{item.codigo}</small>
+                          </td>
+                          <td className="text-success fw-bold">
+                            {utils.formatMoney(item.valor_venda)}
+                          </td>
+                          <td>
+                            <div className="d-flex align-items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() =>
+                                  handleAlterarQuantidade(
+                                    item.id,
+                                    item.quantidade - 1
+                                  )
+                                }
+                              >
+                                -
+                              </Button>
+                              <Form.Control
+                                type="number"
+                                size="sm"
+                                value={item.quantidade}
+                                onChange={(e) =>
+                                  handleAlterarQuantidade(
+                                    item.id,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="text-center"
+                                style={{ width: "60px" }}
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() =>
+                                  handleAlterarQuantidade(
+                                    item.id,
+                                    item.quantidade + 1
+                                  )
+                                }
+                              >
+                                +
+                              </Button>
                             </div>
-                            <div className="d-flex justify-content-between">
-                                <Card.Text>Valor dos Produtos:</Card.Text>
-                                <Card.Text>
-                                    <SomaProdutos listaVenda={listaVenda}/>
-                                </Card.Text>
-                            </div>
-                            <div className="d-flex justify-content-between">
-                                <Card.Text className="mb-0">Desconto:</Card.Text>
-                                <Card.Text className="mb-0">
-                                    <OverlayTrigger
-                                        placement="top"
-                                        overlay={
-                                            <Tooltip id="tooltip-top">Editar Desconto</Tooltip>
-                                        }
-                                    >
-                                        <a className="me-2 text-body-secondary" onClick={() => setModalDesconto(true)} style={{cursor: "pointer"}}>
-                                            <i className="bi bi-pencil-square"></i>
-                                        </a>
-                                    </OverlayTrigger>
-                                    
-                                    {util.formatMoney()}
-                                </Card.Text>
-                            </div>
-                        </Card.Body>
-                        <Card.Footer className="bg-light bg-opacity-25 p-3">
-                            <div className="d-flex justify-content-between">
-                                <Card.Text className="mb-0">Valor Total:</Card.Text>
-                                <Card.Text className="mb-0">{util.formatMoney()}</Card.Text>
-                            </div>
-                        </Card.Footer>
-                    </Card>
-                    <Button size="lg" className="btn-roxo w-100 my-3">Finalizar Compra</Button>
-                </Col>
-            </Row>
-            <ModalDesconto onVisible={modalDesconto} onHiden={() => setModalDesconto(false)}/>
-            <ProdutosInfo visible={modalInfoProduto} onClose={() => setmodalInfoProduto(false)} produto={produto} tableShow={false}/>
-        </>
-    )
+                          </td>
+                          <td className="fw-bold">
+                            {utils.formatMoney(
+                              item.valor_venda * item.quantidade
+                            )}
+                          </td>
+                          <td className="text-end">
+                            <Button
+                              size="sm"
+                              variant="outline-danger"
+                              onClick={() => handleRemoverProduto(item.id)}
+                            >
+                              <i className="bi bi-trash"></i>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center py-5 text-muted">
+                  <i className="bi bi-cart-x fs-1 d-block mb-2 opacity-25"></i>
+                  {cliente
+                    ? "Nenhum produto adicionado"
+                    : "Selecione um cliente para adicionar produtos"}
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Coluna Direita: Resumo */}
+        <Col lg={4}>
+          <Card
+            className="border-0 shadow-sm sticky-top"
+            style={{ top: "20px" }}
+          >
+            <Card.Header className="bg-white border-0 py-3">
+              <h5 className="mb-0">Resumo da Venda</h5>
+            </Card.Header>
+            <Card.Body>
+              {pagamentos.map((pagamento, index) => (
+                <Row key={index} className={index === pagamentos.length - 1 ? "" : "mb-2 border-bottom"}>
+                  {pagamento.codigo_pagamento && (
+                    <Col md={12} className="flex align-items-center justify-content-between">
+                      <div className="mb-2">
+                        <small className="text-muted">Código</small>
+                        <div className="fw-bold">{pagamento.codigo_pagamento}</div>
+                      </div>
+                      {pagamento.parcelas === "Cartão de Crédito" && (
+                        <div>
+                          <smal className="text-muted">Parcelas</smal>
+                          <div className="fw-bold">{pagamento.parcelas}</div>
+                        </div>
+                      )}
+                    </Col>
+                  )}
+                  <Col md={6}>
+                    <div className="mb-2">
+                      <small className="text-muted">Forma de Pagamento</small>
+                      <div className="fw-bold">{pagamento.forma_pagamento}</div>
+                    </div>
+                  </Col>
+                  <Col md={4} className="text-end px-1">
+                    <div className="mb-2">
+                      <small className="text-muted">Valor</small>
+                      <div className="fw-bold">{utils.formatMoney(pagamento.valor_pagamento)}</div>
+                    </div>
+                  </Col>
+                  <Col md={2} className="flex align-items-center justify-content-center text-center">
+                    <Button variant="outline-danger" size="sm" onClick={() => handleRemoverPagamento(index)}>
+                      <Trash2 size={14} />
+                    </Button>
+                  </Col>
+                </Row>
+              ))}
+
+              <Button
+                className="w-full mb-2"
+                variant="outline-primary"
+                onClick={() => setShowModalPagamento(true)}
+                disabled={!cliente || listaVenda.length === 0 || calcularTotal() === 0 || sobra === 0}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Adicionar Forma de Pagamento
+              </Button>
+
+              <hr />
+
+              <div className="d-flex justify-content-between mb-2">
+                <span className="text-muted">Subtotal:</span>
+                <span className="fw-bold">
+                  {utils.formatMoney(calcularSubtotal())}
+                </span>
+              </div>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Desconto</Form.Label>
+                <Form.Control
+                  type="text"
+                  min="0"
+                  max={calcularSubtotal()}
+                  value={utils.formatMoney(desconto)}
+                  onChange={(e) => setDesconto(parseFloat(e.target.value) || 0)}
+                  placeholder="0.00"
+                />
+              </Form.Group>
+
+              <hr />
+
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="mb-0">Total:</h5>
+                <h3 className="mb-0 text-primary">
+                  {utils.formatMoney(calcularTotal())}
+                </h3>
+              </div>
+
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-100"
+                onClick={handleFinalizarVenda}
+                disabled={!cliente || listaVenda.length === 0 || pagamentos.length === 0}
+              >
+                <i className="bi bi-check-circle me-2"></i>
+                Finalizar Venda
+              </Button>
+
+              <Button
+                variant="outline-secondary"
+                className="w-100 mt-2"
+                onClick={() => navigate("/vendas")}
+              >
+                Cancelar
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Modals */}
+      {showModalCliente && (
+      <ModalSelecionarCliente
+        show={showModalCliente}
+        onHide={() => setShowModalCliente(false)}
+        clientes={clientes}
+        onSelect={setCliente}
+      />
+      )}
+
+      {showModalProduto && (
+        <ModalAdicionarProduto
+        show={showModalProduto}
+        onHide={() => setShowModalProduto(false)}
+        produtos={produtos}
+        onAdd={handleAdicionarProduto}
+        />
+      )}
+
+      {showModalPagamento && (
+        <ModalAdicionarPagamento
+        show={showModalPagamento}
+        onHide={() => setShowModalPagamento(false)}
+        valorTotal={sobra}
+        onAdd={handleAdicionarPagamento}
+      />
+      )}
+    </>
+  );
 }
