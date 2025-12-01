@@ -6,7 +6,7 @@ import API from "@app/api";
 import ModalSelecionarCliente from "./include/ModalSelecionarCliente";
 import ModalAdicionarProduto from "./include/ModalAdicionarProduto";
 import ModalAdicionarPagamento from "./include/ModalAdicionarPagamento";
-import { Trash, Trash2, Trash2Icon, TrashIcon } from "lucide-react";
+import { Pencil, Trash, Trash2, Trash2Icon, TrashIcon } from "lucide-react";
 
 export default function NovaVenda() {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ export default function NovaVenda() {
   const [showModalProduto, setShowModalProduto] = useState(false);
 
   const [pagamentos, setPagamentos] = useState([]);
+  const [pagamento, setPagamento] = useState(null);
   const [showModalPagamento, setShowModalPagamento] = useState(false);
 
   const [desconto, setDesconto] = useState(0);
@@ -92,14 +93,28 @@ export default function NovaVenda() {
   };
 
   const handleAdicionarPagamento = (pagamento) => {
-    setPagamentos([...pagamentos, pagamento]);
+    if(pagamento.index !== undefined || pagamento.index !== null){
+      const newPagamentos = [...pagamentos];
+      const { forma_pagamento, valor_pagamento, parcelas, data_pagamento } = pagamento
+      newPagamentos[pagamento.index] = { forma_pagamento, valor_pagamento, parcelas, data_pagamento };
+      setPagamentos(newPagamentos);
+    }else{
+      setPagamentos([...pagamentos, pagamento]);
+    }
     setShowModalPagamento(false);
+    setPagamento(null);
   };
 
   const handleRemoverPagamento = (index) => {
     const newPagamentos = [...pagamentos];
     newPagamentos.splice(index, 1);
     setPagamentos(newPagamentos);
+  };
+
+  const handleEditarPagamento = (index) => {
+    const pagamento = pagamentos[index];
+    setPagamento({ ...pagamento, index: index });
+    setShowModalPagamento(true);
   };
 
   const handleFinalizarVenda = async () => {
@@ -132,7 +147,7 @@ export default function NovaVenda() {
 
     // await API.putVenda(venda);
     alert("Venda finalizada com sucesso!");
-    navigate("/vendas");
+    // navigate("/vendas");
   };
   const sobra = calcularTotal() - pagamentos.map((pagamento) => pagamento.valor_pagamento).reduce((total, valor) => total + valor, 0)
   return (
@@ -315,35 +330,49 @@ export default function NovaVenda() {
             <Card.Body>
               {pagamentos.map((pagamento, index) => (
                 <Row key={index} className={index === pagamentos.length - 1 ? "" : "mb-2 border-bottom"}>
-                  {pagamento.codigo_pagamento && (
-                    <Col md={12} className="flex align-items-center justify-content-between">
+                  <Col md={11} className="flex flex-column pe-3">
+                    {pagamento.forma_pagamento !== "Dinheiro" && (
+                      <Col md={12} className="flex align-items-center justify-content-between">
+
+                        {pagamento.forma_pagamento === "Promissória" ? (
+                          <div>
+                            <small className="text-muted">Data de Pagamento</small>
+                            <div className="fw-bold">{utils.formatDate(pagamento.data_pagamento)}</div>
+                          </div>
+                        ) : (
+                          <div>
+                            <small className="text-muted">Código</small>
+                            <div className="fw-bold">{pagamento.codigo_pagamento}</div>
+                          </div>
+                        )}
+
+                        {pagamento.parcelas && (
+                          <div className="text-end">
+                            <smal className="text-muted">Parcelas</smal>
+                            <div className="fw-bold">{pagamento.parcelas}</div>
+                          </div>
+                        )}
+                      </Col>
+                    )}
+                    <Col md={6} className="flex align-items-center justify-content-between w-100">
                       <div className="mb-2">
-                        <small className="text-muted">Código</small>
-                        <div className="fw-bold">{pagamento.codigo_pagamento}</div>
+                        <small className="text-muted">Forma de Pagamento</small>
+                        <div className="fw-bold">{pagamento.forma_pagamento}</div>
                       </div>
-                      {pagamento.parcelas === "Cartão de Crédito" && (
-                        <div>
-                          <smal className="text-muted">Parcelas</smal>
-                          <div className="fw-bold">{pagamento.parcelas}</div>
-                        </div>
-                      )}
+                      <div className="mb-2 text-end">
+                        <small className="text-muted">Valor</small>
+                        <div className="fw-bold">{utils.formatMoney(pagamento.valor_pagamento)}</div>
+                      </div>
                     </Col>
-                  )}
-                  <Col md={6}>
-                    <div className="mb-2">
-                      <small className="text-muted">Forma de Pagamento</small>
-                      <div className="fw-bold">{pagamento.forma_pagamento}</div>
-                    </div>
+                    <Col md={6} className="text-end px-1">
+                    </Col>
                   </Col>
-                  <Col md={4} className="text-end px-1">
-                    <div className="mb-2">
-                      <small className="text-muted">Valor</small>
-                      <div className="fw-bold">{utils.formatMoney(pagamento.valor_pagamento)}</div>
-                    </div>
-                  </Col>
-                  <Col md={2} className="flex align-items-center justify-content-center text-center">
+                  <Col md={1} className="flex flex-column gap-1 py-2  align-items-end justify-content-center text-center">
                     <Button variant="outline-danger" size="sm" onClick={() => handleRemoverPagamento(index)}>
                       <Trash2 size={14} />
+                    </Button>
+                    <Button variant="outline-success" size="sm" onClick={() => handleEditarPagamento(index)}>
+                      <Pencil size={14} />
                     </Button>
                   </Col>
                 </Row>
@@ -353,7 +382,7 @@ export default function NovaVenda() {
                 className="w-full mb-2"
                 variant="outline-primary"
                 onClick={() => setShowModalPagamento(true)}
-                disabled={!cliente || listaVenda.length === 0 || calcularTotal() === 0 || sobra === 0}
+                disabled={!cliente || listaVenda.length === 0 || calcularTotal() === 0 || sobra <= 0}
               >
                 <i className="bi bi-plus-circle me-2"></i>
                 Adicionar Forma de Pagamento
@@ -374,7 +403,7 @@ export default function NovaVenda() {
                   type="text"
                   min="0"
                   max={calcularSubtotal()}
-                  value={utils.formatMoney(desconto)}
+                  value={desconto}
                   onChange={(e) => setDesconto(parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
                 />
@@ -394,7 +423,7 @@ export default function NovaVenda() {
                 size="lg"
                 className="w-100"
                 onClick={handleFinalizarVenda}
-                disabled={!cliente || listaVenda.length === 0 || pagamentos.length === 0}
+                disabled={!cliente || listaVenda.length === 0 || pagamentos.length === 0 || sobra !== 0}
               >
                 <i className="bi bi-check-circle me-2"></i>
                 Finalizar Venda
@@ -437,6 +466,7 @@ export default function NovaVenda() {
         onHide={() => setShowModalPagamento(false)}
         valorTotal={sobra}
         onAdd={handleAdicionarPagamento}
+        pagamentoEdit={pagamento}
       />
       )}
     </>

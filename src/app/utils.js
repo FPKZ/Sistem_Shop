@@ -11,6 +11,12 @@ const formatDateTime = (dataISO) => {
 // 📅 Formata só a data
 const formatDate = (dataISO) => {
   if (!dataISO) return ''
+  
+  // Se for string YYYY-MM-DD, força interpretação como local adicionando hora
+  if (typeof dataISO === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dataISO)) {
+    return format(new Date(dataISO + 'T00:00:00'), 'dd/MM/yyyy')
+  }
+
   return format(new Date(dataISO), 'dd/MM/yyyy')
 }
 
