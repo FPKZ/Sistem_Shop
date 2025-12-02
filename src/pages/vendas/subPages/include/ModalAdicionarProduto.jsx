@@ -36,144 +36,55 @@ export default function ModalAdicionarProduto({
         const iten = produtoSelecionado.itemEstoque[0];
         setItensSelecionados([...itensSelecionados, iten]);
       }
+      if (quantidade !== itensSelecionados.length) {
+        setQuantidade(itensSelecionados.length);
+      }
     }
-  }, [produtoSelecionado]);
+  }, [produtoSelecionado, itensSelecionados]);
 
   const handleQuantidade = (qtd) => {
-    if (itensSelecionados.length < quantidade) {
-      const iten = produtoSelecionado.itemEstoque.find(
-        (item) => item.id === itensSelecionados[itensSelecionados.length - 1].id
-      );
-      setItensSelecionados([...itensSelecionados, iten]);
-    }
-    if (qtd !== itensSelecionados.length) {
-      if (
-        quantidade + qtd < 0 ||
-        quantidade + qtd > produtoSelecionado.itemEstoque.length
-      )
-        return;
-      setQuantidade(quantidade + qtd);
-      if (itensSelecionados.length < quantidade) {
-        const iten = produtoSelecionado.itemEstoque.find(
-          (item) => item.id !== itensSelecionados.id
-        );
-        setItensSelecionados([...itensSelecionados, iten]);
-      } else {
-        setItensSelecionados(itensSelecionados.slice(0, qtd));
-      }
-    }
-    /*
-    Entendi perfeitamente! Vou te explicar a lógica que você precisa implementar, sem alterar o código.
-
-🎯 Objetivo da Lógica
-Quando o usuário aumenta/diminui a quantidade:
-
-Aumentar (+1): Adiciona o primeiro item NÃO selecionado de itemEstoque para itensSelecionados
-Diminuir (-1): Remove o último item de itensSelecionados
-Input direto: Ajusta itensSelecionados para ter exatamente a quantidade especificada
-📝 Lógica Detalhada
-Função 
-handleQuantidade(qtd)
-javascript
-const handleQuantidade = (qtd) => {
-  // 1. Calcular a nova quantidade
-  const novaQuantidade = quantidade + qtd;
-  
-  // 2. Validar limites
-  if (novaQuantidade < 1 || novaQuantidade > produtoSelecionado.itemEstoque.length) {
-    return; // Não faz nada se estiver fora dos limites
-  }
-  
-  // 3. Atualizar a quantidade
-  setQuantidade(novaQuantidade);
-  
-  // 4. Ajustar itensSelecionados baseado na nova quantidade
-  if (novaQuantidade > itensSelecionados.length) {
-    // AUMENTOU: Adicionar itens não selecionados
-    const itensParaAdicionar = [];
-    const idsJaSelecionados = itensSelecionados.map(i => i.id);
+    // 1. Calcular a nova quantidade
+    const novaQuantidade = quantidade + qtd;
     
-    // Encontrar itens que ainda não foram selecionados
-    for (const item of produtoSelecionado.itemEstoque) {
-      if (!idsJaSelecionados.includes(item.id)) {
-        itensParaAdicionar.push(item);
-        if (itensSelecionados.length + itensParaAdicionar.length >= novaQuantidade) {
-          break; // Parar quando atingir a quantidade desejada
+    // 2. Validar limites
+    if (novaQuantidade < 1 || novaQuantidade > produtoSelecionado.itemEstoque.length) {
+      return; // Não faz nada se estiver fora dos limites
+    }
+    
+    // 3. Atualizar a quantidade
+    setQuantidade(novaQuantidade);
+    
+    // 4. Ajustar itensSelecionados baseado na nova quantidade
+    if (novaQuantidade > itensSelecionados.length) {
+      // AUMENTOU: Adicionar itens não selecionados
+      const itensParaAdicionar = [];
+      const idsJaSelecionados = itensSelecionados.map(i => i.id);
+      
+      // Encontrar itens que ainda não foram selecionados
+      for (const item of produtoSelecionado.itemEstoque) {
+        if (!idsJaSelecionados.includes(item.id)) {
+          itensParaAdicionar.push(item);
+          if (itensSelecionados.length + itensParaAdicionar.length >= novaQuantidade) {
+            break; // Parar quando atingir a quantidade desejada
+          }
         }
       }
+      
+      setItensSelecionados([...itensSelecionados, ...itensParaAdicionar]);
+      
+    } else if (novaQuantidade < itensSelecionados.length) {
+      // DIMINUIU: Remover últimos itens
+      setItensSelecionados(itensSelecionados.slice(0, novaQuantidade));
     }
+    // Se novaQuantidade === itensSelecionados.length, não faz nada
+  };
+  const handleQuantidadeInput = (valorDigitado) => {
+    const novaQuantidade = Math.max(1, Math.min(valorDigitado, produtoSelecionado.itemEstoque.length));
+    const diferenca = novaQuantidade - quantidade;
     
-    setItensSelecionados([...itensSelecionados, ...itensParaAdicionar]);
-    
-  } else if (novaQuantidade < itensSelecionados.length) {
-    // DIMINUIU: Remover últimos itens
-    setItensSelecionados(itensSelecionados.slice(0, novaQuantidade));
-  }
-  // Se novaQuantidade === itensSelecionados.length, não faz nada
-};
-🔍 Explicação Passo a Passo
-Cenário 1: Aumentar quantidade (+1)
-javascript
-// Estado atual:
-quantidade = 2
-itensSelecionados = [item1, item2]
-itemEstoque = [item1, item2, item3, item4, item5]
-
-// Usuário clica em "+"
-handleQuantidade(1)
-
-// Resultado:
-quantidade = 3
-itensSelecionados = [item1, item2, item3] // Adicionou item3 (primeiro não selecionado)
-Cenário 2: Diminuir quantidade (-1)
-javascript
-// Estado atual:
-quantidade = 3
-itensSelecionados = [item1, item2, item3]
-
-// Usuário clica em "-"
-handleQuantidade(-1)
-
-// Resultado:
-quantidade = 2
-itensSelecionados = [item1, item2] // Removeu item3 (último da lista)
-Cenário 3: Input direto (ex: digita 5)
-javascript
-// Estado atual:
-quantidade = 2
-itensSelecionados = [item1, item2]
-
-// Usuário digita 5 no input
-// onChange recebe o valor 5, então:
-const diferenca = 5 - quantidade; // 3
-handleQuantidade(diferenca) // ou ajuste para receber o valor absoluto
-
-// Resultado:
-quantidade = 5
-itensSelecionados = [item1, item2, item3, item4, item5]
-⚠️ Problemas no seu código atual
-Linha 47-49: Você está procurando um item com o mesmo ID do último selecionado, o que vai retornar o mesmo item
-Linha 52: A validação está verificando quantidade + qtd < 0, mas deveria ser < 1
-Linha 60: itensSelecionados.slice(0, qtd) deveria ser slice(0, quantidade + qtd) ou slice(0, novaQuantidade)
-Input onChange: Você está passando parseInt(e.target.value) diretamente, mas deveria calcular a diferença ou usar uma lógica diferente
-💡 Sugestão de Melhoria
-Para o input direto, você pode criar uma função separada:
-
-javascript
-const handleQuantidadeInput = (valorDigitado) => {
-  const novaQuantidade = Math.max(1, Math.min(valorDigitado, produtoSelecionado.itemEstoque.length));
-  const diferenca = novaQuantidade - quantidade;
-  
-  if (diferenca !== 0) {
-    handleQuantidade(diferenca);
-  }
-};
-E usar assim:
-
-javascript
-onChange={(e) => handleQuantidadeInput(parseInt(e.target.value) || 1)}
-Essa é a lógica completa que você precisa! 🚀
-    */
+    if (diferenca !== 0) {
+      handleQuantidade(diferenca);
+    }
   };
 
   const handleAdd = async () => {
@@ -183,14 +94,21 @@ Essa é a lógica completa que você precisa! 🚀
       alert("Quantidade maior que o estoque disponível!");
       return;
     }
-
+    const { id, nome, categoria, img, descricao, itemEstoque } = produtoSelecionado;
     onAdd({
-      ...produtoSelecionado,
+      id,
+      nome,
+      categoria,
+      img,
+      descricao,
+
+      itens: itensSelecionados,
       quantidade: parseInt(quantidade),
     });
 
     // Reset
     setProdutoSelecionado(null);
+    setItensSelecionados([]);
     setQuantidade(1);
     setBusca("");
     onHide();
@@ -213,7 +131,7 @@ Essa é a lógica completa que você precisa! 🚀
     }
   };
 
-  console.log(itensSelecionados);
+  // console.log(itensSelecionados);
   return (
     <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down" centered>
       <Modal.Header closeButton>
@@ -351,7 +269,7 @@ Essa é a lógica completa que você precisa! 🚀
                   max={produtoSelecionado.itemEstoque.length}
                   value={quantidade}
                   onChange={(e) =>
-                    handleQuantidade(parseInt(e.target.value) || 1)
+                    handleQuantidadeInput(parseInt(e.target.value) || 1)
                   }
                   className="text-center"
                 />

@@ -50,7 +50,7 @@ export default function NovaVenda() {
       setListaVenda(
         listaVenda.map((item) =>
           item.id === produto.id
-            ? { ...item, quantidade: item.quantidade + produto.quantidade }
+            ? { ...item, quantidade: item.quantidade + produto.quantidade, itens: item.itens.concat(produto.itens) }
             : item
         )
       );
@@ -59,7 +59,7 @@ export default function NovaVenda() {
       setListaVenda([...listaVenda, produto]);
     }
   };
-  console.log
+  console.log(listaVenda)
   
   const handleRemoverProduto = (id) => {
     setListaVenda(listaVenda.filter((item) => item.id !== id));
@@ -83,7 +83,7 @@ export default function NovaVenda() {
 
   const calcularSubtotal = () => {
     return listaVenda.reduce(
-      (total, item) => total + item.valor_venda * item.quantidade,
+      (total, item) => total + item.itens.reduce( (total, i) => total + i.valor_venda * item.quantidade, 0),
       0
     );
   };
@@ -264,7 +264,7 @@ export default function NovaVenda() {
                             <small className="text-muted">{item.codigo}</small>
                           </td>
                           <td className="text-success fw-bold">
-                            {utils.formatMoney(item.valor_venda)}
+                            {utils.formatMoney(Math.max(item.itens.reduce((total, i) => total + i.valor_venda, 0), 0))}
                           </td>
                           <td>
                             <div className="d-flex align-items-center gap-1">
@@ -309,7 +309,7 @@ export default function NovaVenda() {
                           </td>
                           <td className="fw-bold">
                             {utils.formatMoney(
-                              item.valor_venda * item.quantidade
+                              item.itens.reduce((total, i) => total + i.valor_venda * item.quantidade, 0)
                             )}
                           </td>
                           <td className="text-end">
