@@ -93,12 +93,14 @@ export default function NovaVenda() {
   };
 
   const handleAdicionarPagamento = (pagamento) => {
-    if(pagamento.index !== undefined || pagamento.index !== null){
+    if(pagamento.index !== undefined && pagamento.index !== null){
       const newPagamentos = [...pagamentos];
+      console.log("Pagamentos edit", newPagamentos)
       const { forma_pagamento, valor_pagamento, parcelas, data_pagamento } = pagamento
       newPagamentos[pagamento.index] = { forma_pagamento, valor_pagamento, parcelas, data_pagamento };
       setPagamentos(newPagamentos);
     }else{
+      console.log("Pagamentos add", pagamentos)
       setPagamentos([...pagamentos, pagamento]);
     }
     setShowModalPagamento(false);
@@ -148,7 +150,15 @@ export default function NovaVenda() {
     // await API.putVenda(venda);
     alert("Venda finalizada com sucesso!");
     // navigate("/vendas");
+  }
+
+  const handleDesconto = (e) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      setDesconto(value);
+    }
   };
+  
   const sobra = calcularTotal() - pagamentos.map((pagamento) => pagamento.valor_pagamento).reduce((total, valor) => total + valor, 0)
   return (
     <>
@@ -330,7 +340,7 @@ export default function NovaVenda() {
             <Card.Body>
               {pagamentos.map((pagamento, index) => (
                 <Row key={index} className={index === pagamentos.length - 1 ? "" : "mb-2 border-bottom"}>
-                  <Col md={11} className="flex flex-column pe-3">
+                  <Col md={11} className="flex flex-column pe-4">
                     {pagamento.forma_pagamento !== "Dinheiro" && (
                       <Col md={12} className="flex align-items-center justify-content-between">
 
@@ -404,7 +414,7 @@ export default function NovaVenda() {
                   min="0"
                   max={calcularSubtotal()}
                   value={desconto}
-                  onChange={(e) => setDesconto(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleDesconto(e)}
                   placeholder="0.00"
                 />
               </Form.Group>
@@ -465,6 +475,7 @@ export default function NovaVenda() {
         show={showModalPagamento}
         onHide={() => setShowModalPagamento(false)}
         valorTotal={sobra}
+        total={calcularTotal()}
         onAdd={handleAdicionarPagamento}
         pagamentoEdit={pagamento}
       />

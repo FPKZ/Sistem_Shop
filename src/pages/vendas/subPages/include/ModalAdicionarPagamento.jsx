@@ -14,7 +14,8 @@ export default function ModalAdicionarPagamento({
   onHide,
   valorTotal,
   onAdd,
-  pagamentoEdit
+  pagamentoEdit,
+  total
 }) {
   const [formaPagamento, setFormaPagamento] = useState("Dinheiro");
   const [valorPagamento, setValorPagamento] = useState();
@@ -38,6 +39,7 @@ export default function ModalAdicionarPagamento({
       setCodigoPagamento("");
       setParcelas(1);
       setDataPagamento(new Date().toLocaleDateString("pt-BR"));
+      setIndex(null);
     }
   }, [show, onHide, pagamentoEdit]);
 
@@ -49,8 +51,12 @@ export default function ModalAdicionarPagamento({
     if (name === "forma_pagamento") setFormaPagamento(value);
     if (name === "valor_pagamento") {
       let newValue = parseFloat(value);
-      if (newValue > valorTotal) {
-        newValue = valorTotal;
+      if (index !== undefined && index !== null) {
+        newValue >= total ? newValue = total : newValue = newValue
+      } else {
+        if (newValue > valorTotal) {
+          newValue = valorTotal;
+        }
       }
       setValorPagamento(newValue);
     }
@@ -97,7 +103,8 @@ export default function ModalAdicionarPagamento({
         };
         break;
     }
-    if(index !== undefined || index !== null){
+
+    if(index !== undefined && index !== null){
       pagamento = { ...pagamento, index }
     }
     onAdd(pagamento);
