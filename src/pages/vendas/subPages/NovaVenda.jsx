@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import utils from "@app/utils";
 import API from "@app/api";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 import ModalSelecionarCliente from "./include/ModalSelecionarCliente";
 import ModalAdicionarProduto from "./include/ModalAdicionarProduto";
 import ModalAdicionarPagamento from "./include/ModalAdicionarPagamento";
@@ -23,14 +24,12 @@ export default function NovaVenda() {
   const [pagamento, setPagamento] = useState(null);
   const [showModalPagamento, setShowModalPagamento] = useState(false);
 
-  const [desconto, setDesconto] = useState(0);
+  
 
   useEffect(() => {
     getClientes();
     getProdutos();
-  }, []);
-
-  
+  }, [showModalCliente, showModalProduto]);
 
   const getClientes = async () => {
     const c = await API.getClientes();
@@ -60,7 +59,8 @@ export default function NovaVenda() {
       setListaVenda([...listaVenda, produto]);
     }
   };
-
+  console.log
+  
   const handleRemoverProduto = (id) => {
     setListaVenda(listaVenda.filter((item) => item.id !== id));
   };
@@ -91,16 +91,29 @@ export default function NovaVenda() {
   const calcularTotal = () => {
     return calcularSubtotal() - desconto;
   };
+  const {
+    value: desconto,
+    displayValue: displayDesconto,
+    onChange: handleDescontoChange,
+  } = useCurrencyInput({
+    max: calcularSubtotal() || 0,
+  });
 
   const handleAdicionarPagamento = (pagamento) => {
-    if(pagamento.index !== undefined && pagamento.index !== null){
+    if (pagamento.index !== undefined && pagamento.index !== null) {
       const newPagamentos = [...pagamentos];
-      console.log("Pagamentos edit", newPagamentos)
-      const { forma_pagamento, valor_pagamento, parcelas, data_pagamento } = pagamento
-      newPagamentos[pagamento.index] = { forma_pagamento, valor_pagamento, parcelas, data_pagamento };
+      // console.log("Pagamentos edit", newPagamentos)
+      const { forma_pagamento, valor_pagamento, parcelas, data_pagamento } =
+        pagamento;
+      newPagamentos[pagamento.index] = {
+        forma_pagamento,
+        valor_pagamento,
+        parcelas,
+        data_pagamento,
+      };
       setPagamentos(newPagamentos);
-    }else{
-      console.log("Pagamentos add", pagamentos)
+    } else {
+      console.log("Pagamentos add", pagamentos);
       setPagamentos([...pagamentos, pagamento]);
     }
     setShowModalPagamento(false);
@@ -150,16 +163,13 @@ export default function NovaVenda() {
     // await API.putVenda(venda);
     alert("Venda finalizada com sucesso!");
     // navigate("/vendas");
-  }
-
-  const handleDesconto = (e) => {
-    const value = parseFloat(e.target.value);
-    if (!isNaN(value)) {
-      setDesconto(value);
-    }
   };
-  
-  const sobra = calcularTotal() - pagamentos.map((pagamento) => pagamento.valor_pagamento).reduce((total, valor) => total + valor, 0)
+
+  const sobra =
+    calcularTotal() -
+    pagamentos
+      .map((pagamento) => pagamento.valor_pagamento)
+      .reduce((total, valor) => total + valor, 0);
   return (
     <>
       <div className="mb-4">
@@ -339,20 +349,33 @@ export default function NovaVenda() {
             </Card.Header>
             <Card.Body>
               {pagamentos.map((pagamento, index) => (
-                <Row key={index} className={index === pagamentos.length - 1 ? "" : "mb-2 border-bottom"}>
+                <Row
+                  key={index}
+                  className={
+                    index === pagamentos.length - 1 ? "" : "mb-2 border-bottom"
+                  }
+                >
                   <Col md={11} className="flex flex-column pe-4">
                     {pagamento.forma_pagamento !== "Dinheiro" && (
-                      <Col md={12} className="flex align-items-center justify-content-between">
-
+                      <Col
+                        md={12}
+                        className="flex align-items-center justify-content-between"
+                      >
                         {pagamento.forma_pagamento === "Promissória" ? (
                           <div>
-                            <small className="text-muted">Data de Pagamento</small>
-                            <div className="fw-bold">{utils.formatDate(pagamento.data_pagamento)}</div>
+                            <small className="text-muted">
+                              Data de Pagamento
+                            </small>
+                            <div className="fw-bold">
+                              {utils.formatDate(pagamento.data_pagamento)}
+                            </div>
                           </div>
                         ) : (
                           <div>
                             <small className="text-muted">Código</small>
-                            <div className="fw-bold">{pagamento.codigo_pagamento}</div>
+                            <div className="fw-bold">
+                              {pagamento.codigo_pagamento}
+                            </div>
                           </div>
                         )}
 
@@ -364,24 +387,41 @@ export default function NovaVenda() {
                         )}
                       </Col>
                     )}
-                    <Col md={6} className="flex align-items-center justify-content-between w-100">
+                    <Col
+                      md={6}
+                      className="flex align-items-center justify-content-between w-100"
+                    >
                       <div className="mb-2">
                         <small className="text-muted">Forma de Pagamento</small>
-                        <div className="fw-bold">{pagamento.forma_pagamento}</div>
+                        <div className="fw-bold">
+                          {pagamento.forma_pagamento}
+                        </div>
                       </div>
                       <div className="mb-2 text-end">
                         <small className="text-muted">Valor</small>
-                        <div className="fw-bold">{utils.formatMoney(pagamento.valor_pagamento)}</div>
+                        <div className="fw-bold">
+                          {utils.formatMoney(pagamento.valor_pagamento)}
+                        </div>
                       </div>
                     </Col>
-                    <Col md={6} className="text-end px-1">
-                    </Col>
+                    <Col md={6} className="text-end px-1"></Col>
                   </Col>
-                  <Col md={1} className="flex flex-column gap-1 py-2  align-items-end justify-content-center text-center">
-                    <Button variant="outline-danger" size="sm" onClick={() => handleRemoverPagamento(index)}>
+                  <Col
+                    md={1}
+                    className="flex flex-column gap-1 py-2  align-items-end justify-content-center text-center"
+                  >
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleRemoverPagamento(index)}
+                    >
                       <Trash2 size={14} />
                     </Button>
-                    <Button variant="outline-success" size="sm" onClick={() => handleEditarPagamento(index)}>
+                    <Button
+                      variant="outline-success"
+                      size="sm"
+                      onClick={() => handleEditarPagamento(index)}
+                    >
                       <Pencil size={14} />
                     </Button>
                   </Col>
@@ -392,7 +432,12 @@ export default function NovaVenda() {
                 className="w-full mb-2"
                 variant="outline-primary"
                 onClick={() => setShowModalPagamento(true)}
-                disabled={!cliente || listaVenda.length === 0 || calcularTotal() === 0 || sobra <= 0}
+                disabled={
+                  !cliente ||
+                  listaVenda.length === 0 ||
+                  calcularTotal() === 0 ||
+                  sobra <= 0
+                }
               >
                 <i className="bi bi-plus-circle me-2"></i>
                 Adicionar Forma de Pagamento
@@ -411,11 +456,9 @@ export default function NovaVenda() {
                 <Form.Label>Desconto</Form.Label>
                 <Form.Control
                   type="text"
-                  min="0"
-                  max={calcularSubtotal()}
-                  value={desconto}
-                  onChange={(e) => handleDesconto(e)}
-                  placeholder="0.00"
+                  value={displayDesconto}
+                  onChange={handleDescontoChange}
+                  placeholder="R$ 0,00"
                 />
               </Form.Group>
 
@@ -433,7 +476,12 @@ export default function NovaVenda() {
                 size="lg"
                 className="w-100"
                 onClick={handleFinalizarVenda}
-                disabled={!cliente || listaVenda.length === 0 || pagamentos.length === 0 || sobra !== 0}
+                disabled={
+                  !cliente ||
+                  listaVenda.length === 0 ||
+                  pagamentos.length === 0 ||
+                  sobra !== 0
+                }
               >
                 <i className="bi bi-check-circle me-2"></i>
                 Finalizar Venda
@@ -453,32 +501,32 @@ export default function NovaVenda() {
 
       {/* Modals */}
       {showModalCliente && (
-      <ModalSelecionarCliente
-        show={showModalCliente}
-        onHide={() => setShowModalCliente(false)}
-        clientes={clientes}
-        onSelect={setCliente}
-      />
+        <ModalSelecionarCliente
+          show={showModalCliente}
+          onHide={() => setShowModalCliente(false)}
+          clientes={clientes}
+          onSelect={setCliente}
+        />
       )}
 
       {showModalProduto && (
         <ModalAdicionarProduto
-        show={showModalProduto}
-        onHide={() => setShowModalProduto(false)}
-        produtos={produtos}
-        onAdd={handleAdicionarProduto}
+          show={showModalProduto}
+          onHide={() => setShowModalProduto(false)}
+          produtos={produtos}
+          onAdd={handleAdicionarProduto}
         />
       )}
 
       {showModalPagamento && (
         <ModalAdicionarPagamento
-        show={showModalPagamento}
-        onHide={() => setShowModalPagamento(false)}
-        valorTotal={sobra}
-        total={calcularTotal()}
-        onAdd={handleAdicionarPagamento}
-        pagamentoEdit={pagamento}
-      />
+          show={showModalPagamento}
+          onHide={() => setShowModalPagamento(false)}
+          valorTotal={sobra}
+          total={calcularTotal()}
+          onAdd={handleAdicionarPagamento}
+          pagamentoEdit={pagamento}
+        />
       )}
     </>
   );

@@ -1,3 +1,5 @@
+const back = import.meta.env.VITE_BACKEND_URL
+
 //Produtos
 export async function getProduto({item = "", nome = ""} = {}){
     try{
@@ -26,7 +28,19 @@ export async function postProduto(data){
     }
 }
 
-const back = import.meta.env.VITE_BACKEND_URL
+
+export async function reservarProduto(id){
+    try{
+        const response  = await fetch(`${back}/produto/reservar/${id}`, {
+            method: "PUT"
+        })
+        const result = await response.json()
+        return result
+    } catch (error){
+        console.error("Erro ao reservar produto", error)
+    }
+}
+
 
 export async function deleteProduto(id){
     try{

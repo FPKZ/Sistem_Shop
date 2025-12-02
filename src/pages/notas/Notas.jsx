@@ -146,7 +146,7 @@ export default function Notas() {
             </HoverBtn>
           ) : (
             <Button
-              className="btn btn-roxo"
+              className="btn btn-roxo d-flex align-items-center"
               onClick={() => setIsModalCadastroOpen(true)}
             >
               <Plus size={18} className="me-2" />

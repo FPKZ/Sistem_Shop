@@ -7,7 +7,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
-import utils from "@app/utils";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export default function ModalAdicionarPagamento({
   show,
@@ -15,24 +15,31 @@ export default function ModalAdicionarPagamento({
   valorTotal,
   onAdd,
   pagamentoEdit,
-  total
+  total,
 }) {
   const [formaPagamento, setFormaPagamento] = useState("Dinheiro");
-  const [valorPagamento, setValorPagamento] = useState();
   const [codigoPagamento, setCodigoPagamento] = useState("");
   const [parcelas, setParcelas] = useState("");
   const [dataPagamento, setDataPagamento] = useState("");
   const [index, setIndex] = useState();
+
+  const {
+    value: valorPagamento,
+    displayValue: displayValorPagamento,
+    onChange: handleValorChange,
+    setValue: setValorPagamento,
+  } = useCurrencyInput({
+    max: index !== undefined && index !== null ? total : valorTotal,
+  });
 
   useEffect(() => {
     if (pagamentoEdit) {
       setValorPagamento(pagamentoEdit.valor_pagamento);
       setFormaPagamento(pagamentoEdit.forma_pagamento);
       setCodigoPagamento(pagamentoEdit.codigo_pagamento);
-      setParcelas(pagamentoEdit.parcelas);
+      setParcelas(pagamentoEdit.parcelas || 1);
       setDataPagamento(pagamentoEdit.data_pagamento);
       setIndex(pagamentoEdit.index);
-      console.log(pagamentoEdit)
     } else {
       setValorPagamento(valorTotal);
       setFormaPagamento("Dinheiro");
@@ -41,25 +48,14 @@ export default function ModalAdicionarPagamento({
       setDataPagamento(new Date().toLocaleDateString("pt-BR"));
       setIndex(null);
     }
-  }, [show, onHide, pagamentoEdit]);
+  }, [show, onHide, pagamentoEdit, valorTotal, total, setValorPagamento]);
 
   if (!show) return null;
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
 
     if (name === "forma_pagamento") setFormaPagamento(value);
-    if (name === "valor_pagamento") {
-      let newValue = parseFloat(value);
-      if (index !== undefined && index !== null) {
-        newValue >= total ? newValue = total : newValue = newValue
-      } else {
-        if (newValue > valorTotal) {
-          newValue = valorTotal;
-        }
-      }
-      setValorPagamento(newValue);
-    }
     if (name === "codigo_pagamento") setCodigoPagamento(value);
     if (name === "parcelas") setParcelas(value);
     if (name === "data_pagamento") setDataPagamento(value);
@@ -104,8 +100,8 @@ export default function ModalAdicionarPagamento({
         break;
     }
 
-    if(index !== undefined && index !== null){
-      pagamento = { ...pagamento, index }
+    if (index !== undefined && index !== null) {
+      pagamento = { ...pagamento, index };
     }
     onAdd(pagamento);
     onHide();
@@ -134,15 +130,11 @@ export default function ModalAdicionarPagamento({
           <Form.Group className="mb-3" controlId="formValorPagamento">
             <Form.Label>Valor do Pagamento</Form.Label>
             <Form.Control
-              type="number"
+              type="text"
               name="valor_pagamento"
-              placeholder="0,00"
-              value={valorPagamento}
-              onChange={handleChange}
-              onFocus={() => setValorPagamento("")}
-              step="0.01"
-              min="0"
-              max={valorTotal}
+              placeholder="R$ 0,00"
+              value={displayValorPagamento}
+              onChange={handleValorChange}
             />
           </Form.Group>
 
@@ -160,8 +152,9 @@ export default function ModalAdicionarPagamento({
                   />
                 </Form.Group>
               )}
-              
-              {(formaPagamento === "Cartão de Crédito" || formaPagamento === "Promissória") && (
+
+              {(formaPagamento === "Cartão de Crédito" ||
+                formaPagamento === "Promissória") && (
                 <>
                   <Form.Group className="mb-3" controlId="formParcelas">
                     <Form.Label>Parcelas</Form.Label>
@@ -191,7 +184,6 @@ export default function ModalAdicionarPagamento({
                       />
                     </Form.Group>
                   )}
-
                 </>
               )}
             </>

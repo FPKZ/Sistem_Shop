@@ -6,6 +6,7 @@ import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCateg
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useToast } from "@contexts/ToastContext";
 import { useLoadRequest } from "@hooks/useLoadRequest";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export default function Produtos() {
   const [categoria, setCategoria] = useState({});
@@ -28,48 +29,63 @@ export default function Produtos() {
     marca: "",
     tamanho: "",
     codigo_barras: "",
-    valor_compra: "",
-    valor_venda: "",
-    lucro: "",
     descricao: "",
     quantidade: 1,
   });
 
+  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
+  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
+  const lucroHook = useCurrencyInput({ initialValue: 0 });
+
   const { showToast } = useToast();
 
-  const [ isLoading, request] = useLoadRequest();
+  const [isLoading, request] = useLoadRequest();
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
-    setFormValue((prev) => {
-      const updatedValues = {
-        ...prev,
-        [name]: type === "file" ? files[0] : value,
-      };
 
-      const valorCompra = parseFloat(updatedValues.valor_compra) || 0;
-      const lucro = parseFloat(updatedValues.lucro) || 0;
-      const valorVenda = parseFloat(updatedValues.valor_venda) || 0;
+    if (name === "valor_compra" || name === "valor_venda" || name === "lucro") {
+      // Handled by hooks
+      return;
+    }
 
-      if (name === "valor_venda") {
-        if (valorCompra > 0) {
-          updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
-        }
-      } else if (name === "lucro") {
-        if (valorCompra > 0) {
-          updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
-        }
-      } else if (name === "valor_compra") {
-        if (valorVenda > 0) {
-          updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
-        } else if (lucro > 0) {
-          updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
-        }
-      }
-
-      return updatedValues;
-    });
+    setFormValue((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value,
+    }));
   }
+
+  // Lógica de cálculo automático entre os valores
+  const handleValorCompraChange = (e) => {
+    valorCompraHook.onChange(e);
+    const newValorCompra =
+      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorVendaHook.value > 0) {
+      lucroHook.setValue(valorVendaHook.value - newValorCompra);
+    } else if (lucroHook.value > 0) {
+      valorVendaHook.setValue(newValorCompra + lucroHook.value);
+    }
+  };
+
+  const handleValorVendaChange = (e) => {
+    valorVendaHook.onChange(e);
+    const newValorVenda =
+      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorCompraHook.value > 0) {
+      lucroHook.setValue(newValorVenda - valorCompraHook.value);
+    }
+  };
+
+  const handleLucroChange = (e) => {
+    lucroHook.onChange(e);
+    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorCompraHook.value > 0) {
+      valorVendaHook.setValue(valorCompraHook.value + newLucro);
+    }
+  };
 
   function validate(form) {
     let newErrors = {};
@@ -117,18 +133,18 @@ export default function Produtos() {
             tamanho: formValue.tamanho,
             cor: formValue.cor,
             marca: formValue.marca,
-            valor_compra: formValue.valor_compra,
-            valor_venda: formValue.valor_venda,
-            lucro: formValue.lucro,
+            valor_compra: valorCompraHook.value,
+            valor_venda: valorVendaHook.value,
+            lucro: lucroHook.value,
           },
         ];
 
         finalFormData.set("itens", JSON.stringify(itens));
 
         await request(async () => {
-          try{
+          try {
             const response = await API.postProduto(finalFormData);
-            
+
             if (response.ok) {
               if (response.itensEstoque) {
                 allItensCriados = allItensCriados.concat(response.itensEstoque);
@@ -141,7 +157,7 @@ export default function Produtos() {
           } catch (error) {
             console.log(error);
           }
-        })
+        });
       }
 
       if (allItensCriados.length > 0) {
@@ -245,7 +261,7 @@ export default function Produtos() {
               </Dropdown.Menu>
             </Dropdown>
           </Col>
-          
+
           {/* Marca */}
           <Col xs={6} md={2}>
             <Form.Label htmlFor="marcaProduto">Marca</Form.Label>
@@ -349,9 +365,7 @@ export default function Produtos() {
 
           {/* Valor de Compra */}
           <Col xs={4} md={4}>
-            <Form.Label htmlFor="valorCompraProduto">
-              Vlr. Compra
-            </Form.Label>
+            <Form.Label htmlFor="valorCompraProduto">Vlr. Compra</Form.Label>
             <InputGroup>
               <InputGroup.Text>R$</InputGroup.Text>
               <Form.Control
@@ -364,10 +378,10 @@ export default function Produtos() {
                 }
                 name="valor_compra"
                 id="valorCompraProduto"
-                type="number"
-                placeholder="0.00"
-                value={formValue.valor_compra || ""}
-                onChange={handleChange}
+                type="text"
+                placeholder="R$ 0,00"
+                value={valorCompraHook.displayValue}
+                onChange={handleValorCompraChange}
                 required
               />
             </InputGroup>
@@ -388,10 +402,10 @@ export default function Produtos() {
                 }
                 name="valor_venda"
                 id="valorVendaProduto"
-                type="number"
-                placeholder="0.00"
-                value={formValue.valor_venda || ""}
-                onChange={handleChange}
+                type="text"
+                placeholder="R$ 0,00"
+                value={valorVendaHook.displayValue}
+                onChange={handleValorVendaChange}
                 required
               />
             </InputGroup>
@@ -408,10 +422,10 @@ export default function Produtos() {
                 }
                 name="lucro"
                 id="LucroProduto"
-                type="number"
-                placeholder="0.00"
-                value={formValue.lucro || ""}
-                onChange={handleChange}
+                type="text"
+                placeholder="R$ 0,00"
+                value={lucroHook.displayValue}
+                onChange={handleLucroChange}
                 required
               />
             </InputGroup>
@@ -440,7 +454,12 @@ export default function Produtos() {
         {/* Botão Salvar */}
         <Row>
           <Col xs={12}>
-            <Button variant="outline-secondary" className="btn-roxo w-100" disabled={isLoading} type="submit">
+            <Button
+              variant="outline-secondary"
+              className="btn-roxo w-100"
+              disabled={isLoading}
+              type="submit"
+            >
               Cadastrar
             </Button>
           </Col>

@@ -74,6 +74,7 @@ export default async function vendaRoutes(fastify) {
             reply.code(500).send({message: "Erro ao cadastrar venda", err})
         }
     })
+
     fastify.put("/venda/:id", async (request, reply) => {
         try{
             const venda_Id = request.params.id

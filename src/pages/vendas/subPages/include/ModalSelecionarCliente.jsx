@@ -22,7 +22,7 @@ export default function ModalSelecionarCliente({
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" centered>
+    <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down" centered>
       <Modal.Header closeButton>
         <Modal.Title>Selecionar Cliente</Modal.Title>
       </Modal.Header>
