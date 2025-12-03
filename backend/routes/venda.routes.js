@@ -12,7 +12,7 @@ export default async function vendaRoutes(fastify) {
             as: "itensVendidos",
             include: [{ model: ItemEstoque, as: "itemEstoque" }],
           },
-          { model: NotaVenda, as: "pagamento" },
+          { model: NotaVenda, as: "notaVenda" },
         ],
       });
 
@@ -20,7 +20,7 @@ export default async function vendaRoutes(fastify) {
             return reply.code(404).send({message: "Nenhuma venda encontrada", ok: false})
       }
 
-      reply.code(200).send({ vendas, ok: true });
+      reply.code(200).send(vendas);
     } catch (err) {
       console.log(err);
       reply.code(500).send({ message: "Erro ao buscar Vendas", ok: false });
@@ -29,6 +29,7 @@ export default async function vendaRoutes(fastify) {
 
   fastify.post("/venda", async (request, reply) => {
     try {
+      console.log(request.body);
       const data = request.body;
       const itensVendidos = data.itensVendidos;
 

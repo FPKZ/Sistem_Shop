@@ -33,7 +33,7 @@ ItemVendido.belongsTo(ItemEstoque, {
   as: "itemEstoque",
 });
 
-Venda.hasMany(NotaVenda, { foreignKey: "venda_id", as: "pagamento" });
+Venda.hasMany(NotaVenda, { foreignKey: "venda_id", as: "notaVenda" });
 NotaVenda.belongsTo(Venda, { foreignKey: "venda_id", as: "venda" });
 
 ItemEstoque.hasOne(ItemReservado, {

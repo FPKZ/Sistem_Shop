@@ -27,6 +27,8 @@ export default function NovaVenda() {
   const [produtos, setProdutos] = useState([]);
   const [listaVenda, setListaVenda] = useState([]);
 
+  const [reservar, setReservar] = useState(false);
+
   const [showModalCliente, setShowModalCliente] = useState(false);
   const [showModalProduto, setShowModalProduto] = useState(false);
 
@@ -282,8 +284,18 @@ export default function NovaVenda() {
       </div>
 
       <Row className="g-4">
+        <Col xs={12} className="d-flex align-items-center justify-content-end gap-2 m-0 mt-2 mt-mb-0 mb-2 pe-4">
+          <Form.Check
+            type="switch"
+            id="custom-switch-page"
+            label="Reservar Produtos"
+            checked={reservar}
+            onChange={(e) => setReservar(e.target.checked)}
+            className="m-0 small"
+          />
+        </Col>
         {/* Coluna Esquerda: Cliente e Produtos */}
-        <Col lg={8}>
+        <Col lg={8} className="m-0">
           {/* Card Cliente */}
           <Card className="border-0 shadow-sm mb-3">
             <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center py-3">
@@ -509,7 +521,7 @@ export default function NovaVenda() {
         </Col>
 
         {/* Coluna Direita: Resumo */}
-        <Col lg={4}>
+        <Col lg={4} className="m-0">
           <Card
             className="border-0 shadow-sm sticky-top"
             style={{ top: "20px" }}

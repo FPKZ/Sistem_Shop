@@ -57,7 +57,8 @@ export default function TelaVendas() {
     // totalItems,
     setCurrentPage,
     setItemsPerPage,
-  } = usePagination(vendas);
+  } = usePagination(vendas, 5);
+  
 
   useEffect(() => {
     getVendas();
@@ -227,9 +228,9 @@ export default function TelaVendas() {
       <Row className="g-4">
         {/* Left Column: Sales List */}
         <Col lg={8}>
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-3">
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="position-relative">
+              <div className="d-flex justify-content-between align-items-center mb-4">
                 <h5 className="mb-0">Histórico de Vendas</h5>
                 <div className="d-flex align-items-center gap-2">
                   <span className="text-muted small">Exibir:</span>
@@ -252,12 +253,17 @@ export default function TelaVendas() {
               <TabelaVendas vendas={currentItems} onView={handleViewVenda} />
 
               {/* Pagination Controls */}
-              <div className="my-2">
-                <PaginationButtons
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={paginate}
-                />
+              <div className="position-absolute bottom-0 end-0 w-full m-3">
+                <div className="my-3 mb-4">
+                  <PaginationButtons
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={paginate}
+                  />
+                </div>
+                <div className="d-flex justify-content-end align-items-end">
+                  <span className="text-muted small">Mostrando {currentItems.length} de {vendas.length} vendas</span>
+                </div>
               </div>
             </Card.Body>
           </Card>

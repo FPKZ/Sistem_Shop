@@ -8,7 +8,7 @@ export default async function clienteRoutes(fastify) {
           { model: Venda, as: "vendas", 
               include: [
               { model: ItemVendido, as: "itensVendidos"},
-              { model: NotaVenda, as: "pagamento"}
+              { model: NotaVenda, as: "notaVenda"}
               ]
           },
           ],

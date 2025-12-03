@@ -126,6 +126,13 @@ export default function ModalAdicionarProduto({
     }
   };
 
+  const handleReset = () => {
+    setProdutoSelecionado(null);
+    setItensSelecionados([]);
+    setQuantidade(1);
+    setBusca("");
+  };
+
   // console.log(itensSelecionados);
   return (
     <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down" centered>
@@ -391,7 +398,7 @@ export default function ModalAdicionarProduto({
         {produtoSelecionado && (
           <Button
             variant="outline-secondary"
-            onClick={() => setProdutoSelecionado(null)}
+            onClick={() => handleReset()}
           >
             Voltar
           </Button>
