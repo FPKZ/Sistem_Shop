@@ -18,6 +18,7 @@ export default function ModalAdicionarProduto({
   onHide,
   produtos,
   onAdd,
+  calcularItensAjustados,
 }) {
   const [busca, setBusca] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
@@ -45,43 +46,35 @@ export default function ModalAdicionarProduto({
   const handleQuantidade = (qtd) => {
     // 1. Calcular a nova quantidade
     const novaQuantidade = quantidade + qtd;
-    
+
     // 2. Validar limites
-    if (novaQuantidade < 1 || novaQuantidade > produtoSelecionado.itemEstoque.length) {
+    if (
+      novaQuantidade < 1 ||
+      novaQuantidade > produtoSelecionado.itemEstoque.length
+    ) {
       return; // Não faz nada se estiver fora dos limites
     }
-    
+
     // 3. Atualizar a quantidade
     setQuantidade(novaQuantidade);
-    
-    // 4. Ajustar itensSelecionados baseado na nova quantidade
-    if (novaQuantidade > itensSelecionados.length) {
-      // AUMENTOU: Adicionar itens não selecionados
-      const itensParaAdicionar = [];
-      const idsJaSelecionados = itensSelecionados.map(i => i.id);
-      
-      // Encontrar itens que ainda não foram selecionados
-      for (const item of produtoSelecionado.itemEstoque) {
-        if (!idsJaSelecionados.includes(item.id)) {
-          itensParaAdicionar.push(item);
-          if (itensSelecionados.length + itensParaAdicionar.length >= novaQuantidade) {
-            break; // Parar quando atingir a quantidade desejada
-          }
-        }
-      }
-      
-      setItensSelecionados([...itensSelecionados, ...itensParaAdicionar]);
-      
-    } else if (novaQuantidade < itensSelecionados.length) {
-      // DIMINUIU: Remover últimos itens
-      setItensSelecionados(itensSelecionados.slice(0, novaQuantidade));
+
+    // 4. Ajustar itensSelecionados usando a função recebida via prop
+    if (calcularItensAjustados) {
+      const novosItens = calcularItensAjustados(
+        itensSelecionados,
+        produtoSelecionado.itemEstoque,
+        novaQuantidade
+      );
+      setItensSelecionados(novosItens);
     }
-    // Se novaQuantidade === itensSelecionados.length, não faz nada
   };
   const handleQuantidadeInput = (valorDigitado) => {
-    const novaQuantidade = Math.max(1, Math.min(valorDigitado, produtoSelecionado.itemEstoque.length));
+    const novaQuantidade = Math.max(
+      1,
+      Math.min(valorDigitado, produtoSelecionado.itemEstoque.length)
+    );
     const diferenca = novaQuantidade - quantidade;
-    
+
     if (diferenca !== 0) {
       handleQuantidade(diferenca);
     }
@@ -94,7 +87,9 @@ export default function ModalAdicionarProduto({
       alert("Quantidade maior que o estoque disponível!");
       return;
     }
-    const { id, nome, categoria, img, descricao, itemEstoque } = produtoSelecionado;
+    // eslint-disable-next-line no-unused-vars
+    const { id, nome, categoria, img, descricao, itemEstoque } =
+      produtoSelecionado;
     onAdd({
       id,
       nome,
@@ -225,7 +220,7 @@ export default function ModalAdicionarProduto({
         ) : (
           <div className="d-flex flex-column h-100">
             {/* Informações do produto - fixo */}
-            <div className="border rounded p-3 mb-3 bg-light flex-shrink-0">
+            <div className="border rounded p-3 mb-3 bg-light shrink-0">
               <h5 className="mb-2">{produtoSelecionado.nome}</h5>
               <div className="d-flex justify-content-between mb-2">
                 <span className="text-muted">Preço unitário:</span>
@@ -254,7 +249,7 @@ export default function ModalAdicionarProduto({
             </div>
 
             {/* Seletor de quantidade - fixo */}
-            <Form.Group className="flex-shrink-0">
+            <Form.Group className="shrink-0">
               <Form.Label>Quantidade</Form.Label>
               <InputGroup>
                 <Button
@@ -283,12 +278,12 @@ export default function ModalAdicionarProduto({
 
               {/* Container da lista de itens - cresce para preencher espaço */}
               <div
-                className="d-flex flex-column flex-grow-1 overflow-hidden mt-3 border rounded"
+                className="d-flex flex-column grow overflow-hidden mt-3 border rounded"
                 style={{ minHeight: 0 }}
               >
                 {/* Lista de itens com scroll */}
                 <div
-                  className="flex-grow-1 overflow-y-auto p-2"
+                  className="grow overflow-y-auto p-2"
                   style={{ maxHeight: "400px" }}
                 >
                   <div className="d-flex flex-column gap-2">

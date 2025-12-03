@@ -41,6 +41,22 @@ export async function reservarProduto(id){
     }
 }
 
+export async function updateItemEstoque(id, data){
+    try{
+        const response  = await fetch(`${back}/produto/item/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        })
+        const result = await response.json()
+        return result
+    } catch (error){
+        console.error("Erro ao atualizar item", error)
+    }
+}
+
 
 export async function deleteProduto(id){
     try{

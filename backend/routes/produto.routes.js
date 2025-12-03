@@ -1,4 +1,4 @@
-import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
+import { Produto, Nota, Categoria, ItemEstoque, Cliente, ItemVendido, ItemReservado} from "../database/models/index.js";
 import { Op } from "sequelize"
 import { put } from "@vercel/blob"
 import { randomUUID } from "crypto";
@@ -156,13 +156,23 @@ export default async function produtoRoutes(fastify) {
   fastify.put("/produto/reservar/:id", async (request, reply) => {
     try{
       const produtoId = request.params.id
-      console.log("produtoId", produtoId)
+      const clienteId = request.query.cliente_id
+      const cliente = await Cliente.findByPk(clienteId)
       const produto = await ItemEstoque.findByPk(produtoId)
-      console.log("produto", produto)
 
       if (!produto) {
         return reply.status(404).send({ error: 'Produto não encontrado', ok: false })
       }
+
+      if (!cliente) {
+        return reply.status(404).send({ error: 'Cliente não encontrado', ok: false })
+      }
+
+      await ItemReservado.create({
+        cliente_id: clienteId,
+        itemEstoque_id: produtoId,
+        data: new Date()
+      })
 
       await produto.update({status: "Reservado"})
 
@@ -170,6 +180,26 @@ export default async function produtoRoutes(fastify) {
     } catch(err){
       console.log(err)
       reply.code(500).send({ error: 'Erro ao reservar produto', ok: false })
+    }
+  })
+
+  fastify.put("/produto/item/:id", async (request, reply) => {
+    try{
+      const itemId = request.params.id
+      const data = request.body
+
+      const item = await ItemEstoque.findByPk(itemId)
+
+      if (!item) {
+        return reply.status(404).send({ error: 'Item não encontrado', ok: false })
+      }
+
+      await item.update(data)
+
+      reply.send({ message: 'Item atualizado com sucesso', item, ok: true })
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao atualizar item', ok: false })
     }
   })
 

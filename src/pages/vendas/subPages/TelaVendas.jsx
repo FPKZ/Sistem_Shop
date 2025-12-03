@@ -66,6 +66,7 @@ export default function TelaVendas() {
   const getVendas = async () => {
     setLoading(true);
     const v = await API.getVendas();
+    console.log(v)
     setVendas(Array.isArray(v) ? v : []);
     setLoading(false);
   };

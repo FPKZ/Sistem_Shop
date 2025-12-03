@@ -4,6 +4,7 @@ const back = import.meta.env.VITE_BACKEND_URL
 export async function getVendas(){
     try{
         const vendas = await ( await fetch(`${back}/vendas`, { method: "GET" })).json()
+        console.log(vendas)
         return vendas
     } catch(error){
         console.error("Erro ao buscar Vendas",  error)
@@ -20,7 +21,7 @@ export async function putVenda(data){
             body: JSON.stringify(data)
         })
         //console.log(response.status)
-        return response
+        return await response.json()
     } catch (error){
         console.error("Erro ao cadastrar venda", error)
     }

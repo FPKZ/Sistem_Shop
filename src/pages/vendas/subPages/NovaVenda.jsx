@@ -1,5 +1,14 @@
-import { Row, Col, Card, Button, Form, Table, Badge } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Table,
+  Badge,
+  Dropdown,
+} from "react-bootstrap";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState, useEffect } from "react";
 import utils from "@app/utils";
 import API from "@app/api";
@@ -11,6 +20,7 @@ import { Pencil, Trash, Trash2, Trash2Icon, TrashIcon } from "lucide-react";
 
 export default function NovaVenda() {
   const navigate = useNavigate();
+  const { mobile } = useOutletContext();
 
   const [clientes, setClientes] = useState([]);
   const [cliente, setCliente] = useState(null);
@@ -24,12 +34,20 @@ export default function NovaVenda() {
   const [pagamento, setPagamento] = useState(null);
   const [showModalPagamento, setShowModalPagamento] = useState(false);
 
-  
-
   useEffect(() => {
     getClientes();
     getProdutos();
   }, [showModalCliente, showModalProduto]);
+
+  useEffect(() => {
+    const reservar = async () => {
+      await Promise.all(
+        listaVenda.map((item) => item.itens.map((i) => reservarProduto(i.id)))
+      );
+    };
+
+    reservar();
+  }, [listaVenda]);
 
   const getClientes = async () => {
     const c = await API.getClientes();
@@ -41,6 +59,11 @@ export default function NovaVenda() {
     setProdutos(p || []);
   };
 
+  const reservarProduto = async (produto) => {
+    await API.reservarProduto(produto);
+    getProdutos();
+  };
+
   const handleAdicionarProduto = (produto) => {
     // Verificar se produto já está na lista
     const produtoExistente = listaVenda.find((item) => item.id === produto.id);
@@ -50,7 +73,11 @@ export default function NovaVenda() {
       setListaVenda(
         listaVenda.map((item) =>
           item.id === produto.id
-            ? { ...item, quantidade: item.quantidade + produto.quantidade, itens: item.itens.concat(produto.itens) }
+            ? {
+                ...item,
+                quantidade: item.quantidade + produto.quantidade,
+                itens: item.itens.concat(produto.itens),
+              }
             : item
         )
       );
@@ -59,31 +86,86 @@ export default function NovaVenda() {
       setListaVenda([...listaVenda, produto]);
     }
   };
-  console.log(listaVenda)
-  
-  const handleRemoverProduto = (id) => {
+
+  const handleRemoverProduto = async (id) => {
+    const produto = listaVenda.find((item) => item.id === id);
+    produto.itens.map(async (item) => {
+      const response = await API.updateItemEstoque(item.id, {
+        status: "Disponivel",
+      });
+      console.log(response);
+    });
+
+    await getProdutos();
+
     setListaVenda(listaVenda.filter((item) => item.id !== id));
+  };
+
+  // Função pura para calcular os itens ajustados
+  const calcularItensAjustados = (itensAtuais, todosItens, novaQuantidade) => {
+    const diferencaQuantidade = novaQuantidade - itensAtuais.length;
+    let novosItens = [...itensAtuais];
+
+    if (diferencaQuantidade > 0) {
+      // AUMENTOU: Adicionar itens não selecionados
+      const idsJaSelecionados = itensAtuais.map((i) => i.id);
+      const itensParaAdicionar = [];
+
+      // Encontrar itens que ainda não foram selecionados
+      for (const item of todosItens) {
+        if (!idsJaSelecionados.includes(item.id)) {
+          itensParaAdicionar.push(item);
+          if (itensParaAdicionar.length >= diferencaQuantidade) {
+            break; // Parar quando atingir a quantidade desejada
+          }
+        }
+      }
+
+      novosItens = [...itensAtuais, ...itensParaAdicionar];
+    } else if (diferencaQuantidade < 0) {
+      // DIMINUIU: Remover últimos itens
+      novosItens = itensAtuais.slice(0, novaQuantidade);
+    }
+
+    return novosItens;
   };
 
   const handleAlterarQuantidade = (id, novaQuantidade) => {
     if (novaQuantidade < 1) return;
 
     const produto = produtos.find((p) => p.id === id);
-    if (novaQuantidade > produto.estoque) {
+    const itemVenda = listaVenda.find((item) => item.id === id);
+
+    // Validar se há estoque suficiente
+    if (novaQuantidade > produto.itemEstoque.length) {
       alert("Quantidade maior que o estoque disponível!");
       return;
     }
 
+    const novosItens = calcularItensAjustados(
+      itemVenda.itens,
+      produto.itemEstoque,
+      novaQuantidade
+    );
+
+    // Atualizar lista de vendas
     setListaVenda(
       listaVenda.map((item) =>
-        item.id === id ? { ...item, quantidade: novaQuantidade } : item
+        item.id === id
+          ? {
+              ...item,
+              quantidade: novaQuantidade,
+              itens: novosItens,
+            }
+          : item
       )
     );
   };
 
   const calcularSubtotal = () => {
     return listaVenda.reduce(
-      (total, item) => total + item.itens.reduce( (total, i) => total + i.valor_venda * item.quantidade, 0),
+      (total, item) =>
+        total + item.itens.reduce((total, i) => total + i.valor_venda, 0),
       0
     );
   };
@@ -96,7 +178,13 @@ export default function NovaVenda() {
     displayValue: displayDesconto,
     onChange: handleDescontoChange,
   } = useCurrencyInput({
-    max: calcularSubtotal() || 0,
+    max:
+      calcularSubtotal() -
+        listaVenda.reduce(
+          (total, item) =>
+            total + item.itens.reduce((total, i) => total + i.valor_compra, 0),
+          0
+        ) || 0,
   });
 
   const handleAdicionarPagamento = (pagamento) => {
@@ -143,26 +231,38 @@ export default function NovaVenda() {
       return;
     }
 
+    const itens = [];
+
+    listaVenda.map((item) =>
+      item.itens.map((i) =>
+        itens.push({
+          itemEstoque_id: i.id,
+          valor_unitario: i.valor_venda,
+        })
+      )
+    );
+
     // Aqui você implementaria a lógica de salvar a venda
     const venda = {
       cliente_id: cliente.id,
       data_venda: new Date().toISOString(),
-      forma_pagamento: pagamentos,
+      notaVenda: pagamentos,
       desconto: desconto,
       valor_total: calcularTotal(),
       status: "concluida",
-      itens: listaVenda.map((item) => ({
-        produto_id: item.id,
-        quantidade: item.quantidade,
-        valor_unitario: item.valor_venda,
-      })),
+      itensVendidos: itens,
     };
 
     console.log("Venda a ser salva:", venda);
 
-    // await API.putVenda(venda);
-    alert("Venda finalizada com sucesso!");
-    // navigate("/vendas");
+    const response = await API.putVenda(venda);
+    console.log(response)
+    if (response.ok) {
+      alert("Venda finalizada com sucesso!");
+      // navigate("/vendas");
+    } else {
+      alert("Erro ao finalizar venda!");
+    }
   };
 
   const sobra =
@@ -170,6 +270,8 @@ export default function NovaVenda() {
     pagamentos
       .map((pagamento) => pagamento.valor_pagamento)
       .reduce((total, valor) => total + valor, 0);
+
+  console.log(listaVenda);
   return (
     <>
       <div className="mb-4">
@@ -243,88 +345,156 @@ export default function NovaVenda() {
             </Card.Header>
             <Card.Body className="p-0">
               {listaVenda.length > 0 ? (
-                <div className="table-responsive">
-                  <Table hover className="align-middle mb-0">
-                    <thead className="bg-light">
-                      <tr>
-                        <th className="border-0">Produto</th>
-                        <th className="border-0">Preço Un.</th>
-                        <th className="border-0" style={{ width: "150px" }}>
-                          Quantidade
-                        </th>
-                        <th className="border-0">Subtotal</th>
-                        <th className="border-0 text-end">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {listaVenda.map((item) => (
-                        <tr key={item.id}>
-                          <td>
+                <div className="d-flex flex-column">
+                  {/* Header - Visível apenas em desktop */}
+                  <Row className="py-2 m-0 d-none d-md-flex border-bottom">
+                    <Col md={4} className="fw-semibold">
+                      Produto
+                    </Col>
+                    <Col md={2} className="fw-semibold">
+                      Preço Un.
+                    </Col>
+                    <Col md={3} className="fw-semibold text-center">
+                      Quantidade
+                    </Col>
+                    <Col md={2} className="fw-semibold">
+                      Subtotal
+                    </Col>
+                    <Col md={1} className="fw-semibold text-center m-0 p-0">
+                      Ação
+                    </Col>
+                  </Row>
+
+                  {/* Lista de produtos */}
+                  {listaVenda.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className={`border-top ${
+                        index % 2 === 0 ? "bg-white" : "bg-light bg-opacity-25"
+                      }`}
+                    >
+                      <Row className="py-2 px-1 m-0 align-items-center">
+                        {/* Produto */}
+                        <Col
+                          xs={10}
+                          md={4}
+                          className="mb-2 mb-md-0 order-first"
+                        >
+                          <div className="d-flex flex-column">
+                            <span className="d-none text-muted small mb-1">
+                              Produto
+                            </span>
                             <div className="fw-bold">{item.nome}</div>
                             <small className="text-muted">{item.codigo}</small>
-                          </td>
-                          <td className="text-success fw-bold">
-                            {utils.formatMoney(Math.max(item.itens.reduce((total, i) => total + i.valor_venda, 0), 0))}
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center gap-1">
-                              <Button
-                                size="sm"
-                                variant="outline-secondary"
-                                onClick={() =>
-                                  handleAlterarQuantidade(
-                                    item.id,
-                                    item.quantidade - 1
-                                  )
-                                }
-                              >
-                                -
-                              </Button>
-                              <Form.Control
-                                type="number"
-                                size="sm"
-                                value={item.quantidade}
-                                onChange={(e) =>
-                                  handleAlterarQuantidade(
-                                    item.id,
-                                    parseInt(e.target.value) || 1
-                                  )
-                                }
-                                className="text-center"
-                                style={{ width: "60px" }}
-                              />
-                              <Button
-                                size="sm"
-                                variant="outline-secondary"
-                                onClick={() =>
-                                  handleAlterarQuantidade(
-                                    item.id,
-                                    item.quantidade + 1
-                                  )
-                                }
-                              >
-                                +
-                              </Button>
-                            </div>
-                          </td>
-                          <td className="fw-bold">
-                            {utils.formatMoney(
-                              item.itens.reduce((total, i) => total + i.valor_venda * item.quantidade, 0)
-                            )}
-                          </td>
-                          <td className="text-end">
-                            <Button
-                              size="sm"
-                              variant="outline-danger"
-                              onClick={() => handleRemoverProduto(item.id)}
+                          </div>
+                        </Col>
+
+                        {/* Preço Unitário */}
+                        <Col xs={3} md={2} className="mb-0 order-3 order-md-2">
+                          <div className="d-flex flex-column">
+                            <span className="d-md-none text-muted small mb-1">
+                              Preço Un.
+                            </span>
+                            <span className="text-success fw-bold">
+                              {utils.formatMoney(
+                                Math.max(
+                                  ...item.itens.map((i) => i.valor_venda),
+                                  0
+                                )
+                              )}
+                            </span>
+                          </div>
+                        </Col>
+
+                        {/* Quantidade */}
+                        <Col
+                          xs={3}
+                          md={3}
+                          className="mb-2 mb-md-0 order-2 order-md-3"
+                        >
+                          <div className="d-flex flex-column align-items-md-center w-100">
+                            <span className="d-md-none text-muted small mb-1">
+                              Quantidade
+                            </span>
+                            <div
+                              className={`d-flex align-items-center gap-1 ${
+                                mobile ? "w-100" : "w-50"
+                              }`}
                             >
-                              <i className="bi bi-trash"></i>
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                              <Dropdown className="w-100">
+                                <Dropdown.Toggle
+                                  variant="outline-secondary"
+                                  size="sm"
+                                  className="w-100"
+                                >
+                                  {item.quantidade}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu className="dropdown-menu">
+                                  {Array.from(
+                                    {
+                                      length: produtos.find(
+                                        (i) => i.id === item.id
+                                      ).itemEstoque.length,
+                                    },
+                                    (_, i) => i + 1
+                                  ).map((quantidade) => (
+                                    <Dropdown.Item
+                                      className="text-center"
+                                      key={quantidade}
+                                      onClick={() =>
+                                        handleAlterarQuantidade(
+                                          item.id,
+                                          quantidade
+                                        )
+                                      }
+                                    >
+                                      {quantidade}
+                                    </Dropdown.Item>
+                                  ))}
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </div>
+                          </div>
+                        </Col>
+
+                        {/* Subtotal */}
+                        <Col
+                          xs={6}
+                          md={2}
+                          className="m-0 text-end text-md-start order-4 order-md-4"
+                        >
+                          <div className="d-flex flex-column">
+                            <span className="d-md-none text-muted small mb-1">
+                              Subtotal
+                            </span>
+                            <span className="fw-bold">
+                              {utils.formatMoney(
+                                item.itens.reduce(
+                                  (total, i) => total + i.valor_venda,
+                                  0
+                                )
+                              )}
+                            </span>
+                          </div>
+                        </Col>
+
+                        {/* Ação */}
+                        <Col
+                          xs={2}
+                          md={1}
+                          className="flex justify-content-end justify-content-md-center order-1 order-md-last"
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            onClick={() => handleRemoverProduto(item.id)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </Col>
+                      </Row>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-5 text-muted">
@@ -515,6 +685,7 @@ export default function NovaVenda() {
           onHide={() => setShowModalProduto(false)}
           produtos={produtos}
           onAdd={handleAdicionarProduto}
+          calcularItensAjustados={calcularItensAjustados}
         />
       )}
 
