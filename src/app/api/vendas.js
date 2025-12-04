@@ -11,7 +11,7 @@ export async function getVendas(){
     }
 }
 
-export async function putVenda(data){
+export async function postVenda(data){
     try{
         const response  = await fetch(`${back}/venda`, {
             method: "POST",

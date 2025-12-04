@@ -183,6 +183,33 @@ export default async function produtoRoutes(fastify) {
     }
   })
 
+  fastify.put("/produto/remover/:id", async (request, reply) => {
+    try{
+      const itemId = request.params.id
+      const data = request.body
+
+      const item = await ItemEstoque.findByPk(itemId)
+      const itemReservado = await ItemReservado.findOne({where: {itemEstoque_id: itemId}})
+
+      if (!item) {
+        return reply.status(404).send({ error: 'Item não encontrado', ok: false })
+      }
+
+      if (!itemReservado) {
+        return reply.status(404).send({ error: 'Item reservado não encontrado', ok: false })
+      }
+
+      await itemReservado.destroy()
+
+      await item.update(data)
+
+      reply.send({ message: 'Item atualizado com sucesso', item, ok: true })
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao atualizar item', ok: false })
+    }
+  })
+
   fastify.put("/produto/item/:id", async (request, reply) => {
     try{
       const itemId = request.params.id

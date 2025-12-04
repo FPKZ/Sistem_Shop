@@ -85,7 +85,7 @@ export default function TabelaVendas({ vendas, onView }) {
                 Valor:
               </span>
               <span className="fw-bold text-dark">
-                {utils.formatMoney(venda.total)}
+                {utils.formatMoney(venda.valor_total)}
               </span>
             </Col>
 

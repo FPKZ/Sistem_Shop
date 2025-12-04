@@ -44,7 +44,7 @@ export default function NovaVenda() {
   useEffect(() => {
     const reservar = async () => {
       await Promise.all(
-        listaVenda.map((item) => item.itens.map((i) => reservarProduto(i.id)))
+        listaVenda.map((item) => item.itens.map((i) => reservarProduto(i.id, cliente.id)))
       );
     };
 
@@ -62,11 +62,11 @@ export default function NovaVenda() {
   };
 
   const reservarProduto = async (produto) => {
-    await API.reservarProduto(produto);
+    await API.reservarProduto(produto, cliente.id);
     getProdutos();
   };
 
-  const handleAdicionarProduto = (produto) => {
+  const handleAdicionarProduto = async (produto) => {
     // Verificar se produto já está na lista
     const produtoExistente = listaVenda.find((item) => item.id === produto.id);
 
@@ -87,15 +87,15 @@ export default function NovaVenda() {
       // Adicionar novo produto
       setListaVenda([...listaVenda, produto]);
     }
+    await getProdutos();
   };
 
   const handleRemoverProduto = async (id) => {
     const produto = listaVenda.find((item) => item.id === id);
     produto.itens.map(async (item) => {
-      const response = await API.updateItemEstoque(item.id, {
+      await API.removerProduto(item.id, {
         status: "Disponivel",
       });
-      console.log(response);
     });
 
     await getProdutos();
@@ -244,20 +244,23 @@ export default function NovaVenda() {
       )
     );
 
+    const currentDate = new Date().toISOString();
+    const currentTotal = calcularTotal();
+
     // Aqui você implementaria a lógica de salvar a venda
     const venda = {
       cliente_id: cliente.id,
-      data_venda: new Date().toISOString(),
+      data_venda: currentDate,
       notaVenda: pagamentos,
       desconto: desconto,
-      valor_total: calcularTotal(),
+      valor_total: currentTotal,
       status: "concluida",
       itensVendidos: itens,
     };
 
     console.log("Venda a ser salva:", venda);
 
-    const response = await API.putVenda(venda);
+    const response = await API.postVenda(venda);
     console.log(response)
     if (response.ok) {
       alert("Venda finalizada com sucesso!");
@@ -273,6 +276,13 @@ export default function NovaVenda() {
       .map((pagamento) => pagamento.valor_pagamento)
       .reduce((total, valor) => total + valor, 0);
 
+  const handleCancelarVenda = async () => {
+    
+    await listaVenda.map( async (item) => await handleRemoverProduto(item.id))
+    
+    navigate("/vendas");
+  };
+  
   console.log(listaVenda);
   return (
     <>
@@ -446,7 +456,7 @@ export default function NovaVenda() {
                                     {
                                       length: produtos.find(
                                         (i) => i.id === item.id
-                                      ).itemEstoque.length,
+                                      ).itemEstoque.length || 0,
                                     },
                                     (_, i) => i + 1
                                   ).map((quantidade) => (
@@ -563,7 +573,7 @@ export default function NovaVenda() {
 
                         {pagamento.parcelas && (
                           <div className="text-end">
-                            <smal className="text-muted">Parcelas</smal>
+                            <small className="text-muted">Parcelas</small>
                             <div className="fw-bold">{pagamento.parcelas}</div>
                           </div>
                         )}
@@ -672,7 +682,7 @@ export default function NovaVenda() {
               <Button
                 variant="outline-secondary"
                 className="w-100 mt-2"
-                onClick={() => navigate("/vendas")}
+                onClick={() => handleCancelarVenda()}
               >
                 Cancelar
               </Button>

@@ -29,15 +29,31 @@ export async function postProduto(data){
 }
 
 
-export async function reservarProduto(id){
+export async function reservarProduto(id, cliente){
     try{
-        const response  = await fetch(`${back}/produto/reservar/${id}`, {
+        const response  = await fetch(`${back}/produto/reservar/${id}?cliente_id=${cliente}`, {
             method: "PUT"
         })
         const result = await response.json()
         return result
     } catch (error){
         console.error("Erro ao reservar produto", error)
+    }
+}
+
+export async function removerProduto(id, data){
+    try{
+        const response  = await fetch(`${back}/produto/remover/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        })
+        const result = await response.json()
+        return result
+    } catch (error){
+        console.error("Erro ao remover produto", error)
     }
 }
 

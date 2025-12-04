@@ -38,6 +38,8 @@ export default function Layout() {
     setMobile
   }), [mobile]);
 
+  
+
 
   return (
     <>

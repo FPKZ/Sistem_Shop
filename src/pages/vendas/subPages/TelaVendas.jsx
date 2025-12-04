@@ -31,6 +31,7 @@ import { usePagination } from "@hooks/usePagination";
 import PaginationButtons from "@components/Pagination/PaginationButtons";
 import ItemsPerPageSelector from "@components/Pagination/ItemsPerPageSelector";
 
+
 const cardStyle = {
   cursor: "pointer",
   fontSize: "0.9rem"
@@ -43,6 +44,7 @@ export default function TelaVendas() {
   const [loading, setLoading] = useState(true);
   const [selectedVenda, setSelectedVenda] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
 
   // Pagination State
   const {
@@ -58,7 +60,8 @@ export default function TelaVendas() {
     setCurrentPage,
     setItemsPerPage,
   } = usePagination(vendas, 5);
-  
+
+
 
   useEffect(() => {
     getVendas();
@@ -88,7 +91,7 @@ export default function TelaVendas() {
     // O método .reduce percorre cada item (curr) e soma ao acumulador (acc).
     const totalReceita = vendas.reduce(
       // Converte o valor_total para número; se falhar, usa 0.
-      (acc, curr) => acc + (Number(curr.total) || 0),
+      (acc, curr) => acc + (Number(curr.valor_total) || 0),
       0 // Valor inicial do acumulador é 0.
     );
 
@@ -137,7 +140,7 @@ export default function TelaVendas() {
       // Incrementa a contagem de vendas para essa data.
       acc[date].vendas += 1;
       // Soma o valor total da venda à receita dessa data.
-      acc[date].receita += Number(curr.total) || 0;
+      acc[date].receita += Number(curr.valor_total) || 0;
       
       return acc; // Retorna o acumulador atualizado.
     }, {}); // Começa com um objeto vazio.
