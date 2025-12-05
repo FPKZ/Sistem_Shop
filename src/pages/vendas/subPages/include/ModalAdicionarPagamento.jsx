@@ -69,14 +69,14 @@ export default function ModalAdicionarPagamento({
       case "Dinheiro":
         pagamento = {
           forma_pagamento: formaPagamento,
-          valor_pagamento: valorPagamento,
+          valor_nota: valorPagamento,
           data_pagamento: new Date(),
         };
         break;
       case "Cartão de Crédito":
         pagamento = {
           forma_pagamento: formaPagamento,
-          valor_pagamento: valorPagamento,
+          valor_nota: valorPagamento,
           codigo_pagamento: codigoPagamento,
           parcelas: parcelas,
           data_pagamento: new Date(),
@@ -85,7 +85,7 @@ export default function ModalAdicionarPagamento({
       case "Promissória":
         pagamento = {
           forma_pagamento: formaPagamento,
-          valor_pagamento: valorPagamento,
+          valor_nota: valorPagamento,
           parcelas: parcelas,
           data_pagamento: dataPagamento,
         };
@@ -93,7 +93,7 @@ export default function ModalAdicionarPagamento({
       default:
         pagamento = {
           forma_pagamento: formaPagamento,
-          valor_pagamento: valorPagamento,
+          valor_nota: valorPagamento,
           codigo_pagamento: codigoPagamento,
           data_pagamento: new Date(),
         };
@@ -131,7 +131,7 @@ export default function ModalAdicionarPagamento({
             <Form.Label>Valor do Pagamento</Form.Label>
             <Form.Control
               type="text"
-              name="valor_pagamento"
+              name="valor_nota"
               placeholder="R$ 0,00"
               value={displayValorPagamento}
               onChange={handleValorChange}

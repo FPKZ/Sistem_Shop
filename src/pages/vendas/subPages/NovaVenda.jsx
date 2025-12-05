@@ -193,11 +193,11 @@ export default function NovaVenda() {
     if (pagamento.index !== undefined && pagamento.index !== null) {
       const newPagamentos = [...pagamentos];
       // console.log("Pagamentos edit", newPagamentos)
-      const { forma_pagamento, valor_pagamento, parcelas, data_pagamento } =
+      const { forma_pagamento, valor_nota, parcelas, data_pagamento } =
         pagamento;
       newPagamentos[pagamento.index] = {
         forma_pagamento,
-        valor_pagamento,
+        valor_nota,
         parcelas,
         data_pagamento,
       };
@@ -221,6 +221,9 @@ export default function NovaVenda() {
     setPagamento({ ...pagamento, index: index });
     setShowModalPagamento(true);
   };
+  const d = pagamentos.map((item) => item.forma_pagamento === "Promissória" ? item.data_pagamento : null)
+  const diff = new Date(d) - new Date()
+  console.log(d, new Date().toDateString(), diff / (1000 * 60 * 60 * 24))
 
   const handleFinalizarVenda = async () => {
     if (!cliente) {
@@ -246,6 +249,10 @@ export default function NovaVenda() {
 
     const currentDate = new Date().toISOString();
     const currentTotal = calcularTotal();
+    const status = pagamentos.every((item) => item.forma_pagamento === "Promissória") ? "pendente" : "concluida";
+
+    const d = pagamentos.every((item) => item.forma_pagamento === "Promissória")
+    console.log(d, new Date().toDateString(), new Date().toTimeString() - d)
 
     // Aqui você implementaria a lógica de salvar a venda
     const venda = {
@@ -254,7 +261,7 @@ export default function NovaVenda() {
       notaVenda: pagamentos,
       desconto: desconto,
       valor_total: currentTotal,
-      status: "concluida",
+      status: status,
       itensVendidos: itens,
     };
 
@@ -282,7 +289,7 @@ export default function NovaVenda() {
     
     navigate("/vendas");
   };
-  
+  console.log(pagamentos);
   console.log(listaVenda);
   return (
     <>
@@ -592,7 +599,7 @@ export default function NovaVenda() {
                       <div className="mb-2 text-end">
                         <small className="text-muted">Valor</small>
                         <div className="fw-bold">
-                          {utils.formatMoney(pagamento.valor_pagamento)}
+                          {utils.formatMoney(pagamento.valor_nota)}
                         </div>
                       </div>
                     </Col>
