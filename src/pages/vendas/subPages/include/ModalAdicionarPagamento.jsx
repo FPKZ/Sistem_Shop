@@ -36,7 +36,7 @@ export default function ModalAdicionarPagamento({
     if (pagamentoEdit) {
       setValorPagamento(pagamentoEdit.valor_pagamento);
       setFormaPagamento(pagamentoEdit.forma_pagamento);
-      setCodigoPagamento(pagamentoEdit.codigo_pagamento);
+      setCodigoPagamento(pagamentoEdit.codigo);
       setParcelas(pagamentoEdit.parcelas || 1);
       setDataPagamento(pagamentoEdit.data_pagamento);
       setIndex(pagamentoEdit.index);
@@ -56,7 +56,7 @@ export default function ModalAdicionarPagamento({
     const { name, value } = e.target;
 
     if (name === "forma_pagamento") setFormaPagamento(value);
-    if (name === "codigo_pagamento") setCodigoPagamento(value);
+    if (name === "codigo") setCodigoPagamento(value);
     if (name === "parcelas") setParcelas(value);
     if (name === "data_pagamento") setDataPagamento(value);
   };
@@ -77,7 +77,7 @@ export default function ModalAdicionarPagamento({
         pagamento = {
           forma_pagamento: formaPagamento,
           valor_nota: valorPagamento,
-          codigo_pagamento: codigoPagamento,
+          codigo: codigoPagamento,
           parcelas: parcelas,
           data_pagamento: new Date(),
         };
@@ -94,7 +94,7 @@ export default function ModalAdicionarPagamento({
         pagamento = {
           forma_pagamento: formaPagamento,
           valor_nota: valorPagamento,
-          codigo_pagamento: codigoPagamento,
+          codigo: codigoPagamento,
           data_pagamento: new Date(),
         };
         break;
@@ -145,7 +145,7 @@ export default function ModalAdicionarPagamento({
                   <Form.Label>Código do Pagamento</Form.Label>
                   <Form.Control
                     type="text"
-                    name="codigo_pagamento"
+                    name="codigo"
                     placeholder="Ex: 12345"
                     value={codigoPagamento}
                     onChange={handleChange}

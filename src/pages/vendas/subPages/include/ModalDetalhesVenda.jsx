@@ -1,34 +1,62 @@
 import { Modal, Button, Table, Row, Col } from "react-bootstrap";
 import utils from "@app/utils";
+import { useOutletContext } from "react-router-dom";
 
 export default function ModalDetalhesVenda({ show, onHide, venda }) {
+  const { mobile } = useOutletContext();
+
   if (!venda) return null;
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" centered>
+    <Modal show={show} onHide={onHide} size="lg" fullscreen="lg-down" centered>
       <Modal.Header closeButton>
         <Modal.Title>Detalhes da Venda #{venda.id}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row className="mb-3">
-          <Col md={6}>
-            <h5>Informações do Cliente</h5>
-            <p>
-              <strong>Nome:</strong> {venda.cliente?.nome || "N/A"}
-            </p>
-            <p>
-              <strong>Data:</strong> {utils.formatDate(venda.data_venda)}
-            </p>
-            <p>
-              <strong>Status:</strong> {utils.capitalize(venda.status)}
-            </p>
+          <Col xs={12} md={6} className={mobile ? "border-bottom pb-2 mb-3" : ``}>
+          <Row>
+              <h5>Informações do Cliente</h5>
+              <Col xs={6} md={12}>
+                <p>
+                  <strong>Nome:</strong> {venda.cliente?.nome || "N/A"}
+                </p>
+                <p>
+                  <strong>Email:</strong> {venda.cliente?.email || "N/A"}
+                </p>
+              </Col>
+              <Col xs={6} md={12}>
+                <p>
+                  <strong>Telefone:</strong> {venda.cliente?.telefone || "N/A"}
+                </p>
+                <p>
+                  <strong>Endereço:</strong> {venda.cliente?.endereco || "N/A"}
+                </p>
+              </Col>
+          </Row>
           </Col>
-          <Col md={6} className="text-end">
-            <h5>Resumo</h5>
-            <p>
-              <strong>Total:</strong>{" "}
-              {utils.formatMoney(venda.valor_total || 0)}
-            </p>
+          <Col xs={12} md={6} className="text-start text-md-end">
+          <Row>
+              <h5>Resumo</h5>
+              <Col xs={6} md={12}>
+                <p>
+                  <strong>Data:</strong> {utils.formatDate(venda.data_venda)}
+                </p>
+                <p>
+                  <strong>Forma de Pagamento:</strong>{" "}
+                  {venda.forma_pagamento}
+                </p>
+              </Col>
+              <Col xs={6} md={12}>
+                <p>
+                  <strong>Status:</strong> {utils.capitalize(venda.status)}
+                </p>
+                <p>
+                  <strong>Total:</strong>{" "}
+                  {utils.formatMoney(venda.valor_total || 0)}
+                </p>
+              </Col>
+          </Row>
           </Col>
         </Row>
 
@@ -37,22 +65,22 @@ export default function ModalDetalhesVenda({ show, onHide, venda }) {
           <thead>
             <tr>
               <th>Produto</th>
-              <th>Qtd</th>
-              <th>Valor Unit.</th>
-              <th>Subtotal</th>
+              <th>Marca</th>
+              <th>Tamanho</th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
-            {venda.itens_venda && venda.itens_venda.length > 0 ? (
-              venda.itens_venda.map((item, index) => (
+            {venda.itensVendidos && venda.itensVendidos.length > 0 ? (
+              venda.itensVendidos.map((item, index) => (
                 <tr key={index}>
                   <td>
-                    {item.produto?.nome || item.nome_produto || "Produto"}
+                    {item.itemEstoque.nome}
                   </td>
-                  <td>{item.quantidade}</td>
-                  <td>{utils.formatMoney(item.valor_unitario)}</td>
+                  <td>{item.itemEstoque.marca}</td>
+                  <td>{item.itemEstoque.tamanho}</td>
                   <td>
-                    {utils.formatMoney(item.quantidade * item.valor_unitario)}
+                    {utils.formatMoney(item.itemEstoque.valor_venda)}
                   </td>
                 </tr>
               ))

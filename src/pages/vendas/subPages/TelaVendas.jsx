@@ -31,6 +31,8 @@ import { usePagination } from "@hooks/usePagination";
 import PaginationButtons from "@components/Pagination/PaginationButtons";
 import ItemsPerPageSelector from "@components/Pagination/ItemsPerPageSelector";
 
+import { useOutletContext } from "react-router-dom";
+
 
 const cardStyle = {
   cursor: "pointer",
@@ -39,7 +41,7 @@ const cardStyle = {
 
 export default function TelaVendas() {
   const navigate = useNavigate();
-
+  const { mobile } = useOutletContext();
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVenda, setSelectedVenda] = useState(null);
@@ -230,7 +232,7 @@ export default function TelaVendas() {
 
       <Row className="g-4">
         {/* Left Column: Sales List */}
-        <Col lg={8}>
+        <Col md={8}>
           <Card className="border-0 shadow-sm h-100">
             <Card.Body className="position-relative">
               <div className="d-flex justify-content-between align-items-center mb-4">
@@ -256,7 +258,7 @@ export default function TelaVendas() {
               <TabelaVendas vendas={currentItems} onView={handleViewVenda} />
 
               {/* Pagination Controls */}
-              <div className="position-absolute bottom-0 end-0 w-full m-3">
+              <div className={mobile ? "" : "position-absolute bottom-0 end-0 w-full m-3"}>
                 <div className="my-3 mb-4">
                   <PaginationButtons
                     currentPage={currentPage}
@@ -273,7 +275,7 @@ export default function TelaVendas() {
         </Col>
 
         {/* Right Column: Dashboard & Stats */}
-        <Col lg={4}>
+        <Col md={4}>
           <div className="d-flex flex-column gap-3">
             {/* Total Revenue Card */}
             <Card className="border-0 shadow-sm bg-primary text-white">

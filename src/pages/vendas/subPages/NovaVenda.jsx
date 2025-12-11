@@ -17,6 +17,9 @@ import ModalSelecionarCliente from "./include/ModalSelecionarCliente";
 import ModalAdicionarProduto from "./include/ModalAdicionarProduto";
 import ModalAdicionarPagamento from "./include/ModalAdicionarPagamento";
 import { Pencil, Trash, Trash2, Trash2Icon, TrashIcon } from "lucide-react";
+import { useToast } from "@contexts/ToastContext";
+import { useLoadRequest } from "@hooks/useLoadRequest";
+
 
 export default function NovaVenda() {
   const navigate = useNavigate();
@@ -35,6 +38,10 @@ export default function NovaVenda() {
   const [pagamentos, setPagamentos] = useState([]);
   const [pagamento, setPagamento] = useState(null);
   const [showModalPagamento, setShowModalPagamento] = useState(false);
+
+  const { showToast } = useToast();
+
+  const [isLoading, request] = useLoadRequest();
 
   useEffect(() => {
     getClientes();
@@ -221,10 +228,8 @@ export default function NovaVenda() {
     setPagamento({ ...pagamento, index: index });
     setShowModalPagamento(true);
   };
-  const d = pagamentos.map((item) => item.forma_pagamento === "Promissória" ? item.data_pagamento : null)
-  const diff = new Date(d) - new Date()
-  console.log(d, new Date().toDateString(), diff / (1000 * 60 * 60 * 24))
 
+  
   const handleFinalizarVenda = async () => {
     if (!cliente) {
       alert("Selecione um cliente!");
@@ -251,9 +256,6 @@ export default function NovaVenda() {
     const currentTotal = calcularTotal();
     const status = pagamentos.every((item) => item.forma_pagamento === "Promissória") ? "pendente" : "concluida";
 
-    const d = pagamentos.every((item) => item.forma_pagamento === "Promissória")
-    console.log(d, new Date().toDateString(), new Date().toTimeString() - d)
-
     // Aqui você implementaria a lógica de salvar a venda
     const venda = {
       cliente_id: cliente.id,
@@ -266,22 +268,25 @@ export default function NovaVenda() {
     };
 
     console.log("Venda a ser salva:", venda);
-
-    const response = await API.postVenda(venda);
-    console.log(response)
-    if (response.ok) {
-      alert("Venda finalizada com sucesso!");
-      // navigate("/vendas");
-    } else {
-      alert("Erro ao finalizar venda!");
-    }
-  };
+    request(async () => {
+      const response = await API.postVenda(venda);
+      console.log(response)
+      if (response.ok) {
+        showToast("Venda finalizada com sucesso!", "success");
+        navigate("/vendas");
+      } else {
+        showToast("Erro ao finalizar venda!", "error");
+      }
+    })
+  }
 
   const sobra =
     calcularTotal() -
     pagamentos
-      .map((pagamento) => pagamento.valor_pagamento)
+      .map((pagamento) => pagamento.valor_nota)
       .reduce((total, valor) => total + valor, 0);
+
+  console.log(sobra)
 
   const handleCancelarVenda = async () => {
     
@@ -679,7 +684,8 @@ export default function NovaVenda() {
                   !cliente ||
                   listaVenda.length === 0 ||
                   pagamentos.length === 0 ||
-                  sobra !== 0
+                  sobra !== 0 ||
+                  isLoading
                 }
               >
                 <i className="bi bi-check-circle me-2"></i>

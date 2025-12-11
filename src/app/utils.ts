@@ -1,5 +1,5 @@
 // utils.js
-import { format, formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // 📆 Formata data em dd/MM/yyyy HH:mm
@@ -18,6 +18,31 @@ const formatDate = (dataISO) => {
   }
 
   return format(new Date(dataISO), 'dd/MM/yyyy')
+}
+
+// Formata data e retorna o dia da semana
+const formatDayOfWeek = (dataISO) => {
+  if (!dataISO) return ''
+  return format(new Date(dataISO), 'EEEE', { locale: ptBR })
+}
+
+// Formata data e retorna a diferença em dias
+const formatDifferenceInDays = (start : Date, end : Date) => {
+  if (!start || !end) return ''
+  const duration = intervalToDuration({ start, end })
+
+  console.log(duration)
+  
+  const parts = []
+  if (duration.years > 0) parts.push(`${duration.years} ano${duration.years > 1 ? 's' : ''}`)
+  if (duration.months > 0) parts.push(`${duration.months} ${duration.months > 1 ? 'meses' : 'mês'}`)
+  if (duration.days > 0) parts.push(`${duration.days} dia${duration.days > 1 ? 's' : ''}`)
+
+  if (parts.length === 0) return '0 dias'
+
+  if (parts.length === 1) return parts[0]
+  const last = parts.pop()
+  return `${parts.join(', ')} e ${last}`
 }
 
 // ⏳ Data relativa (ex: "há 3 dias")
@@ -88,4 +113,4 @@ const removeAccents = (str) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 }
 
-export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer}
+export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer, formatDifferenceInDays}

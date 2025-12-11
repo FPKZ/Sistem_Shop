@@ -1,7 +1,8 @@
+import React from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 
 
-export default function ToastCuston({visible, onClose, children}){
+export default function ToastCuston({visible, onClose, children}: {visible: boolean, onClose: () => void, children: React.ReactNode}){
 
     return(
         <ToastContainer position="bottom-end" style={{ zIndex: 2000, marginRight: "1.5rem", maxWidth: "35%" }}>
