@@ -2,22 +2,34 @@ import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import util from "../../../app/utils.js"
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
+import API from "@app/api";
 
-function Produto({produtos, setModalInfoProduto, setProduto, children}) {
+function Produto({ setModalInfoProduto, setProduto, children }) {
+
+    const { data:produtos, isLoading, error } = API.getProdutos()
+    console.log(produtos)
     
     const camposFiltragem = [
         "nome",
         "categoria.nome",
-        {path: "itemEstoque", subCampos: ["marca"]}
-    ]
+    { path: "itemEstoque", subCampos: ["marca"] },
+  ];
 
     const {
         // filtro,
         // setFiltro,
         order,
         dadosProcessados,
-        requisitarOrdenacao
-    } = useFiltroOrdenacao(produtos, camposFiltragem)
+    requisitarOrdenacao,
+  } = useFiltroOrdenacao(produtos || [], camposFiltragem);
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (error) {
+    return <div>Erro ao carregar produtos</div>;
+  }
 
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
@@ -58,14 +70,14 @@ function Produto({produtos, setModalInfoProduto, setProduto, children}) {
                     <div className="d-flex gap-3 align-items-center">
                         <div>
                             <Button size="sm" variant="" ><Search size={15} /></Button>
-                        </div>
-                        <Dropdown>
+                                    </div>
+                                    <Dropdown>
                             <Dropdown.Toggle variant="" className="dropdown-toggle-hidden-arrow d-flex justify-content-center align-items-center">
                                 <ListFilter size={15} />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <Row className="m-0 p-0">
-                                    <Col xs={12}>
+                                            <Col xs={12}>
                                         <Form.Group>
                                             <Dropdown>
                                                 <Dropdown.Toggle variant="">
@@ -96,17 +108,15 @@ function Produto({produtos, setModalInfoProduto, setProduto, children}) {
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </Form.Group>
-                                    
                                     </Col>
                                 </Row>
-                                
                             </Dropdown.Menu>
                         </Dropdown>
                         <ButtonGroup>
                             <Button size="sm" variant={`outline-secondary`}><LayoutGrid size={15} /></Button>
                             <Button size="sm" variant={`secondary`}><LayoutList size={15} /></Button>
                         </ButtonGroup>
-                    {children}
+                        {children}
                     </div>
                 </div>
                 {/* <div className="d-flex justify-content-center">

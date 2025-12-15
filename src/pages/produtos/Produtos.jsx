@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Produto from "./components/Produto";
 import HoverBtn from "@components/HoverBtn";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
@@ -7,7 +7,7 @@ import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { useOutletContext } from "react-router-dom";
 import usePopStateModal from "@hooks/usePopStateModal";
 import { useToast } from "@contexts/ToastContext";
-import useProdutos from "@app/data/produtos";
+// import useProdutos from "@app/data/produtos";
 
 
 // import "../../../public/css/produtos/produtos.css"
@@ -21,7 +21,7 @@ function Produtos() {
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
 
-  const [produtos, getProdutos] = useProdutos();
+  // const [produtos, getProdutos] = useProdutos();
 
 
   const { showToast } = useToast();
@@ -33,34 +33,6 @@ function Produtos() {
     [setModalAddProduto, setModalInfoProduto]
   )
   
-
-
-  useEffect(() => {
-    getProdutos()
-
-    // const handlePopState = () => {
-    //   if (modalAddProduto || modalInfoProduto){
-    //     setModalAddProduto(false)
-    //     setModalInfoProduto(false)
-    //   }
-    // }
-
-    // if(modalAddProduto || modalInfoProduto){
-    //   window.history.pushState({ modak: true }, '')
-    //   window.addEventListener('popstate', handlePopState)
-    // }
-
-    // const handleResize = () => {
-    //   setMobile(window.innerWidth < 768)
-    // }
-
-    // window.addEventListener("resize", handleResize)
-
-    return () => {
-      // window.removeEventListener("resize", handleResize)
-      // window.removeEventListener("popstate", handlePopState)
-    }
-  }, [ modalAddProduto, modalInfoProduto ])
   
   
 
@@ -72,7 +44,6 @@ function Produtos() {
     else{
       showToast(response.message, "error")
     } 
-    await getProduto()
     return response;
   }
 
@@ -84,12 +55,11 @@ function Produtos() {
     else{
       showToast(response.message, "error")
     }
-    await getProduto()
   }
   
   return (
     <div className="p-md-4 h-100 overflow-hidden">
-      <Produto produtos={produtos} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
+      <Produto deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
         <HoverBtn mobile={mobile} func={setModalAddProduto}>Adicionar Produto</HoverBtn>
       </Produto>
 

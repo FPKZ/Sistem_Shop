@@ -9,8 +9,8 @@ const Venda = sequelize.define('Venda', {
         allowNull: false
     },
     status: DataTypes.STRING,
-    valor_total: DataTypes.DECIMAL,
-    desconto: DataTypes.DECIMAL,
+    valor_total: DataTypes.FLOAT,
+    desconto: DataTypes.FLOAT,
 }, {
     tableName: 'Vendas'
 });
