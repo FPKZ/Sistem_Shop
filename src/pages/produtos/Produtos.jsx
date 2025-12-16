@@ -7,7 +7,6 @@ import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import { useOutletContext } from "react-router-dom";
 import usePopStateModal from "@hooks/usePopStateModal";
 import { useToast } from "@contexts/ToastContext";
-// import useProdutos from "@app/data/produtos";
 
 
 // import "../../../public/css/produtos/produtos.css"
@@ -17,11 +16,9 @@ function Produtos() {
   const { mobile } = useOutletContext()
 
   const [produto, setProduto] = useState({})
-  // const [produtos, setProdutos] = useState([]);
   const [modalAddProduto, setModalAddProduto] = useState(false)
   const [modalInfoProduto, setModalInfoProduto] = useState(false)
 
-  // const [produtos, getProdutos] = useProdutos();
 
 
   const { showToast } = useToast();
@@ -32,7 +29,6 @@ function Produtos() {
     [modalAddProduto, modalInfoProduto],
     [setModalAddProduto, setModalInfoProduto]
   )
-  
   
   
 

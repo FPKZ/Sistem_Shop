@@ -1,7 +1,7 @@
 import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import util from "../../../app/utils.js"
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
-import { Button, Row, Col, ButtonGroup, Dropdown, Form } from "react-bootstrap";
+import { Button, Row, Col, ButtonGroup, Dropdown, Form, Spinner } from "react-bootstrap";
 import API from "@app/api";
 
 function Produto({ setModalInfoProduto, setProduto, children }) {
@@ -23,9 +23,15 @@ function Produto({ setModalInfoProduto, setProduto, children }) {
     requisitarOrdenacao,
   } = useFiltroOrdenacao(produtos || [], camposFiltragem);
 
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
+  if(isLoading) return (
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
+    >
+      {/* Componente de Spinner (rodinha girando) do Bootstrap */}
+      <Spinner animation="border" variant="primary" />
+    </div>
+  )
 
   if (error) {
     return <div>Erro ao carregar produtos</div>;

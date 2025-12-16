@@ -7,6 +7,7 @@ import {
   InputGroup,
   Dropdown,
   Badge,
+  Spinner,
 } from "react-bootstrap";
 import {
   Plus,
@@ -81,7 +82,15 @@ function Clientes() {
     setShowDetailsModal(true);
   };
 
-  if(isLoading) return <div>loading</div>
+  if(isLoading) return (
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
+    >
+      {/* Componente de Spinner (rodinha girando) do Bootstrap */}
+      <Spinner animation="border" variant="primary" />
+    </div>
+  )
 
   if(error) return <div>error</div> 
 
