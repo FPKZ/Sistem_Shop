@@ -23,7 +23,7 @@ function Produtos() {
 
   const { showToast } = useToast();
 
-  
+  const { data: produtos } = API.getProdutos();
 
   usePopStateModal(
     [modalAddProduto, modalInfoProduto],
@@ -55,7 +55,7 @@ function Produtos() {
   
   return (
     <div className="p-md-4 h-100 overflow-hidden">
-      <Produto deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
+      <Produto produtos={produtos || []} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
         <HoverBtn mobile={mobile} func={setModalAddProduto}>Adicionar Produto</HoverBtn>
       </Produto>
 

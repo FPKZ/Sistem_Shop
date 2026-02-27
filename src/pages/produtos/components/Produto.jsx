@@ -2,21 +2,11 @@ import { useState } from "react";
 import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import util from "../../../app/utils.js";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
-<<<<<<< HEAD
 import { Button, Row, Col, ButtonGroup, Dropdown, Form, InputGroup } from "react-bootstrap";
 
 function Produto({produtos, setModalInfoProduto, setProduto, children}) {
     const [showSearch, setShowSearch] = useState(false);
     const [viewMode, setViewMode] = useState("grid"); // "grid" ou "list"
-=======
-import { Button, Row, Col, ButtonGroup, Dropdown, Form, Spinner } from "react-bootstrap";
-import API from "@app/api";
-
-function Produto({ setModalInfoProduto, setProduto, children }) {
-
-    const { data:produtos, isLoading, error } = API.getProdutos()
-    console.log(produtos)
->>>>>>> 899eeb527da3359a1c09a1033bb063df7c7b1359
     
     const camposFiltragem = [
         "nome",
@@ -29,7 +19,6 @@ function Produto({ setModalInfoProduto, setProduto, children }) {
         setFiltro,
         order,
         dadosProcessados,
-<<<<<<< HEAD
         requisitarOrdenacao
     } = useFiltroOrdenacao(produtos, camposFiltragem);
 
@@ -37,24 +26,6 @@ function Produto({ setModalInfoProduto, setProduto, children }) {
     const categoriasUnicas = Array.from(
         new Set(produtos.filter(p => p.categoria?.nome).map(p => p.categoria.nome))
     );
-=======
-    requisitarOrdenacao,
-  } = useFiltroOrdenacao(produtos || [], camposFiltragem);
-
-  if(isLoading) return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
-    >
-      {/* Componente de Spinner (rodinha girando) do Bootstrap */}
-      <Spinner animation="border" variant="primary" />
-    </div>
-  )
-
-  if (error) {
-    return <div>Erro ao carregar produtos</div>;
-  }
->>>>>>> 899eeb527da3359a1c09a1033bb063df7c7b1359
 
     if(!produtos || produtos.length === 0) return (
         <div className="alert alert-roxo mt-4" role="alert" >
@@ -93,7 +64,6 @@ function Produto({ setModalInfoProduto, setProduto, children }) {
                 <div className="d-flex justify-content-between align-items-center">
                     <div className="h5 text-center fw-normal m-0">Produtos</div>
                     <div className="d-flex gap-3 align-items-center">
-<<<<<<< HEAD
                         <div className="d-flex align-items-center position-relative">
                             {/* Barra de Pesquisa Expansível */}
                             {showSearch && (
@@ -168,50 +138,6 @@ function Produto({ setModalInfoProduto, setProduto, children }) {
                                         </Form.Select>
                                     </Form.Group>
                                 </div>
-=======
-                        <div>
-                            <Button size="sm" variant="" ><Search size={15} /></Button>
-                                    </div>
-                                    <Dropdown>
-                            <Dropdown.Toggle variant="" className="dropdown-toggle-hidden-arrow d-flex justify-content-center align-items-center">
-                                <ListFilter size={15} />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Row className="m-0 p-0">
-                                            <Col xs={12}>
-                                        <Form.Group>
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="">
-                                                    Filtrar por: 
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs={12}>
-                                        <Form.Group>
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="">
-                                                    Ordenar por: {order.chave}        
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item onClick={() => requisitarOrdenacao("id")}>
-                                                        <Dropdown.ItemText>id</Dropdown.ItemText>
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => requisitarOrdenacao("nome")}>
-                                                        <Dropdown.ItemText>Nome</Dropdown.ItemText>
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item>
-                                                        <Dropdown.ItemText>Nome</Dropdown.ItemText>
-                                                    </Dropdown.Item>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
->>>>>>> 899eeb527da3359a1c09a1033bb063df7c7b1359
                             </Dropdown.Menu>
                         </Dropdown>
                         <ButtonGroup>
