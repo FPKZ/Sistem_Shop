@@ -32,15 +32,21 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
 import PaginationControl from "@components/Pagination/PaginationControl";
 import ClientDetailsModal from "./include/ClientDetailsModal";
+import { useToast } from "@contexts/ToastContext";
+import { Modal as RSModal } from "react-bootstrap";
 
 function Clientes() {
   const [modalCadastroCliente, setModalCadastroCliente] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(true);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState(null);
 
   const { mobile } = useOutletContext();
+  const { showToast } = useToast();
 
-  const { data:clientes, isLoading, error } = API.getClientes();
+  const { data: clientes, isLoading, error } = API.getClientes();
+  const deleteMutation = API.deleteCliente();
 
   const camposFiltragem = ["id", "nome", "email", "telefone"];
 
@@ -66,8 +72,6 @@ function Clientes() {
     setCurrentPage,
   } = usePagination(dadosProcessados);
 
-
-
   // Resetar para a página 1 quando o filtro mudar
   useEffect(() => {
     setCurrentPage(1);
@@ -75,24 +79,53 @@ function Clientes() {
 
   usePopStateModal([modalCadastroCliente], [setModalCadastroCliente]);
 
-
-
   const handleShowDetails = (cliente) => {
     setSelectedClient(cliente);
     setShowDetailsModal(true);
   };
 
-  if(isLoading) return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
-    >
-      {/* Componente de Spinner (rodinha girando) do Bootstrap */}
-      <Spinner animation="border" variant="primary" />
-    </div>
-  )
+  const handleEditClient = (cliente) => {
+    setSelectedClient(cliente);
+    setModalCadastroCliente(true);
+  };
 
-  if(error) return <div>error</div> 
+  const handleDeleteRequest = (cliente) => {
+    setClientToDelete(cliente);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!clientToDelete) return;
+
+    deleteMutation.mutate(clientToDelete.id, {
+      onSuccess: () => {
+        showToast("Cliente excluído com sucesso", "success");
+        setShowDeleteModal(false);
+        setClientToDelete(null);
+      },
+      onError: (err) => {
+        showToast(err?.message || "Erro ao excluir cliente", "error");
+      },
+    });
+  };
+
+  const handleCloseCadastro = () => {
+    setModalCadastroCliente(false);
+    setSelectedClient(null);
+  };
+
+  if (isLoading)
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
+      >
+        {/* Componente de Spinner (rodinha girando) do Bootstrap */}
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+
+  if (error) return <div>error</div>;
 
   return (
     <div className="">
@@ -113,14 +146,20 @@ function Clientes() {
               {mobile ? (
                 <HoverBtn
                   upClass={"position-absolute end-0"}
-                  func={setModalCadastroCliente}
+                  func={() => {
+                    setSelectedClient(null);
+                    setModalCadastroCliente(true);
+                  }}
                   mobile={mobile}
                 >
                   Adicionar Cliente
                 </HoverBtn>
               ) : (
                 <Button
-                  onClick={() => setModalCadastroCliente(true)}
+                  onClick={() => {
+                    setSelectedClient(null);
+                    setModalCadastroCliente(true);
+                  }}
                   className="btn-roxo d-flex align-items-center gap-2"
                 >
                   <Plus size={16} />
@@ -131,7 +170,7 @@ function Clientes() {
 
             <Row className="mb-4 g-3">
               <Col md={10}>
-                <InputGroup className="flex-grow-1 h-100 rounded-4">
+                <InputGroup className="grow h-100 rounded-4">
                   <InputGroup.Text>
                     <Search size={16} className="text-muted" />
                   </InputGroup.Text>
@@ -237,7 +276,10 @@ function Clientes() {
                       key={cliente.id}
                       className={`hover:bg-gray-100 transition cursor-pointer ${mobile ? "card rounded-3 overflow-hidden" : ""}`}
                     >
-                      <Card.Body className={`${mobile ? "" : "border-top"}`} onClick={() => mobile && handleShowDetails(cliente)}>
+                      <Card.Body
+                        className={`${mobile ? "" : "border-top"}`}
+                        onClick={() => mobile && handleShowDetails(cliente)}
+                      >
                         <div
                           className="position-absolute top-0 start-0 h-100 rounded-0 d-md-none"
                           style={{
@@ -311,7 +353,28 @@ function Clientes() {
                                 <Dropdown.Item
                                   onClick={() => handleShowDetails(cliente)}
                                 >
-                                  Sobre
+                                  <div className="d-flex align-items-center gap-2">
+                                    <Eye size={16} />
+                                    Sobre
+                                  </div>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                  onClick={() => handleEditClient(cliente)}
+                                >
+                                  <div className="d-flex align-items-center gap-2">
+                                    <Edit size={16} />
+                                    Editar
+                                  </div>
+                                </Dropdown.Item>
+                                <Dropdown.Divider />
+                                <Dropdown.Item
+                                  onClick={() => handleDeleteRequest(cliente)}
+                                  className="text-danger"
+                                >
+                                  <div className="d-flex align-items-center gap-2">
+                                    <Trash2 size={16} />
+                                    Excluir
+                                  </div>
                                 </Dropdown.Item>
                                 {/* {nota.status !== "pago" && <Dropdown.Item onClick={() => handleBuy(nota.id)}>Pago</Dropdown.Item>} */}
                               </Dropdown.Menu>
@@ -340,7 +403,8 @@ function Clientes() {
         </Card>
         <ModalCadastroCliente
           visible={modalCadastroCliente}
-          onClose={() => setModalCadastroCliente(false)}
+          onClose={handleCloseCadastro}
+          clienteParaEditar={selectedClient}
           mobile={mobile}
         />
         <ClientDetailsModal
@@ -349,6 +413,53 @@ function Clientes() {
           cliente={selectedClient}
           mobile={mobile}
         />
+
+        {/* Modal de Confirmação de Exclusão */}
+        <RSModal
+          show={showDeleteModal}
+          onHide={() => setShowDeleteModal(false)}
+          centered
+          size="sm"
+        >
+          <RSModal.Header closeButton className="border-0">
+            <RSModal.Title className="h5 fw-bold">
+              Confirmar Exclusão
+            </RSModal.Title>
+          </RSModal.Header>
+          <RSModal.Body className="text-center pb-4">
+            <div className="mb-3 text-danger d-flex justify-content-center">
+              <Trash2 size={48} />
+            </div>
+            <p className="mb-0">
+              Tem certeza que deseja excluir o cliente{" "}
+              <strong>{clientToDelete?.nome}</strong>?
+            </p>
+            <p className="small text-muted mt-2">
+              Esta ação não poderá ser desfeita.
+            </p>
+          </RSModal.Body>
+          <RSModal.Footer className="border-0 pt-0 d-flex justify-content-center gap-2">
+            <Button
+              variant="light"
+              onClick={() => setShowDeleteModal(false)}
+              className="px-4"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+              className="px-4"
+            >
+              {deleteMutation.isPending ? (
+                <Spinner animation="border" size="sm" />
+              ) : (
+                "Excluir"
+              )}
+            </Button>
+          </RSModal.Footer>
+        </RSModal>
       </div>
     </div>
   );
