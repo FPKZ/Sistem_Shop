@@ -149,4 +149,77 @@ export default async function vendaRoutes(fastify) {
       reply.code(500).send({ error: "Erro ao deletar venda", ok: false });
     }
   });
+  fastify.put("/venda/:id/estorno", async (request, reply) => {
+    try {
+      const { id } = request.params;
+      const venda = await Venda.findByPk(id, {
+        include: [{ model: ItemVendido, as: "itensVendidos" }]
+      });
+
+      if (!venda) {
+        return reply.code(404).send({ error: "Venda não encontrada", ok: false });
+      }
+
+      if (venda.status === "estorno") {
+        return reply.code(400).send({ error: "Venda já está estornada", ok: false });
+      }
+
+      const itensEstoqueIds = venda.itensVendidos.map((item) => item.itemEstoque_id);
+
+      // Atualiza os itens devolvendo ao estoque
+      await ItemEstoque.update(
+        { status: "Disponivel" },
+        { where: { id: itensEstoqueIds } }
+      );
+
+      // Marca a Venda como estornada
+      await venda.update({ status: "estorno" });
+
+      reply.code(200).send({ message: "Estorno realizado com sucesso", ok: true });
+    } catch (err) {
+      console.log(err);
+      reply.code(500).send({ error: "Erro ao estornar venda", ok: false });
+    }
+  });
+
+  fastify.put("/venda/:id/devolucao", async (request, reply) => {
+    try {
+      const { id } = request.params;
+      const { itensDevolverIds, valorDevolvido } = request.body; // ids do ItemEstoque a devolver
+
+      const venda = await Venda.findByPk(id);
+
+      if (!venda) {
+        return reply.code(404).send({ error: "Venda não encontrada", ok: false });
+      }
+
+      if (!itensDevolverIds || itensDevolverIds.length === 0) {
+        return reply.code(400).send({ error: "É necessário informar os itens para devolução", ok: false });
+      }
+
+      // Torna novamente Disponível os Itens no Estoque
+      await ItemEstoque.update(
+        { status: "Disponivel" },
+        { where: { id: itensDevolverIds } }
+      );
+
+      // Remove os Itens Vendidos do histórico dessa venda
+      await ItemVendido.destroy({
+        where: {
+          venda_id: id,
+          itemEstoque_id: itensDevolverIds,
+        }
+      });
+
+      // Abate o valor
+      const novoTotal = Number(venda.valor_total) - Number(valorDevolvido);
+
+      await venda.update({ valor_total: novoTotal });
+
+      reply.code(200).send({ message: "Devolução parcial realizada com sucesso!", novaVenda: venda, ok: true });
+    } catch(err) {
+      console.log(err);
+      reply.code(500).send({ error: "Erro ao devolver itens da venda", ok: false });
+    }
+  });
 }

@@ -69,3 +69,28 @@ export async function deleteNotaVenda(id){
         console.error("Erro ao deleter Nota Venda", error)
     }
 }
+
+// Estorno e Devolucao
+export async function putEstorno(id){
+    try {
+        const response = await fetch(`${back}/venda/${id}/estorno`, {
+            method: "PUT"
+        })
+        return await response.json()
+    } catch(error) {
+        console.error("Erro ao estornar venda", error)
+    }
+}
+
+export async function putDevolucao(id, data){
+    try {
+        const response = await fetch(`${back}/venda/${id}/devolucao`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        return await response.json()
+    } catch(error) {
+        console.error("Erro ao devolver venda", error)
+    }
+}
