@@ -25,9 +25,8 @@ export default function NovaVenda() {
   const navigate = useNavigate();
   const { mobile } = useOutletContext();
 
-  const [clientes, setClientes] = useState([]);
+  // const [clientes, setClientes] = useState([]);
   const [cliente, setCliente] = useState(null);
-  const [produtos, setProdutos] = useState([]);
   const [listaVenda, setListaVenda] = useState([]);
 
   const [reservar, setReservar] = useState(false);
@@ -43,9 +42,11 @@ export default function NovaVenda() {
 
   const [isLoading, request] = useLoadRequest();
 
+  const { data: produtos, isLoading: isLoadingProdutos, error: errorProdutos } = API.getProdutos({ item: "estoque" });
+
   useEffect(() => {
-    getClientes();
-    getProdutos();
+    // getClientes();
+    // getProdutos();
   }, [showModalCliente, showModalProduto]);
 
   useEffect(() => {
@@ -58,19 +59,19 @@ export default function NovaVenda() {
     reservar();
   }, [listaVenda]);
 
-  const getClientes = async () => {
-    const c = await API.getClientes();
-    setClientes(c || []);
-  };
+  // const getClientes = async () => {
+  //   const c = await API.getClientes();
+  //   setClientes(c || []);
+  // };
 
-  const getProdutos = async () => {
-    const p = await API.getProduto({ item: "estoque" });
-    setProdutos(p || []);
-  };
+  // const getProdutos = async () => {
+  //   const p = await API.getProduto({ item: "estoque" });
+  //   setProdutos(p || []);
+  // };
 
   const reservarProduto = async (produto) => {
     await API.reservarProduto(produto, cliente.id);
-    getProdutos();
+    // getProdutos();
   };
 
   const handleAdicionarProduto = async (produto) => {
@@ -94,7 +95,7 @@ export default function NovaVenda() {
       // Adicionar novo produto
       setListaVenda([...listaVenda, produto]);
     }
-    await getProdutos();
+    // await getProdutos();
   };
 
   const handleRemoverProduto = async (id) => {
@@ -105,7 +106,7 @@ export default function NovaVenda() {
       });
     });
 
-    await getProdutos();
+    // await getProdutos();
 
     setListaVenda(listaVenda.filter((item) => item.id !== id));
   };
@@ -709,12 +710,11 @@ export default function NovaVenda() {
         <ModalSelecionarCliente
           show={showModalCliente}
           onHide={() => setShowModalCliente(false)}
-          clientes={clientes}
           onSelect={setCliente}
         />
       )}
 
-      {showModalProduto && (
+      {showModalProduto && !isLoadingProdutos && !errorProdutos && (
         <ModalAdicionarProduto
           show={showModalProduto}
           onHide={() => setShowModalProduto(false)}

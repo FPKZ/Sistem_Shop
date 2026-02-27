@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
 import API from "@app/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { use } from "react";
 
 interface getProdutosProps {
     item?: "estoque" | "vendidos" | "reservado" | "all" | string,
@@ -29,24 +30,36 @@ interface Produto {
 }
 
 
-export default function usePprodutos() {
+
  
-    const [produtos, setProdutos] = useState([]);
 
-    useEffect(() => {
-        getProdutos();
-    }, []);
 
-    const getProdutos = async ({item, nome}:getProdutosProps = {}) => {
-        const p = await API.getProduto({item, nome});
-        setProdutos(p || []);
-    };
+export function getProdutos({item, nome}:getProdutosProps = {}) {
+    return useQuery({
+        queryKey: ['produtos'],
+        queryFn: () => API.getProduto({item, nome}),
+    });
+};
 
-    const postProduto = async (data:Produto) => {
-        const p = await API.postProduto(data);
-        setProdutos(p || []);
-    };
+export function postProduto(data:Produto) { 
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: () => API.postProduto(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['produtos'] })
+        }
+    })
+};
 
-    return [produtos, getProdutos, postProduto];
+export function deleteProduto(id:number) { 
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: () => API.deleteProduto(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['produtos'] })
+        }
+    })
+};
 
-}
+
+

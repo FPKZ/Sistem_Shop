@@ -1,7 +1,10 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProdutosProps, ItemEstoque, Produto } from "./interfaces";
+
 const back = import.meta.env.VITE_BACKEND_URL
 
 //Produtos
-export async function getProduto({item = "", nome = ""} = {}){
+async function getProduto({item = "", nome = ""}:getProdutosProps){
     try{
         //console.log({item, nome})
         const produtos = await (
@@ -14,11 +17,14 @@ export async function getProduto({item = "", nome = ""} = {}){
     }
 }
 
-export async function postProduto(data){
+export async function postProduto(data:Produto){
     try{
         const response  = await fetch(`${back}/produto`, {
             method: "POST",
-            body: data
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
         })
         const result = await response.json()
         //console.log(result.itensEstoque)
@@ -29,7 +35,7 @@ export async function postProduto(data){
 }
 
 
-export async function reservarProduto(id, cliente){
+export async function reservarProduto(id: number, cliente: number){
     try{
         const response  = await fetch(`${back}/produto/reservar/${id}?cliente_id=${cliente}`, {
             method: "PUT"
@@ -41,7 +47,7 @@ export async function reservarProduto(id, cliente){
     }
 }
 
-export async function removerProduto(id, data){
+export async function removerProduto(id: number, data: any){
     try{
         const response  = await fetch(`${back}/produto/remover/${id}`, {
             method: "PUT",
@@ -57,7 +63,7 @@ export async function removerProduto(id, data){
     }
 }
 
-export async function updateItemEstoque(id, data){
+export async function updateItemEstoque(id: number, data: any){
     try{
         const response  = await fetch(`${back}/produto/item/${id}`, {
             method: "PUT",
@@ -74,7 +80,7 @@ export async function updateItemEstoque(id, data){
 }
 
 
-export async function deleteProduto(id){
+export async function deleteProduto(id: number){
     try{
         await fetch(`${back}/produto/${id}`, { method: "DELETE" });
     } catch (error){
@@ -95,7 +101,7 @@ export async function getCategoria(){
     }
 }
 
-export async function postCategoria(data){
+export async function postCategoria(data: any){
     try{
         const response  = await fetch(`${back}/categoria`, {
             method: "POST",
@@ -111,10 +117,40 @@ export async function postCategoria(data){
     }
 }
 
-export async function deleteCategoria(id){
+export async function deleteCategoria(id: number){
     try{
         await fetch(`${back}/categoria/${id}`, { method: "DELETE" })
     }catch(err){
         console.error("Erro ao deletar Categoria", err)
     }
 }
+
+//querys 
+
+
+export function getProdutos({item, nome}:getProdutosProps = {}) {
+    return useQuery({
+        queryKey: ['produtos'],
+        queryFn: () => getProduto({item, nome}),
+    });
+};
+
+export function cadastrarProduto(data:Produto) { 
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: () => postProduto(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['produtos'] })
+        }
+    })
+};
+
+export function deletarProduto(id:number) { 
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: () => deleteProduto(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['produtos'] })
+        }
+    })
+};
