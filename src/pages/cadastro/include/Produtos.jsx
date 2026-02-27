@@ -1,195 +1,43 @@
-import { useEffect, useState } from "react";
 import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
-import API from "@app/api";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
-import { useToast } from "@contexts/ToastContext";
-import { useLoadRequest } from "@hooks/useLoadRequest";
-import useCurrencyInput from "@hooks/useCurrencyInput";
+import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
 
 export default function Produtos() {
-  const [categoria, setCategoria] = useState({});
-  const [nota, setNota] = useState({});
-  const [notas, setNotas] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [modalCadastroNota, setModalCadastroNota] = useState(false);
-  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
-
-  const [modalCriar, setModalCriar] = useState(false);
-
-  const [itensCriados, setItensCriados] = useState([]);
-
-  const [erros, setErros] = useState({});
-  const [validated, setValidated] = useState(false);
-  const [formValue, setFormValue] = useState({
-    nome: "",
-    img: null,
-    cor: "#000000",
-    marca: "",
-    tamanho: "",
-    codigo_barras: "",
-    descricao: "",
-    quantidade: 1,
-  });
-
-  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
-  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
-  const lucroHook = useCurrencyInput({ initialValue: 0 });
-
-  const { showToast } = useToast();
-
-  const [isLoading, request] = useLoadRequest();
-
-  function handleChange(e) {
-    const { name, value, type, files } = e.target;
-
-    if (name === "valor_compra" || name === "valor_venda" || name === "lucro") {
-      // Handled by hooks
-      return;
-    }
-
-    setFormValue((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));
-  }
-
-  // Lógica de cálculo automático entre os valores
-  const handleValorCompraChange = (e) => {
-    valorCompraHook.onChange(e);
-    const newValorCompra =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorVendaHook.value > 0) {
-      lucroHook.setValue(valorVendaHook.value - newValorCompra);
-    } else if (lucroHook.value > 0) {
-      valorVendaHook.setValue(newValorCompra + lucroHook.value);
-    }
-  };
-
-  const handleValorVendaChange = (e) => {
-    valorVendaHook.onChange(e);
-    const newValorVenda =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorCompraHook.value > 0) {
-      lucroHook.setValue(newValorVenda - valorCompraHook.value);
-    }
-  };
-
-  const handleLucroChange = (e) => {
-    lucroHook.onChange(e);
-    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorCompraHook.value > 0) {
-      valorVendaHook.setValue(valorCompraHook.value + newLucro);
-    }
-  };
-
-  function validate(form) {
-    let newErrors = {};
-
-    const elements = form.querySelectorAll("[name]");
-
-    elements.forEach((e) => {
-      const { name, value, required, type } = e;
-
-      if (required && !value.trim()) {
-        newErrors[name] = "Campo obrigatório!";
-      }
-
-      if (type == "number" && value && isNaN(value)) {
-        newErrors[name] = "Digite um valor numerico valido";
-      }
-    });
-    return newErrors;
-  }
-
-  async function handleSubimit(e) {
-    e.preventDefault();
-    const form = e.target;
-
-    const newErrors = validate(form);
-    setErros(newErrors);
-    setValidated(true);
-
-    if (Object.keys(newErrors).length === 0) {
-      const quantidade = parseInt(formValue.quantidade) || 1;
-      let allItensCriados = [];
-
-      for (let i = 0; i < quantidade; i++) {
-        const finalFormData = new FormData();
-
-        finalFormData.append("nome", formValue.nome);
-        finalFormData.append("descricao", formValue.descricao);
-        finalFormData.append("img", formValue.img);
-        finalFormData.append("categoria_id", categoria.id || "");
-
-        const itens = [
-          {
-            codigo_barras: formValue.codigo_barras,
-            nota_id: nota.id || "",
-            tamanho: formValue.tamanho,
-            cor: formValue.cor,
-            marca: formValue.marca,
-            valor_compra: valorCompraHook.value,
-            valor_venda: valorVendaHook.value,
-            lucro: lucroHook.value,
-          },
-        ];
-
-        finalFormData.set("itens", JSON.stringify(itens));
-
-        await request(async () => {
-          try {
-            const response = await API.postProduto(finalFormData);
-
-            if (response.ok) {
-              if (response.itensEstoque) {
-                allItensCriados = allItensCriados.concat(response.itensEstoque);
-              }
-            } else {
-              if (response.message) {
-                showToast(response.message, "error");
-              }
-            }
-          } catch (error) {
-            console.log(error);
-          }
-        });
-      }
-
-      if (allItensCriados.length > 0) {
-        showToast(
-          `${allItensCriados.length} produtos criados com sucesso!`,
-          "success"
-        );
-        setItensCriados(allItensCriados);
-        setModalCriar(true);
-      }
-    }
-  }
-
-  useEffect(() => {
-    GetNotas();
-    GetCategorias();
-  }, [modalCadastroCategoria, modalCadastroNota]);
-
-  const GetCategorias = async () => {
-    const categorias = await API.getCategoria();
-    setCategorias(categorias);
-  };
-  const GetNotas = async () => {
-    const notas = await API.getNotas();
-    setNotas(notas);
-  };
+  const {
+    categoria,
+    setCategoria,
+    nota,
+    setNota,
+    notas,
+    categorias,
+    modalCadastroNota,
+    setModalCadastroNota,
+    modalCadastroCategoria,
+    setModalCadastroCategoia,
+    modalCriar,
+    setModalCriar,
+    itensCriados,
+    erros,
+    validated,
+    formValue,
+    isLoading,
+    valorCompraHook,
+    valorVendaHook,
+    lucroHook,
+    handleChange,
+    handleValorCompraChange,
+    handleValorVendaChange,
+    handleLucroChange,
+    handleSubimit,
+  } = useCadastroProduto();
 
   return (
     <div className="w-100 p-3 pt-0 m-0">
       <Form onSubmit={handleSubimit} noValidate>
+        {/* === Bloco de Detalhes Básicos === */}
         <Row className="g-3 mb-3 pb-4 border-bottom">
-          {/* Nome */}
           <Col xs={12}>
             <Form.Label htmlFor="nomeProduto">Nome</Form.Label>
             <Form.Control
@@ -206,7 +54,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Imagem */}
           <Col xs={10} md={4}>
             <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
             <Form.Control
@@ -217,7 +64,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Cor */}
           <Col xs={2} md={1} className="d-flex flex-column align-items-center">
             <Form.Label htmlFor="corProduto">Cor</Form.Label>
             <Form.Control
@@ -230,7 +76,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Categoria */}
           <Col xs={12} md={3}>
             <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
             <Dropdown>
@@ -262,7 +107,6 @@ export default function Produtos() {
             </Dropdown>
           </Col>
 
-          {/* Marca */}
           <Col xs={6} md={2}>
             <Form.Label htmlFor="marcaProduto">Marca</Form.Label>
             <Form.Control
@@ -279,7 +123,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Tamanho */}
           <Col xs={6} md={2}>
             <Form.Label htmlFor="tamanhoProduto">Tamanho</Form.Label>
             <Form.Control
@@ -297,8 +140,8 @@ export default function Produtos() {
           </Col>
         </Row>
 
+        {/* === Bloco de Finanças e Vínculo de Estoque === */}
         <Row className="g-3 mb-3 pb-4 border-bottom">
-          {/* Nota */}
           <Col xs={12} md={4}>
             <Form.Label htmlFor="notaProduto">Nota</Form.Label>
             <Dropdown>
@@ -327,7 +170,6 @@ export default function Produtos() {
             </Dropdown>
           </Col>
 
-          {/* Código de Barras */}
           <Col xs={10} md={6}>
             <Form.Label htmlFor="codigoBarras">Código de Barras</Form.Label>
             <Form.Control
@@ -348,7 +190,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Quantidade */}
           <Col xs={2} md={2}>
             <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
             <Form.Control
@@ -363,7 +204,6 @@ export default function Produtos() {
             />
           </Col>
 
-          {/* Valor de Compra */}
           <Col xs={4} md={4}>
             <Form.Label htmlFor="valorCompraProduto">Vlr. Compra</Form.Label>
             <InputGroup>
@@ -387,7 +227,6 @@ export default function Produtos() {
             </InputGroup>
           </Col>
 
-          {/* Valor de Venda */}
           <Col xs={4} md={4}>
             <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
             <InputGroup>
@@ -411,7 +250,6 @@ export default function Produtos() {
             </InputGroup>
           </Col>
 
-          {/* Lucro */}
           <Col xs={4} md={4}>
             <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
             <InputGroup>
@@ -432,7 +270,6 @@ export default function Produtos() {
           </Col>
         </Row>
 
-        {/* Descrição */}
         <Row className="g-3 mb-3">
           <Col xs={12}>
             <Form.Label htmlFor="descricaoProduto">Descrição</Form.Label>
@@ -451,7 +288,6 @@ export default function Produtos() {
           </Col>
         </Row>
 
-        {/* Botão Salvar */}
         <Row>
           <Col xs={12}>
             <Button

@@ -20,18 +20,15 @@ import {
   Login,
   CadastroUser,
   PerfilPage,
-  GerenciamentoUsuario
+  GerenciamentoUsuario,
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
-import ProtectedRoute from "./autentic/sistem/ProtectedRoute.jsx";
-import { AuthProvider } from "./autentic/sistem/AuthContext.jsx";
+import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
+import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -42,14 +39,16 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { index: true, element: <App /> },
-          { path: "cadastro", element: <Cadastro />,
+          {
+            path: "cadastro",
+            element: <Cadastro />,
             children: [
               { index: true, element: <TelaCadastro /> },
               { path: "produto", element: <CadastroProduto /> },
               { path: "nota", element: <CadastroNota /> },
               { path: "cliente", element: <CadastroCliente /> },
-            ]
-           },
+            ],
+          },
           { path: "clientes", element: <Clientes /> },
           { path: "produtos", element: <Produtos /> },
           { path: "notas", element: <Notas /> },
@@ -64,16 +63,14 @@ const router = createBrowserRouter([
             ],
           },
           { path: "perfil", element: <PerfilPage /> },
-          { path: "usuarios", element: <GerenciamentoUsuario /> }
+          { path: "usuarios", element: <GerenciamentoUsuario /> },
         ],
       },
-    ],  
+    ],
   },
-  { path: "login", element: <Login />},
+  { path: "login", element: <Login /> },
   { path: "cadastro-user", element: <CadastroUser /> },
-
 ]);
-
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -84,5 +81,5 @@ createRoot(document.getElementById("root")).render(
         </QueryClientProvider>
       </ToastProvider>
     </AuthProvider>
-  </StrictMode>
+  </StrictMode>,
 );

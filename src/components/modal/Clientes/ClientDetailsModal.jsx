@@ -10,11 +10,11 @@ import {
   Calendar,
 } from "lucide-react";
 
-import utils from "@app/utils"
+import utils from "../../../app/utils";
 
 const ClientDetailsModal = ({ show, onHide, cliente }) => {
   if (!cliente) return null;
-  console.log(cliente)
+  console.log(cliente);
   return (
     <Modal show={show} onHide={onHide} size="lg" fullscreen="md-down" centered>
       <Modal.Header closeButton className="border-0 pb-0">
@@ -100,8 +100,8 @@ const ClientDetailsModal = ({ show, onHide, cliente }) => {
                           venda.status === "concluida"
                             ? "success"
                             : venda.status === "pendente"
-                            ? "warning"
-                            : "danger"
+                              ? "warning"
+                              : "danger"
                         }
                       >
                         {utils.capitalize(venda.status) || "desconhecido"}
@@ -117,10 +117,19 @@ const ClientDetailsModal = ({ show, onHide, cliente }) => {
                       </span>
                     </div>
                     <div className="d-flex flex-column align-items-end gap-2">
-                      <Badge bg="light" text="dark" className="border" style={{ cursor: "pointer" }}>
+                      <Badge
+                        bg="light"
+                        text="dark"
+                        className="border"
+                        style={{ cursor: "pointer" }}
+                      >
                         Ver detalhes
                       </Badge>
-                      <span className="fw-semibold text-end">{venda.total ? `R$ ${venda.total}` : "Valor não disponível"}</span>
+                      <span className="fw-semibold text-end">
+                        {venda.total
+                          ? `R$ ${venda.total}`
+                          : "Valor não disponível"}
+                      </span>
                     </div>
                   </ListGroup.Item>
                 ))}
