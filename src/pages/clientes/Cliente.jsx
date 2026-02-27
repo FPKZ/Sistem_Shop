@@ -7,6 +7,7 @@ import {
   InputGroup,
   Dropdown,
   Badge,
+  Spinner,
 } from "react-bootstrap";
 import {
   Plus,
@@ -33,12 +34,13 @@ import PaginationControl from "@components/Pagination/PaginationControl";
 import ClientDetailsModal from "./include/ClientDetailsModal";
 
 function Clientes() {
-  const [clientes, setClientes] = useState([]);
   const [modalCadastroCliente, setModalCadastroCliente] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(true);
   const [selectedClient, setSelectedClient] = useState(null);
 
   const { mobile } = useOutletContext();
+
+  const { data:clientes, isLoading, error } = API.getClientes();
 
   const camposFiltragem = ["id", "nome", "email", "telefone"];
 
@@ -49,7 +51,7 @@ function Clientes() {
     dadosProcessados,
     // setOrdem,
     requisitarOrdenacao,
-  } = useFiltroOrdenacao(clientes, camposFiltragem);
+  } = useFiltroOrdenacao(clientes || [], camposFiltragem);
 
   const {
     currentItems,
@@ -64,6 +66,8 @@ function Clientes() {
     setCurrentPage,
   } = usePagination(dadosProcessados);
 
+
+
   // Resetar para a página 1 quando o filtro mudar
   useEffect(() => {
     setCurrentPage(1);
@@ -71,23 +75,24 @@ function Clientes() {
 
   usePopStateModal([modalCadastroCliente], [setModalCadastroCliente]);
 
-  useEffect(() => {
-    getClientes();
-  }, []);
 
-  const getClientes = async () => {
-    try {
-      const c = await API.getClientes();
-      setClientes(c);
-    } catch (error) {
-      console.error("Erro ao buscar clientes:", error);
-    }
-  };
 
   const handleShowDetails = (cliente) => {
     setSelectedClient(cliente);
     setShowDetailsModal(true);
   };
+
+  if(isLoading) return (
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
+    >
+      {/* Componente de Spinner (rodinha girando) do Bootstrap */}
+      <Spinner animation="border" variant="primary" />
+    </div>
+  )
+
+  if(error) return <div>error</div> 
 
   return (
     <div className="">

@@ -65,13 +65,17 @@ export default function Estorno() {
     if (!confirmacao) return;
 
     try {
-      // Aqui você implementaria a lógica de estorno
-      // await API.updateVenda(venda.id, { status: "estorno" });
+      const response = await API.putEstorno(venda.id);
 
-      alert("Estorno realizado com sucesso!");
-      setVenda(null);
-      setVendaId("");
-      navigate("/vendas");
+      if (response && response.ok) {
+        alert("Estorno realizado com sucesso!");
+        setVenda(null);
+        setVendaId("");
+        navigate("/vendas");
+      } else {
+        alert(response?.error || "Erro ao realizar estorno");
+      }
+
     } catch (error) {
       alert("Erro ao realizar estorno");
       console.error(error);
@@ -217,7 +221,7 @@ export default function Estorno() {
                 <div className="d-flex gap-2">
                   <Button
                     variant="danger"
-                    className="flex-grow-1"
+                    className="grow"
                     onClick={confirmarEstorno}
                   >
                     <i className="bi bi-x-circle me-2"></i>

@@ -3,7 +3,6 @@ import { useState } from "react"
 import API from "@app/api"
 import { useNavigate } from "react-router-dom"
 import { useToast } from "@contexts/ToastContext"
-import { useLoadRequest } from "@hooks/useLoadRequest"
 
 export default function ModalCliente({visible, onClose}){
 
@@ -13,7 +12,8 @@ export default function ModalCliente({visible, onClose}){
 
     const navigate = useNavigate()
     const { showToast } = useToast()    
-    const [ isLoading, request ] = useLoadRequest()
+
+    const criarCliente = API.postClientes()
 
     function handleChange(e){
         // eslint-disable-next-line no-unused-vars
@@ -92,23 +92,33 @@ export default function ModalCliente({visible, onClose}){
             const formData = new FormData(e.target)
             const data = Object.fromEntries(formData.entries())
 
-            await request(async () => {
-                try{
-                    const responsta = await API.postClientes(data)
-
-                    if(responsta.ok) {
-                        showToast(responsta.message, "success")
-                        navigate(-1)
-                    }else {
-                        if(responsta.message){
-                            showToast(responsta.message || responsta.error, "error")
-                        }
-                    }
-                } catch(err){
-                    console.error(err)
-                    showToast(err, "error")
+            criarCliente.mutate(data, {
+                onSuccess: () => {
+                    showToast("Cliente criado com sucesso", "success")
+                    navigate(-1)
+                },
+                onError: (error) => {
+                    showToast(error, "error")
                 }
             })
+
+            // await request(async () => {
+            //     try{
+            //         const responsta = await API.postClientes(data)
+
+            //         if(responsta.ok) {
+            //             showToast(responsta.message, "success")
+            //             navigate(-1)
+            //         }else {
+            //             if(responsta.message){
+            //                 showToast(responsta.message || responsta.error, "error")
+            //             }
+            //         }
+            //     } catch(err){
+            //         console.error(err)
+            //         showToast(err, "error")
+            //     }
+            // })
             
         }
     }

@@ -66,15 +66,19 @@ export default function Devolucao() {
         ...produtosSelecionados,
         {
           ...item,
-          quantidade_devolver: item.quantidade,
+          nome_produto: item.itemEstoque?.nome
         },
       ]);
     }
   };
 
   const alterarQuantidadeDevolucao = (itemId, novaQuantidade) => {
-    const item = venda.itens_venda.find((i) => i.id === itemId);
-    if (novaQuantidade < 1 || novaQuantidade > item.quantidade) return;
+    const item = venda.itensVendidos.find((i) => i.id === itemId);
+    // Observe que no estoque cada itemVendido é uma unidade (quantidade = 1 fisicamente).
+    // Se no frontend os itens foram agrupados, a quantidade_devolver máxima precisa ser ajustada pela agregação real.
+    // Como os itens estão vindos do banco de 1 em 1 no model ItemEstoque, nós temos que garantir que a interface agrupe ou use a quantidade=1 per row.
+
+    if (novaQuantidade < 1) return;
 
     setProdutosSelecionados(
       produtosSelecionados.map((p) =>
@@ -85,7 +89,7 @@ export default function Devolucao() {
 
   const calcularValorDevolucao = () => {
     return produtosSelecionados.reduce(
-      (total, item) => total + item.valor_unitario * item.quantidade_devolver,
+      (total, item) => total + Number(item.itemEstoque?.valor_venda || 0),
       0
     );
   };
@@ -105,25 +109,47 @@ export default function Devolucao() {
     if (!confirmacao) return;
 
     try {
-      // Aqui você implementaria a lógica de devolução
-      const devolucao = {
-        venda_id: venda.id,
-        itens: produtosSelecionados.map((item) => ({
-          produto_id: item.produto_id || item.id,
-          quantidade: item.quantidade_devolver,
-          valor_unitario: item.valor_unitario,
-        })),
-        valor_total: calcularValorDevolucao(),
+      // Cria a lista dos ids específicos de itemEstoqueBaseados na qtdSelecionada
+      const itensDevolverIds = [];
+
+      produtosSelecionados.forEach((prodSelecionado) => {
+        // Encontrar o grupo do carrinho dentro da venda atual para pegar os itemEstoque que pertencem a esse produto_id
+        const itemVendaReal = venda.itensVendidos.find(
+          (iv) => iv.itemEstoque?.produto_id === prodSelecionado.produto_id 
+          || iv.itemEstoque?.nome === prodSelecionado.nome_produto
+        );
+        
+        // Pega quantos o user quer devolver e joga o ID correspondente à baixa
+        if(prodSelecionado.itens){
+           const itensFisicos = prodSelecionado.itens.slice(0, prodSelecionado.quantidade_devolver);
+           itensFisicos.forEach(i => itensDevolverIds.push(i.itemEstoque_id));
+        } else {
+            // Em fallback onde o Array de itens separados não está tão visual
+            // A gente busca na própria Venda os itens daquele nome/produto que podem ser devolvidos
+            const itensDoProdutoNaVenda = venda.itensVendidos.filter(iv => iv.itemEstoque?.nome === prodSelecionado.nome_produto);
+            const itensReduzir = itensDoProdutoNaVenda.slice(0, prodSelecionado.quantidade_devolver);
+            itensReduzir.forEach(i => itensDevolverIds.push(i.itemEstoque_id));
+        }
+      });
+
+      const devolucaoPayload = {
+        itensDevolverIds,
+        valorDevolvido: calcularValorDevolucao(),
       };
 
-      console.log("Devolução:", devolucao);
-      // await API.putDevolucao(devolucao);
+      console.log("Devolução:", devolucaoPayload);
+      const response = await API.putDevolucao(venda.id, devolucaoPayload);
 
-      alert("Devolução realizada com sucesso!");
-      setVenda(null);
-      setVendaId("");
-      setProdutosSelecionados([]);
-      navigate("/vendas");
+      if (response && response.ok) {
+        alert("Devolução realizada com sucesso!");
+        setVenda(null);
+        setVendaId("");
+        setProdutosSelecionados([]);
+        navigate("/vendas");
+      } else {
+        alert(response?.error || "Erro ao realizar devolução");
+      }
+
     } catch (error) {
       alert("Erro ao realizar devolução");
       console.error(error);
@@ -211,16 +237,14 @@ export default function Devolucao() {
                       <th className="border-0" style={{ width: "50px" }}>
                         <Form.Check type="checkbox" disabled />
                       </th>
+                      <th className="border-0">ID Item</th>
                       <th className="border-0">Produto</th>
-                      <th className="border-0">Qtd Vendida</th>
-                      <th className="border-0">Qtd Devolver</th>
-                      <th className="border-0">Valor Un.</th>
-                      <th className="border-0">Subtotal</th>
+                      <th className="border-0 text-end">Valor do Item</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {venda.itens_venda &&
-                      venda.itens_venda.map((item, index) => {
+                    {venda.itensVendidos &&
+                      venda.itensVendidos.map((item, index) => {
                         const selecionado = produtosSelecionados.find(
                           (p) => p.id === item.id
                         );
@@ -233,71 +257,13 @@ export default function Devolucao() {
                                 onChange={() => toggleProduto(item)}
                               />
                             </td>
+                            <td>#{item.id}</td>
                             <td>
                               <div className="fw-bold">
-                                {item.produto?.nome || item.nome_produto}
+                                {item.itemEstoque?.nome}
                               </div>
                             </td>
-                            <td>{item.quantidade}</td>
-                            <td>
-                              {selecionado ? (
-                                <div
-                                  className="d-flex align-items-center gap-1"
-                                  style={{ width: "120px" }}
-                                >
-                                  <Button
-                                    size="sm"
-                                    variant="outline-secondary"
-                                    onClick={() =>
-                                      alterarQuantidadeDevolucao(
-                                        item.id,
-                                        selecionado.quantidade_devolver - 1
-                                      )
-                                    }
-                                  >
-                                    -
-                                  </Button>
-                                  <Form.Control
-                                    type="number"
-                                    size="sm"
-                                    value={selecionado.quantidade_devolver}
-                                    onChange={(e) =>
-                                      alterarQuantidadeDevolucao(
-                                        item.id,
-                                        parseInt(e.target.value) || 1
-                                      )
-                                    }
-                                    className="text-center"
-                                    style={{ width: "50px" }}
-                                  />
-                                  <Button
-                                    size="sm"
-                                    variant="outline-secondary"
-                                    onClick={() =>
-                                      alterarQuantidadeDevolucao(
-                                        item.id,
-                                        selecionado.quantidade_devolver + 1
-                                      )
-                                    }
-                                  >
-                                    +
-                                  </Button>
-                                </div>
-                              ) : (
-                                <span className="text-muted">-</span>
-                              )}
-                            </td>
-                            <td>{utils.formatMoney(item.valor_unitario)}</td>
-                            <td className="fw-bold">
-                              {selecionado ? (
-                                utils.formatMoney(
-                                  item.valor_unitario *
-                                    selecionado.quantidade_devolver
-                                )
-                              ) : (
-                                <span className="text-muted">-</span>
-                              )}
-                            </td>
+                            <td className="text-end">{utils.formatMoney(item.itemEstoque?.valor_venda)}</td>
                           </tr>
                         );
                       })}
@@ -335,12 +301,9 @@ export default function Devolucao() {
                 </div>
 
                 <div className="mb-3">
-                  <small className="text-muted">Unidades a devolver</small>
+                  <small className="text-muted">Itens a devolver</small>
                   <div className="h4 mb-0">
-                    {produtosSelecionados.reduce(
-                      (total, item) => total + item.quantidade_devolver,
-                      0
-                    )}
+                    {produtosSelecionados.length}
                   </div>
                 </div>
 

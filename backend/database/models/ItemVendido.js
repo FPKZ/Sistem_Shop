@@ -1,10 +1,5 @@
-import { DataTypes } from "sequelize";
 import sequelize from "../sequelize.js";
 
-const ItemVendido = sequelize.define("ItemVendido", {
-    valor_produto: DataTypes.FLOAT,
-},{
-    tableName: "ItemVendido"
-})
+const ItemVendido = sequelize.define("ItemVendido", {},{ tableName: "ItemVendido" })
 
 export default ItemVendido

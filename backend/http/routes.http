@@ -154,7 +154,7 @@ POST http://localhost:3333/cadastrar-conta
 Content-Type: application/json
 
 {
-    "nome": "jorge",
+    "nome": "Admin",
     "email": "superUser@gmail.com",
     "senha": "super432",
     "cargo": "Adm"

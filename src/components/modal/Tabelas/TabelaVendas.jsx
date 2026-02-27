@@ -85,7 +85,7 @@ export default function TabelaVendas({ vendas, onView }) {
                 Valor:
               </span>
               <span className="fw-bold text-dark">
-                {utils.formatMoney(venda.total)}
+                {utils.formatMoney(venda.valor_total)}
               </span>
             </Col>
 
@@ -104,7 +104,7 @@ export default function TabelaVendas({ vendas, onView }) {
               <Button
                 variant="light"
                 size="sm"
-                className={`text-info text-center btn-icon ${mobile ? "w-100" : ""}`}
+                className={`text-info text-center btn-icon ${mobile ? "d-flex justify-content-center align-items-center w-100" : ""}`}
                 onClick={() => onView(venda)}
                 title="Visualizar Detalhes"
               >

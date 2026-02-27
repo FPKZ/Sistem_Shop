@@ -1,15 +1,37 @@
-import { Modal, Button, Form, Table, Badge } from "react-bootstrap";
+import { Modal, Button, Form, Table, Badge, Spinner } from "react-bootstrap";
 import { useState } from "react";
+import API from "@app/api";
+import { Alert } from "bootstrap";
 
 export default function ModalSelecionarCliente({
   show,
   onHide,
-  clientes,
   onSelect,
 }) {
   const [busca, setBusca] = useState("");
+  const { data: clientes, isLoading, error } = API.getClientes();
 
-  const clientesFiltrados = clientes.filter(
+  // Verifica se a aplicação está em estado de carregamento (loading).
+  if (isLoading) {
+    // Se estiver carregando, retorna um componente visual de "Loading" (Spinner) centralizado na tela.
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }} // Define a altura como 100% da altura da janela (viewport height).
+      >
+        {/* Componente de Spinner (rodinha girando) do Bootstrap */}
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if(error) return (
+    <Alert className="alert-roxo">
+      {error.message}
+    </Alert>
+  )
+
+  const clientesFiltrados = clientes?.filter(
     (cliente) =>
       cliente.nome?.toLowerCase().includes(busca.toLowerCase()) ||
       cliente.telefone?.includes(busca)
@@ -22,7 +44,7 @@ export default function ModalSelecionarCliente({
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" centered>
+    <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down" centered>
       <Modal.Header closeButton>
         <Modal.Title>Selecionar Cliente</Modal.Title>
       </Modal.Header>

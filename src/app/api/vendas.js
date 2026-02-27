@@ -4,13 +4,14 @@ const back = import.meta.env.VITE_BACKEND_URL
 export async function getVendas(){
     try{
         const vendas = await ( await fetch(`${back}/vendas`, { method: "GET" })).json()
+        console.log(vendas)
         return vendas
     } catch(error){
         console.error("Erro ao buscar Vendas",  error)
     }
 }
 
-export async function putVenda(data){
+export async function postVenda(data){
     try{
         const response  = await fetch(`${back}/venda`, {
             method: "POST",
@@ -20,7 +21,7 @@ export async function putVenda(data){
             body: JSON.stringify(data)
         })
         //console.log(response.status)
-        return response
+        return await response.json()
     } catch (error){
         console.error("Erro ao cadastrar venda", error)
     }
@@ -66,5 +67,30 @@ export async function deleteNotaVenda(id){
         await fetch(`${back}/notaVenda/${id}`, { method: "DELETE" })
     } catch(error){
         console.error("Erro ao deleter Nota Venda", error)
+    }
+}
+
+// Estorno e Devolucao
+export async function putEstorno(id){
+    try {
+        const response = await fetch(`${back}/venda/${id}/estorno`, {
+            method: "PUT"
+        })
+        return await response.json()
+    } catch(error) {
+        console.error("Erro ao estornar venda", error)
+    }
+}
+
+export async function putDevolucao(id, data){
+    try {
+        const response = await fetch(`${back}/venda/${id}/devolucao`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        return await response.json()
+    } catch(error) {
+        console.error("Erro ao devolver venda", error)
     }
 }

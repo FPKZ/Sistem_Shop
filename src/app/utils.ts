@@ -1,15 +1,15 @@
 // utils.js
-import { format, formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // 📆 Formata data em dd/MM/yyyy HH:mm
-const formatDateTime = (dataISO) => {
+const formatDateTime = (dataISO : string) : string => {
   if (!dataISO) return ''
   return format(new Date(dataISO), 'dd/MM/yyyy HH:mm')
 }
 
 // 📅 Formata só a data
-const formatDate = (dataISO) => {
+const formatDate = (dataISO : string) : string => {
   if (!dataISO) return ''
   
   // Se for string YYYY-MM-DD, força interpretação como local adicionando hora
@@ -20,14 +20,39 @@ const formatDate = (dataISO) => {
   return format(new Date(dataISO), 'dd/MM/yyyy')
 }
 
+// Formata data e retorna o dia da semana
+const formatDayOfWeek = (dataISO : string) : string => {
+  if (!dataISO) return ''
+  return format(new Date(dataISO), 'EEEE', { locale: ptBR })
+}
+
+// Formata data e retorna a diferença em dias
+const formatDifferenceInDays = (start : Date, end : Date) : string => {
+  if (!start || !end) return ''
+  const duration = intervalToDuration({ start, end })
+
+  console.log(duration)
+  
+  const parts = []
+  if (duration.years > 0) parts.push(`${duration.years} ano${duration.years > 1 ? 's' : ''}`)
+  if (duration.months > 0) parts.push(`${duration.months} ${duration.months > 1 ? 'meses' : 'mês'}`)
+  if (duration.days > 0) parts.push(`${duration.days} dia${duration.days > 1 ? 's' : ''}`)
+
+  if (parts.length === 0) return '0 dias'
+
+  if (parts.length === 1) return parts[0]
+  const last = parts.pop()
+  return `${parts.join(', ')} e ${last}`
+}
+
 // ⏳ Data relativa (ex: "há 3 dias")
-const formatRelativeDate = (dataISO) => {
+const formatRelativeDate = (dataISO : string) : string => {
   if (!dataISO) return ''
   return formatDistanceToNow(new Date(dataISO), { addSuffix: true, locale: ptBR })
 }
 
 // Timer
-function formatTimer(totalSeconds) {
+const formatTimer = (totalSeconds : number) : string => {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -44,22 +69,22 @@ function formatTimer(totalSeconds) {
 // console.log(formatTimer(3672));   // "01:01:12"
 
 // 💰 Formata número como valor monetário BRL
-const formatMoney = (valor, config = {
+const formatMoney = (valor : number, config : {style: string, currency: string} = {
     style: 'currency',
     currency: 'BRL',
-  }) => {
+  }) : string => {
   if (isNaN(valor)) return 'R$ 0,00'
   return new Intl.NumberFormat('pt-BR', config).format(valor)
 }
 
 // 🔢 Formata número com separadores (ex: 1.000.000)
-const formatNumber = (valor) => {
+const formatNumber = (valor : number) : string => {
   if (isNaN(valor)) return '0'
   return new Intl.NumberFormat('pt-BR').format(valor)
 }
 
 // 🔠 Capitaliza cada palavra de um texto
-const capitalize = (str, maxLength = null) => {
+const capitalize = (str : string, maxLength : number = null) : string => {
   if (!str) return '';
   
   // Primeiro, substitui hífens por espaços
@@ -78,14 +103,14 @@ const capitalize = (str, maxLength = null) => {
 };
 
 // 🧼 Remove espaços extras e quebra de linha
-const normalizeText = (str) => {
+const normalizeText = (str : string) : string => {
   if (!str) return ''
   return str.replace(/\s+/g, ' ').trim()
 }
 
 // 📛 Remove acentos (útil para buscas)
-const removeAccents = (str) => {
+const removeAccents = (str : string) : string => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 }
 
-export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer}
+export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer, formatDifferenceInDays}

@@ -8,7 +8,7 @@ export default async function clienteRoutes(fastify) {
           { model: Venda, as: "vendas", 
               include: [
               { model: ItemVendido, as: "itensVendidos"},
-              { model: NotaVenda, as: "pagamento"}
+              { model: NotaVenda, as: "notaVenda"}
               ]
           },
           ],
@@ -20,7 +20,7 @@ export default async function clienteRoutes(fastify) {
           reply.code(200).send(clientes)
       }catch(err){
           console.log(err)
-          reply.code(500).send({message: "Erro ao buscar Clientes"})
+          reply.code(500).send({message: "Erro ao buscar Clientes", ok: false})
       }
   })
 
@@ -48,14 +48,14 @@ export default async function clienteRoutes(fastify) {
 
       const cliente = await Cliente.findByPk(id)
       if (!cliente) {
-        return reply.code(404).send({ error: "Cliente não encontrado" })
+        return reply.code(404).send({ error: "Cliente não encontrado", ok: false })
       }
 
       await Cliente.update(data, { where: { id } })
-      reply.code(204).send()
+      reply.code(204).send({message: "Cliente atualizado com sucesso!", ok: true})
     } catch(err){
       console.log(err)
-      reply.code(500).send({error: "Erro ao atualizar Cliente", err})
+      reply.code(500).send({error: "Erro ao atualizar Cliente", err, ok: false})
     }
   })
 

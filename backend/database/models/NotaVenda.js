@@ -6,6 +6,8 @@ const NotaVenda = sequelize.define('NotaVenda', {
     valor_nota: DataTypes.FLOAT,
     forma_pagamento: DataTypes.STRING,
     data_nota: DataTypes.DATE,
+    data_pagamento: DataTypes.DATE,
+    parcelas: DataTypes.INTEGER,
 }, {
     tableName: 'NotasVendas'
 });

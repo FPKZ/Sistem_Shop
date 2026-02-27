@@ -30,7 +30,7 @@ export default function Header({mobile}) {
           <Button className="btn btn-roxo " size={mobile && "sm"} onClick={() => {pathParts.length > 1 ? navigate(-1) : navigate('/')}}>
               <i className="bi bi-chevron-left"></i>
           </Button>
-          <nav
+          {/* <nav
               className="d-flex justify-content-center align-items-center"
               aria-label="breadcrumb"
           >
@@ -44,7 +44,7 @@ export default function Header({mobile}) {
                   ))
                 }
               </ol>
-          </nav>
+          </nav> */}
           </>
         ) : ""}
       </div>
@@ -87,26 +87,26 @@ export default function Header({mobile}) {
         <Button variant="outline-light" onClick={() => logout()}>Sair</Button> */}
       </div>
     </header>
-    {mobile && 
+    {/* {mobile && 
       pathParts.length > 1 ? (
       <div className="mt-2">
         <nav
             className="d-flex justify-content-center align-items-center"
             aria-label="breadcrumb"
         >
-            <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center  m-0">
-                {pathParts.map(tela => {
-                  if(tela !== pathParts[0]){
-                    return (
-                      <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-6">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
-                    )
-                  }
-                })}
-              </ol>
-            </nav>
-          </div>
+          <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center  m-0">
+            {pathParts.map(tela => {
+              if(tela !== pathParts[0]){
+                return (
+                  <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-6">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
+                )
+              }
+            })}
+          </ol>
+        </nav>
+      </div>
       ) : ""
-    }
+    } */}
   </>
   )
 }

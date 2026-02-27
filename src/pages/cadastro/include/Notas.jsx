@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useToast } from "@contexts/ToastContext";
 import { useLoadRequest } from "@hooks/useLoadRequest";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export default function Notas() {
   const [formValue, setFormValue] = useState({});
@@ -42,6 +43,8 @@ export default function Notas() {
   const [isLoading, request] = useLoadRequest();
 
   const navigate = useNavigate();
+
+  const valorTotalHook = useCurrencyInput({ initialValue: 0 });
 
   useEffect(() => {
     if (incluirProdutos) {
@@ -74,6 +77,12 @@ export default function Notas() {
 
   function handleChange(e) {
     const { name, value } = e.target;
+
+    if (name === "valor_total") {
+      // Handled by hook
+      return;
+    }
+
     if (name === "categoria") console.log("1");
     setFormValue((prev) => {
       const updateValues = {
@@ -122,7 +131,7 @@ export default function Notas() {
 
       // Adiciona os campos da nota
       finalFormData.append("codigo", formValue.codigo);
-      finalFormData.append("valor_total", formValue.valor_total);
+      finalFormData.append("valor_total", valorTotalHook.value);
       finalFormData.append("data", formValue.data);
       finalFormData.append("data_vencimento", formValue.data_vencimento);
       finalFormData.append("fornecedor", formValue.fornecedor);
@@ -157,12 +166,12 @@ export default function Notas() {
       console.log("Dados a serem enviados:", Object.fromEntries(finalFormData));
       // Aqui você faria a chamada para a API para cadastrar a nota
       await request(async () => {
-        try{
+        try {
           const response = await API.postNota(finalFormData);
 
-          if(!response.ok){
+          if (!response.ok) {
             showToast(response.message || response.error, "error");
-            return
+            return;
           }
 
           // const response = ObjectText
@@ -175,21 +184,21 @@ export default function Notas() {
               setItensCriados(itensCriados);
               setModalCriar(true);
               showToast(response.message || response.error, "success");
-              navigate(-1)
+              navigate(-1);
             } else {
               if (response.message) {
                 showToast(response.message || response.error, "success");
-                navigate(-1)
+                navigate(-1);
               }
             }
           } else {
             showToast(response.message || response.error, "error");
           }
           // console.log(response)
-        } catch(err){
-          console.log(err)
+        } catch (err) {
+          console.log(err);
         }
-      })
+      });
     }
   };
   //  console.log(produtos)
@@ -272,13 +281,15 @@ export default function Notas() {
               Valor da Nota
             </label>
             <input
-              type="number"
+              type="text"
               className={`form-control ${
                 validated ? (erros.valor_total ? `is-invalid` : `is-valid`) : ""
               }`}
               name="valor_total"
               id="valor_total"
-              onChange={handleChange}
+              placeholder="R$ 0,00"
+              value={valorTotalHook.displayValue}
+              onChange={valorTotalHook.onChange}
               required
             />
           </Col>
@@ -319,7 +330,10 @@ export default function Notas() {
         </Row>
 
         {incluirProdutos && (
-          <div className="d-flex flex-column flex-grow-1 overflow-hidden mt-3 border rounded" style={{ height: "400px" }}>
+          <div
+            className="d-flex flex-column flex-grow-1 overflow-hidden mt-3 border rounded"
+            style={{ height: "400px" }}
+          >
             <div className="d-flex justify-content-between p-2 border-bottom bg-light flex-shrink-0">
               <p className="align-content-center m-0 fw-bold">
                 Produtos da Nota
@@ -348,7 +362,12 @@ export default function Notas() {
           </div>
         )}
 
-        <Button variant="outline-secondary" className="btn-roxo mt-3 w-100" disabled={isLoading || modalCadastroPrduto} type="submit">
+        <Button
+          variant="outline-secondary"
+          className="btn-roxo mt-3 w-100"
+          disabled={isLoading || modalCadastroPrduto}
+          type="submit"
+        >
           Adicionar
         </Button>
       </Form>

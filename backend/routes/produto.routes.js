@@ -1,10 +1,9 @@
-import { Produto, Nota, Categoria, ItemEstoque } from "../database/models/index.js";
+import { Produto, Nota, Categoria, ItemEstoque, Cliente, ItemVendido, ItemReservado} from "../database/models/index.js";
 import { Op } from "sequelize"
 import { put } from "@vercel/blob"
 import { randomUUID } from "crypto";
 import { Buffer } from "buffer";
 import "dotenv/config"
-import { setTimeout } from "timers/promises"
 //const pump = util.promisify(pipeline)
 
 export default async function produtoRoutes(fastify) {
@@ -45,8 +44,35 @@ export default async function produtoRoutes(fastify) {
     }
     else if(query.itens === "estoque"){
       console.log("estoque")
+      // const produtos = await ItemEstoque.findAll({
+      //   where: {status: "Disponivel"},
+      //   include: [
+      //     {model: Nota, as: "nota"},
+      //     {model: Produto, as: "produto",
+      //       include: [
+      //         {model: Categoria, as: "categoria"}
+      //       ]
+      //     }
+      //   ]
+      // })
+      const produtos = await Produto.findAll({
+        include: [
+          { model: Categoria, as: "categoria" },
+          { model: ItemEstoque, as: "itemEstoque",
+            where: {status: "Disponivel"},
+            include: [
+              {model: Nota, as: "nota"}
+            ]
+          }
+        ]
+      })
+      // console.log(produtos)
+      return reply.code(200).send(produtos)
+    }
+    else if(query.itens === "reservado"){
+      console.log("reservado")
       const produtos = await ItemEstoque.findAll({
-        where: {status: "Disponivel"},
+        where: {status: "Reservado"},
         include: [
           {model: Nota, as: "nota"},
           {model: Produto, as: "produto",
@@ -124,6 +150,83 @@ export default async function produtoRoutes(fastify) {
     } catch(err){
       console.log(err)
       reply.code(500).send({ error: 'Erro ao cadastrar produtos', ok: false })
+    }
+  })
+
+  fastify.put("/produto/reservar/:id", async (request, reply) => {
+    try{
+      const produtoId = request.params.id
+      const clienteId = request.query.cliente_id
+      const cliente = await Cliente.findByPk(clienteId)
+      const produto = await ItemEstoque.findByPk(produtoId)
+
+      if (!produto) {
+        return reply.status(404).send({ error: 'Produto não encontrado', ok: false })
+      }
+
+      if (!cliente) {
+        return reply.status(404).send({ error: 'Cliente não encontrado', ok: false })
+      }
+
+      await ItemReservado.create({
+        cliente_id: clienteId,
+        itemEstoque_id: produtoId,
+        data: new Date()
+      })
+
+      await produto.update({status: "Reservado"})
+
+      reply.send({ message: 'Produto reservado com sucesso', produto, ok: true })
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao reservar produto', ok: false })
+    }
+  })
+
+  fastify.put("/produto/remover/:id", async (request, reply) => {
+    try{
+      const itemId = request.params.id
+      const data = request.body
+
+      const item = await ItemEstoque.findByPk(itemId)
+      const itemReservado = await ItemReservado.findOne({where: {itemEstoque_id: itemId}})
+
+      if (!item) {
+        return reply.status(404).send({ error: 'Item não encontrado', ok: false })
+      }
+
+      if (!itemReservado) {
+        return reply.status(404).send({ error: 'Item reservado não encontrado', ok: false })
+      }
+
+      await itemReservado.destroy()
+
+      await item.update(data)
+
+      reply.send({ message: 'Item atualizado com sucesso', item, ok: true })
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao atualizar item', ok: false })
+    }
+  })
+
+  fastify.put("/produto/item/:id", async (request, reply) => {
+    try{
+      const itemId = request.params.id
+      const data = request.body
+
+      const item = await ItemEstoque.findByPk(itemId)
+
+      if (!item) {
+        return reply.status(404).send({ error: 'Item não encontrado', ok: false })
+      }
+
+      await item.update(data)
+
+      reply.send({ message: 'Item atualizado com sucesso', item, ok: true })
+    } catch(err){
+      console.log(err)
+      reply.code(500).send({ error: 'Erro ao atualizar item', ok: false })
     }
   })
 

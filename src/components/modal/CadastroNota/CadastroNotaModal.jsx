@@ -8,6 +8,7 @@ import API from "@app/api";
 import { useToast } from "@contexts/ToastContext";
 import { useOutletContext } from "react-router-dom";
 import { useLoadRequest } from "@hooks/useLoadRequest";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export default function CadastroNotaModal({ visible, onClose }) {
   const [formValue, setFormValue] = useState({});
@@ -28,6 +29,8 @@ export default function CadastroNotaModal({ visible, onClose }) {
   const { showToast } = useToast();
 
   const [isLoading, request] = useLoadRequest();
+
+  const valorTotalHook = useCurrencyInput({ initialValue: 0 });
 
   // Update formValue.quantidade when produtos changes IF incluirProdutos is true
   useEffect(() => {
@@ -57,6 +60,12 @@ export default function CadastroNotaModal({ visible, onClose }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
+
+    if (name === "valor_total") {
+      // Handled by hook
+      return;
+    }
+
     setFormValue((prev) => {
       const updateValues = {
         ...prev,
@@ -98,7 +107,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
 
       // Adiciona os campos da nota
       finalFormData.append("codigo", formValue.codigo);
-      finalFormData.append("valor_total", formValue.valor_total);
+      finalFormData.append("valor_total", valorTotalHook.value);
       finalFormData.append("data", formValue.data);
       finalFormData.append("data_vencimento", formValue.data_vencimento);
       finalFormData.append("fornecedor", formValue.fornecedor);
@@ -134,7 +143,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
       await request(async () => {
         try {
           const response = await API.postNota(finalFormData);
-          
+
           if (response.ok) {
             if (response.produtos) {
               let itensCriados = [];
@@ -157,7 +166,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
         } catch (error) {
           console.log(error);
         }
-      })
+      });
     }
   };
 
@@ -170,10 +179,10 @@ export default function CadastroNotaModal({ visible, onClose }) {
         size="xl"
         centered
         contentClassName={`${
-          mobile ? "h-100" : produtos.length > 0 ? "h-90" : "h-0"
+          mobile ? "h-100" : produtos.length > 0 ? "h-90" : ""
         }`} // Altura total para permitir flex
         dialogClassName={`${
-          mobile ? "h-100" : produtos.length > 0 ? "h-90" : "h-0"
+          mobile ? "h-100" : produtos.length > 0 ? "h-90" : ""
         }`} // Altura total para o dialog
       >
         <Form
@@ -267,7 +276,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
                     Valor Total
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className={`form-control ${
                       validated
                         ? erros.valor_total
@@ -277,7 +286,9 @@ export default function CadastroNotaModal({ visible, onClose }) {
                     }`}
                     name="valor_total"
                     id="valor_total"
-                    onChange={handleChange}
+                    placeholder="R$ 0,00"
+                    value={valorTotalHook.displayValue}
+                    onChange={valorTotalHook.onChange}
                     required
                   />
                 </Col>

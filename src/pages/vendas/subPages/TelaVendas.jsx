@@ -31,6 +31,9 @@ import { usePagination } from "@hooks/usePagination";
 import PaginationButtons from "@components/Pagination/PaginationButtons";
 import ItemsPerPageSelector from "@components/Pagination/ItemsPerPageSelector";
 
+import { useOutletContext } from "react-router-dom";
+
+
 const cardStyle = {
   cursor: "pointer",
   fontSize: "0.9rem"
@@ -38,11 +41,12 @@ const cardStyle = {
 
 export default function TelaVendas() {
   const navigate = useNavigate();
-
+  const { mobile } = useOutletContext();
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVenda, setSelectedVenda] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
 
   // Pagination State
   const {
@@ -57,7 +61,9 @@ export default function TelaVendas() {
     // totalItems,
     setCurrentPage,
     setItemsPerPage,
-  } = usePagination(vendas);
+  } = usePagination(vendas, 5);
+
+
 
   useEffect(() => {
     getVendas();
@@ -66,6 +72,7 @@ export default function TelaVendas() {
   const getVendas = async () => {
     setLoading(true);
     const v = await API.getVendas();
+    console.log(v)
     setVendas(Array.isArray(v) ? v : []);
     setLoading(false);
   };
@@ -86,7 +93,7 @@ export default function TelaVendas() {
     // O método .reduce percorre cada item (curr) e soma ao acumulador (acc).
     const totalReceita = vendas.reduce(
       // Converte o valor_total para número; se falhar, usa 0.
-      (acc, curr) => acc + (Number(curr.total) || 0),
+      (acc, curr) => acc + (Number(curr.valor_total) || 0),
       0 // Valor inicial do acumulador é 0.
     );
 
@@ -135,7 +142,7 @@ export default function TelaVendas() {
       // Incrementa a contagem de vendas para essa data.
       acc[date].vendas += 1;
       // Soma o valor total da venda à receita dessa data.
-      acc[date].receita += Number(curr.total) || 0;
+      acc[date].receita += Number(curr.valor_total) || 0;
       
       return acc; // Retorna o acumulador atualizado.
     }, {}); // Começa com um objeto vazio.
@@ -225,10 +232,10 @@ export default function TelaVendas() {
 
       <Row className="g-4">
         {/* Left Column: Sales List */}
-        <Col lg={8}>
-          <Card className="border-0 shadow-sm">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-3">
+        <Col md={8}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="position-relative">
+              <div className="d-flex justify-content-between align-items-center mb-4">
                 <h5 className="mb-0">Histórico de Vendas</h5>
                 <div className="d-flex align-items-center gap-2">
                   <span className="text-muted small">Exibir:</span>
@@ -251,19 +258,24 @@ export default function TelaVendas() {
               <TabelaVendas vendas={currentItems} onView={handleViewVenda} />
 
               {/* Pagination Controls */}
-              <div className="my-2">
-                <PaginationButtons
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={paginate}
-                />
+              <div className={mobile ? "" : "position-absolute bottom-0 end-0 w-full m-3"}>
+                <div className="my-3 mb-4">
+                  <PaginationButtons
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={paginate}
+                  />
+                </div>
+                <div className="d-flex justify-content-end align-items-end">
+                  <span className="text-muted small">Mostrando {currentItems.length} de {vendas.length} vendas</span>
+                </div>
               </div>
             </Card.Body>
           </Card>
         </Col>
 
         {/* Right Column: Dashboard & Stats */}
-        <Col lg={4}>
+        <Col md={4}>
           <div className="d-flex flex-column gap-3">
             {/* Total Revenue Card */}
             <Card className="border-0 shadow-sm bg-primary text-white">

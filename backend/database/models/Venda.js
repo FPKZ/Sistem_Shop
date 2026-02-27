@@ -9,11 +9,20 @@ const Venda = sequelize.define('Venda', {
         allowNull: false
     },
     status: DataTypes.STRING,
-    total: DataTypes.DECIMAL,
-    desconto: DataTypes.DECIMAL,
-    forma_pagamento: DataTypes.STRING,
+    valor_total: DataTypes.FLOAT,
+    desconto: DataTypes.FLOAT,
 }, {
     tableName: 'Vendas'
 });
 
 export default Venda;
+
+/*
+cliente_id: cliente.id,
+data_venda: new Date().toISOString(),
+notaVenda: pagamentos,
+desconto: desconto,
+valor_total: calcularTotal(),
+status: "concluida",
+itensVendidos: itens,
+*/

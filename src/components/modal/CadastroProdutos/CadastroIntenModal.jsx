@@ -1,9 +1,18 @@
 import API from "@app/api";
 import { useState, useEffect } from "react";
-import { Modal, Row, Col, Button, Form, Dropdown, InputGroup } from "react-bootstrap";
+import {
+  Modal,
+  Row,
+  Col,
+  Button,
+  Form,
+  Dropdown,
+  InputGroup,
+} from "react-bootstrap";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useLoadRequest } from "@hooks/useLoadRequest";
+import useCurrencyInput from "@hooks/useCurrencyInput";
 
 function CadastroIntenModal({
   visible,
@@ -20,12 +29,16 @@ function CadastroIntenModal({
   const [categorias, setCategorias] = useState([]);
   const [categoria, setCategoria] = useState({});
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
-  
+
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState(null);
 
-  const [ isLoading, request ] = useLoadRequest()
-  
+  const [isLoading, request] = useLoadRequest();
+
+  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
+  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
+  const lucroHook = useCurrencyInput({ initialValue: 0 });
+
   useEffect(() => {
     if (!visible) {
       const timer = setTimeout(() => {
@@ -56,35 +69,49 @@ function CadastroIntenModal({
 
   function handleChange(e) {
     const { name, value, type, files } = e.target;
-    setFormValue((prev) => {
-      const updatedValues = {
-        ...prev,
-        [name]: type === "file" ? files[0] : value,
-      };
 
-      const valorCompra = parseFloat(updatedValues.valor_compra) || 0;
-      const lucro = parseFloat(updatedValues.lucro) || 0;
-      const valorVenda = parseFloat(updatedValues.valor_venda) || 0;
+    if (name === "valor_compra" || name === "valor_venda" || name === "lucro") {
+      // Handled by hooks
+      return;
+    }
 
-      if (name === "valor_venda") {
-        if (valorCompra > 0) {
-          updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
-        }
-      } else if (name === "lucro") {
-        if (valorCompra > 0) {
-          updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
-        }
-      } else if (name === "valor_compra") {
-        if (valorVenda > 0) {
-          updatedValues.lucro = (valorVenda - valorCompra).toFixed(2);
-        } else if (lucro > 0) {
-          updatedValues.valor_venda = (valorCompra + lucro).toFixed(2);
-        }
-      }
-
-      return updatedValues;
-    });
+    setFormValue((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value,
+    }));
   }
+
+  // Lógica de cálculo automático entre os valores
+  const handleValorCompraChange = (e) => {
+    valorCompraHook.onChange(e);
+    const newValorCompra =
+      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorVendaHook.value > 0) {
+      lucroHook.setValue(valorVendaHook.value - newValorCompra);
+    } else if (lucroHook.value > 0) {
+      valorVendaHook.setValue(newValorCompra + lucroHook.value);
+    }
+  };
+
+  const handleValorVendaChange = (e) => {
+    valorVendaHook.onChange(e);
+    const newValorVenda =
+      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorCompraHook.value > 0) {
+      lucroHook.setValue(newValorVenda - valorCompraHook.value);
+    }
+  };
+
+  const handleLucroChange = (e) => {
+    lucroHook.onChange(e);
+    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
+
+    if (valorCompraHook.value > 0) {
+      valorVendaHook.setValue(valorCompraHook.value + newLucro);
+    }
+  };
 
   function validate(form) {
     let newErrors = {};
@@ -109,332 +136,385 @@ function CadastroIntenModal({
     setValidated(true);
 
     if (Object.keys(newErrors).length === 0) {
-      
       await request(async () => {
         const quantidade = parseInt(formValue.quantidade) || 1;
         let allItensCriados = [];
-  
+
         try {
           for (let i = 0; i < quantidade; i++) {
-              const finalFormData = new FormData();
-              finalFormData.append("nome", formValue.nome);
-              finalFormData.append("descricao", formValue.descricao);
-              finalFormData.append("img", formValue.img);
-              finalFormData.append("categoria_id", categoria.id || "");
-  
-              const itens = [
+            const finalFormData = new FormData();
+            finalFormData.append("nome", formValue.nome);
+            finalFormData.append("descricao", formValue.descricao);
+            finalFormData.append("img", formValue.img);
+            finalFormData.append("categoria_id", categoria.id || "");
+
+            const itens = [
               {
-                  codigo_barras: formValue.codigo_barras,
-                  nota_id: nota.id || "",
-                  tamanho: formValue.tamanho,
-                  cor: formValue.cor,
-                  marca: formValue.marca,
-                  valor_compra: formValue.valor_compra,
-                  valor_venda: formValue.valor_venda,
-                  lucro: formValue.lucro,
+                codigo_barras: formValue.codigo_barras,
+                nota_id: nota.id || "",
+                tamanho: formValue.tamanho,
+                cor: formValue.cor,
+                marca: formValue.marca,
+                valor_compra: valorCompraHook.value,
+                valor_venda: valorVendaHook.value,
+                lucro: lucroHook.value,
               },
-              ];
-              finalFormData.set("itens", JSON.stringify(itens));
-  
-              if (cadastroNota) {
-                  await cadastrarProduto(finalFormData);
-              } else {
-                  const response = await cadastrarProduto(finalFormData);
-                  if (response && response.ok && response.itensEstoque) {
-                      allItensCriados = allItensCriados.concat(response.itensEstoque);
-                  }
+            ];
+            finalFormData.set("itens", JSON.stringify(itens));
+
+            if (cadastroNota) {
+              await cadastrarProduto(finalFormData);
+            } else {
+              const response = await cadastrarProduto(finalFormData);
+              if (response && response.ok && response.itensEstoque) {
+                allItensCriados = allItensCriados.concat(response.itensEstoque);
               }
+            }
           }
-  
+
           if (cadastroNota) {
-              onClose();
+            onClose();
           } else {
-              if (allItensCriados.length > 0) {
-                  setItensCriados(allItensCriados);
-                  setModalCriar(true);
-              } else {
-                  onClose();
-              }
+            if (allItensCriados.length > 0) {
+              setItensCriados(allItensCriados);
+              setModalCriar(true);
+            } else {
+              onClose();
+            }
           }
         } catch (error) {
           console.error(error);
-        } 
-      })
+        }
+      });
     }
   }
 
   function NotaItems({ notas, setNota }) {
     return (
-        <>
+      <>
         {notas.map((n) => (
-            <Dropdown.Item key={n.id} onClick={() => setNota(n)}>
+          <Dropdown.Item key={n.id} onClick={() => setNota(n)}>
             {n.codigo}
-            </Dropdown.Item>
+          </Dropdown.Item>
         ))}
-        </>
+      </>
     );
   }
 
   function CategoriaItems({ categorias, setCategoria }) {
     return (
-        <>
+      <>
         {categorias.map((c) => (
-            <Dropdown.Item key={c.id} onClick={() => setCategoria(c)}>
+          <Dropdown.Item key={c.id} onClick={() => setCategoria(c)}>
             {c.nome}
-            </Dropdown.Item>
+          </Dropdown.Item>
         ))}
-        </>
+      </>
     );
   }
 
   return (
     <>
-    <Modal
-      show={visible && !modalCriar}
-      onHide={onClose}
-      size="xl"
-      centered
-      fullscreen="md-down"
-      animation
-    >
-      <Form onSubmit={handleSubimit} noValidate>
-        <Modal.Header closeButton>
-          <Modal.Title>Cadastrar Item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Row className="g-3 mb-3 pb-4 border-bottom">
-             <Col xs={12}>
+      <Modal
+        show={visible && !modalCriar}
+        onHide={onClose}
+        size="xl"
+        centered
+        fullscreen="md-down"
+        animation
+      >
+        <Form onSubmit={handleSubimit} noValidate>
+          <Modal.Header closeButton>
+            <Modal.Title>Cadastrar Item</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Row className="g-3 mb-3 pb-4 border-bottom">
+              <Col xs={12}>
                 <Form.Label htmlFor="nomeProduto">Nome</Form.Label>
                 <Form.Control
-                    className={validated ? (erros.nome ? "is-invalid" : "is-valid") : ""}
-                    name="nome"
-                    id="nomeProduto"
-                    type="text"
-                    placeholder="Nome do produto"
-                    value={formValue.nome || ""}
-                    onChange={handleChange}
-                    required
+                  className={
+                    validated ? (erros.nome ? "is-invalid" : "is-valid") : ""
+                  }
+                  name="nome"
+                  id="nomeProduto"
+                  type="text"
+                  placeholder="Nome do produto"
+                  value={formValue.nome || ""}
+                  onChange={handleChange}
+                  required
                 />
-             </Col>
-             <Col xs={10} md={4}>
+              </Col>
+              <Col xs={10} md={4}>
                 <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
                 <Form.Control
-                    name="img"
-                    id="imgProduto"
-                    type="file"
-                    onChange={handleChange}
+                  name="img"
+                  id="imgProduto"
+                  type="file"
+                  onChange={handleChange}
                 />
-             </Col>
-             <Col xs={2} md={1} className="d-flex flex-column align-items-center">
+              </Col>
+              <Col
+                xs={2}
+                md={1}
+                className="d-flex flex-column align-items-center"
+              >
                 <Form.Label htmlFor="corProduto">Cor</Form.Label>
                 <Form.Control
-                    className="form-control-color"
-                    name="cor"
-                    id="corProduto"
-                    type="color"
-                    value={formValue.cor || "#000000"}
-                    onChange={handleChange}
+                  className="form-control-color"
+                  name="cor"
+                  id="corProduto"
+                  type="color"
+                  value={formValue.cor || "#000000"}
+                  onChange={handleChange}
                 />
-             </Col>
-             <Col xs={12} md={3}>
+              </Col>
+              <Col xs={12} md={3}>
                 <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
                 <Dropdown>
-                    <Dropdown.Toggle
-                        variant="outline-secondary"
-                        className={`w-100 d-flex justify-content-between align-items-center ${
-                        validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""
-                        }`}
-                    >
-                        {categoria.nome || "Selecione a Categoria"}
-                    </Dropdown.Toggle>
-                    <Form.Control
-                        id="categoriaProduto"
-                        type="hidden"
-                        name="categoria"
-                        value={categoria.id || ""}
-                        required
+                  <Dropdown.Toggle
+                    variant="outline-secondary"
+                    className={`w-100 d-flex justify-content-between align-items-center ${
+                      validated
+                        ? erros.categoria
+                          ? "is-invalid"
+                          : "is-valid"
+                        : ""
+                    }`}
+                  >
+                    {categoria.nome || "Selecione a Categoria"}
+                  </Dropdown.Toggle>
+                  <Form.Control
+                    id="categoriaProduto"
+                    type="hidden"
+                    name="categoria"
+                    value={categoria.id || ""}
+                    required
+                  />
+                  <Dropdown.Menu className="w-100">
+                    <CategoriaItems
+                      categorias={categorias}
+                      setCategoria={setCategoria}
                     />
-                    <Dropdown.Menu className="w-100">
-                        <CategoriaItems categorias={categorias} setCategoria={setCategoria} />
-                        <Dropdown.Divider />
-                        <Dropdown.Item onClick={() => setModalCadastroCategoia(true)}>
-                            Nova Categoria
-                        </Dropdown.Item>
-                    </Dropdown.Menu>
+                    <Dropdown.Divider />
+                    <Dropdown.Item
+                      onClick={() => setModalCadastroCategoia(true)}
+                    >
+                      Nova Categoria
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
                 </Dropdown>
-             </Col>
-             <Col xs={6} md={2}>
+              </Col>
+              <Col xs={6} md={2}>
                 <Form.Label htmlFor="marcaProduto">Marca</Form.Label>
                 <Form.Control
-                    className={validated ? (erros.marca ? "is-invalid" : "is-valid") : ""}
-                    name="marca"
-                    id="marcaProduto"
-                    type="text"
-                    placeholder="Marca"
-                    value={formValue.marca || ""}
-                    onChange={handleChange}
-                    required
+                  className={
+                    validated ? (erros.marca ? "is-invalid" : "is-valid") : ""
+                  }
+                  name="marca"
+                  id="marcaProduto"
+                  type="text"
+                  placeholder="Marca"
+                  value={formValue.marca || ""}
+                  onChange={handleChange}
+                  required
                 />
-             </Col>
-             <Col xs={6} md={2}>
+              </Col>
+              <Col xs={6} md={2}>
                 <Form.Label htmlFor="tamanhoProduto">Tamanho</Form.Label>
                 <Form.Control
-                    className={validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""}
-                    name="tamanho"
-                    id="tamanhoProduto"
-                    type="text"
-                    value={formValue.tamanho || ""}
-                    onChange={handleChange}
-                    placeholder="Tamanho"
-                    required
+                  className={
+                    validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""
+                  }
+                  name="tamanho"
+                  id="tamanhoProduto"
+                  type="text"
+                  value={formValue.tamanho || ""}
+                  onChange={handleChange}
+                  placeholder="Tamanho"
+                  required
                 />
-             </Col>
-          </Row>
+              </Col>
+            </Row>
 
-          <Row className="g-3 mb-3 pb-4 border-bottom">
-             {!cadastroNota && (
-                 <Col xs={12} md={4}>
-                    <Form.Label htmlFor="notaProduto">Nota</Form.Label>
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            variant="outline-secondary"
-                            className={`w-100 d-flex justify-content-between align-items-center ${
-                            validated ? (erros.nota ? "is-invalid" : "is-valid") : ""
-                            }`}
-                        >
-                            {nota.codigo || "Selecione a Nota"}
-                        </Dropdown.Toggle>
-                        <Form.Control
-                            id="notaProduto"
-                            type="hidden"
-                            name="nota"
-                            value={nota.id || ""}
-                            required
-                        />
-                        <Dropdown.Menu className="w-100">
-                            <NotaItems notas={notas} setNota={setNota} />
-                        </Dropdown.Menu>
-                    </Dropdown>
-                 </Col>
-             )}
-             
-             <Col xs={10} md={!cadastroNota ? 6 : 9}>
+            <Row className="g-3 mb-3 pb-4 border-bottom">
+              {!cadastroNota && (
+                <Col xs={12} md={4}>
+                  <Form.Label htmlFor="notaProduto">Nota</Form.Label>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      variant="outline-secondary"
+                      className={`w-100 d-flex justify-content-between align-items-center ${
+                        validated
+                          ? erros.nota
+                            ? "is-invalid"
+                            : "is-valid"
+                          : ""
+                      }`}
+                    >
+                      {nota.codigo || "Selecione a Nota"}
+                    </Dropdown.Toggle>
+                    <Form.Control
+                      id="notaProduto"
+                      type="hidden"
+                      name="nota"
+                      value={nota.id || ""}
+                      required
+                    />
+                    <Dropdown.Menu className="w-100">
+                      <NotaItems notas={notas} setNota={setNota} />
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Col>
+              )}
+
+              <Col xs={10} md={!cadastroNota ? 6 : 9}>
                 <Form.Label htmlFor="codigoBarras">Código de Barras</Form.Label>
                 <Form.Control
-                    className={validated ? (erros.codigo_barras ? "is-invalid" : "is-valid") : ""}
-                    name="codigo_barras"
-                    id="codigoBarras"
-                    type="number"
-                    placeholder="Código de Barras"
-                    value={formValue.codigo_barras || ""}
-                    onChange={handleChange}
-                    required
+                  className={
+                    validated
+                      ? erros.codigo_barras
+                        ? "is-invalid"
+                        : "is-valid"
+                      : ""
+                  }
+                  name="codigo_barras"
+                  id="codigoBarras"
+                  type="number"
+                  placeholder="Código de Barras"
+                  value={formValue.codigo_barras || ""}
+                  onChange={handleChange}
+                  required
                 />
-             </Col>
-             
-             <Col xs={2} md={!cadastroNota ? 2 : 3}>
+              </Col>
+
+              <Col xs={2} md={!cadastroNota ? 2 : 3}>
                 <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
                 <Form.Control
-                    name="quantidade"
-                    id="quantidadeProduto"
-                    type="text"
-                    placeholder="G"
-                    value={formValue.quantidade}
-                    onChange={handleChange}
-                    required
+                  name="quantidade"
+                  id="quantidadeProduto"
+                  type="text"
+                  placeholder="G"
+                  value={formValue.quantidade}
+                  onChange={handleChange}
+                  required
                 />
-             </Col>
-             
-             <Col xs={4} md={4}>
-                <Form.Label htmlFor="valorCompraProduto">Vlr. Compra</Form.Label>
+              </Col>
+
+              <Col xs={4} md={4}>
+                <Form.Label htmlFor="valorCompraProduto">
+                  Vlr. Compra
+                </Form.Label>
                 <InputGroup>
-                    <InputGroup.Text>R$</InputGroup.Text>
-                    <Form.Control
-                        className={validated ? (erros.valor_compra ? "is-invalid" : "is-valid") : ""}
-                        name="valor_compra"
-                        id="valorCompraProduto"
-                        type="number"
-                        placeholder="0.00"
-                        value={formValue.valor_compra || ""}
-                        onChange={handleChange}
-                        required
-                    />
+                  <InputGroup.Text>R$</InputGroup.Text>
+                  <Form.Control
+                    className={
+                      validated
+                        ? erros.valor_compra
+                          ? "is-invalid"
+                          : "is-valid"
+                        : ""
+                    }
+                    name="valor_compra"
+                    id="valorCompraProduto"
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={valorCompraHook.displayValue}
+                    onChange={handleValorCompraChange}
+                    required
+                  />
                 </InputGroup>
-             </Col>
-             
-             <Col xs={4} md={4}>
+              </Col>
+
+              <Col xs={4} md={4}>
                 <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
                 <InputGroup>
-                    <InputGroup.Text>R$</InputGroup.Text>
-                    <Form.Control
-                        className={validated ? (erros.valor_venda ? "is-invalid" : "is-valid") : ""}
-                        name="valor_venda"
-                        id="valorVendaProduto"
-                        type="number"
-                        placeholder="0.00"
-                        value={formValue.valor_venda || ""}
-                        onChange={handleChange}
-                        required
-                    />
+                  <InputGroup.Text>R$</InputGroup.Text>
+                  <Form.Control
+                    className={
+                      validated
+                        ? erros.valor_venda
+                          ? "is-invalid"
+                          : "is-valid"
+                        : ""
+                    }
+                    name="valor_venda"
+                    id="valorVendaProduto"
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={valorVendaHook.displayValue}
+                    onChange={handleValorVendaChange}
+                    required
+                  />
                 </InputGroup>
-             </Col>
-             
-             <Col xs={4} md={4}>
+              </Col>
+
+              <Col xs={4} md={4}>
                 <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
                 <InputGroup>
-                    <InputGroup.Text>R$</InputGroup.Text>
-                    <Form.Control
-                        className={validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""}
-                        name="lucro"
-                        id="LucroProduto"
-                        type="number"
-                        placeholder="0.00"
-                        value={formValue.lucro || ""}
-                        onChange={handleChange}
-                        required
-                    />
+                  <InputGroup.Text>R$</InputGroup.Text>
+                  <Form.Control
+                    className={
+                      validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
+                    }
+                    name="lucro"
+                    id="LucroProduto"
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={lucroHook.displayValue}
+                    onChange={handleLucroChange}
+                    required
+                  />
                 </InputGroup>
-             </Col>
-          </Row>
-          
-          <Row className="g-3 mb-3">
-             <Col xs={12}>
+              </Col>
+            </Row>
+
+            <Row className="g-3 mb-3">
+              <Col xs={12}>
                 <Form.Label htmlFor="descricaoProduto">Descrição</Form.Label>
                 <Form.Control
-                    className={validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""}
-                    name="descricao"
-                    type="text"
-                    id="descricaoProduto"
-                    placeholder="Descrição"
-                    value={formValue.descricao || ""}
-                    onChange={handleChange}
-                    required
+                  className={
+                    validated
+                      ? erros.descricao
+                        ? "is-invalid"
+                        : "is-valid"
+                      : ""
+                  }
+                  name="descricao"
+                  type="text"
+                  id="descricaoProduto"
+                  placeholder="Descrição"
+                  value={formValue.descricao || ""}
+                  onChange={handleChange}
+                  required
                 />
-             </Col>
-          </Row>
+              </Col>
+            </Row>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              className="btn btn-roxo w-100"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Salvando..." : "Salvar"}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button className="btn btn-roxo w-100" type="submit" disabled={isLoading}>
-            {isLoading ? "Salvando..." : "Salvar"}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
-    
-    <CadastroCategoria
-      visible={modalCadastroCategoria}
-      onClose={() => setModalCadastroCategoia(false)}
-    />
-    
-    <ProdutosCriados
+      <CadastroCategoria
+        visible={modalCadastroCategoria}
+        onClose={() => setModalCadastroCategoia(false)}
+      />
+
+      <ProdutosCriados
         visible={modalCriar}
         onClose={() => {
-            setModalCriar(false);
-            onClose();
+          setModalCriar(false);
+          onClose();
         }}
         itens={itensCriados}
-    />
+      />
     </>
   );
 }
