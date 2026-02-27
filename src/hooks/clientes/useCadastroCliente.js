@@ -12,6 +12,7 @@ export function useCadastroCliente(navigate) {
   const [isLoading, request] = useLoadRequest();
 
   function handleChange(e) {
+    // eslint-disable-next-line no-unused-vars
     const { name, value, type } = e.target;
     let newValue = value;
 

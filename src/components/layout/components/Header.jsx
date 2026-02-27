@@ -2,6 +2,7 @@ import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@auth-sistem/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import utils from "@app/utils";
 
 export default function Header({ mobile }) {
@@ -13,6 +14,7 @@ export default function Header({ mobile }) {
   const location = useLocation();
   const pathParts = location.pathname.split("/").filter((part) => part);
 
+  // eslint-disable-next-line no-unused-vars
   const breadcrumbTitles = {
     usuarios: "Usuários",
     Extorno: "Estorno",
