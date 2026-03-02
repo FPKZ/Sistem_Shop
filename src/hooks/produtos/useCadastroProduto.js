@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "@app/api";
-import { useToast } from "@contexts/ToastContext";
-import { useLoadRequest } from "@hooks/useLoadRequest";
+import { useForm } from "@hooks/useForm";
+import { useRequestHandler } from "@hooks/useRequestHandler";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export function useCadastroProduto() {
@@ -11,49 +11,48 @@ export function useCadastroProduto() {
   const [categorias, setCategorias] = useState([]);
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
-
   const [modalCriar, setModalCriar] = useState(false);
-
   const [itensCriados, setItensCriados] = useState([]);
 
-  const [erros, setErros] = useState({});
-  const [validated, setValidated] = useState(false);
-  const [formValue, setFormValue] = useState({
-    nome: "",
-    img: null,
-    cor: "#000000",
-    marca: "",
-    tamanho: "",
-    codigo_barras: "",
-    descricao: "",
-    quantidade: 1,
-  });
+  // Configuração do useForm para os campos básicos do produto
+  const {
+    formValue,
+    erros,
+    setErros,
+    validated,
+    setValidated,
+    handleChange,
+    validate,
+  } = useForm(
+    {
+      nome: "",
+      img: null,
+      cor: "#000000",
+      marca: "",
+      tamanho: "",
+      codigo_barras: "",
+      descricao: "",
+      quantidade: 1,
+    },
+    {
+      validators: {
+        nome: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        quantidade: (v) => (!v || v < 1 ? "Quantidade mínima é 1" : null),
+      },
+    },
+  );
 
   const valorCompraHook = useCurrencyInput({ initialValue: 0 });
   const valorVendaHook = useCurrencyInput({ initialValue: 0 });
   const lucroHook = useCurrencyInput({ initialValue: 0 });
 
-  const { showToast } = useToast();
-  const [isLoading, request] = useLoadRequest();
+  const { isLoading, handleRequest } = useRequestHandler();
 
-  function handleChange(e) {
-    const { name, value, type, files } = e.target;
-
-    if (name === "valor_compra" || name === "valor_venda" || name === "lucro") {
-      return;
-    }
-
-    setFormValue((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));
-  }
-
+  // Handlers de precificação (lógica complexa mantida localmente para clareza)
   const handleValorCompraChange = (e) => {
     valorCompraHook.onChange(e);
     const newValorCompra =
       parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
     if (valorVendaHook.value > 0) {
       lucroHook.setValue(valorVendaHook.value - newValorCompra);
     } else if (lucroHook.value > 0) {
@@ -65,7 +64,6 @@ export function useCadastroProduto() {
     valorVendaHook.onChange(e);
     const newValorVenda =
       parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
     if (valorCompraHook.value > 0) {
       lucroHook.setValue(newValorVenda - valorCompraHook.value);
     }
@@ -74,46 +72,20 @@ export function useCadastroProduto() {
   const handleLucroChange = (e) => {
     lucroHook.onChange(e);
     const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
     if (valorCompraHook.value > 0) {
       valorVendaHook.setValue(valorCompraHook.value + newLucro);
     }
   };
 
-  function validate(form) {
-    let newErrors = {};
-
-    const elements = form.querySelectorAll("[name]");
-
-    elements.forEach((e) => {
-      const { name, value, required, type } = e;
-
-      if (required && !value.trim()) {
-        newErrors[name] = "Campo obrigatório!";
-      }
-
-      if (type == "number" && value && isNaN(value)) {
-        newErrors[name] = "Digite um valor numerico valido";
-      }
-    });
-    return newErrors;
-  }
-
   async function handleSubimit(e) {
     e.preventDefault();
-    const form = e.target;
 
-    const newErrors = validate(form);
-    setErros(newErrors);
-    setValidated(true);
-
-    if (Object.keys(newErrors).length === 0) {
+    if (validate()) {
       const quantidade = parseInt(formValue.quantidade) || 1;
       let allItensCriados = [];
 
       for (let i = 0; i < quantidade; i++) {
         const finalFormData = new FormData();
-
         finalFormData.append("nome", formValue.nome);
         finalFormData.append("descricao", formValue.descricao);
         finalFormData.append("img", formValue.img);
@@ -134,30 +106,19 @@ export function useCadastroProduto() {
 
         finalFormData.set("itens", JSON.stringify(itens));
 
-        await request(async () => {
-          try {
-            const response = await API.postProduto(finalFormData);
+        const response = await handleRequest(
+          () => API.postProduto(finalFormData),
+          {
+            showSuccessToast: false, // Desabilitamos o toast individual do loop
+          },
+        );
 
-            if (response.ok) {
-              if (response.itensEstoque) {
-                allItensCriados = allItensCriados.concat(response.itensEstoque);
-              }
-            } else {
-              if (response.message) {
-                showToast(response.message, "error");
-              }
-            }
-          } catch (error) {
-            console.log(error);
-          }
-        });
+        if (response?.ok && response.itensEstoque) {
+          allItensCriados = allItensCriados.concat(response.itensEstoque);
+        }
       }
 
       if (allItensCriados.length > 0) {
-        showToast(
-          `${allItensCriados.length} produtos criados com sucesso!`,
-          "success",
-        );
         setItensCriados(allItensCriados);
         setModalCriar(true);
       }
