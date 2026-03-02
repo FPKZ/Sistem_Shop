@@ -24,6 +24,8 @@ export default function NovaVenda() {
 
   const [cliente, setCliente] = useState(null);
   const [reservar, setReservar] = useState(false);
+  const [prazoReserva, setPrazoReserva] = useState(3); // Padrão 3 dias
+  const [vendaId, setVendaId] = useState(null);
 
   // Controle de Modais Locais
   const [showModalCliente, setShowModalCliente] = useState(false);
@@ -43,6 +45,44 @@ export default function NovaVenda() {
     cart.calcularSubtotal(),
     cart.calcularCompraBase(),
   );
+
+  // Carregar venda se houver vendaId na URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("vendaId");
+    if (id && produtos && produtos.length > 0) {
+      setVendaId(id);
+      const fetchVenda = async () => {
+        const response = await API.getVendaById(id);
+        if (response && response.id) {
+          setCliente(response.cliente);
+
+          // Agrupar itens por produto
+          const grupos = {};
+          response.itensVendidos.forEach((iv) => {
+            const item = iv.itemEstoque;
+            const produtoId = item.produto.id;
+            if (!grupos[produtoId]) {
+              grupos[produtoId] = {
+                ...item.produto,
+                itens: [],
+                quantidade: 0,
+              };
+            }
+            grupos[produtoId].itens.push(item);
+            grupos[produtoId].quantidade += 1;
+          });
+
+          // Adicionar grupos ao carrinho de uma só vez
+          cart.handleCarregarCarrinho(Object.values(grupos));
+
+          // Se for uma reserva sendo finalizada, desativamos o switch reservar
+          setReservar(false);
+        }
+      };
+      fetchVenda();
+    }
+  }, [produtos, cart.handleCarregarCarrinho]); // Dependente de produtos para garantir que o cart funcione
 
   useEffect(() => {
     const reservarEstoque = async () => {
@@ -72,30 +112,54 @@ export default function NovaVenda() {
       ),
     );
 
-    const currentDate = new Date().toISOString();
+    const currentDate = new Date();
     const status = pagamentoState.pagamentos.every(
       (item) => item.forma_pagamento === "Promissória",
     )
       ? "pendente"
       : "concluida";
 
+    // Calcular data de expiração se for reserva
+    let data_expiracao = null;
+    if (reservar) {
+      data_expiracao = new Date();
+      data_expiracao.setDate(data_expiracao.getDate() + prazoReserva);
+    }
+
     const venda = {
       cliente_id: cliente.id,
-      data_venda: currentDate,
+      data_venda: currentDate.toISOString(),
       notaVenda: pagamentoState.pagamentos,
       desconto: pagamentoState.desconto,
       valor_total: pagamentoState.calcularTotalComDesconto(),
-      status: status,
+      status: reservar ? "pendente" : status,
       itensVendidos: itens,
+      reservar: reservar,
+      prazo_reserva: data_expiracao ? data_expiracao.toISOString() : null,
     };
 
     request(async () => {
-      const response = await API.postVenda(venda);
+      let response;
+      if (vendaId) {
+        // Finalizando uma reserva existente
+        response = await API.putFinalizarVenda(vendaId, venda);
+      } else {
+        // Criando nova venda ou reserva
+        response = await API.postVenda(venda);
+      }
+
       if (response.ok) {
-        showToast("Venda finalizada com sucesso!", "success");
+        showToast(
+          vendaId
+            ? "Venda finalizada com sucesso!"
+            : reservar
+              ? "Reserva realizada com sucesso!"
+              : "Venda finalizada com sucesso!",
+          "success",
+        );
         navigate("/vendas");
       } else {
-        showToast("Erro ao finalizar venda!", "error");
+        showToast(response.message || "Erro ao processar venda!", "error");
       }
     });
   };
@@ -112,7 +176,7 @@ export default function NovaVenda() {
       <VendaHeader reservar={reservar} setReservar={setReservar} />
 
       <Row className="g-4">
-        <Col lg={8} className="m-0">
+        <Col lg={8}>
           <VendaCart
             mobile={mobile}
             cliente={cliente}
@@ -125,7 +189,7 @@ export default function NovaVenda() {
           />
         </Col>
 
-        <Col lg={4} className="m-0">
+        <Col lg={4}>
           <VendaResumo
             cliente={cliente}
             listaVenda={cart.listaVenda}
@@ -141,6 +205,9 @@ export default function NovaVenda() {
             handleFinalizarVenda={handleFinalizarVenda}
             handleCancelarVenda={handleCancelarVenda}
             isLoading={isLoading}
+            reservar={reservar}
+            prazoReserva={prazoReserva}
+            setPrazoReserva={setPrazoReserva}
           />
         </Col>
       </Row>

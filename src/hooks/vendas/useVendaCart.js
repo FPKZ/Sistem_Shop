@@ -4,12 +4,12 @@ import API from "@app/api";
 export function useVendaCart(produtos) {
   const [listaVenda, setListaVenda] = useState([]);
 
-  const handleAdicionarProduto = async (produto) => {
-    const produtoExistente = listaVenda.find((item) => item.id === produto.id);
+  const handleAdicionarProduto = (produto) => {
+    setListaVenda((prevLista) => {
+      const produtoExistente = prevLista.find((item) => item.id === produto.id);
 
-    if (produtoExistente) {
-      setListaVenda(
-        listaVenda.map((item) =>
+      if (produtoExistente) {
+        return prevLista.map((item) =>
           item.id === produto.id
             ? {
                 ...item,
@@ -17,19 +17,31 @@ export function useVendaCart(produtos) {
                 itens: item.itens.concat(produto.itens),
               }
             : item,
-        ),
-      );
-    } else {
-      setListaVenda([...listaVenda, produto]);
-    }
+        );
+      } else {
+        return [...prevLista, produto];
+      }
+    });
   };
 
   const handleRemoverProduto = async (id) => {
-    const produto = listaVenda.find((item) => item.id === id);
-    produto.itens.map(async (item) => {
-      await API.removerProduto(item.id, { status: "Disponivel" });
+    // Obter itens antes de remover para disparar API
+    setListaVenda((prevLista) => {
+      const produto = prevLista.find((p) => p.id === id);
+      if (produto) {
+        // Disparar liberação de itens no estoque (side effect controlado)
+        Promise.all(
+          produto.itens.map((item) =>
+            API.removerProduto(item.id, { status: "Disponivel" }),
+          ),
+        );
+      }
+      return prevLista.filter((item) => item.id !== id);
     });
-    setListaVenda(listaVenda.filter((item) => item.id !== id));
+  };
+
+  const handleCarregarCarrinho = (lista) => {
+    setListaVenda(lista);
   };
 
   const calcularItensAjustados = (itensAtuais, todosItens, novaQuantidade) => {
@@ -58,22 +70,24 @@ export function useVendaCart(produtos) {
   const handleAlterarQuantidade = (id, novaQuantidade) => {
     if (novaQuantidade < 1) return;
 
-    const produto = produtos.find((p) => p.id === id);
-    const itemVenda = listaVenda.find((item) => item.id === id);
+    setListaVenda((prevLista) => {
+      const produto = produtos.find((p) => p.id === id);
+      const itemVenda = prevLista.find((item) => item.id === id);
 
-    if (novaQuantidade > produto.itemEstoque.length) {
-      alert("Quantidade maior que o estoque disponível!");
-      return;
-    }
+      if (!produto || !itemVenda) return prevLista;
 
-    const novosItens = calcularItensAjustados(
-      itemVenda.itens,
-      produto.itemEstoque,
-      novaQuantidade,
-    );
+      if (novaQuantidade > produto.itemEstoque.length) {
+        alert("Quantidade maior que o estoque disponível!");
+        return prevLista;
+      }
 
-    setListaVenda(
-      listaVenda.map((item) =>
+      const novosItens = calcularItensAjustados(
+        itemVenda.itens,
+        produto.itemEstoque,
+        novaQuantidade,
+      );
+
+      return prevLista.map((item) =>
         item.id === id
           ? {
               ...item,
@@ -81,14 +95,15 @@ export function useVendaCart(produtos) {
               itens: novosItens,
             }
           : item,
-      ),
-    );
+      );
+    });
   };
 
   const calcularSubtotal = () => {
     return listaVenda.reduce(
       (total, item) =>
-        total + item.itens.reduce((total, i) => total + i.valor_venda, 0),
+        total +
+        (item.itens?.reduce((total, i) => total + i.valor_venda, 0) || 0),
       0,
     );
   };
@@ -96,7 +111,8 @@ export function useVendaCart(produtos) {
   const calcularCompraBase = () => {
     return listaVenda.reduce(
       (total, item) =>
-        total + item.itens.reduce((total, i) => total + i.valor_compra, 0),
+        total +
+        (item.itens?.reduce((total, i) => total + i.valor_compra, 0) || 0),
       0,
     );
   };
@@ -109,6 +125,7 @@ export function useVendaCart(produtos) {
     listaVenda,
     handleAdicionarProduto,
     handleRemoverProduto,
+    handleCarregarCarrinho,
     handleAlterarQuantidade,
     calcularItensAjustados,
     calcularSubtotal,
