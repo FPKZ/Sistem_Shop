@@ -28,7 +28,6 @@ export function ProdutoHeader({
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
                 autoFocus
-                className="me-2 shadow-sm"
                 className="me-2 shadow-sm rounded-pill search-input-expand"
               />
             )}

@@ -12,7 +12,7 @@ export default function Clientes() {
     isLoading,
     handleChange,
     handleSubimit,
-  } = useCadastroCliente(navigate);
+  } = useCadastroCliente(() => navigate(-1));
 
   return (
     <>
@@ -75,7 +75,9 @@ export default function Clientes() {
               className={`form-control`}
               id="endereco"
               name="endereco"
-              placeholder="Endereco"
+              placeholder="Endereço"
+              value={formValue.endereco || ""}
+              onChange={handleChange}
             />
           </Col>
           <Button

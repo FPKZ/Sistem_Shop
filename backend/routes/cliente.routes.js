@@ -32,34 +32,52 @@ export default async function clienteRoutes(fastify) {
   fastify.post("/cliente", async (request, reply) => {
     try {
       const data = request.body;
+      console.log(
+        "\n[BACKEND] Tentando cadastrar cliente. Dados recebidos:",
+        data,
+      );
+
+      if (!data.nome || !data.telefone) {
+        console.log("[BACKEND] Erro: Nome ou telefone ausentes.");
+        return reply
+          .code(400)
+          .send({ message: "Nome e telefone são obrigatórios.", ok: false });
+      }
 
       const clienteExistente = await Cliente.findOne({
-        where: { email: data.email, nome: data.nome, telefone: data.telefone },
+        where: {
+          email: data.email || null,
+          nome: data.nome,
+          telefone: data.telefone,
+        },
       });
 
-      if (clienteExistente)
-        return reply
-          .code(200)
-          .send({
-            message: "Cliente já cadastrado!",
-            clienteExistente,
-            ok: false,
-          });
+      if (clienteExistente) {
+        console.log("[BACKEND] Cliente já existe.");
+        return reply.code(200).send({
+          message: "Cliente já cadastrado!",
+          clienteExistente,
+          ok: false,
+        });
+      }
 
       const novoCliente = await Cliente.create(data);
+      console.log("[BACKEND] Cliente criado com sucesso:", novoCliente.id);
 
-      reply
-        .code(201)
-        .send({
-          message: "Cliente cadastrado com sucesso!",
-          novoCliente,
-          ok: true,
-        });
+      reply.code(201).send({
+        message: "Cliente cadastrado com sucesso!",
+        novoCliente,
+        ok: true,
+      });
     } catch (err) {
-      console.log(err);
+      console.error("\n[BACKEND] ERRO CRÍTICO NO CADASTRO:", err);
       reply
         .code(500)
-        .send({ error: "Erro ao cadastrar Cliente", err, ok: false });
+        .send({
+          error: "Erro ao cadastrar Cliente",
+          message: err.message,
+          ok: false,
+        });
     }
   });
 
@@ -77,13 +95,11 @@ export default async function clienteRoutes(fastify) {
 
       await Cliente.update(data, { where: { id } });
       const clienteAtualizado = await Cliente.findByPk(id);
-      reply
-        .code(200)
-        .send({
-          message: "Cliente atualizado com sucesso!",
-          cliente: clienteAtualizado,
-          ok: true,
-        });
+      reply.code(200).send({
+        message: "Cliente atualizado com sucesso!",
+        cliente: clienteAtualizado,
+        ok: true,
+      });
     } catch (err) {
       console.log(err);
       reply
