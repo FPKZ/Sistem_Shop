@@ -26,7 +26,7 @@ export default function PerfilPage() {
   return (
     <Row>
       <Col className="d-flex flex-column overflow-hidden">
-        <main className="flex-grow-1 overflow-y-auto p-4 md:p-8">
+        <main className="grow overflow-y-auto p-4 md:p-8">
           <Container fluid="xl" className="d-flex flex-column gap-4">
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-gray-800">Meu Perfil</h2>

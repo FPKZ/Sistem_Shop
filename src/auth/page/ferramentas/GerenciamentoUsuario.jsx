@@ -66,7 +66,7 @@ export default function GerenciamentoUsuario() {
 
   return (
     <>
-      <main className="flex-grow-1 overflow-auto p-2 p-sm-6 p-md-8">
+      <main className="grow overflow-y-auto p-4 md:p-8">
         <Container fluid="xl">
           <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between mb-4">
             <div>

@@ -3,7 +3,7 @@
 :root {
   /* Tipografia Fluida */
   --font-size-sm: clamp(0.6rem, 0.17vw + 0.7rem, 0.8rem);
-  --font-size-md: clamp(0.9rem, 0.50vw + 0.5rem, 1.6rem);
+  --font-size-md: clamp(0.9rem, 0.5vw + 0.5rem, 1.6rem);
   --font-size-lg: clamp(1rem, 0.6vw + 1.1rem, 1.2rem);
   --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.2rem);
   --font-size-xxl: clamp(1.95rem, 1.56vw + 1.56rem, 2.8rem);
@@ -13,7 +13,7 @@ html,
 body {
   /* position: relative; */
   padding: 0;
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
   margin: 0;
   overflow: hidden;
   /* position: absolute; */
@@ -22,12 +22,23 @@ body {
   width: 100dvw;
   height: 100dvh;
   gap: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
   font-size: var(--font-size-md);
   background-color: #ebebeb;
 }
 
-.h-90{
+.h-90 {
   height: 90vh;
 }
 
@@ -78,7 +89,7 @@ body {
 }
 
 /* Breadcrumb com Chevron Pequeno */
-.breadcrumb-sm-chevron .breadcrumb-item+.breadcrumb-item::before {
+.breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
   content: "";
   /* Remove o divisor padrão */
   display: inline-block;
@@ -94,17 +105,18 @@ body {
   vertical-align: middle;
 
   /* Define o ícone como imagem de fundo */
-  background-image: var(--bs-breadcrumb-divider, url("/assets/chevron-right.svg"));
+  background-image: var(
+    --bs-breadcrumb-divider,
+    url("/assets/chevron-right.svg")
+  );
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 @media (max-width: 766px) {
-
   /* Breadcrumb com Chevron Pequeno */
-  .breadcrumb-sm-chevron .breadcrumb-item+.breadcrumb-item::before {
-
+  .breadcrumb-sm-chevron .breadcrumb-item + .breadcrumb-item::before {
     /* Aqui você controla o tamanho! */
     width: 0.8rem;
     /* 12px */
@@ -116,8 +128,6 @@ body {
     vertical-align: middle;
   }
 }
-
-
 
 .btn-roxo {
   color: white;
@@ -162,15 +172,15 @@ body {
   box-shadow: none;
 }
 
-
-
 .animed-btn {
   display: flex;
   width: 2.7rem;
   height: 2.5rem;
   overflow: hidden;
 
-  transition: width 0.4s ease, background-color 0.3s ease;
+  transition:
+    width 0.4s ease,
+    background-color 0.3s ease;
 }
 
 .btn-roxo .text {
@@ -209,8 +219,6 @@ body {
 }
 
 .dropdown-menu {
-  width: 100% !important;
-  min-width: 100% !important;
   z-index: 10000 !important;
 }
 
@@ -219,8 +227,6 @@ body {
 }
 
 @media (max-width: 766px) {
-
-
   .layout-ativo #root {
     margin-left: 2.5rem !important;
     margin-top: 3rem !important;
@@ -278,7 +284,7 @@ body {
 }
 
 .pagination-roxo .page-item.active .page-link {
-  background-color: #C63CF4;
+  background-color: #c63cf4;
   color: white;
   box-shadow: 0 4px 10px rgba(198, 60, 244, 0.3);
 }
@@ -286,7 +292,7 @@ body {
 .pagination-roxo .page-link:hover:not(.active) {
   background-color: #f3e5f5;
   /* Roxo bem claro no hover */
-  color: #C63CF4;
+  color: #c63cf4;
 }
 
 .pagination-roxo .page-link:focus {
@@ -304,6 +310,6 @@ body {
 
 .pagination-roxo .page-item:first-child .page-link:hover,
 .pagination-roxo .page-item:last-child .page-link:hover {
-  color: #C63CF4;
+  color: #c63cf4;
   background-color: transparent;
 }

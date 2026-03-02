@@ -29,11 +29,7 @@ export function ProdutoHeader({
                 onChange={(e) => setFiltro(e.target.value)}
                 autoFocus
                 className="me-2 shadow-sm"
-                style={{
-                  width: "200px",
-                  transition: "width 0.3s ease-in-out",
-                  borderRadius: "20px",
-                }}
+                className="me-2 shadow-sm rounded-pill search-input-expand"
               />
             )}
             <Button
@@ -46,8 +42,7 @@ export function ProdutoHeader({
                   setShowSearch(true);
                 }
               }}
-              className="d-flex align-items-center justify-content-center p-1 rounded-circle border-0"
-              style={{ width: "32px", height: "32px" }}
+              className="d-flex align-items-center justify-content-center p-1 rounded-circle border-0 icon-btn-sm"
             >
               <Search
                 size={15}
@@ -58,12 +53,6 @@ export function ProdutoHeader({
             </Button>
           </div>
           <Dropdown>
-            <style>{`
-              .custom-dropdown-filter {
-                  width: 260px !important;
-                  min-width: 260px !important;
-              }
-            `}</style>
             <Dropdown.Toggle
               variant=""
               className="dropdown-toggle-hidden-arrow d-flex justify-content-center align-items-center"

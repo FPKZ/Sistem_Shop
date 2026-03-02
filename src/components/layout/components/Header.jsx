@@ -134,12 +134,9 @@ function ProfileMenu({ user, logout }) {
         className="d-flex dropdown-toggle-no-caret"
         onClick={() => handleShowMenu()}
       >
-        <Figure
-          className="d-flex m-0 p-0 align-items-center"
-          style={{ cursor: "pointer" }}
-        >
+        <Figure className="d-flex m-0 p-0 align-items-center profile-trigger">
           <Figure.Image
-            className="m-0"
+            className="m-0 profile-avatar"
             alt="Usuário"
             src={
               user.img ||
@@ -149,14 +146,11 @@ function ProfileMenu({ user, logout }) {
             style={{
               width: imgSizeState,
               height: imgSizeState,
-              objectFit: "cover",
-              objectPosition: "center",
-              border: "2px solid #eaeaeaa1",
             }}
           />
         </Figure>
       </Dropdown.Toggle>
-      <Dropdown.Menu align="end" style={{ marginTop: "-2px" }}>
+      <Dropdown.Menu align="end" className="profile-menu">
         <Dropdown.ItemText className="text-center">
           {user.nome}
         </Dropdown.ItemText>
