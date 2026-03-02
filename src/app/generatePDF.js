@@ -91,10 +91,33 @@ export const printPDF = async (config) => {
   };
   const fontSize = config.fontSize || { title: 18, body: 12, header: 14 };
 
+  // --- CALCULAR ALTURA DINÂMICA PARA FORMATO TÉRMICO ---
+  let finalFormat = config.format || "a4";
+  if (isSmallFormat) {
+    const headerHeight = 65; // Logo e Info da Empresa
+    const infoHeight = 45; // Cliente, Data, Código
+    const tableHeaderHeight = 20;
+    const rowHeight = 15;
+    const totalHeight = 30;
+    const paymentHeight = (config.pagamentos?.length || 0) * 15;
+    const extraPadding = 40;
+
+    const estimatedHeight =
+      headerHeight +
+      infoHeight +
+      tableHeaderHeight +
+      config.dadosItens.length * rowHeight +
+      totalHeight +
+      paymentHeight +
+      extraPadding;
+
+    finalFormat = [config.format[0], Math.max(estimatedHeight, 200)];
+  }
+
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "pt",
-    format: config.format || "a4",
+    format: finalFormat,
   });
 
   // Carregar logo
