@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+/* Custom Dropdown Styles */
+.custom-dropdown-filter {
+  width: 260px !important;
+  min-width: 260px !important;
+}
+
+.profile-trigger {
+  cursor: pointer;
+}
+
+.profile-avatar {
+  object-fit: cover;
+  object-position: center;
+  border: 2px solid #eaeaeaa1;
+}
+
+.profile-menu {
+  min-width: 180px !important;
+}
+
+.profile-menu[data-bs-popper] {
+  margin-top: -2px !important;
+}
+
+.search-input-expand {
+  width: 200px;
+  transition: width 0.3s ease-in-out;
+}
+
+.icon-btn-sm {
+  width: 32px;
+  height: 32px;
+}

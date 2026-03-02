@@ -9,7 +9,7 @@
       "@components": ["components/*"],
       "@tabelas": ["components/modal/Tabelas/*"],
       "@hooks": ["hooks/*"],
-      "@autentic-sistem": ["autentic/sistem/*"],
+      "@auth-sistem": ["auth/sistem/*"],
       "@contexts": ["contexts/*"]
     }
   }

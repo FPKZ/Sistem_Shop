@@ -13,67 +13,117 @@
 //   console.log(`Server running at http://${hostname}:${port}/`);
 // });
 import { fastify } from "fastify";
-import cors from "@fastify/cors"
-import multipart from "@fastify/multipart"
-import process from "node:process"
-import "dotenv/config"
+import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
+import process from "node:process";
+import "dotenv/config";
 import sequelize from "./database/sequelize.js";
-import { produtoRoutes, categoriaRoutes, clienteRoutes, notaRoutes, vendaRoutes, notaVendaRoutes, contaRoutes } from "./routes/routers.js";
+import {
+  produtoRoutes,
+  categoriaRoutes,
+  clienteRoutes,
+  notaRoutes,
+  vendaRoutes,
+  notaVendaRoutes,
+  contaRoutes,
+} from "./routes/routers.js";
 // import { setTimeout } from "node:timers/promises";
 //import { request } from "node:http";
 
-const server = fastify({ logger: true, trustProxy: true })
+const server = fastify({ logger: true, trustProxy: true });
 
+// Configuração de CORS simplificada e robusta
+// Configuração de CORS refinada
 const origins = [
-  "http://localhost:5173",
-]
+  "http://localhost:5888",
+  "http://127.0.0.1:5888",
+  "http://192.168.8.226:5888",
+];
 
-if (process.env.FRONTEND_URL) {
-  if (process.env.FRONTEND_URL === "ALL") {
-    console.log("\n\nTodos aparelhos liberados \n\n Aparelho atual \n\n")
-    await server.register(cors, {
-      origin: true,
-      methods: ["GET", "POST", "PUT", "DELETE"],
-    });
-    
-  }else{
-    origins.push(process.env.FRONTEND_URL)
-    console.log("Apenas aparelhos liberados")
-    await server.register(cors, {
-      origin: origins,
-      methods: ["GET", "POST", "PUT", "DELETE"],
-    });
-  }
-}else{
-  console.log("Apenas aparelhos liberados")
-  await server.register(cors, {
-    origin: origins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  });
+const corsOptions = {
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Origin",
+    "X-Requested-With",
+    "Accept",
+  ],
+  credentials: true,
+};
+
+if (process.env.FRONTEND_URL === "ALL") {
+  console.log("\n[CORS] Modo: Aberto (Ecoando Origem)");
+  await server.register(cors, { ...corsOptions, origin: true });
+} else {
+  if (process.env.FRONTEND_URL) origins.push(process.env.FRONTEND_URL);
+  console.log("\n[CORS] Modo: Restrito às seguintes origens:", origins);
+  await server.register(cors, { ...corsOptions, origin: origins });
 }
 
+// Hook para logar todas as requisições e ajudar no diagnóstico
+server.addHook("onRequest", async (request, reply) => {
+  console.log(
+    `\n[REQUISICAO] ${request.method} ${request.url} - IP: ${request.ip}`,
+  );
+});
+
+// Bloco condicional complexo de CORS original (bloqueado)
+
+// const origins = [
+//   "http://localhost:5888",
+//   "http://127.0.0.1:5888",
+//   "http://192.168.8.226:5888",
+// ];
+
+// if (process.env.FRONTEND_URL) {
+//   if (process.env.FRONTEND_URL === "ALL") {
+//     console.log("\n[CORS] Modo: TODOS aparelhos liberados (*)");
+//     await server.register(cors, {
+//       origin: true,
+//       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//       // allowedHeaders: ["Content-Type", "Authorization"],
+//     });
+//   } else {
+//     origins.push(process.env.FRONTEND_URL);
+//     console.log("[CORS] Modo: Restrito às seguintes origens:", origins);
+//     await server.register(cors, {
+//       origin: origins,
+//       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//       // allowedHeaders: ["Content-Type", "Authorization"],
+//       credentials: true,
+//     });
+//   }
+// } else {
+//   console.log("[CORS] Modo: Restrito (Padrão)");
+//   await server.register(cors, {
+//     origin: origins,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     // allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true,
+//   });
+// }
 
 server.register(multipart, {
   limits: {
     fileSize: 50 * 1024 * 1024,
-  }
-})
-
+  },
+});
 
 // GET http://localhost:3333/
 // POST http://localhost:3333/
 // PUT http://localhost:3333/509
 // DELETE http://localhost:3333/509
 
-server.get('/', async (request, reply) => {
-  const ip = request.ip.replace('::ffff:', '');
-  console.log("Ip Cliente: ", ip)
+server.get("/", async (request, reply) => {
+  const ip = request.ip.replace("::ffff:", "");
+  console.log("Ip Cliente: ", ip);
 
   // const e = await setTimeout(60000, 'esperando')
 
   // console.log(e)
   // await esperar()
-  reply.code(200).send({message: "Olá ", clientIp: ip})
+  reply.code(200).send({ message: "Olá ", clientIp: ip });
   // return 'Servidor rodando com Fastify e ES Modules!';
 });
 
@@ -85,19 +135,18 @@ server.register(vendaRoutes);
 server.register(notaVendaRoutes);
 server.register(contaRoutes);
 
+async function start() {
+  try {
+    await sequelize.sync({ alter: true });
+    console.log("Conectou ao banco de dados com sucesso!");
 
-async function start(){
-  try{
-    await sequelize.sync({ alter: true })
-    console.log("Conectou ao banco de dados com sucesso!")
-
-    const port = process.env.PORT || 3333
-    await server.listen({ port, host: '0.0.0.0' })
-    console.log(`Servidor rodando na porta ${port}`)
-  } catch(err){
-    console.log("Erro ao iniciar o servidor:", err)
-    process.exit(1)
-  } 
+    const port = process.env.PORT || 3333;
+    await server.listen({ port, host: "0.0.0.0" });
+    console.log(`Servidor rodando na porta ${port}`);
+  } catch (err) {
+    console.log("Erro ao iniciar o servidor:", err);
+    process.exit(1);
+  }
 }
 
-start()
+start();

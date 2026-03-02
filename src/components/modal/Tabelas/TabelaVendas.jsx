@@ -1,11 +1,11 @@
-import { Row, Col, Button, Badge } from "react-bootstrap";
+import { Row, Col, Button, Badge, Dropdown } from "react-bootstrap";
 import utils from "@app/utils";
-import { EyeIcon } from "lucide-react";
-import { useOutletContext } from "react-router-dom";
+import { EyeIcon, CheckCircle, Printer, MoreVertical } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { printPDF, getVendaConfig } from "@app/generatePDF";
 
 export default function TabelaVendas({ vendas, onView }) {
-
-  const { mobile } = useOutletContext();
+  const navigate = useNavigate();
 
   console.log(vendas);
   const getStatusBadge = (status) => {
@@ -42,7 +42,10 @@ export default function TabelaVendas({ vendas, onView }) {
         <Col md={2} className="text-secondary small text-uppercase fw-bold">
           Status
         </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold text-end">
+        <Col
+          md={2}
+          className="text-secondary small text-uppercase fw-bold text-end"
+        >
           Ações
         </Col>
       </Row>
@@ -52,11 +55,15 @@ export default function TabelaVendas({ vendas, onView }) {
         vendas.map((venda) => (
           <Row
             key={venda.id}
-            className="tabela-vendas-row align-items-center py-3 px-2 px-md-3 mb-2 border rounded g-2 hover:scale-105 transition cursor-pointer"
+            className="tabela-vendas-row align-items-center py-3 px-2 px-md-3 mb-2 border rounded g-2 hover:bg-zinc-100 transition cursor-pointer"
             onClick={() => onView(venda)}
           >
             {/* ID */}
-            <Col xs={2} md={1} className="mb-2 mb-md-0 order-1 order-md-0 text-end text-md-start">
+            <Col
+              xs={2}
+              md={1}
+              className="my-2 my-md-0 order-1 order-md-0 text-end text-md-start"
+            >
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 ID:
               </span>
@@ -64,7 +71,7 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Cliente */}
-            <Col xs={10} md={3} className="mb-2 mb-md-0 order-first order-md-0">
+            <Col xs={10} md={3} className="my-2 my-md-0 order-first order-md-0">
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Cliente:
               </span>
@@ -72,7 +79,11 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Data */}
-            <Col xs={4} md={2} className="mb-2 mb-md-0 order-3 order-md-0 text-center text-md-start">
+            <Col
+              xs={4}
+              md={2}
+              className="my-2 my-md-0 order-3 order-md-0 text-center text-md-start"
+            >
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Data:
               </span>
@@ -80,7 +91,11 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Valor */}
-            <Col xs={4} md={2} className="mb-2 mb-md-0 order-4 order-md-0 text-end text-md-start">
+            <Col
+              xs={4}
+              md={2}
+              className="my-2 my-md-0 order-4 order-md-0 text-end text-md-start"
+            >
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Valor:
               </span>
@@ -90,7 +105,7 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Status */}
-            <Col xs={4} md={2} className="mb-2 mb-md-0 order-2 order-md-0">
+            <Col xs={4} md={2} className="my-2 my-md-0 order-2 order-md-0">
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Status:
               </span>
@@ -100,17 +115,54 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Ações */}
-            <Col xs={12} md={2} className="text-md-end order-last order-md-0">
-              <Button
-                variant="light"
-                size="sm"
-                className={`text-info text-center btn-icon ${mobile ? "d-flex justify-content-center align-items-center w-100" : ""}`}
-                onClick={() => onView(venda)}
-                title="Visualizar Detalhes"
-              >
-                <EyeIcon size={20} color="#00bfff" />
-                <span className="d-md-none ms-2">Visualizar Detalhes</span>
-              </Button>
+            <Col
+              xs={12}
+              md={2}
+              className="my-2 my-md-0 text-md-end order-last order-md-0 d-flex justify-content-md-end"
+            >
+              <Dropdown onClick={(e) => e.stopPropagation()}>
+                <Dropdown.Toggle
+                  variant="light"
+                  size="sm"
+                  className="p-0 border-0 bg-transparent dropdown-toggle-no-caret"
+                  id={`dropdown-venda-${venda.id}`}
+                >
+                  <MoreVertical size={20} className="text-secondary" />
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu align="end" className="shadow-sm border-0">
+                  <Dropdown.Item
+                    onClick={() => onView(venda)}
+                    className="d-flex align-items-center gap-2 py-2"
+                  >
+                    <EyeIcon size={16} className="text-info" />
+                    <span>Visualizar</span>
+                  </Dropdown.Item>
+
+                  {venda.status === "pendente" && (
+                    <Dropdown.Item
+                      onClick={() =>
+                        navigate(`/vendas/Nova-Venda?vendaId=${venda.id}`)
+                      }
+                      className="d-flex align-items-center gap-2 py-2 text-success"
+                    >
+                      <CheckCircle size={16} />
+                      <span>Finalizar Reserva</span>
+                    </Dropdown.Item>
+                  )}
+
+                  <Dropdown.Item
+                    onClick={() => {
+                      const configVenda = getVendaConfig(venda);
+                      printPDF(configVenda);
+                    }}
+                    className="d-flex align-items-center gap-2 py-2"
+                  >
+                    <Printer size={16} className="text-secondary" />
+                    <span>Imprimir Nota</span>
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </Col>
           </Row>
         ))

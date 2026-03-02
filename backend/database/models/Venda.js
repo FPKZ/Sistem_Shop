@@ -2,18 +2,23 @@ import { DataTypes } from "sequelize";
 import sequelize from "../sequelize.js";
 //import { data } from "react-router-dom";
 
-const Venda = sequelize.define('Venda', {
+const Venda = sequelize.define(
+  "Venda",
+  {
     data_venda: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     status: DataTypes.STRING,
     valor_total: DataTypes.FLOAT,
     desconto: DataTypes.FLOAT,
-}, {
-    tableName: 'Vendas'
-});
+    prazo_reserva: DataTypes.DATE,
+  },
+  {
+    tableName: "Vendas",
+  },
+);
 
 export default Venda;
 
