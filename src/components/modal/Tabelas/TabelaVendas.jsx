@@ -2,7 +2,7 @@ import { Row, Col, Button, Badge, Dropdown } from "react-bootstrap";
 import utils from "@app/utils";
 import { EyeIcon, CheckCircle, Printer, MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { gerarPDFNota } from "@app/generatePDF";
+import { printPDF, getVendaConfig } from "@app/generatePDF";
 
 export default function TabelaVendas({ vendas, onView }) {
   const navigate = useNavigate();
@@ -153,31 +153,8 @@ export default function TabelaVendas({ vendas, onView }) {
 
                   <Dropdown.Item
                     onClick={() => {
-                      const configVenda = {
-                        tipo: "venda",
-                        dadosNota: {
-                          codigo: venda.id,
-                          data: venda.data_venda,
-                          cliente: venda.cliente?.nome || "Consumidor",
-                          valor_total: venda.valor_total,
-                        },
-                        colunas: [
-                          { header: "#ID", dataKey: "id" },
-                          { header: "Produto", dataKey: "nome" },
-                          { header: "Marca", dataKey: "marca" },
-                          { header: "Tam.", dataKey: "tamanho" },
-                          { header: "Valor", dataKey: "valor_venda" },
-                        ],
-                        dadosItens: venda.itensVendidos.map((iv) => ({
-                          id: iv.itemEstoque.id,
-                          nome: iv.itemEstoque.nome,
-                          marca: iv.itemEstoque.marca,
-                          tamanho: iv.itemEstoque.tamanho,
-                          valor_venda: iv.itemEstoque.valor_venda,
-                        })),
-                        nomeArquivo: `nota-venda-${venda.id}.pdf`,
-                      };
-                      gerarPDFNota(configVenda);
+                      const configVenda = getVendaConfig(venda);
+                      printPDF(configVenda);
                     }}
                     className="d-flex align-items-center gap-2 py-2"
                   >
