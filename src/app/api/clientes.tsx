@@ -19,12 +19,15 @@ async function getClientesfunc() {
 }
 
 async function postClients(data: any) {
+  const isFormData = data instanceof FormData;
   const response = await fetch(`${back}/cliente`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    headers: isFormData
+      ? {}
+      : {
+          "Content-Type": "application/json",
+        },
+    body: isFormData ? data : JSON.stringify(data),
   });
 
   const result = await response.json();

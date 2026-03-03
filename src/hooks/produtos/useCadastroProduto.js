@@ -4,7 +4,7 @@ import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
-export function useCadastroProduto() {
+export function useCadastroProduto(onSuccess) {
   const [categoria, setCategoria] = useState({});
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
@@ -23,6 +23,7 @@ export function useCadastroProduto() {
     setValidated,
     handleChange,
     validate,
+    setFormValue,
   } = useForm(
     {
       nome: "",
@@ -77,50 +78,45 @@ export function useCadastroProduto() {
     }
   };
 
+  const gerarFormData = () => {
+    const finalFormData = new FormData();
+    finalFormData.append("nome", formValue.nome);
+    finalFormData.append("descricao", formValue.descricao);
+    finalFormData.append("img", formValue.img);
+    finalFormData.append("categoria_id", categoria.id || "");
+
+    const quantidade = parseInt(formValue.quantidade) || 1;
+    const itens = Array.from({ length: quantidade }, () => ({
+      codigo_barras: formValue.codigo_barras,
+      nota_id: nota.id || "",
+      tamanho: formValue.tamanho,
+      cor: formValue.cor,
+      marca: formValue.marca,
+      valor_compra: valorCompraHook.value,
+      valor_venda: valorVendaHook.value,
+      lucro: lucroHook.value,
+    }));
+
+    finalFormData.set("itens", JSON.stringify(itens));
+    return finalFormData;
+  };
+
   async function handleSubimit(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
 
     if (validate()) {
-      const quantidade = parseInt(formValue.quantidade) || 1;
-      let allItensCriados = [];
+      const finalFormData = gerarFormData();
 
-      for (let i = 0; i < quantidade; i++) {
-        const finalFormData = new FormData();
-        finalFormData.append("nome", formValue.nome);
-        finalFormData.append("descricao", formValue.descricao);
-        finalFormData.append("img", formValue.img);
-        finalFormData.append("categoria_id", categoria.id || "");
+      const response = await handleRequest(() =>
+        API.postProduto(finalFormData),
+      );
 
-        const itens = [
-          {
-            codigo_barras: formValue.codigo_barras,
-            nota_id: nota.id || "",
-            tamanho: formValue.tamanho,
-            cor: formValue.cor,
-            marca: formValue.marca,
-            valor_compra: valorCompraHook.value,
-            valor_venda: valorVendaHook.value,
-            lucro: lucroHook.value,
-          },
-        ];
-
-        finalFormData.set("itens", JSON.stringify(itens));
-
-        const response = await handleRequest(
-          () => API.postProduto(finalFormData),
-          {
-            showSuccessToast: false, // Desabilitamos o toast individual do loop
-          },
-        );
-
-        if (response?.ok && response.itensEstoque) {
-          allItensCriados = allItensCriados.concat(response.itensEstoque);
+      if (response?.ok) {
+        if (response.itensEstoque) {
+          setItensCriados(response.itensEstoque);
+          setModalCriar(true);
         }
-      }
-
-      if (allItensCriados.length > 0) {
-        setItensCriados(allItensCriados);
-        setModalCriar(true);
+        if (onSuccess) onSuccess(response.itensEstoque);
       }
     }
   }
@@ -154,8 +150,11 @@ export function useCadastroProduto() {
     setModalCriar,
     itensCriados,
     erros,
+    setErros,
     validated,
+    setValidated,
     formValue,
+    setFormValue,
     isLoading,
     valorCompraHook,
     valorVendaHook,
@@ -164,6 +163,8 @@ export function useCadastroProduto() {
     handleValorCompraChange,
     handleValorVendaChange,
     handleLucroChange,
+    validate,
+    gerarFormData,
     handleSubimit,
   };
 }

@@ -1,5 +1,3 @@
-import API from "@app/api";
-import { useState, useEffect } from "react";
 import {
   Modal,
   Row,
@@ -11,8 +9,8 @@ import {
 } from "react-bootstrap";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
-import { useLoadRequest } from "@hooks/useLoadRequest";
-import useCurrencyInput from "@hooks/useCurrencyInput";
+import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
+import { useEffect } from "react";
 
 function CadastroIntenModal({
   visible,
@@ -20,174 +18,73 @@ function CadastroIntenModal({
   cadastrarProduto,
   cadastroNota = false,
 }) {
-  const [formValue, setFormValue] = useState({ quantidade: 1 });
-  const [erros, setErros] = useState({});
-  const [validated, setValidated] = useState(false);
+  const {
+    categoria,
+    setCategoria,
+    nota,
+    setNota,
+    notas,
+    categorias,
+    modalCadastroCategoria,
+    setModalCadastroCategoia,
+    modalCriar,
+    setModalCriar,
+    itensCriados,
+    erros,
+    setErros,
+    validated,
+    setValidated,
+    formValue,
+    setFormValue,
+    isLoading,
+    valorCompraHook,
+    valorVendaHook,
+    lucroHook,
+    handleChange,
+    handleValorCompraChange,
+    handleValorVendaChange,
+    handleLucroChange,
+    handleSubimit,
+    validate,
+    gerarFormData,
+  } = useCadastroProduto((itens) => {
+    if (cadastroNota && itens) {
+      // No modo nota, apenas repassamos os itens para a nota pai
+      // O hook já faz o loop, mas aqui o modal original tinha uma lógica de cadastrarProduto(FormData)
+      // que vinha por props. Vamos manter a compatibilidade se necessário.
+    }
+  });
 
-  const [notas, setNotas] = useState([]);
-  const [nota, setNota] = useState({});
-  const [categorias, setCategorias] = useState([]);
-  const [categoria, setCategoria] = useState({});
-  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
-
-  const [modalCriar, setModalCriar] = useState(false);
-  const [itensCriados, setItensCriados] = useState(null);
-
-  const [isLoading, request] = useLoadRequest();
-
-  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
-  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
-  const lucroHook = useCurrencyInput({ initialValue: 0 });
+  // Sincronização de props especiais (como cadastrarProduto manual da Nota)
+  // No modal original de Nota, o cadastrarProduto apenas adicionava ao array local da Nota.
+  // Vamos interceptar o submit se for cadastroNota
+  const finalHandleSubmit = async (e) => {
+    if (cadastroNota) {
+      e.preventDefault();
+      // Usamos o validate e gerarFormData do hook para garantir consistência
+      if (validate()) {
+        const formData = gerarFormData();
+        if (cadastrarProduto) {
+          cadastrarProduto(formData);
+        }
+        onClose();
+      }
+    } else {
+      handleSubimit(e);
+    }
+  };
 
   useEffect(() => {
     if (!visible) {
-      const timer = setTimeout(() => {
-        setValidated(false);
-        setErros({});
-        setFormValue({ quantidade: 1 });
-        setNota({});
-        setCategoria({});
-        setItensCriados(null);
-      }, 200);
-      return () => clearTimeout(timer);
+      setFormValue({ quantidade: 1 });
+      setValidated(false);
+      setErros({});
+      setNota({});
+      setCategoria({});
     }
-
-    !cadastroNota && GetNotas();
-    GetCategorias();
-  }, [visible, modalCadastroCategoria]);
-
-  const GetCategorias = async () => {
-    const data = await API.getCategoria();
-    setCategorias(data);
-  };
-  const GetNotas = async () => {
-    const data = await API.getNotas();
-    setNotas(data);
-  };
+  }, [visible, setFormValue, setValidated, setErros, setNota, setCategoria]);
 
   if (!visible) return null;
-
-  function handleChange(e) {
-    const { name, value, type, files } = e.target;
-
-    if (name === "valor_compra" || name === "valor_venda" || name === "lucro") {
-      // Handled by hooks
-      return;
-    }
-
-    setFormValue((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));
-  }
-
-  // Lógica de cálculo automático entre os valores
-  const handleValorCompraChange = (e) => {
-    valorCompraHook.onChange(e);
-    const newValorCompra =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorVendaHook.value > 0) {
-      lucroHook.setValue(valorVendaHook.value - newValorCompra);
-    } else if (lucroHook.value > 0) {
-      valorVendaHook.setValue(newValorCompra + lucroHook.value);
-    }
-  };
-
-  const handleValorVendaChange = (e) => {
-    valorVendaHook.onChange(e);
-    const newValorVenda =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorCompraHook.value > 0) {
-      lucroHook.setValue(newValorVenda - valorCompraHook.value);
-    }
-  };
-
-  const handleLucroChange = (e) => {
-    lucroHook.onChange(e);
-    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-
-    if (valorCompraHook.value > 0) {
-      valorVendaHook.setValue(valorCompraHook.value + newLucro);
-    }
-  };
-
-  function validate(form) {
-    let newErrors = {};
-    const elements = form.querySelectorAll("[name]");
-    elements.forEach((e) => {
-      const { name, value, required, type } = e;
-      if (required && !value.trim()) {
-        newErrors[name] = "Campo obrigatório!";
-      }
-      if (type == "number" && value && isNaN(value)) {
-        newErrors[name] = "Digite um valor numerico valido";
-      }
-    });
-    return newErrors;
-  }
-
-  async function handleSubimit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const newErrors = validate(form);
-    setErros(newErrors);
-    setValidated(true);
-
-    if (Object.keys(newErrors).length === 0) {
-      await request(async () => {
-        const quantidade = parseInt(formValue.quantidade) || 1;
-        let allItensCriados = [];
-
-        try {
-          for (let i = 0; i < quantidade; i++) {
-            const finalFormData = new FormData();
-            finalFormData.append("nome", formValue.nome);
-            finalFormData.append("descricao", formValue.descricao);
-            finalFormData.append("img", formValue.img);
-            finalFormData.append("categoria_id", categoria.id || "");
-
-            const itens = [
-              {
-                codigo_barras: formValue.codigo_barras,
-                nota_id: nota.id || "",
-                tamanho: formValue.tamanho,
-                cor: formValue.cor,
-                marca: formValue.marca,
-                valor_compra: valorCompraHook.value,
-                valor_venda: valorVendaHook.value,
-                lucro: lucroHook.value,
-              },
-            ];
-            finalFormData.set("itens", JSON.stringify(itens));
-
-            if (cadastroNota) {
-              await cadastrarProduto(finalFormData);
-            } else {
-              const response = await cadastrarProduto(finalFormData);
-              if (response && response.ok && response.itensEstoque) {
-                allItensCriados = allItensCriados.concat(response.itensEstoque);
-              }
-            }
-          }
-
-          if (cadastroNota) {
-            onClose();
-          } else {
-            if (allItensCriados.length > 0) {
-              setItensCriados(allItensCriados);
-              setModalCriar(true);
-            } else {
-              onClose();
-            }
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      });
-    }
-  }
 
   function NotaItems({ notas, setNota }) {
     return (
@@ -223,7 +120,7 @@ function CadastroIntenModal({
         fullscreen="md-down"
         animation
       >
-        <Form onSubmit={handleSubimit} noValidate>
+        <Form onSubmit={finalHandleSubmit} noValidate>
           <Modal.Header closeButton>
             <Modal.Title>Cadastrar Item</Modal.Title>
           </Modal.Header>
@@ -393,8 +290,8 @@ function CadastroIntenModal({
                   name="quantidade"
                   id="quantidadeProduto"
                   type="text"
-                  placeholder="G"
-                  value={formValue.quantidade}
+                  placeholder="1"
+                  value={formValue.quantidade || 1}
                   onChange={handleChange}
                   required
                 />

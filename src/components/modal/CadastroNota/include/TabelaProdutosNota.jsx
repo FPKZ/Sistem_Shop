@@ -1,6 +1,7 @@
-import { Container, Card, Col, Row, Badge } from "react-bootstrap";
+import { Container, Card, Col, Row, Badge, Button } from "react-bootstrap";
 import utils from "@app/utils";
 import img from "@assets/logo.svg?url";
+import { X } from "lucide-react";
 
 export default function TabelaProdutosNota({
   produto,
@@ -8,6 +9,7 @@ export default function TabelaProdutosNota({
   width,
   custom,
   setmodalInfoProduto,
+  removerProduto,
 }) {
   return (
     <Col
@@ -19,7 +21,7 @@ export default function TabelaProdutosNota({
         className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light fw-bold text-secondary"
         style={{ zIndex: 1, fontSize: "0.9rem" }}
       >
-        <Col xs={2} sm={1} className="text-center">
+        <Col xs={1} sm={1} className="text-center">
           Img
         </Col>
         <Col xs={4} sm={4}>
@@ -28,17 +30,20 @@ export default function TabelaProdutosNota({
         <Col xs={3} sm={2} className="text-end">
           Valor
         </Col>
-        <Col xs={3} sm={2} className="text-center">
+        <Col xs={2} sm={2} className="text-center">
           Status
         </Col>
-        <Col xs={12} sm={3} className="d-none d-sm-block text-end">
+        <Col xs={1} sm={2} className="text-end pe-2">
           Lucro
+        </Col>
+        <Col xs={1} sm={1} className="text-center">
+          {/* Ações */}
         </Col>
       </Row>
 
       {/* Container dos Cards com Rolagem */}
       <div
-        className={`flex-grow-1 p-0 overflow-hidden h-100`}
+        className="grow p-0 overflow-hidden h-100"
         style={{ overflowY: "auto" }}
       >
         {produto.map((prod, index) => (
@@ -47,6 +52,7 @@ export default function TabelaProdutosNota({
             produtos={prod}
             setItemEstoque={setItemEstoque}
             setmodalInfoProduto={setmodalInfoProduto}
+            removerProduto={removerProduto}
           />
         ))}
       </div>
@@ -54,7 +60,12 @@ export default function TabelaProdutosNota({
   );
 }
 
-function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
+function Produtos({
+  produtos,
+  setItemEstoque,
+  setmodalInfoProduto,
+  removerProduto,
+}) {
   if (!produtos) return null;
 
   // O objeto produto pode vir direto ou dentro de 'itens' dependendo de como foi estruturado anteriormente.
@@ -125,7 +136,8 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               {produtos.nome}
             </div>
             <div className="text-muted small text-truncate">
-              {itemDetalhe.marca} - {/*{itemDetalhe.cor} -*/}  {itemDetalhe.tamanho}
+              {itemDetalhe.marca} - {/*{itemDetalhe.cor} -*/}{" "}
+              {itemDetalhe.tamanho}
             </div>
           </Col>
 
@@ -145,10 +157,24 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
           </Col>
 
           {/* Lucro (Desktop) */}
-          <Col xs={12} sm={3} className="d-none d-sm-block text-end ps-2">
+          <Col xs={1} sm={2} className="text-end ps-2 pe-2">
             <span className="text-success fw-medium">
               +{utils.formatMoney(itemDetalhe.lucro || 0)}
             </span>
+          </Col>
+
+          {/* Botão Remover */}
+          <Col xs={1} sm={1} className="text-center">
+            <Button
+              variant="link"
+              className="p-0 text-danger shadow-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                removerProduto?.(produtos.frontId);
+              }}
+            >
+              <X size={18} />
+            </Button>
           </Col>
         </Row>
       </Card.Body>

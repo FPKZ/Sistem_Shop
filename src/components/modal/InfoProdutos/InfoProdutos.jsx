@@ -1,273 +1,355 @@
 import { useState, useEffect, useRef } from "react";
-import util from "@app/utils.js"
-import { Modal, Row, Col, Button, Card, Form, Alert, Container, Table, Badge, InputGroup } from "react-bootstrap";
+import util from "@app/utils.js";
+import {
+  Modal,
+  Row,
+  Col,
+  Button,
+  Card,
+  Container,
+  Badge,
+} from "react-bootstrap";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
+import {
+  Tag,
+  Package,
+  Layers,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Edit,
+  Trash2,
+  DollarSign,
+  Barcode,
+  ShoppingBag,
+  Info as InfoIcon,
+  Archive,
+} from "lucide-react";
 
-
-export default function ProdutoInfo({ visible, onClose, produto, mobile, tableShow = true }) {
-  if (!visible) return null;
+export default function ProdutoInfo({
+  visible,
+  onClose,
+  produto,
+  mobile,
+  tableShow = true,
+}) {
   const [itemEstoque, setItemEstoque] = useState({});
-  console.log(itemEstoque)
-  const detailsRef = useRef(null)
+  const detailsRef = useRef(null);
 
-  
   useEffect(() => {
-    if(!tableShow){
-      setItemEstoque(produto)
-      console.log(itemEstoque)
+    if (visible && !tableShow) {
+      setItemEstoque(produto);
     }
-    
-  },[visible])
+  }, [visible, tableShow, produto]);
 
   useEffect(() => {
-    if(tableShow) setItemEstoque({});
-  }, [produto]);
+    if (visible && tableShow) setItemEstoque({});
+  }, [visible, produto, tableShow]);
 
   useEffect(() => {
-    if(detailsRef.current){
-      detailsRef.current.scrollTop = 0
+    if (visible && detailsRef.current) {
+      detailsRef.current.scrollTop = 0;
     }
-  }, [itemEstoque])
-  
-  //console.log(produto)
-  
+  }, [visible, itemEstoque]);
+
+  if (!visible) return null;
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "Disponivel":
+        return (
+          <Badge
+            bg="success-subtle"
+            className="text-success border border-success-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+          >
+            <CheckCircle2 size={14} /> Disponível
+          </Badge>
+        );
+      case "Reservado":
+        return (
+          <Badge
+            bg="warning-subtle"
+            className="text-warning border border-warning-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+          >
+            <Clock size={14} /> Reservado
+          </Badge>
+        );
+      case "Vendido":
+        return (
+          <Badge
+            bg="danger-subtle"
+            className="text-danger border border-danger-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+          >
+            <ShoppingBag size={14} /> Vendido
+          </Badge>
+        );
+      default:
+        return (
+          <Badge
+            bg="secondary-subtle"
+            className="text-secondary border border-secondary-subtle px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+          >
+            <AlertCircle size={14} /> {status || "Pendente"}
+          </Badge>
+        );
+    }
+  };
+
+  const InfoBlock = ({
+    label,
+    value,
+    icon: Icon,
+    color = "text-secondary",
+    colIdx = 6,
+    xs = 5,
+  }) => (
+    <Col md={colIdx} xs={xs} className="mb-2">
+      <div className="p-2 px-3 rounded-4 bg-light border border-opacity-10 h-100 transition-hover shadow-sm">
+        <div className="d-flex align-items-center gap-2 mb-1">
+          {Icon && <Icon size={12} className="text-roxo" />}
+          <span
+            className="text-muted fw-bold text-uppercase"
+            style={{ fontSize: "0.6rem", letterSpacing: "0.03rem" }}
+          >
+            {label}
+          </span>
+        </div>
+        <div className={`fw-semibold ${color} text-truncate small`}>
+          {value || "---"}
+        </div>
+      </div>
+    </Col>
+  );
+
   return (
-    <Modal show={visible} onHide={onClose} size="xl" fullscreen="lg-down" dialogClassName="modal-xxl" animation={true} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Detalhes dos Produtos</Modal.Title>
+    <Modal
+      show={visible}
+      onHide={onClose}
+      size="xl"
+      fullscreen="lg-down"
+      dialogClassName="modal-xl"
+      animation={true}
+      centered
+    >
+      <Modal.Header closeButton className="border-0 pb-0">
+        <Modal.Title className="fw-bold text-roxo h5">
+          Detalhes do Produto
+        </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body ref={mobile ? detailsRef : null} style={{height: "80dvh", padding: 0}} className={mobile ? "overflow-auto" : "overflow-hidden"}>
-        <Row className="h-100 g-0 p-0">
-          {/* Lista de Produtos */}
+      <Modal.Body
+        style={{
+          height: mobile ? "auto" : "75dvh",
+          minHeight: mobile ? "auto" : "550px",
+          padding: 0,
+        }}
+        className={`${mobile ? "overflow-auto" : "overflow-hidden"} bg-white`}
+      >
+        <Row className="h-100 g-0">
+          {/* Tabela lateral opcional */}
           {tableShow && (
-            <TabelaProdutos mobile={mobile} produto={produto} setItemEstoque={setItemEstoque} width={6}/>
+            <TabelaProdutos
+              mobile={mobile}
+              produto={produto}
+              setItemEstoque={setItemEstoque}
+              width={mobile ? 12 : 5}
+              custom={`border-end ${mobile ? "border-bottom" : ""}`}
+            />
           )}
 
-          {/* Detalhes */}
-          <Col ref={mobile ? null : detailsRef} className={`order-md-2 order-1 p-0 ${mobile ? "" : "overflow-y-auto h-100"}`}>
-            <Container fluid className={`d-flex flex-column ${mobile ? "" : "h-100"}`}>
-              <div className="text-center mb-3 mt-2 border-bottom">
-                <h3>{produto.nome}</h3>
+          {/* Área de Detalhes Principal */}
+          <Col
+            lg={tableShow ? 7 : 12}
+            xl={tableShow ? 7 : 12}
+            className={`order-2 ${mobile ? "" : "h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
+          >
+            {!itemEstoque.id ? (
+              <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
+                <div className="bg-roxo-subtle p-4 rounded-circle mb-3">
+                  <Package size={48} className="text-roxo" />
+                </div>
+                <h4 className="fw-bold">Nenhum item selecionado</h4>
+                <p className="text-muted">
+                  Selecione um item da lista lateral para visualizar as
+                  especificações, valores e status atualizado.
+                </p>
               </div>
+            ) : (
+              <div className="animate-fade-in">
+                {/* Cabeçalho do Produto */}
+                <div className="d-flex flex-column flex-md-row gap-3 mb-2 pb-2 border-bottom align-items-start align-items-md-center">
+                  <div
+                    className="bg-light rounded-4 border p-2 shadow-sm"
+                    style={{
+                      width: "140px",
+                      height: "140px",
+                      minWidth: "140px",
+                    }}
+                  >
+                    <img
+                      className="w-100 h-100 rounded-3 object-fit-cover"
+                      src={produto.img || "src/assets/logo.svg"}
+                      alt={produto.nome}
+                    />
+                  </div>
+                  <div className="grow">
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      {getStatusBadge(itemEstoque.status)}
+                      <Badge
+                        bg="roxo-subtle"
+                        className="text-roxo px-3 py-2 rounded-pill d-flex align-items-center gap-1"
+                      >
+                        <Tag size={14} />
+                        <span>
+                          {produto.categoria?.nome || "Sem Categoria"}
+                        </span>
+                      </Badge>
+                    </div>
+                    <h3 className="fw-bold mb-0">{produto.nome}</h3>
+                    <p className="text-muted small mb-2">
+                      {produto.descricao || "Sem descrição disponível."}
+                    </p>
+                    <div className="d-flex gap-2 mt-3">
+                      <Button
+                        variant="roxo"
+                        className="d-flex align-items-center gap-2 px-4 shadow-sm"
+                      >
+                        <Edit size={18} /> Editar
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        className="d-flex align-items-center gap-2 px-4"
+                      >
+                        <Trash2 size={18} /> Excluir
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-              <div className={`text-center mb-3 ${mobile ? "" : "h-25"}`}>
-                <img
-                  className="img-thumbnail h-100 rounded"
-                  src={produto.img ||
-                     "src/assets/tube-spinner.svg"
-                  }
-                  style={mobile ? {maxHeight: "25dvh"}: {}}
-                  alt={produto.nome}
-                />
-              </div>
-
-              {!itemEstoque.id && (
-                <Alert variant="warning">
-                  Selecione um item de estoque para ver os detalhes.
-                </Alert>
-              )}
-
-              {itemEstoque.id && (
+                {/* Grid de Informações */}
                 <Row className="g-3">
-                  <Col md={12} xs={12}>
-                    <Form.Group>
-                      <Form.Label>Nome</Form.Label>
-                      <Form.Control type="text" value={itemEstoque.nome} disabled />
-                    </Form.Group>
+                  <Col xl={8} lg={12}>
+                    <Card className="border-0 shadow-sm rounded-4 h-100">
+                      <Card.Body className="p-2">
+                        <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                          <InfoIcon size={20} className="text-roxo" />{" "}
+                          Informações Técnicas
+                        </h5>
+                        <Row className="g-3">
+                          <InfoBlock
+                            label="Marca"
+                            value={itemEstoque.marca}
+                            icon={Package}
+                            colIdx={6}
+                          />
+                          <InfoBlock
+                            label="Tamanho"
+                            value={itemEstoque.tamanho}
+                            icon={Layers}
+                            colIdx={4}
+                          />
+                          <Col md={2} xs={2} className="mb-2">
+                            <div className="p-3 rounded-4 bg-light border border-opacity-10 h-100 shadow-sm d-flex flex-column align-items-center">
+                              <span
+                                className="text-muted small fw-bold text-uppercase mb-2"
+                                style={{ fontSize: "0.6rem" }}
+                              >
+                                COR
+                              </span>
+                              <div
+                                className="rounded-circle border shadow-sm"
+                                style={{
+                                  width: "1.5rem",
+                                  height: "1.5rem",
+                                  backgroundColor: itemEstoque.cor || "#000",
+                                }}
+                              />
+                            </div>
+                          </Col>
+                          <InfoBlock
+                            label="Código de Barras"
+                            value={itemEstoque.codigo_barras}
+                            icon={Barcode}
+                            colIdx={12}
+                            xs={12}
+                          />
+                          <InfoBlock
+                            label="Origem (Nota)"
+                            value={
+                              itemEstoque.nota
+                                ? `#${itemEstoque.nota.codigo}`
+                                : "Nenhuma nota associada"
+                            }
+                            icon={Archive}
+                            colIdx={12}
+                            xs={12}
+                            color={
+                              itemEstoque.nota ? "text-roxo" : "text-danger"
+                            }
+                          />
+                        </Row>
+                      </Card.Body>
+                    </Card>
                   </Col>
 
-                  <Col md={6} xs={5}>
-                    <Form.Group>
-                      <Form.Label>Marca</Form.Label>
-                      <Form.Control type="text" value={itemEstoque.marca} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={4} xs={4}>
-                    <Form.Group>
-                      <Form.Label>Tamanho</Form.Label>
-                      <Form.Control type="text" value={itemEstoque.tamanho} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={1} xs={1}>
-                    <Form.Group>
-                      <Form.Label>Cor</Form.Label>
-                      <Form.Control
-                        type="color"
-                        value={itemEstoque.cor}
-                        onChange={(e) =>
-                          setItemEstoque({ ...itemEstoque, cor: e.target.value })
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Group>
-                      <Form.Label>Descrição</Form.Label>
-                      <Form.Control type="text" value={produto.descricao} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={4} xs={4}>
-                    <Form.Group>
-                      <Form.Label>Preço de Venda</Form.Label>
-                      <Form.Control
-                        type="text"
-                        className="text-end"
-                        value={util.formatMoney(itemEstoque.valor_venda)}
-                        disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={4} xs={4}>
-                    <Form.Group>
-                      <Form.Label>Preço de Compra</Form.Label>
-                      <Form.Control
-                        type="text"
-                        className="text-end"
-                        value={util.formatMoney(itemEstoque.valor_compra)}
-                        disabled />
-                    </Form.Group>
-                  </Col>
-                  <Col md={4} xs={4}>
-                    <Form.Group>
-                      <Form.Label>Lucro</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          type="text"
-                          className="text-end"
-                          value={util.formatMoney(itemEstoque.lucro)}
-                          disabled
-                        />
-                        <InputGroup.Text>{ itemEstoque.lucro ? (((itemEstoque.valor_venda - itemEstoque.valor_compra) / itemEstoque.valor_venda) * 100).toFixed(0) : 0}%</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={8} xs={8}>
-                    <Form.Group>
-                      <Form.Label>Categoria</Form.Label>
-                      <Form.Control type="text" value={produto.categoria.nome} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={4} xs={4}>
-                    <Form.Group>
-                      <Form.Label>Status</Form.Label>
-                      <Form.Control type="text" value={itemEstoque.status} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Group>
-                      <Form.Label>Código de Barras</Form.Label>
-                      <Form.Control type="text" value={itemEstoque.codigo_barras} disabled />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Group>
-                      <Form.Label>Nota</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={
-                          itemEstoque.nota
-                            ? itemEstoque.nota.codigo
-                            : "Nenhuma nota associada"
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={12} className="d-flex justify-content-end gap-2 mt-3 mb-3">
-                    <Button variant="primary">Editar</Button>
-                    <Button variant="danger">Excluir</Button>
+                  <Col xl={4} lg={12}>
+                    <Card className="border-0 shadow-sm rounded-4 h-100 bg-roxo text-white">
+                      <Card.Body className="p-2">
+                        <h5 className="fw-bold mb-2 p-2 d-flex align-items-center gap-2 text-white">
+                          <DollarSign size={20} /> Financeiro
+                        </h5>
+                        <div className="d-flex flex-column gap-3">
+                          <div className="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-10">
+                            <span className="small text-white-50 d-block mb-1">
+                              PREÇO DE VENDA
+                            </span>
+                            <h3 className="fw-bold mb-0">
+                              {util.formatMoney(itemEstoque.valor_venda)}
+                            </h3>
+                          </div>
+                          <div className="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-10">
+                            <span className="small text-white-50 d-block mb-1">
+                              CUSTO DE COMPRA
+                            </span>
+                            <h4 className="fw-bold mb-0 text-white-50">
+                              {util.formatMoney(itemEstoque.valor_compra)}
+                            </h4>
+                          </div>
+                          <div className="p-3 rounded-4 bg-white bg-opacity-20 shadow-sm border border-white border-opacity-20 d-flex justify-content-between align-items-center">
+                            <div className="flex flex-column w-100">
+                              <span className="small text-zinc-400 d-block mb-0 ">
+                                LUCRO ESTIMADO
+                              </span>
+                              <div className="d-flex w-100 position-relative pt-2">
+                                <h3 className="fw-bold mb-0 text-success-bright">
+                                  +{util.formatMoney(itemEstoque.lucro)}
+                                </h3>
+                                <div className="position-absolute top-0 end-0">
+                                  <span className="badge text-roxo rounded-pill">
+                                    {itemEstoque.lucro
+                                      ? (
+                                          ((itemEstoque.valor_venda -
+                                            itemEstoque.valor_compra) /
+                                            itemEstoque.valor_venda) *
+                                          100
+                                        ).toFixed(0)
+                                      : 0}
+                                    %
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Card.Body>
+                    </Card>
                   </Col>
                 </Row>
-              )}
-            </Container>
+              </div>
+            )}
           </Col>
         </Row>
       </Modal.Body>
     </Modal>
-  );
-}
-
-function Produtos({ produtos, setItemEstoque }) {
-  //console.log(produtos)
-  const itens = produtos.itemEstoque;
-
-  
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Disponivel':
-        return <Badge bg="success">{status}</Badge>;
-      case 'Reservado':
-        return <Badge bg="warning">{status}</Badge>;
-      case 'Vendido':
-        return <Badge bg="danger">{status}</Badge>;
-      default:
-        return <Badge bg="secondary">{status}</Badge>;
-    }
-  };
-
-  return (
-    <Container fluid className="p-0 m-0 pt-3 ">
-        {itens.map((produto) => (
-          <Card
-            key={produto.id}
-            className={`alert p-0
-                      ${produto.status === "Disponivel" ? "alert-light" : ""}
-                      ${produto.status === "Vendido" ? "alert-danger" : ""} 
-                      ${produto.status === "Reservado" ? "alert-warning" : ""}`}
-            onClick={() => setItemEstoque(produto)}
-            style={{cursor: 'pointer'}}
-          >
-            <Card.Body className="p-0">
-              <Row className="px-2 py-1">
-                <Col xs={1} className="pe-2 m-0 text-center d-flex align-items-center">
-                  <strong >{produto.id}</strong>
-                </Col>
-                <Col xs={2} className="p-0">
-                  <img
-                    src={produtos.img || "src/assets/tube-spinner.svg"}
-                    alt={produto.nome}
-                    className="img-fluid rounded"
-                    style={{maxHeight: "40px"}}
-                  />
-                </Col>
-                <Col xs={3} className="p-2 m-0 text-truncate d-flex align-items-center">
-                  <span>
-                    {produto.nome}
-                  </span>
-                </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center">
-                  <span>
-                    {util.formatMoney(produto.valor_compra)}
-                  </span>
-                </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center">
-                  <span>
-                    {util.formatMoney(produto.valor_venda)}
-                  </span>
-                </Col>
-                <Col xs={2} className="p-0 m-0 d-flex align-items-center">
-                  <span>
-                    {getStatusBadge(produto.status)}
-                  </span>
-                </Col>
-                {/* <div className="col-1  end-0 d-flex flex-wrap gap-2 p-1">
-                              <button className="btn btn-outline-danger" type="button"><i className="bi bi-trash3"></i></button>
-                              <button className="btn btn-outline-secondary" type="button"><i className="bi bi-three-dots"></i></button>
-                          </div> */}
-              </Row>
-            </Card.Body>
-          </Card>
-        ))}
-    </Container>
   );
 }

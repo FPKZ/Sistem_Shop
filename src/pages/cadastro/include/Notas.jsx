@@ -29,9 +29,10 @@ export default function Notas() {
     isLoading,
     valorTotalHook,
     cadastrarProduto,
+    removerProduto,
     handleChange,
     handleSubimit,
-  } = useCadastroNota(navigate);
+  } = useCadastroNota(() => navigate(-1));
 
   return (
     <div className="w-100 p-3">
@@ -159,10 +160,10 @@ export default function Notas() {
 
         {incluirProdutos && (
           <div
-            className="d-flex flex-column flex-grow-1 overflow-hidden mt-3 border rounded"
+            className="d-flex flex-column grow overflow-hidden mt-3 border rounded"
             style={{ height: "400px" }}
           >
-            <div className="d-flex justify-content-between p-2 border-bottom bg-light flex-shrink-0">
+            <div className="d-flex justify-content-between p-2 border-bottom bg-light shrink-0">
               <p className="align-content-center m-0 fw-bold">
                 Produtos da Nota
               </p>
@@ -174,12 +175,13 @@ export default function Notas() {
                 + Adicionar Produto
               </button>
             </div>
-            <div className="flex-grow-1 overflow-y-auto bg-white">
+            <div className="grow overflow-y-auto bg-white">
               {produtos.length > 0 ? (
                 <TabelaProdutosNota
                   produto={produtos}
                   setItemEstoque={setItemEstoque}
                   setmodalInfoProduto={setmodalInfoProduto}
+                  removerProduto={removerProduto}
                 />
               ) : (
                 <div className="d-flex justify-content-center align-items-center h-100 text-muted p-4">
