@@ -4,7 +4,7 @@ import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
-export function useCadastroNota(navigate) {
+export function useCadastroNota(onSuccess) {
   const [incluirProdutos, setIncluirProdutos] = useState(false);
   const [itemEstoque, setItemEstoque] = useState({});
   const [produtos, setProdutos] = useState([]);
@@ -35,9 +35,13 @@ export function useCadastroNota(navigate) {
 
   useEffect(() => {
     if (incluirProdutos) {
+      const totalItens = produtos.reduce(
+        (acc, p) => acc + (p.itens?.length || 0),
+        0,
+      );
       setFormValue((prev) => ({
         ...prev,
-        quantidade: produtos.length,
+        quantidade: totalItens,
       }));
     }
   }, [produtos, incluirProdutos, setFormValue]);
@@ -45,16 +49,26 @@ export function useCadastroNota(navigate) {
   function cadastrarProduto(data) {
     const obj = Object.fromEntries(data.entries());
     const imgFile = data.get("img");
+    let itemsArray = [];
+
     if (obj.itens && typeof obj.itens === "string") {
       try {
-        obj.itens = JSON.parse(obj.itens);
+        itemsArray = JSON.parse(obj.itens);
       } catch (error) {
-        console.error("Erro ao tentar parsear os itens:", error);
+        console.error("Erro ao parsear itens:", error);
       }
+    } else if (Array.isArray(obj.itens)) {
+      itemsArray = obj.itens;
     }
-    obj.img = imgFile;
-    obj.frontId = `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    setProdutos((prev) => prev.concat(obj));
+
+    const novasEntradas = itemsArray.map((item, index) => ({
+      ...obj,
+      itens: [item],
+      img: imgFile,
+      frontId: `prod_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
+    }));
+
+    setProdutos((prev) => prev.concat(novasEntradas));
   }
 
   const handleSubimit = async (e) => {
@@ -67,13 +81,17 @@ export function useCadastroNota(navigate) {
       finalFormData.append("data", formValue.data);
       finalFormData.append("data_vencimento", formValue.data_vencimento);
       finalFormData.append("fornecedor", formValue.fornecedor);
+      const quantidadeTotal = produtos.reduce(
+        (acc, p) => acc + (p.itens?.length || 0),
+        0,
+      );
       finalFormData.append(
         "quantidade",
-        incluirProdutos ? produtos.length : formValue.quantidade,
+        incluirProdutos ? quantidadeTotal : formValue.quantidade,
       );
 
       if (incluirProdutos && produtos.length > 0) {
-        const produtosParaEnviar = produtos.map(({ img, ...resto }) => resto);
+        const produtosParaEnviar = produtos.map(({ ...resto }) => resto);
         finalFormData.append("itens", JSON.stringify(produtosParaEnviar));
         produtos.forEach((p) => {
           if (p.img) finalFormData.append(`imagem_${p.frontId}`, p.img);
@@ -91,7 +109,7 @@ export function useCadastroNota(navigate) {
           setItensCriados(itensCriadosData);
           setModalCriar(true);
         }
-        navigate(-1);
+        if (onSuccess) onSuccess();
       }
     }
   };
@@ -117,5 +135,6 @@ export function useCadastroNota(navigate) {
     cadastrarProduto,
     handleChange,
     handleSubimit,
+    setFormValue,
   };
 }

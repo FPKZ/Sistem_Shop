@@ -8,7 +8,6 @@ Content-Type: application/json
 {
     "nome": "infermeira",
     "descricao": "um gel muito bom",
-    "img": "https://img.freepik.com",
     "categoria_id": 3,
     "itens": [{
         "nota_id": 1,

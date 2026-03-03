@@ -12,12 +12,15 @@ export async function getVendaById(id) {
 
 export async function postVenda(data) {
   try {
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${back}/venda`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers: isFormData
+        ? {}
+        : {
+            "Content-Type": "application/json",
+          },
+      body: isFormData ? data : JSON.stringify(data),
     });
     //console.log(response.status)
     return await response.json();
