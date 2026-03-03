@@ -7,10 +7,14 @@ export function ProdutoGrid({
   getEstoqueBadge,
 }) {
   return (
-    <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 align-items-stretch h-100 g-4 mb-4">
+    <div className="
+      row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5
+      align-items-stretch
+      h-100 g-4 mb-4
+    ">
       {dadosProcessados.map((produto) => (
         <div
-          className="col"
+          className="col hover:translate-y-[-5px] transition-transform duration-300"
           key={produto.id}
           onClick={() => {
             setModalInfoProduto(true);
