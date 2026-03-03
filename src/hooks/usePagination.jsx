@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /**
  * Hook para gerenciar paginação de dados locais.
@@ -25,7 +25,14 @@ export function usePagination(data = [], initialItemsPerPage = 10) {
 
   const safeData = Array.isArray(data) ? data : [];
   const totalItems = safeData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+  // Garante que a página atual nunca exceda o total de páginas ao filtrar/excluir
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

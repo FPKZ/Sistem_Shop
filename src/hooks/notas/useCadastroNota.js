@@ -71,6 +71,10 @@ export function useCadastroNota(onSuccess) {
     setProdutos((prev) => prev.concat(novasEntradas));
   }
 
+  function removerProduto(frontId) {
+    setProdutos((prev) => prev.filter((p) => p.frontId !== frontId));
+  }
+
   const handleSubimit = async (e) => {
     e.preventDefault();
 
@@ -133,6 +137,7 @@ export function useCadastroNota(onSuccess) {
     isLoading,
     valorTotalHook,
     cadastrarProduto,
+    removerProduto,
     handleChange,
     handleSubimit,
     setFormValue,

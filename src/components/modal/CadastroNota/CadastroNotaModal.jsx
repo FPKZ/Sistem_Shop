@@ -30,6 +30,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
     isLoading,
     valorTotalHook,
     cadastrarProduto,
+    removerProduto,
     handleChange,
     handleSubimit,
   } = useCadastroNota(onClose);
@@ -220,6 +221,7 @@ export default function CadastroNotaModal({ visible, onClose }) {
                       produto={produtos}
                       setItemEstoque={setItemEstoque}
                       setmodalInfoProduto={setmodalInfoProduto}
+                      removerProduto={removerProduto}
                     />
                   ) : (
                     <div className="d-flex justify-content-center align-items-center h-100 text-muted p-4">

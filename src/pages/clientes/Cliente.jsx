@@ -1,6 +1,6 @@
 import { Card, Spinner } from "react-bootstrap";
 import API from "../../app/api.js";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import usePopStateModal from "@hooks/usePopStateModal";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
@@ -27,7 +27,10 @@ function Clientes() {
     handlers,
   } = useClienteModals();
 
-  const camposFiltragem = ["id", "nome", "email", "telefone"];
+  const camposFiltragem = useMemo(
+    () => ["id", "nome", "email", "telefone"],
+    [],
+  );
 
   const { filtro, setFiltro, order, dadosProcessados, requisitarOrdenacao } =
     useFiltroOrdenacao(clientes || [], camposFiltragem);

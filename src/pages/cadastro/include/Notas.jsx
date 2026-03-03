@@ -29,6 +29,7 @@ export default function Notas() {
     isLoading,
     valorTotalHook,
     cadastrarProduto,
+    removerProduto,
     handleChange,
     handleSubimit,
   } = useCadastroNota(() => navigate(-1));
@@ -180,6 +181,7 @@ export default function Notas() {
                   produto={produtos}
                   setItemEstoque={setItemEstoque}
                   setmodalInfoProduto={setmodalInfoProduto}
+                  removerProduto={removerProduto}
                 />
               ) : (
                 <div className="d-flex justify-content-center align-items-center h-100 text-muted p-4">
