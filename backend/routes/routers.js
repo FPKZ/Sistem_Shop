@@ -5,6 +5,7 @@ import notaRoutes from "./nota.routes.js";
 import vendaRoutes from "./venda.routes.js";
 import notaVendaRoutes from "./notaVenda.routes.js";
 import contaRoutes from "./Conta.routes.js";
+import dashboardRoutes from "./Dashboard.routes.js";
 
 export { 
     produtoRoutes,
@@ -13,5 +14,6 @@ export {
     notaRoutes,
     vendaRoutes,
     notaVendaRoutes,
-    contaRoutes
+    contaRoutes,
+    dashboardRoutes
 };

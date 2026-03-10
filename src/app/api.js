@@ -4,6 +4,7 @@ import * as clientes from "./api/clientes.tsx";
 import * as notas from "./api/notas.js";
 import * as produtos from "./api/produtos.tsx";
 import * as vendas from "./api/vendas.js";
+import * as dashboard from "./api/dashboard.js";
 
 const back = import.meta.env.VITE_BACKEND_URL;
 
@@ -24,6 +25,7 @@ const API = {
   ...notas,
   ...produtos,
   ...vendas,
+  ...dashboard,
 };
 
 export default API;
