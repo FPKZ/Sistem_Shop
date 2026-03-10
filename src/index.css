@@ -81,14 +81,12 @@
 }
 
 .transition-hover {
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.2s ease-in-out !important;
 }
 
 .transition-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+  transform: translateX(8px);
+  filter: brightness(0.95);
 }
 
 .text-success-bright {

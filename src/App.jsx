@@ -84,7 +84,7 @@ function App() {
                 <Button
                   key={idx}
                   variant="light"
-                  className={`d-flex align-items-center justify-content-start p-3 border-0 shadow-sm hover:translate-x-2 transition-transform ${at.color}`}
+                  className={`d-flex align-items-center justify-content-start p-3 border-0 shadow-sm transition-hover ${at.color}`}
                   onClick={() => navigate(at.path)}
                   style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}
                 >
