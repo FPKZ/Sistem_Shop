@@ -28,7 +28,14 @@ import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60000, // 1 minuto
+      refetchOnWindowFocus: false, // Evita picos de rede/processamento ao voltar para a aba
+    },
+  },
+});
 
 const router = createBrowserRouter([
   {

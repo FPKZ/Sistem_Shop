@@ -1,11 +1,12 @@
+import React from "react";
 import util from "@app/utils.js";
 
-export function ProdutoList({
+export const ProdutoList = React.memo(({
   dadosProcessados,
   setModalInfoProduto,
   setProduto,
   getEstoqueBadge,
-}) {
+}) => {
   return (
     <div className="table-responsive bg-white rounded shadow-sm mb-4">
       <table className="table table-hover align-middle mb-0">
@@ -33,7 +34,7 @@ export function ProdutoList({
               <td>
                 <div className="d-flex align-items-center gap-3">
                   <img
-                    src={produto.img || "src/assets/tube-spinner.svg"}
+                    src={produto.img || "assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="rounded object-fit-contain bg-light"
                     style={{ width: "40px", height: "40px" }}
@@ -67,4 +68,4 @@ export function ProdutoList({
       </table>
     </div>
   );
-}
+});

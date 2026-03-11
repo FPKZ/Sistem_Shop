@@ -36,6 +36,8 @@ Content-Type: application/json
 ###
 DELETE http://localhost:3333/produto/18
 
+###
+DELETE http://localhost:3333/produto/item/183
 
 # Notas
 
