@@ -1,13 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
-  const [filtro, setFiltro] = useState("");
+  const [filtroInput, setFiltroInput] = useState("");
+  const [filtroDebounced, setFiltroDebounced] = useState("");
   const [order, setOrder] = useState({ chave: "id", direcao: "asc" });
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFiltroDebounced(filtroInput);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [filtroInput]);
 
   const dadosProcessados = useMemo(() => {
     let dadosFiltrados = [...dadosIniciais];
 
-    if (filtro) {
+    if (filtroDebounced) {
       dadosFiltrados = dadosFiltrados.filter((item) => {
         return camposFiltragem.some((campoConfig) => {
           if (typeof campoConfig === "string") {
@@ -17,7 +26,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
             return (
               valorCampo !== null &&
               valorCampo !== undefined &&
-              String(valorCampo).toLowerCase().includes(filtro.toLowerCase())
+              String(valorCampo).toLowerCase().includes(filtroDebounced.toLowerCase())
             );
           }
           if (
@@ -40,7 +49,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
                     valorSubCampo !== undefined &&
                     String(valorSubCampo)
                       .toLowerCase()
-                      .includes(filtro.toLowerCase())
+                      .includes(filtroDebounced.toLowerCase())
                   );
                 });
               });
@@ -50,6 +59,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
         });
       });
     }
+
     dadosFiltrados.sort((a, b) => {
       const valorA = a[order.chave];
       const valorB = b[order.chave];
@@ -60,7 +70,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
     });
 
     return dadosFiltrados;
-  }, [dadosIniciais, filtro, order, camposFiltragem]);
+  }, [dadosIniciais, filtroDebounced, order, camposFiltragem]);
 
   const requisitarOrdenacao = (chave) => {
     let direcao = "asc";
@@ -76,8 +86,8 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
   };
 
   return {
-    filtro,
-    setFiltro,
+    filtro: filtroInput,
+    setFiltro: setFiltroInput,
     order,
     dadosProcessados,
     setOrdem,

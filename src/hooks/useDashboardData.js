@@ -16,8 +16,8 @@ export function useDashboardData() {
       }
       throw new Error("Erro ao buscar dados do dashboard");
     },
-    refetchInterval: 10000, // Atualiza a cada 10 segundos
-    staleTime: 5000,
+    refetchInterval: 30000, // Atualiza a cada 30 segundos (reduz interrupções)
+    staleTime: 10000,
   });
 
   return {

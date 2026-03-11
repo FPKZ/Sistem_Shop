@@ -9,11 +9,8 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(null);
 
-    useEffect(() => {
-        initServer()
-    },[])
 
-    const verificLogin = async () => {
+    const verificLogin = React.useCallback(async () => {
         const storedToken = localStorage.getItem("authToken");
         if (storedToken) {
             try{
@@ -34,9 +31,9 @@ export const AuthProvider = ({ children }) => {
         }
         // await initServer()
         setLoading(false);
-    }
+    }, []);
 
-    const login = async (data) => {
+    const login = React.useCallback(async (data) => {
         try {
             const response = await API.login(data);
             if (response.ok && response.token) {
@@ -53,28 +50,43 @@ export const AuthProvider = ({ children }) => {
             console.error("Login error:", error);
             return { success: false, message: "An error occurred during login" };
         }
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = React.useCallback(() => {
         localStorage.removeItem("authToken");
         setUser(null);
         setToken(null);
-    };
+    }, []);
 
-    const isAutenticated = () => {
+    const isAutenticated = React.useCallback(() => {
         // console.log(user)
         return !!user;
-    }
+    }, [user]);
 
-    const initServer = async () => {
+    const initServer = React.useCallback(async () => {
         setLoading(true)
         await API.initServer()
         setLoading(false)
         // console.log(response)
-    }
+    }, []);
+
+    useEffect(() => {
+        initServer()
+    }, [initServer]);
+
+    const authValue = React.useMemo(() => ({
+        user,
+        token,
+        loading,
+        login,
+        logout,
+        isAutenticated,
+        verificLogin,
+        initServer
+    }), [user, token, loading, isAutenticated, login, logout, verificLogin, initServer]);
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout, isAutenticated, verificLogin, initServer }}>
+        <AuthContext.Provider value={authValue}>
             {children}
         </AuthContext.Provider>
     );

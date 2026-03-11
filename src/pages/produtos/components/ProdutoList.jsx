@@ -1,11 +1,12 @@
+import React from "react";
 import util from "@app/utils.js";
 
-export function ProdutoList({
+export const ProdutoList = React.memo(({
   dadosProcessados,
   setModalInfoProduto,
   setProduto,
   getEstoqueBadge,
-}) {
+}) => {
   return (
     <div className="table-responsive bg-white rounded shadow-sm mb-4">
       <table className="table table-hover align-middle mb-0">
@@ -67,4 +68,4 @@ export function ProdutoList({
       </table>
     </div>
   );
-}
+});

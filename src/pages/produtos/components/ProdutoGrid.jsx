@@ -1,11 +1,12 @@
+import React from "react";
 import util from "@app/utils.js";
 
-export function ProdutoGrid({
+export const ProdutoGrid = React.memo(({
   dadosProcessados,
   setModalInfoProduto,
   setProduto,
   getEstoqueBadge,
-}) {
+}) => {
   return (
     <div className="
       row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5
@@ -67,4 +68,4 @@ export function ProdutoGrid({
       ))}
     </div>
   );
-}
+});

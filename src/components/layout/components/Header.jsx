@@ -1,15 +1,13 @@
+import React, { useState } from "react";
 import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@auth-sistem/AuthContext";
-import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import utils from "@app/utils";
 
-export default function Header({ mobile }) {
+const Header = React.memo(({ mobile }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
-
-  let imgSize;
 
   const location = useLocation();
   const pathParts = location.pathname.split("/").filter((part) => part);
@@ -19,7 +17,6 @@ export default function Header({ mobile }) {
     usuarios: "Usuários",
     Extorno: "Estorno",
     Devolucao: "Devolução",
-    // Adicione outras traduções conforme necessário
   };
 
   return (
@@ -40,21 +37,6 @@ export default function Header({ mobile }) {
               >
                 <i className="bi bi-chevron-left"></i>
               </Button>
-              {/* <nav
-              className="d-flex justify-content-center align-items-center"
-              aria-label="breadcrumb"
-          >
-              <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center m-0">
-                {mobile ? 
-                  <h1 className="h3 breadcrumb-item m-0 d-flex align-items-center fs-3">{breadcrumbTitles[0] || utils.capitalize(pathParts[0])}</h1>
-                  :
-                  pathParts.length &&
-                    pathParts.map(tela => (
-                    <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-3">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
-                  ))
-                }
-              </ol>
-          </nav> */}
             </>
           ) : (
             ""
@@ -62,34 +44,14 @@ export default function Header({ mobile }) {
         </div>
         <div id="user-menu" className="d-flex align-items-center h-100">
           <h1 className="me-2 m-0 text-[1rem]!">Sistem Shop</h1>
-          <ProfileMenu user={user} imgSize={imgSize} logout={logout} />
+          <ProfileMenu user={user} logout={logout} />
         </div>
       </header>
-      {/* {mobile && 
-      pathParts.length > 1 ? (
-      <div className="mt-2">
-        <nav
-            className="d-flex justify-content-center align-items-center"
-            aria-label="breadcrumb"
-        >
-          <ol className="breadcrumb breadcrumb-sm-chevron d-flex align-content-center  m-0">
-            {pathParts.map(tela => {
-              if(tela !== pathParts[0]){
-                return (
-                  <h1 key={tela} className="h3 breadcrumb-item m-0 d-flex align-items-center fs-6">{breadcrumbTitles[tela] || utils.capitalize(tela)}</h1>
-                )
-              }
-            })}
-          </ol>
-        </nav>
-      </div>
-      ) : ""
-    } */}
     </>
   );
-}
+});
 
-function ProfileMenu({ user, logout }) {
+const ProfileMenu = React.memo(({ user, logout }) => {
   const [show, setShow] = useState(false);
 
   const navigate = useNavigate();
@@ -151,4 +113,6 @@ function ProfileMenu({ user, logout }) {
       </Dropdown.Menu>
     </Dropdown>
   );
-}
+});
+
+export default Header;
