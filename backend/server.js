@@ -56,6 +56,34 @@ server.register(multipart, {
   },
 });
 
+// Padronização de Respostas
+server.decorateReply("ok", function (data = {}, message = "Operação realizada com sucesso") {
+  return this.code(this.statusCode === 200 ? 200 : this.statusCode).send({ 
+    ok: true, 
+    message, 
+    ...data 
+  });
+});
+
+server.decorateReply("err", function (message = "Ocorreu um erro", code = 400) {
+  return this.code(code).send({ 
+    ok: false, 
+    error: message 
+  });
+});
+
+// Tratamento de Erro Global
+server.setErrorHandler((error, request, reply) => {
+  server.log.error(error);
+  const statusCode = error.statusCode || 500;
+  const message = statusCode === 500 ? "Erro interno no servidor" : error.message;
+  
+  reply.code(statusCode).send({ 
+    ok: false, 
+    error: message 
+  });
+});
+
 server.get("/", async (request, reply) => {
   const ip = request.ip.replace("::ffff:", "");
   console.log("Ip Cliente: ", ip);

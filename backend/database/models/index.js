@@ -13,7 +13,7 @@ Produto.belongsTo(Categoria, { foreignKey: "categoria_id", as: "categoria" });
 Categoria.hasMany(Produto, { foreignKey: "categoria_id", as: "produtos" });
 
 ItemEstoque.belongsTo(Produto, { foreignKey: "produto_id", as: "produto" });
-Produto.hasMany(ItemEstoque, { foreignKey: "produto_id", as: "itemEstoque" });
+Produto.hasMany(ItemEstoque, { foreignKey: "produto_id", as: "itemEstoque", onDelete: "CASCADE" });
 
 ItemEstoque.belongsTo(Nota, { foreignKey: "nota_id", as: "nota" });
 Nota.hasMany(ItemEstoque, { foreignKey: "nota_id", as: "itensNota" });
@@ -39,6 +39,7 @@ NotaVenda.belongsTo(Venda, { foreignKey: "venda_id", as: "venda" });
 ItemEstoque.hasOne(ItemReservado, {
   foreignKey: "itemEstoque_id",
   as: "detalheReserva",
+  onDelete: "CASCADE",
 });
 ItemReservado.belongsTo(ItemEstoque, {
   foreignKey: "itemEstoque_id",

@@ -106,204 +106,134 @@ export default async function produtoRoutes(fastify) {
       return reply.code(200).send(produtos);
     }
 
-    try {
-      console.log("produtos");
-      const produtos = await Produto.findAll({
-        include: [
-          { model: Categoria, as: "categoria" },
-          {
-            model: ItemEstoque,
-            as: "itemEstoque",
-            include: [{ model: Nota, as: "nota" }],
-          },
-        ],
-      });
+    const produtos = await Produto.findAll({
+      include: [
+        { model: Categoria, as: "categoria" },
+        {
+          model: ItemEstoque,
+          as: "itemEstoque",
+          include: [{ model: Nota, as: "nota" }],
+        },
+      ],
+    });
 
-      return reply.send(produtos);
-    } catch (err) {
-      console.log(err);
-      return reply.code(500).send({ error: "Erro ao buscar produtos" });
-    }
+    return reply.send(produtos);
   });
 
   fastify.post("/produto", async (request, reply) => {
-    try {
-      let body = {};
-      let imgFile = null;
+    let body = {};
+    let imgFile = null;
 
-      console.log(request.body);
+    console.log(request.body);
 
-      if (request.isMultipart()) {
-        const data = await request.parts();
-        for await (const part of data) {
-          if (part.type === "file") {
-            const buffer = await toBuffer(part.file);
-            imgFile = { buffer: buffer, filename: part.filename };
-            console.log(`Arquivo processado: ${part.filename}`);
-          } else {
-            body[part.fieldname] = part.value;
-          }
+    if (request.isMultipart()) {
+      const data = await request.parts();
+      for await (const part of data) {
+        if (part.type === "file") {
+          const buffer = await toBuffer(part.file);
+          imgFile = { buffer: buffer, filename: part.filename };
+          console.log(`Arquivo processado: ${part.filename}`);
+        } else {
+          body[part.fieldname] = part.value;
         }
-      } else {
-        body = request.body;
       }
-
-      // Normaliza itens: pode vir como string (multipart) ou como objeto (JSON)
-      if (body.itens && typeof body.itens === "string") {
-        body.itens = JSON.parse(body.itens);
-      }
-
-      if (!body.nome) {
-        return reply
-          .code(400)
-          .send({ error: 'O campo "nome" é obrigatório', ok: false });
-      }
-
-      const result = await CadastroProduto(body, imgFile);
-
-      //const novoProduto = await Produto.create(data)
-
-      reply.code(201).send({
-        message: "Estoque atualizado com sucesso!",
-        ...result,
-        ok: true,
-      });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao cadastrar produtos", ok: false });
+    } else {
+      body = request.body;
     }
+
+    // Normaliza itens: pode vir como string (multipart) ou como objeto (JSON)
+    if (body.itens && typeof body.itens === "string") {
+      body.itens = JSON.parse(body.itens);
+    }
+
+    if (!body.nome) {
+      return reply.err('O campo "nome" é obrigatório');
+    }
+
+    const result = await CadastroProduto(body, imgFile);
+
+    return reply.code(201).ok(result, "Estoque atualizado com sucesso!");
   });
 
   fastify.put("/produto/reservar/:id", async (request, reply) => {
-    try {
-      const produtoId = request.params.id;
-      const clienteId = request.query.cliente_id;
-      const cliente = await Cliente.findByPk(clienteId);
-      const produto = await ItemEstoque.findByPk(produtoId);
+    const produtoId = request.params.id;
+    const clienteId = request.query.cliente_id;
+    const cliente = await Cliente.findByPk(clienteId);
+    const produto = await ItemEstoque.findByPk(produtoId);
 
-      if (!produto) {
-        return reply
-          .status(404)
-          .send({ error: "Produto não encontrado", ok: false });
-      }
+    if (!produto) return reply.err("Produto não encontrado", 404);
+    if (!cliente) return reply.err("Cliente não encontrado", 404);
 
-      if (!cliente) {
-        return reply
-          .status(404)
-          .send({ error: "Cliente não encontrado", ok: false });
-      }
+    await ItemReservado.create({
+      cliente_id: clienteId,
+      itemEstoque_id: produtoId,
+      data: new Date(),
+    });
 
-      await ItemReservado.create({
-        cliente_id: clienteId,
-        itemEstoque_id: produtoId,
-        data: new Date(),
-      });
+    await produto.update({ status: "Reservado" });
 
-      await produto.update({ status: "Reservado" });
-
-      reply.send({
-        message: "Produto reservado com sucesso",
-        produto,
-        ok: true,
-      });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao reservar produto", ok: false });
-    }
+    return reply.ok({ produto }, "Produto reservado com sucesso");
   });
 
   fastify.put("/produto/remover/:id", async (request, reply) => {
-    try {
-      const itemId = request.params.id;
-      const data = request.body;
+    const itemId = request.params.id;
+    const data = request.body;
 
-      const item = await ItemEstoque.findByPk(itemId);
-      const itemReservado = await ItemReservado.findOne({
-        where: { itemEstoque_id: itemId },
-      });
+    const item = await ItemEstoque.findByPk(itemId);
+    const itemReservado = await ItemReservado.findOne({
+      where: { itemEstoque_id: itemId },
+    });
 
-      if (!item) {
-        return reply
-          .status(404)
-          .send({ error: "Item não encontrado", ok: false });
-      }
+    if (!item) return reply.err("Item não encontrado", 404);
+    if (!itemReservado) return reply.err("Item reservado não encontrado", 404);
 
-      if (!itemReservado) {
-        return reply
-          .status(404)
-          .send({ error: "Item reservado não encontrado", ok: false });
-      }
+    await itemReservado.destroy();
+    await item.update(data);
 
-      await itemReservado.destroy();
-
-      await item.update(data);
-
-      reply.send({ message: "Item atualizado com sucesso", item, ok: true });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao atualizar item", ok: false });
-    }
+    return reply.ok({ item }, "Item atualizado com sucesso");
   });
 
   fastify.put("/produto/item/:id", async (request, reply) => {
-    try {
-      const itemId = request.params.id;
-      const data = request.body;
+    const itemId = request.params.id;
+    const data = request.body;
 
-      const item = await ItemEstoque.findByPk(itemId);
+    const item = await ItemEstoque.findByPk(itemId);
+    if (!item) return reply.err("Item não encontrado", 404);
 
-      if (!item) {
-        return reply
-          .status(404)
-          .send({ error: "Item não encontrado", ok: false });
-      }
-
-      await item.update(data);
-
-      reply.send({ message: "Item atualizado com sucesso", item, ok: true });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao atualizar item", ok: false });
-    }
+    await item.update(data);
+    return reply.ok({ item }, "Item atualizado com sucesso");
   });
 
   fastify.put("/produto/:id", async (request, reply) => {
-    try {
-      const produtoId = request.params.id;
-      const data = request.body;
+    const produtoId = request.params.id;
+    const data = request.body;
 
-      const produto = await Produto.findByPk(produtoId);
+    const produto = await Produto.findByPk(produtoId);
+    if (!produto) return reply.err("Produto não encontrado", 404);
 
-      if (!produto) {
-        return reply.status(404).send({ error: "Produto não encontrado" });
-      }
-
-      await produto.update(data);
-
-      reply.send({ message: "Produto atualizado com sucesso", produto });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao atualizar produto" });
-    }
+    await produto.update(data);
+    return reply.ok({ produto }, "Produto atualizado com sucesso");
   });
 
   fastify.delete("/produto/:id", async (request, reply) => {
-    try {
-      const produtoId = request.params.id;
+    const produtoId = request.params.id;
 
-      const produto = await Produto.findByPk(produtoId);
+    const produto = await Produto.findByPk(produtoId);
 
-      if (!produto) {
-        return reply.status(404).send({ error: "Produto não encontrado" });
-      }
+    if (!produto) return reply.err("Produto não encontrado", 404);
 
-      await produto.destroy();
+    await produto.destroy();
+    return reply.status(204).ok({}, "Produto deletado com sucesso");
+  });
 
-      reply.status(204).send({ message: "Produto deletado com sucesso" });
-    } catch (err) {
-      console.log(err);
-      reply.code(500).send({ error: "Erro ao deletar produto" });
-    }
+  fastify.delete("/produto/item/:id", async (request, reply) => {
+    const itemId = request.params.id;
+
+    const item = await ItemEstoque.findByPk(itemId);
+    if (!item) return reply.err("Item não encontrado", 404);
+
+    await item.destroy();
+    return reply.status(204).ok({}, "Item deletado com sucesso");
   });
 }
 
