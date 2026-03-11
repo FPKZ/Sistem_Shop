@@ -188,7 +188,7 @@ export default function ProdutoInfo({
                   >
                     <img
                       className="w-100 h-100 rounded-3 object-fit-cover"
-                      src={produto.img || "src/assets/logo.svg"}
+                      src={produto.img || "assets/tube-spinner.svg"}
                       alt={produto.nome}
                     />
                   </div>

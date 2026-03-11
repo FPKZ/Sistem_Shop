@@ -33,7 +33,7 @@ export function ProdutoGrid({
             >
               <img
                 className="card-img-top produto-img"
-                src={produto.img || "src/assets/tube-spinner.svg"}
+                src={produto.img || "assets/tube-spinner.svg"}
                 alt={produto.nome}
                 style={{
                   objectFit: "contain",
