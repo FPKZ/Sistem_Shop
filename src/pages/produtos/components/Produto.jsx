@@ -66,7 +66,7 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
         {children}
       </ProdutoHeader>
 
-      <div className="grow overflow-auto custom-scrollbar px-1">
+      <div className="grow custom-scrollbar px-1">
         {viewMode === "grid" ? (
           <ProdutoGrid
             dadosProcessados={currentItems}
