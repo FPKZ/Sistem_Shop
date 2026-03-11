@@ -17,7 +17,7 @@ export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
                 {estoqueBaixo.map((item) => (
                   <ListGroup.Item key={item.id} className="d-flex justify-content-between align-items-center py-3 border-light">
                     <div className="d-flex align-items-center">
-                      {item.img && <img src={item.img} alt={item.nome} className="rounded me-3 shadow-sm" style={{ width: "40px", height: "40px", objectFit: "cover" }} />}
+                      <img src={item.img || "/assets/tube-spinner.svg"} alt={item.nome} className="rounded me-3 shadow-sm" style={{ width: "40px", height: "40px", objectFit: "cover" }} />
                       <div>
                         <div className="fw-bold text-dark">{item.nome}</div>
                         <small className="text-muted">ID: {item.id}</small>

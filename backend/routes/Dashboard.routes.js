@@ -17,13 +17,21 @@ export default async function dashboardRoutes(fastify) {
       const proximoVencimento = new Date();
       proximoVencimento.setDate(proximoVencimento.getDate() + 7);
 
-      const [vendasRecentes, todasVendas, todasNotas, todosItensEstoque] = await Promise.all([
+      const [vendasRecentes, todasVendas, notasRecentes, todasNotas, todosItensEstoque] = await Promise.all([
         Venda.findAll({
           where: { data_venda: { [Op.gte]: trintaDiasAtras } },
           include: [{ model: ItemVendido, as: "itensVendidos", include: [{ model: ItemEstoque, as: "itemEstoque" }] }]
         }),
         Venda.findAll({
           include: [{ model: ItemVendido, as: "itensVendidos", include: [{ model: ItemEstoque, as: "itemEstoque" }] }]
+        }),
+        Nota.findAll({
+          where: {
+            [Op.or]: [
+              { data: { [Op.gte]: trintaDiasAtras } },
+              { data_vencimento: { [Op.gte]: trintaDiasAtras } }
+            ]
+          }
         }),
         Nota.findAll({
           where: { status: "pendente" },
@@ -61,13 +69,23 @@ export default async function dashboardRoutes(fastify) {
         if (v.status === "atrasado") stats.pagamentosAtrasados++;
       });
 
-      // 2. Gráfico de Vendas (30 dias)
+      // 2. Gráfico de Vendas e Débitos (30 dias passados + 15 futuros)
       const chartDataMap = {};
-      for (let i = 29; i >= 0; i--) {
+      
+      // Gerar intervalo de 30 dias atrás até 15 dias no futuro
+      for (let i = 30; i >= -15; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split("T")[0];
-        chartDataMap[dateStr] = { name: dateStr, vendas: 0, receita: 0, lucro: 0 };
+        chartDataMap[dateStr] = { 
+          name: dateStr, 
+          vendas: 0, 
+          receita: 0, 
+          lucro: 0, 
+          debitos: 0, 
+          debitosPrevistos: 0,
+          isFuture: i < 0 
+        };
       }
 
       vendasRecentes.forEach((v) => {
@@ -83,6 +101,25 @@ export default async function dashboardRoutes(fastify) {
                custoVenda += Number(item.itemEstoque?.valor_compra) || 0;
             });
             chartDataMap[dateStr].lucro += (valorVenda - custoVenda);
+          }
+        }
+      });
+
+      notasRecentes.forEach((n) => {
+        const valorNota = Number(n.valor_total) || 0;
+        
+        // Débitos (Notas Pagas) - Usamos a data da nota
+        if (n.status === 'pago') {
+          const dateStr = new Date(n.data).toISOString().split("T")[0];
+          if (chartDataMap[dateStr]) {
+            chartDataMap[dateStr].debitos += valorNota;
+          }
+        } 
+        // Débitos Previstos (Notas Pendentes/Vencidas) - Usamos a data de vencimento
+        else if (['pendente', 'vencido'].includes(n.status)) {
+          const dateStr = new Date(n.data_vencimento).toISOString().split("T")[0];
+          if (chartDataMap[dateStr]) {
+            chartDataMap[dateStr].debitosPrevistos += valorNota;
           }
         }
       });

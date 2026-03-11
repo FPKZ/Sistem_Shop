@@ -1,6 +1,6 @@
 import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@auth-sistem/AuthContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import utils from "@app/utils";
@@ -26,7 +26,7 @@ export default function Header({ mobile }) {
     <>
       <header
         id="header"
-        className="p-0 px-3 d-flex align-items-center justify-content-between"
+        className="p-0 px-2 px-md-3 d-flex align-items-center justify-content-between"
       >
         <div className="d-flex justify-content-center flex-wrap flex-md-nowarp align-items-center gap-4 position-relative">
           {pathParts.length > 0 ? (
@@ -61,7 +61,7 @@ export default function Header({ mobile }) {
           )}
         </div>
         <div id="user-menu" className="d-flex align-items-center h-100">
-          <h1 className="me-3 m-0 fs-5">Sistem Shop</h1>
+          <h1 className="me-2 m-0 text-[1rem]!">Sistem Shop</h1>
           <ProfileMenu user={user} imgSize={imgSize} logout={logout} />
         </div>
       </header>
@@ -91,31 +91,12 @@ export default function Header({ mobile }) {
 
 function ProfileMenu({ user, logout }) {
   const [show, setShow] = useState(false);
-  const [imgSizeState, setImgSizeState] = useState(35);
 
   const navigate = useNavigate();
 
   // 1. Detecta se o dispositivo suporta toque (mobile) ou não (desktop)
   const isTouchDevice =
     "ontouchstart" in window || navigator.maxTouchPoints > 0;
-
-  useEffect(() => {
-    const calcSize = () => {
-      const userMenu = document.getElementById("user-menu");
-      if (userMenu) {
-        setImgSizeState(userMenu.clientHeight - 7);
-      }
-    };
-
-    calcSize();
-    // console.log(imgSizeState)
-
-    window.addEventListener("resize", () => calcSize());
-
-    return () => {
-      window.removeEventListener("resize", () => calcSize());
-    };
-  }, []);
 
   const handleShowMenu = async () => {
     if (isTouchDevice) setShow(!show);
@@ -136,17 +117,13 @@ function ProfileMenu({ user, logout }) {
       >
         <Figure className="d-flex m-0 p-0 align-items-center profile-trigger">
           <Figure.Image
-            className="m-0 profile-avatar"
+            className="m-0 profile-avatar w-11 xl:w-13!"
             alt="Usuário"
             src={
               user.img ||
               "https://cdn-icons-png.flaticon.com/512/149/149071.png"
             }
             roundedCircle
-            style={{
-              width: imgSizeState,
-              height: imgSizeState,
-            }}
           />
         </Figure>
       </Dropdown.Toggle>

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+}
+
 /* Custom Dropdown Styles */
 .custom-dropdown-filter {
   width: 260px !important;
@@ -124,12 +132,3 @@
 }
 
 
-/* Animação para Sincronização */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.spin-animation {
-  animation: spin 2s linear infinite;
-}

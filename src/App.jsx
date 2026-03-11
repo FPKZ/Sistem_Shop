@@ -11,7 +11,7 @@ function App() {
 
   const atalhos = [
     {
-      label: "Novo Cadastro",
+      label: "Cadastro",
       icon: <i className="bi bi-plus-square-fill fs-6"></i>,
       path: "cadastro",
       color: "text-primary",
@@ -60,7 +60,7 @@ function App() {
             Bem-vindo ao sistema de gestão Sistem Shop.
           </p>
         </div>
-        <div className="d-flex align-items-center bg-white px-3 py-2 rounded shadow-sm border">
+        <div className="d-none d-md-flex align-items-center bg-white px-3 py-2 rounded shadow-sm border">
           <i className={`bi bi-arrow-clockwise fs-6 text-primary me-2 ${refreshing ? "spin-animation" : ""}`}></i>
           <span className="small text-muted">{refreshing ? "Sincronizando..." : "Sincronizado"}</span>
         </div>
@@ -77,9 +77,9 @@ function App() {
 
         {/* Atalhos Rápidos */}
         <Col xs={12} xl={4}>
-          <div className="bg-white p-4 rounded shadow-sm">
+          <div className="bg-white p-4 rounded shadow-sm h-100">
             <h5 className="fw-bold mb-4">Atalhos Rápidos</h5>
-            <div className="d-grid gap-3">
+            <div className="d-grid grid-cols-2 xl:grid-cols-1 gap-3">
               {atalhos.map((at, idx) => (
                 <Button
                   key={idx}
