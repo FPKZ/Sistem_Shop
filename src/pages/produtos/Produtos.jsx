@@ -1,75 +1,49 @@
-import { useState } from "react";
 import Produto from "./components/Produto";
 import HoverBtn from "@components/HoverBtn";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
-import API from "@app/api.js"
 import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
-import { useOutletContext } from "react-router-dom";
-import usePopStateModal from "@hooks/usePopStateModal";
-import { useToast } from "@contexts/ToastContext";
-
-
-// import "../../../public/css/produtos/produtos.css"
+import useProdutosPage from "@hooks/produtos/useProdutosPage";
 
 function Produtos() {
-  
-  const { mobile } = useOutletContext()
+  const {
+    mobile,
+    produtos,
+    produto,
+    setProduto,
+    modalAddProduto,
+    setModalAddProduto,
+    modalInfoProduto,
+    setModalInfoProduto,
+    cadastroProduto,
+    deleteProduto,
+  } = useProdutosPage();
 
-  const [produto, setProduto] = useState({})
-  const [modalAddProduto, setModalAddProduto] = useState(false)
-  const [modalInfoProduto, setModalInfoProduto] = useState(false)
-
-
-
-  const { showToast } = useToast();
-
-  const { data: produtos } = API.getProdutos();
-
-  usePopStateModal(
-    [modalAddProduto, modalInfoProduto],
-    [setModalAddProduto, setModalInfoProduto]
-  )
-  
-  
-
-  const cadastroProduto = async (data) => {
-    const response = await API.postProduto(data)
-    if(response.ok){
-      showToast(response.message, "success")
-    }
-    else{
-      showToast(response.message, "error")
-    } 
-    return response;
-  }
-
-  const deleteProduto = async (id) => {
-    const response = await API.deleteProduto(id)
-    if(response.ok){
-      showToast(response.message, "success")
-    }
-    else{
-      showToast(response.message, "error")
-    }
-  }
-  
   return (
     <div className="p-md-4 h-100 overflow-hidden">
-      <Produto produtos={produtos || []} deleteProduto={deleteProduto} setModalInfoProduto={setModalInfoProduto} setProduto={setProduto} mobile={mobile}>
-        <HoverBtn mobile={mobile} func={setModalAddProduto}>Adicionar Produto</HoverBtn>
+      <Produto
+        produtos={produtos}
+        deleteProduto={deleteProduto}
+        setModalInfoProduto={setModalInfoProduto}
+        setProduto={setProduto}
+        mobile={mobile}
+      >
+        <HoverBtn mobile={mobile} func={setModalAddProduto}>
+          Adicionar Produto
+        </HoverBtn>
       </Produto>
 
-
-      <CadastroModal visible={modalAddProduto}
+      <CadastroModal
+        visible={modalAddProduto}
         onClose={() => setModalAddProduto(false)}
-        onSubmit={async (data) =>  await cadastroProduto(data)}
+        onSubmit={async (data) => await cadastroProduto(data)}
         cadastrarProduto={cadastroProduto}
         mobile={mobile}
       />
-      <ProdutosInfo 
+      <ProdutosInfo
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}
         produto={produto}
+        deletarProduto={deleteProduto}
         mobile={mobile}
       />
     </div>

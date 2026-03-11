@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getProdutosProps, ItemEstoque, Produto } from "./interfaces";
+import { getProdutosProps, ItemEstoque } from "./interfaces";
 
 const back = import.meta.env.VITE_BACKEND_URL;
 
@@ -93,6 +93,14 @@ export async function deleteProduto(id: number) {
   }
 }
 
+export async function deleteItem(id: number) {
+  try {
+    await fetch(`${back}/produto/item/${id}`, { method: "DELETE" });
+  } catch (error) {
+    console.error("Erro ao deletar item", error);
+  }
+}
+
 //Categorias
 export async function getCategoria() {
   try {
@@ -139,20 +147,30 @@ export function getProdutos({ item, nome }: getProdutosProps = {}) {
   });
 }
 
-export function cadastrarProduto(data: Produto) {
+export function useCadastrarProduto() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => postProduto(data),
+    mutationFn: (data: any) => postProduto(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["produtos"] });
     },
   });
 }
 
-export function deletarProduto(id: number) {
+export function useDeletarProduto() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => deleteProduto(id),
+    mutationFn: (id: number) => deleteProduto(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["produtos"] });
+    },
+  });
+}
+
+export function useDeletarItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteItem(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["produtos"] });
     },

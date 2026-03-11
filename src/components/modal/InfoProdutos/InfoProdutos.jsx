@@ -30,6 +30,7 @@ export default function ProdutoInfo({
   visible,
   onClose,
   produto,
+  deletarProduto,
   mobile,
   tableShow = true,
 }) {
@@ -219,6 +220,7 @@ export default function ProdutoInfo({
                       <Button
                         variant="outline-danger"
                         className="d-flex align-items-center gap-2 px-4"
+                        onClick={() => deletarProduto(itemEstoque.id)}
                       >
                         <Trash2 size={18} /> Excluir
                       </Button>
