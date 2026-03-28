@@ -53,6 +53,7 @@ export default async function catalogoRoutes(fastify){
     fastify.post("/pedido", async (request, reply) => {
         try{
             let pedido = request.body.pedido
+            let total = request.body.total
             console.log(pedido)
             // pedido = [
             //     {id: 1, quantidade: 2},
@@ -68,10 +69,11 @@ export default async function catalogoRoutes(fastify){
                 // ]
             })
 
+           
             const mssg = `Olá, gostaria de fazer um pedido:\n\n${pedido.map((item) => {
                 const produto = produtos.find((produto) => produto.id === item.id)
                 return `*${produto.nome}* - ${item.quantidade}`
-            }).join("\n")}`
+            }).join("\n")}\n\nTotal: R$ ${total.toFixed(2).replace('.', ',')}`
             console.log(mssg)
             const number = "5513997062443"
             

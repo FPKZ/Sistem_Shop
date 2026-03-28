@@ -1,9 +1,5 @@
-export default function Carrinho({produtos, carrinho, handleChangeQuantity, totalItens, pedir}){
-    // Calcula o valor total do carrinho
-    const valorTotal = Object.entries(carrinho).reduce((acc, [id, quantidade]) => {
-        const produto = produtos.find(p => p.id === Number(id));
-        return acc + (produto ? Number(produto.preco) * quantidade : 0);
-    }, 0);
+export default function Carrinho({produtos,carrinho,handleChangeQuantity, totalItens, valorTotal, pedir}){
+    
 
     return (
         <main className="container my-4 flex-grow-1">

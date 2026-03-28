@@ -55,7 +55,7 @@ export default function useCatalogo(){
         }));
 
         try {
-            const result = await API.postPedido({ pedido: pedidoArray });
+            const result = await API.postPedido({ pedido: pedidoArray, total: valorTotal });
             if (result && result.url) {
                 window.open(result.url, "_blank");
             }
@@ -65,6 +65,12 @@ export default function useCatalogo(){
         }
     }
 
+    // Calcula o valor total do carrinho
+    const valorTotal = Object.entries(carrinho).reduce((acc, [id, quantidade]) => {
+        const produto = produtos.find(p => p.id === Number(id));
+        return acc + (produto ? Number(produto.preco) * quantidade : 0);
+    }, 0);
+
     return {
         produtos,
         carrinho,
@@ -72,6 +78,7 @@ export default function useCatalogo(){
         totalItens,
         carrinhoAberto,
         setCarrinhoAberto,
+        valorTotal,
         pedir
     }
 }
