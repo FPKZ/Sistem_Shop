@@ -25,7 +25,7 @@ export default async function catalogoRoutes(fastify){
                 where,
                 include: [
                     { model: Categoria, as: "categoria"},
-                    { model: ItemEstoque, as: "itens"}
+                    { model: ItemEstoque, as: "itemEstoque"}
                 ]
             })
 
@@ -35,16 +35,50 @@ export default async function catalogoRoutes(fastify){
                     nome: produto.nome,
                     descricao: produto.descricao,
                     categoria: produto.categoria.nome,
-                    imagem: produto.imagem,
-                    preco: produto.itens.length > 0 ? Math.max(...produto.itens.map((item) => Number(item.preco))) : 0,
-                    quantidade: produto.itens.length,
+                    img: produto.img,
+                    // itens: produto.itemEstoque,
+                    preco: produto.itemEstoque.some(item => item.status === "Disponivel")
+                        ? Math.max(...produto.itemEstoque.filter(item => item.status === "Disponivel").map(item => Number(item.valor_venda)))
+                        : 0,
+                    quantidade: produto.itemEstoque.length,
                 }
             })
 
             reply.send(catalogo)
         } catch(err){
             console.log(err)
-            reply.code(500).send({error: "Erro ao buscar produtos"})
+            reply.err("Erro ao buscar produtos", 500)
+        }
+    })
+    fastify.post("/pedido", async (request, reply) => {
+        try{
+            let pedido = request.body.pedido
+            console.log(pedido)
+            // pedido = [
+            //     {id: 1, quantidade: 2},
+            //     {id: 2, quantidade: 1},
+            //     {id: 6, quantidade: 1}
+            // ]
+            
+            const produtos = await Produto.findAll({
+                where: { id: { [Op.in]: pedido.map(item => item.id) } },
+                // include: [
+                //     { model: Categoria, as: "categoria"},
+                //     { model: ItemEstoque, as: "itemEstoque"}
+                // ]
+            })
+
+            const mssg = `Olá, gostaria de fazer um pedido:\n\n${pedido.map((item) => {
+                const produto = produtos.find((produto) => produto.id === item.id)
+                return `*${produto.nome}* - ${item.quantidade}`
+            }).join("\n")}`
+            console.log(mssg)
+            const number = "5513997062443"
+            
+            reply.send({ url: `https://wa.me/${number}?text=${encodeURIComponent(mssg)}` })
+        }catch(err){
+            console.log(err)
+            reply.err("Erro ao buscar produtos", 500)
         }
     })
 }

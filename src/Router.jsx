@@ -15,6 +15,7 @@ import Login from "./auth/page/login/Login.jsx";
 import CadastroUser from "./auth/page/cadastro/CadastroUser.jsx";
 import PerfilPage from "./auth/page/perfil/Perfil.jsx";
 import GerenciamentoUsuario from "./auth/page/ferramentas/GerenciamentoUsuario.jsx";
+import Catalogo from "./pages/catalogo/Catalogo.jsx";
 
 export {
   Cadastro,
@@ -34,4 +35,5 @@ export {
   CadastroUser,
   PerfilPage,
   GerenciamentoUsuario,
+  Catalogo,
 };
