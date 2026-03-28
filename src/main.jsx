@@ -21,6 +21,7 @@ import {
   CadastroUser,
   PerfilPage,
   GerenciamentoUsuario,
+  Catalogo,
 } from "./Router.jsx";
 import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
   },
   { path: "login", element: <Login /> },
   { path: "cadastro-user", element: <CadastroUser /> },
+  { path: "catalogo", element: <Catalogo /> },
 ]);
 
 createRoot(document.getElementById("root")).render(

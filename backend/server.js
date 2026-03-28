@@ -13,6 +13,7 @@ import {
   notaVendaRoutes,
   contaRoutes,
   dashboardRoutes,
+  catalogoRoutes
 } from "./routes/routers.js";
 
 const server = fastify({ logger: true, trustProxy: true });
@@ -98,6 +99,7 @@ server.register(vendaRoutes);
 server.register(notaVendaRoutes);
 server.register(contaRoutes);
 server.register(dashboardRoutes);
+server.register(catalogoRoutes);
 
 async function start() {
   try {
