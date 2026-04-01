@@ -12,11 +12,11 @@ export default async function catalogoRoutes(fastify) {
   });
 
   fastify.post("/pedido", async (request, reply) => {
-    const { pedido, total } = request.body;
+    const { pedido, total, observacao } = request.body;
 
     const produtos = await listarCatalogo(pedido);
 
-    const url = gerarLinkPedido(pedido, total, produtos);
+    const url = gerarLinkPedido(pedido, total, produtos, observacao);
     return reply.ok({ url });
   });
 }

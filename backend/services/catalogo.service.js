@@ -55,7 +55,7 @@ export async function listarCatalogo(query = {}) {
  * @param {Array} produtos - Produtos carregados do banco
  * @returns {string} URL do WhatsApp
  */
-export function gerarLinkPedido(pedido, total, produtos) {
+export function gerarLinkPedido(pedido, total, produtos, observacao) {
   const linhasPedido = pedido
     .map((item) => {
       const produto = produtos.find((p) => p.id === item.id);
@@ -65,7 +65,7 @@ export function gerarLinkPedido(pedido, total, produtos) {
 
   const mensagem = `Olá, gostaria de fazer um pedido:\n\n${linhasPedido}\n\nTotal: R$ ${total
     .toFixed(2)
-    .replace(".", ",")}`;
+    .replace(".", ",")} ${observacao ? `\n\nObservação: ${observacao}` : ""}`;
 
   const numero = env.WHATSAPP_NUMBER;
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
