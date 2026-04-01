@@ -1,36 +1,39 @@
-const back = import.meta.env.VITE_BACKEND_URL
+import api from "@app/httpClient";
 
-export async function login(data){
-    try{
-        // console.log(data)
-        const response = await fetch(`${back}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        })
-        const result = await response.json()
-        return result
-    }
-    catch(error){
-        console.error("Erro ao fazer login", error)
-    }
+// Rotas públicas — usa fetch puro (sem token)
+const back = import.meta.env.VITE_BACKEND_URL;
+
+export async function login(data) {
+  try {
+    const response = await fetch(`${back}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao fazer login", error);
+  }
 }
 
-export async function postConta(data){
-    try{
-        const response = await fetch(`${back}/conta`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data)
-        })
-        const result = await response.json()
-        return result
-    }
-    catch(error){
-        console.error("Erro ao cadastrar conta", error)
-    }
+export async function registerUser(data) {
+  try {
+    const response = await fetch(`${back}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao registrar usuário", error);
+  }
+}
+
+// Rota protegida
+export async function postConta(data) {
+  try {
+    return await api.post("/cadastrar-conta", data);
+  } catch (error) {
+    console.error("Erro ao cadastrar conta", error);
+  }
 }
