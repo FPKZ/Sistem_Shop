@@ -5,6 +5,7 @@ export default function useCatalogo(){
     const [produtos, setProdutos] = useState([])
     const [carrinho, setCarrinho] = useState({}) // { idProduto: quantidade }
     const [carrinhoAberto, setCarrinhoAberto] = useState(false)
+    const [obs, setObs] = useState("")
     
     useEffect(() => {
         API.getProduto({}).then((dados) => {
@@ -55,7 +56,7 @@ export default function useCatalogo(){
         }));
 
         try {
-            const result = await API.postPedido({ pedido: pedidoArray, total: valorTotal });
+            const result = await API.postPedido({ pedido: pedidoArray, total: valorTotal, observacao: obs });
             if (result && result.url) {
                 window.open(result.url, "_blank");
             }
@@ -79,6 +80,8 @@ export default function useCatalogo(){
         carrinhoAberto,
         setCarrinhoAberto,
         valorTotal,
-        pedir
+        pedir,
+        obs,
+        setObs
     }
 }

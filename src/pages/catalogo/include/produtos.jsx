@@ -3,7 +3,7 @@
 export default function Produtos({produtos, carrinho, handleChangeQuantity}){
     return (
         <main className="container my-4 flex-grow-1">
-            <h2 className="mb-4 text-center" style={{ color: "rgba(147, 51, 179, 1)", fontWeight: "600" }}>
+            <h2 className="mb-4 text-center" style={{ fontWeight: "600" }}>
                 Catálogo de Produtos
             </h2>
 
@@ -15,7 +15,7 @@ export default function Produtos({produtos, carrinho, handleChangeQuantity}){
                         const quantidade = carrinho[produto.id] || 0;
                         return (
                             <div className="col hover:translate-y-[-5px] transition-transform duration-300" key={produto.id}>
-                                <div className="card produto-card shadow-sm border-0 h-100 d-flex flex-column">
+                                <div className="rounded-4 bg-white shadow-sm border-0 h-100 d-flex flex-column overflow-hidden">
                                     <div
                                         className="produto-img-wrapper"
                                         style={{
@@ -23,8 +23,7 @@ export default function Produtos({produtos, carrinho, handleChangeQuantity}){
                                             justifyContent: "center",
                                             alignItems: "center",
                                             overflow: "hidden",
-                                            height: "180px",
-                                            backgroundColor: "#fff"
+                                            // height: "12rem",
                                         }}
                                     >
                                         <img
@@ -32,14 +31,14 @@ export default function Produtos({produtos, carrinho, handleChangeQuantity}){
                                             src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
                                             alt={produto.nome}
                                             style={{
-                                                objectFit: "contain",
+                                                objectFit: "cover",
                                                 height: "100%",
                                                 width: "100%",
-                                                padding: "0.5rem",
+                                                padding: "0",
                                             }}
                                         />
                                     </div>
-                                    <div className="card-body p-3 d-flex flex-column flex-grow-1 bg-white">
+                                    <div className="card-body p-3 d-flex flex-column flex-grow-1">
                                         <h5 className="card-title text-truncate fw-bold mb-1" title={produto.nome}>
                                             {produto.nome}
                                         </h5>
@@ -52,7 +51,7 @@ export default function Produtos({produtos, carrinho, handleChangeQuantity}){
                                             R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}
                                         </div>
                                     </div>
-                                    <div className="card-footer bg-white border-top-0 p-3 pt-0 mt-auto">
+                                    <div className="card-footer border-top-0 p-3 pt-0 mt-auto">
                                         {quantidade === 0 ? (
                                             <button 
                                                 className="btn w-100 fw-bold border-0 text-white shadow-sm" 

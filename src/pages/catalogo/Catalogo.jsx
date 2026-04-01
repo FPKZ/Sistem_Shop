@@ -5,14 +5,14 @@ import Produtos from "./include/produtos"
 import Carrinho from "./include/Carrinho"
 
 export default function Catalogo(){
-    const { produtos, carrinho, handleChangeQuantity, totalItens, pedir, carrinhoAberto, setCarrinhoAberto, valorTotal } = useCatalogo()
+    const { produtos, carrinho, handleChangeQuantity, totalItens, pedir, carrinhoAberto, setCarrinhoAberto, valorTotal, obs, setObs } = useCatalogo()
     
     return(
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f8f9fa" }}>
+        <div style={{display: "flex", flexDirection: "column" }}>
             <Header carrinhoAberto={carrinhoAberto} setCarrinhoAberto={setCarrinhoAberto} />
             {
                 carrinhoAberto ? (
-                    <Carrinho produtos={produtos} carrinho={carrinho} handleChangeQuantity={handleChangeQuantity} totalItens={totalItens} valorTotal={valorTotal} pedir={pedir} />
+                    <Carrinho produtos={produtos} carrinho={carrinho} handleChangeQuantity={handleChangeQuantity} totalItens={totalItens} valorTotal={valorTotal} pedir={pedir} obs={obs} setObs={setObs} />
                 ) : (
                     <Produtos produtos={produtos} carrinho={carrinho} handleChangeQuantity={handleChangeQuantity} />
                 )

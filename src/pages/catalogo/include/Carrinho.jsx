@@ -1,5 +1,7 @@
-export default function Carrinho({produtos,carrinho,handleChangeQuantity, totalItens, valorTotal, pedir}){
-    
+import { useState } from "react";
+
+export default function Carrinho({produtos,carrinho,handleChangeQuantity, valorTotal, obs, setObs}){
+    const [showObs, setShowObs] = useState(false);
 
     return (
         <main className="container my-4 flex-grow-1">
@@ -10,7 +12,7 @@ export default function Carrinho({produtos,carrinho,handleChangeQuantity, totalI
             {Object.keys(carrinho).length === 0 ? (
                 <div className="text-center text-muted mt-5">Seu carrinho está vazio.</div>
             ) : (
-                <div className="d-flex flex-column gap-3 mb-5 pb-5">
+                <div className="d-flex flex-column gap-3 mb-2 pb-2">
                     {Object.entries(carrinho).map(([id, quantidade]) => {
                         const produto = produtos.find(p => p.id === Number(id));
                         if (!produto) return null;
@@ -67,6 +69,21 @@ export default function Carrinho({produtos,carrinho,handleChangeQuantity, totalI
                     </div>
                 </div>
             )}
+            
+            <div className="card shadow-sm border-0 p-3 mt-3 bg-white ">
+                <div 
+                    className="d-flex align-items-center justify-content-between" 
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setShowObs(!showObs)}
+                >
+                    <span className="fw-bold text-muted mb-0">Observações:</span>
+                    <i className={`bi bi-chevron-${showObs ? 'up' : 'down'} text-muted`}></i>
+                </div>
+                {showObs && (
+                    <textarea className="form-control bg-light mt-2" placeholder="Digite aqui suas observações..." value={obs} onChange={(e) => setObs(e.target.value)} />
+                )}
+            </div>
+
         </main>
     )
 }
