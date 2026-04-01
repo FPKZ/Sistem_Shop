@@ -5,7 +5,7 @@ import { env } from "../config/env.js";
 
 /**
  * Lista os produtos do catálogo público aplicando filtros opcionais.
- * @param {{ categoria?: string, nome?: string }} query
+ * @param {{ categoria?: string, nome?: string, id?: string }} query
  * @returns {Promise<Array>}
  */
 export async function listarCatalogo(query = {}) {
@@ -17,6 +17,10 @@ export async function listarCatalogo(query = {}) {
 
   if (!isNullOrUndefined(query.nome)) {
     where.nome = { [Op.like]: `%${query.nome}%` };
+  }
+
+  if (!isNullOrUndefined(query.id)) {
+    where.id = query.id;
   }
 
   const produtos = await Produto.findAll({
@@ -55,7 +59,7 @@ export function gerarLinkPedido(pedido, total, produtos) {
   const linhasPedido = pedido
     .map((item) => {
       const produto = produtos.find((p) => p.id === item.id);
-      return `*${produto.nome}* - ${item.quantidade}`;
+      return `*${item.quantidade}x - ${produto.nome}* - R$ ${produto.preco.toFixed(2)} Uni. `;
     })
     .join("\n");
 
@@ -65,4 +69,5 @@ export function gerarLinkPedido(pedido, total, produtos) {
 
   const numero = env.WHATSAPP_NUMBER;
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+  // return mensagem;
 }

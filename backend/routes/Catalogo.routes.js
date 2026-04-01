@@ -14,9 +14,7 @@ export default async function catalogoRoutes(fastify) {
   fastify.post("/pedido", async (request, reply) => {
     const { pedido, total } = request.body;
 
-    const produtos = await Produto.findAll({
-      where: { id: { [Op.in]: pedido.map((item) => item.id) } },
-    });
+    const produtos = await listarCatalogo(pedido);
 
     const url = gerarLinkPedido(pedido, total, produtos);
     return reply.ok({ url });
