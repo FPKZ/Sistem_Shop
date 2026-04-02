@@ -1,6 +1,8 @@
 import { Cores } from "../database/models/index.js";
 import { Op } from "sequelize";
 
+
+// Configuração de busca
 const config = {
     attributes: ["id", "name", "hex"],
     order: [["name", "ASC"]],
@@ -40,6 +42,7 @@ export function deleteColor(id) {
     return Cores.destroy({ where: { id } });
 }
 
+// Busca de cores
 export async function getColors(query) {
      // 1) Busca de vários itens (Array)
     // Se enviar ?list=#FFF,#000 ou ?list=#FFF&list=#000

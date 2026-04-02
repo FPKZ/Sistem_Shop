@@ -37,6 +37,7 @@ export async function listarCatalogo(query = {}) {
     descricao:  produto.descricao,
     categoria:  produto.categoria.nome,
     img:        produto.img,
+    cores: [...new Set(produto.itemEstoque.map((item) => item.cor))].sort(),
     preco: produto.itemEstoque.some((item) => item.status === "Disponivel")
       ? Math.max(
           ...produto.itemEstoque
@@ -45,6 +46,7 @@ export async function listarCatalogo(query = {}) {
         )
       : 0,
     quantidade: produto.itemEstoque.length,
+    tamanho: [...new Set(produto.itemEstoque.map((item) => item.tamanho))].filter((item) => item !== "").sort()
   }));
 }
 

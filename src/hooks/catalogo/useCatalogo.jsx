@@ -9,11 +9,7 @@ export default function useCatalogo(){
     
     useEffect(() => {
         API.getProduto({}).then((dados) => {
-            if (dados && dados.catalogo) {
-                setProdutos(dados.catalogo)
-            } else if (Array.isArray(dados)) {
-                setProdutos(dados)
-            }
+            setProdutos(dados.data)
         })
     }, [])
 

@@ -8,7 +8,7 @@ export default async function catalogoRoutes(fastify) {
 
   fastify.get("/catalogo", async (request, reply) => {
     const catalogo = await listarCatalogo(request.query);
-    return reply.code(200).send(catalogo);
+    return reply.ok({ data: catalogo });
   });
 
   fastify.post("/pedido", async (request, reply) => {
