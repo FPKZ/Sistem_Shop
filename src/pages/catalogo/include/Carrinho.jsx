@@ -18,15 +18,16 @@ export default function Carrinho({produtos,carrinho,handleChangeQuantity, valorT
                         if (!produto) return null;
                         
                         return (
-                            <div className="card shadow-sm border-0 flex-row align-items-center p-2" key={id}>
-                                <div style={{ width: "80px", height: "80px", flexShrink: 0, backgroundColor: "#fff", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", borderRadius: "8px" }}>
+                            <div className="card shadow-sm border-0 flex-row align-items-stretch p-0 overflow-hidden" key={id}>
+                                <div style={{ width: "6rem", minHeight: "6rem", flexShrink: 0, backgroundColor: "#fff", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
                                     <img 
                                         src={produto.img || produto.imagem || "assets/tube-spinner.svg"} 
                                         alt={produto.nome} 
-                                        style={{ objectFit: "contain", height: "100%", width: "100%", padding: "0.2rem" }}
+                                        style={{ objectFit: "cover", height: "100%", width: "100%" }}
                                     />
                                 </div>
-                                <div className="ms-3 flex-grow-1 d-flex flex-column justify-content-center">
+
+                                <div className="ms-3 flex-grow-1 d-flex flex-column justify-content-center p-2">
                                     <h6 className="fw-bold mb-1 text-truncate" style={{ maxWidth: "200px" }} title={produto.nome}>{produto.nome}</h6>
                                     <div className="fw-bold text-success mb-2">
                                         R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}
@@ -50,7 +51,7 @@ export default function Carrinho({produtos,carrinho,handleChangeQuantity, valorT
                                         </button>
                                     </div>
                                 </div>
-                                <div className="ms-auto pe-2 text-end">
+                                <div className="flex items-center ms-auto pe-3 text-end">
                                     <div className="fw-bold" style={{ fontSize: "1.1rem" }}>
                                         R$ {(Number(produto.preco || 0) * quantidade).toFixed(2).replace('.', ',')}
                                     </div>

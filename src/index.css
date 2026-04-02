@@ -84,6 +84,7 @@
   background-color: #6f42c1;
   border-color: #6f42c1;
   color: white;
+  transition: all 0.2s ease-in-out;
 }
 
 .btn-roxo:hover {

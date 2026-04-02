@@ -1,15 +1,21 @@
 import { COMPANY_INFO } from "@app/companyConfig";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Menu } from "lucide-react";
 
-export default function Header({carrinhoAberto, setCarrinhoAberto}) {
+export default function Header({carrinhoAberto, setCarrinhoAberto, setMenuAberto}) {
     return (
         <header 
             className="d-flex justify-content-center align-items-center p-3 shadow-sm position-relative"
             style={{ backgroundColor: "rgba(147, 51, 179, 1)" }}
         >
             {
-                carrinhoAberto && (
-                    <button className="btn-roxo position-absolute start-3 p-2 rounded" onClick={() => setCarrinhoAberto(false)}><ChevronLeft size={20} /></button>
+                carrinhoAberto ? (
+                    <button className="btn-roxo position-absolute start-3 p-2 rounded" onClick={() => setCarrinhoAberto(false)} title="Voltar ao Catálogo">
+                        <ChevronLeft size={20} />
+                    </button>
+                ) : (
+                    <button className="btn-roxo position-absolute start-3 p-2 rounded d-lg-none" onClick={() => setMenuAberto()} title="Menu de Categorias">
+                        <Menu size={20} />
+                    </button>
                 )
             }
             <img 
@@ -19,4 +25,4 @@ export default function Header({carrinhoAberto, setCarrinhoAberto}) {
             />
         </header>
     );
-} 
+}
