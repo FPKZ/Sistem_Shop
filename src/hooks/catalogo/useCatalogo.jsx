@@ -3,11 +3,13 @@ import { useEffect, useState } from "react"
 
 export default function useCatalogo(){
     const [produtos, setProdutos] = useState([])
+    const [produtoSelecionado, setProdutoSelecionado] = useState(null)
+    const [telaProduto, setTelaProduto] = useState(false)
     const [carrinho, setCarrinho] = useState({}) // { idProduto: quantidade }
     const [carrinhoAberto, setCarrinhoAberto] = useState(false)
     const [menu, setMenu] = useState(false)
     const [obs, setObs] = useState("")
-    
+    console.log(carrinho)
     useEffect(() => {
         async function getProdutos(){
             const dados = await API.getProduto([])
@@ -65,6 +67,26 @@ export default function useCatalogo(){
         }
     }
 
+    const handleBadge = (id) => {
+        if(carrinho[id] > 0){
+            return (
+                <div 
+                    key={id}
+                    className="
+                        position-absolute top-2 end-2 
+                        bg-[#f333f3] 
+                        rounded-circle shadow-sm
+                        d-flex align-items-center justify-content-center
+                        text-white
+                    " 
+                    style={{ width: "1.7rem", height: "1.7rem", fontSize: "0.9rem" }}
+                >
+                    {carrinho[id]}
+                </div>
+            )
+        }
+    }
+
     // Calcula o valor total do carrinho
     const valorTotal = Object.entries(carrinho).reduce((acc, [id, quantidade]) => {
         const produto = produtos.find(p => p.id === Number(id));
@@ -73,8 +95,13 @@ export default function useCatalogo(){
 
     return {
         produtos,
+        produtoSelecionado,
+        setProdutoSelecionado,
+        telaProduto,
+        setTelaProduto,
         carrinho,
         handleChangeQuantity,
+        handleBadge,
         totalItens,
         carrinhoAberto,
         setCarrinhoAberto,

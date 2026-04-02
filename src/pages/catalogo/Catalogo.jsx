@@ -2,6 +2,7 @@ import Header from "./include/Header";
 import FooterCatalogo from "./include/Footer";
 import Produtos from "./include/produtos";
 import Carrinho from "./include/Carrinho";
+import Produto from "./include/Produto";
 import Menu from "./include/Menu";
 
 //Hooks
@@ -11,8 +12,13 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 export default function Catalogo() {
   const {
     produtos,
+    produtoSelecionado,
+    setProdutoSelecionado,
+    telaProduto,
+    setTelaProduto,
     carrinho,
     handleChangeQuantity,
+    handleBadge,
     totalItens,
     valorTotal,
     obs,
@@ -41,14 +47,21 @@ export default function Catalogo() {
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
-        setCarrinhoAberto={setCarrinhoAberto}
+        telaProduto={telaProduto}
+        voltar={() => {
+            if(carrinhoAberto){
+                setCarrinhoAberto(false);
+            }else if(telaProduto){
+                setTelaProduto(false);
+            }
+        }}
         setMenuAberto={() => setMenu(true)}
       />
 
       <div className="d-lg-flex flex-grow-1">
         {/* Sidebar Desktop - Abaixo do Header */}
         {
-            !carrinhoAberto && (
+            !carrinhoAberto && !telaProduto && (
                 <aside
                 className="d-none d-lg-block border-end bg-white shadow-sm"
                 style={{
@@ -91,6 +104,8 @@ export default function Catalogo() {
                 obs={obs}
                 setObs={setObs}
               />
+            ) : telaProduto ? (
+              <Produto produto={produtoSelecionado} handleChangeQuantity={handleChangeQuantity} carrinho={carrinho} />
             ) : (
               <Produtos
                 produtos={dadosProcessados}
@@ -98,7 +113,10 @@ export default function Catalogo() {
                 setFiltro={setFiltro}
                 filtro={filtro}
                 carrinho={carrinho}
+                handleBadge={handleBadge}
                 handleChangeQuantity={handleChangeQuantity}
+                setProdutoSelecionado={setProdutoSelecionado}
+                setTelaProduto={setTelaProduto}
               />
             )}
           </main>
