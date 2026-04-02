@@ -3,11 +3,11 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 export default async function categoriaRoutes(fastify) {
 
-  fastify.get("/categorias", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.get("/categorias", async (request, reply) => {
     const categorias = await Categoria.findAll({
-      include: [{ model: Produto, as: "produtos" }],
+      attributes: ["id", "nome", "descricao"],
     });
-    return reply.code(200).send(categorias);
+    return reply.ok({ data: categorias });
   });
 
   fastify.post("/categoria", { preHandler: authMiddleware }, async (request, reply) => {

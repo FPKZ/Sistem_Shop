@@ -132,7 +132,7 @@ export function useCadastroProduto(onSuccess) {
 
   const GetCategorias = async () => {
     const categorias = await API.getCategoria();
-    setCategorias(categorias);
+    setCategorias(categorias.data);
   };
   const GetNotas = async () => {
     const notas = await API.getNotas();
