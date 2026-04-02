@@ -124,7 +124,7 @@
 
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 0.5rem;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -134,6 +134,10 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #6f42c144;
   border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6f42c1;
 }
 
 
