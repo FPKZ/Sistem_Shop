@@ -14,7 +14,9 @@ import {
   contaRoutes,
   dashboardRoutes,
   catalogoRoutes,
+  coresRoutes,
 } from "./routes/routers.js";
+import tableCores from "./database/interface/tableCores.js";
 
 const server = fastify({ logger: true, trustProxy: true });
 
@@ -98,6 +100,7 @@ server.register(notaVendaRoutes);
 server.register(contaRoutes);
 server.register(dashboardRoutes);
 server.register(catalogoRoutes);
+server.register(coresRoutes);
 
 // ──────────────────────────────────────────────
 // Inicialização
@@ -107,6 +110,10 @@ async function start() {
     await sequelize.sync({ alter: true });
     server.log.info("Conectado ao banco de dados com sucesso!");
     await server.listen({ port: env.PORT, host: "0.0.0.0" });
+
+    const seedCores = new tableCores();
+    await seedCores.seedCoresIniciais();
+
   } catch (err) {
     server.log.error("Erro ao iniciar o servidor:", err);
     process.exit(1);
