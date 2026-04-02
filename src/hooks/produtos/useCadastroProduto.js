@@ -9,10 +9,13 @@ export function useCadastroProduto(onSuccess) {
   const [nota, setNota] = useState({});
   const [notas, setNotas] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [cores, setCores] = useState([]);
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
+  const [modalCores, setModalCores] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
+
 
   // Configuração do useForm para os campos básicos do produto
   const {
@@ -124,7 +127,8 @@ export function useCadastroProduto(onSuccess) {
   useEffect(() => {
     GetNotas();
     GetCategorias();
-  }, [modalCadastroCategoria, modalCadastroNota]);
+    GetCores();
+  }, [modalCadastroCategoria, modalCadastroNota, modalCores]);
 
   const GetCategorias = async () => {
     const categorias = await API.getCategoria();
@@ -135,9 +139,16 @@ export function useCadastroProduto(onSuccess) {
     setNotas(notas);
   };
 
+  const GetCores = async () => {
+    const cores = await API.getCores();
+    setCores(cores.data);
+  };
+
   return {
     categoria,
     setCategoria,
+    cores,
+    setCores,
     nota,
     setNota,
     notas,

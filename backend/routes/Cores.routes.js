@@ -5,9 +5,17 @@ export default async function CoresRoutes(fastify, options) {
         try {
             const query = request.query;
 
+            if(query.id && (query.name || query.hex) || query.name && (query.id || query.hex) || query.hex && (query.id || query.name)) {
+                return reply.err("Escolha apenas um parametro para buscar");
+            }
+
             const cores = await getColors(query);
             if (!cores) return reply.err("Nenhuma cor encontrada");
-            return reply.ok(cores);
+            
+            // Usamos `.send()` nativo para devolver a Array crua
+            // pois o seu decorador `reply.ok()` transforma arrays em Objetos (Ex: { "0": {...}, "1": {...} })
+            // return reply.send(cores);
+            return reply.ok({data : cores})
         } catch (error) {
             console.error("Erro ao buscar cores:", error);
             reply.err(error);

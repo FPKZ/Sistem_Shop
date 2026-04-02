@@ -67,6 +67,15 @@ export async function getCategoria() {
     console.error("Erro ao buscar categorias", error);
   }
 }
+export async function getCores({ id = "", hex = "", name = "" }: any = {}) {
+  try {
+    console.log("entrou")
+    return await api.get(`/cores?id=${id}&hex=${hex}&name=${name}`);
+    
+  } catch (error) {
+    console.error("Erro ao buscar cores", error);
+  }
+}
 
 export async function postCategoria(data: any) {
   try {
