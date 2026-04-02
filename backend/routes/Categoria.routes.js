@@ -6,6 +6,7 @@ export default async function categoriaRoutes(fastify) {
   fastify.get("/categorias", async (request, reply) => {
     const categorias = await Categoria.findAll({
       attributes: ["id", "nome", "descricao"],
+      order: [["nome", "ASC"]],
     });
     return reply.ok({ data: categorias });
   });
