@@ -19,7 +19,7 @@ export default function Carrinho({produtos,carrinho,alterarQuantidade, valorTota
                         if (!produto) return null;
                         
                         return (
-                            <div className="card shadow-sm border-0 flex-row align-items-stretch p-0 overflow-hidden" key={item.id}>
+                            <div className="card shadow-sm border-0 flex-row align-items-stretch p-0 overflow-hidden" key={`${item.id}-${item.cor}-${item.tamanho}`}>
                                 <div style={{ width: "6rem", minHeight: "6rem", flexShrink: 0, backgroundColor: "#fff", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
                                     <img 
                                         src={produto.img || produto.imagem || "assets/tube-spinner.svg"} 
