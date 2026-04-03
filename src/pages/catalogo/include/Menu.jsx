@@ -39,8 +39,7 @@ export default function Menu({ categorias, setFiltro, filtro, isOpen, onClose, i
                     </button>
 
                     {categorias?.map((categoria) => {
-                        const isActive = filtro.categoria === categoria;
-
+                        const isActive = filtro.categoria === categoria.nome;
                         return (
                             <button 
                                 key={categoria.id}
