@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import API from "@app/api";
 import { jwtDecode } from "jwt-decode";
 
@@ -9,38 +9,41 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(null);
 
+    const logout = useCallback(() => {
+        localStorage.removeItem("authToken");
+        setUser(null);
+        setToken(null);
+    }, []);
 
-    const verificLogin = React.useCallback(async () => {
+    const verificLogin = useCallback(async () => {
         const storedToken = localStorage.getItem("authToken");
         if (storedToken) {
-            try{
+            try {
                 const decoded = jwtDecode(storedToken);
-                if(decoded.exp * 1000 > Date.now()) {
-                    setUser( decoded );
+                if (decoded.exp * 1000 > Date.now()) {
+                    setUser(decoded);
                     setToken(storedToken);
-                } else{
-                    localStorage.removeItem("authToken");
+                } else {
+                    logout();
                 }
             } catch (error) {
                 console.error("Token inválido:", error);
-                localStorage.removeItem("authToken");
+                logout();
             }
+        } else {
+            setUser(null);
         }
-        else{
-            setUser(null)
-        }
-        // await initServer()
         setLoading(false);
-    }, []);
+    }, [logout]);
 
-    const login = React.useCallback(async (data) => {
+    const login = useCallback(async (data) => {
         try {
             const response = await API.login(data);
             if (response.ok && response.token) {
                 const { token, conta } = response;
                 localStorage.setItem("authToken", token);
                 const decoded = jwtDecode(token);
-                setUser({email: decoded.email, ...conta});
+                setUser({ email: decoded.email, ...conta });
                 setToken(token);
                 return { ok: true };
             } else {
@@ -48,31 +51,32 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            return { success: false, message: "An error occurred during login" };
+            return { ok: false, message: "Ocorreu um erro durante o login" };
         }
     }, []);
 
-    const logout = React.useCallback(() => {
-        localStorage.removeItem("authToken");
-        setUser(null);
-        setToken(null);
+    const isAutenticated = useCallback(() => !!user, [user]);
+
+    const initServer = useCallback(async () => {
+        setLoading(true);
+        await API.initServer();
+        setLoading(false);
     }, []);
 
-    const isAutenticated = React.useCallback(() => {
-        // console.log(user)
-        return !!user;
-    }, [user]);
-
-    const initServer = React.useCallback(async () => {
-        setLoading(true)
-        await API.initServer()
-        setLoading(false)
-        // console.log(response)
-    }, []);
-
+    // Inicializa o estado de autenticação
     useEffect(() => {
-        initServer()
-    }, [initServer]);
+        initServer().then(verificLogin);
+    }, [initServer, verificLogin]);
+
+    // Escuta o evento de 401 disparado pelo httpClient → faz logout automático
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            console.warn("[AuthContext] Token expirado ou inválido. Fazendo logout.");
+            logout();
+        };
+        window.addEventListener("auth:401", handleUnauthorized);
+        return () => window.removeEventListener("auth:401", handleUnauthorized);
+    }, [logout]);
 
     const authValue = React.useMemo(() => ({
         user,
@@ -82,7 +86,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         isAutenticated,
         verificLogin,
-        initServer
+        initServer,
     }), [user, token, loading, isAutenticated, login, logout, verificLogin, initServer]);
 
     return (
@@ -90,9 +94,7 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
-}
+};
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
-    return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);

@@ -1,138 +1,75 @@
 import {
   Produto,
-  Nota,
   Categoria,
+  Nota,
   ItemEstoque,
   Cliente,
-  ItemVendido,
   ItemReservado,
 } from "../database/models/index.js";
 import { Op } from "sequelize";
-import { put } from "@vercel/blob";
-import { randomUUID } from "crypto";
-import { Buffer } from "buffer";
-import "dotenv/config";
-//const pump = util.promisify(pipeline)
+import { cadastrarProduto, toBuffer } from "../services/produto.service.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+
+const INCLUDE_PRODUTO_COM_CATEGORIA = [
+  { model: Categoria, as: "categoria" },
+];
+
+const INCLUDE_ITEM_ESTOQUE_COMPLETO = [
+  { model: Categoria, as: "categoria" },
+  { model: ItemEstoque, as: "itemEstoque", include: [{ model: Nota, as: "nota" }] },
+];
+
+const INCLUDE_ITEM_COM_PRODUTO = [
+  { model: Nota, as: "nota" },
+  { model: Produto, as: "produto", include: [{ model: Categoria, as: "categoria" }] },
+];
 
 export default async function produtoRoutes(fastify) {
-  fastify.get("/produtos", async (request, reply) => {
-    const query = request.query;
-    //console.log(query)
 
-    if (query.itens === "all") {
-      console.log("all");
-      const produtos = await ItemEstoque.findAll({
-        include: [
-          { model: Nota, as: "nota" },
-          {
-            model: Produto,
-            as: "produto",
-            include: [{ model: Categoria, as: "categoria" }],
-          },
-        ],
-      });
+  // --- Leitura ---
+  fastify.get("/produtos", { preHandler: authMiddleware }, async (request, reply) => {
+    const { itens, nome } = request.query;
 
-      return reply.code(200).send(produtos);
-    } else if (query.itens === "vendidos") {
-      console.log("vendidos");
-      const produtos = await ItemEstoque.findAll({
-        where: { status: "Vendido" },
-        include: [
-          { model: Nota, as: "nota" },
-          {
-            model: Produto,
-            as: "produto",
-            include: [{ model: Categoria, as: "categoria" }],
-          },
-        ],
-      });
-      // console.log(produtos)
-      return reply.code(200).send(produtos);
-    } else if (query.itens === "estoque") {
-      console.log("estoque");
-      // const produtos = await ItemEstoque.findAll({
-      //   where: {status: "Disponivel"},
-      //   include: [
-      //     {model: Nota, as: "nota"},
-      //     {model: Produto, as: "produto",
-      //       include: [
-      //         {model: Categoria, as: "categoria"}
-      //       ]
-      //     }
-      //   ]
-      // })
-      const produtos = await Produto.findAll({
-        include: [
-          { model: Categoria, as: "categoria" },
-          {
-            model: ItemEstoque,
-            as: "itemEstoque",
-            where: { status: "Disponivel" },
-            include: [{ model: Nota, as: "nota" }],
-          },
-        ],
-      });
-      // console.log(produtos)
-      return reply.code(200).send(produtos);
-    } else if (query.itens === "reservado") {
-      console.log("reservado");
-      const produtos = await ItemEstoque.findAll({
-        where: { status: "Reservado" },
-        include: [
-          { model: Nota, as: "nota" },
-          {
-            model: Produto,
-            as: "produto",
-            include: [{ model: Categoria, as: "categoria" }],
-          },
-        ],
-      });
-      // console.log(produtos)
-      return reply.code(200).send(produtos);
-    } else if (query.nome && query.nome !== " ") {
-      console.log(query.nome);
-      const produtos = await Produto.findAll({
-        where: { nome: { [Op.like]: "%" + query.nome + "%" } },
-        include: [
-          { model: Categoria, as: "categoria" },
-          {
-            model: ItemEstoque,
-            as: "itemEstoque",
-            include: [{ model: Nota, as: "nota" }],
-          },
-        ],
-      });
-
+    if (itens === "all") {
+      const produtos = await ItemEstoque.findAll({ include: INCLUDE_ITEM_COM_PRODUTO });
       return reply.code(200).send(produtos);
     }
 
-    const produtos = await Produto.findAll({
-      include: [
-        { model: Categoria, as: "categoria" },
-        {
-          model: ItemEstoque,
-          as: "itemEstoque",
-          include: [{ model: Nota, as: "nota" }],
-        },
-      ],
-    });
+    if (itens === "vendidos") {
+      const produtos = await ItemEstoque.findAll({ where: { status: "Vendido" }, include: INCLUDE_ITEM_COM_PRODUTO });
+      return reply.code(200).send(produtos);
+    }
 
-    return reply.send(produtos);
+    if (itens === "estoque") {
+      const produtos = await Produto.findAll({
+        include: [
+          ...INCLUDE_PRODUTO_COM_CATEGORIA,
+          { model: ItemEstoque, as: "itemEstoque", where: { status: "Disponivel" }, include: [{ model: Nota, as: "nota" }] },
+        ],
+      });
+      return reply.code(200).send(produtos);
+    }
+
+    if (itens === "reservado") {
+      const produtos = await ItemEstoque.findAll({ where: { status: "Reservado" }, include: INCLUDE_ITEM_COM_PRODUTO });
+      return reply.code(200).send(produtos);
+    }
+
+    const where = nome && nome !== " " ? { nome: { [Op.like]: `%${nome}%` } } : {};
+    const produtos = await Produto.findAll({ where, include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
+    return reply.code(200).send(produtos);
   });
 
-  fastify.post("/produto", async (request, reply) => {
+  // --- Criação ---
+  fastify.post("/produto", { preHandler: authMiddleware }, async (request, reply) => {
     let body = {};
     let imgFile = null;
-
-    console.log(request.body);
 
     if (request.isMultipart()) {
       const data = await request.parts();
       for await (const part of data) {
         if (part.type === "file") {
-          const buffer = await toBuffer(part.file);
-          imgFile = { buffer: buffer, filename: part.filename };
-          console.log(`Arquivo processado: ${part.filename}`);
+          imgFile = { buffer: await toBuffer(part.file), filename: part.filename };
         } else {
           body[part.fieldname] = part.value;
         }
@@ -141,157 +78,73 @@ export default async function produtoRoutes(fastify) {
       body = request.body;
     }
 
-    // Normaliza itens: pode vir como string (multipart) ou como objeto (JSON)
-    if (body.itens && typeof body.itens === "string") {
-      body.itens = JSON.parse(body.itens);
-    }
+    if (body.itens && typeof body.itens === "string") body.itens = JSON.parse(body.itens);
+    if (!body.nome) return reply.err('O campo "nome" é obrigatório');
 
-    if (!body.nome) {
-      return reply.err('O campo "nome" é obrigatório');
-    }
-
-    const result = await CadastroProduto(body, imgFile);
-
+    const result = await cadastrarProduto(body, imgFile);
     return reply.code(201).ok(result, "Estoque atualizado com sucesso!");
   });
 
-  fastify.put("/produto/reservar/:id", async (request, reply) => {
-    const produtoId = request.params.id;
-    const clienteId = request.query.cliente_id;
-    const cliente = await Cliente.findByPk(clienteId);
-    const produto = await ItemEstoque.findByPk(produtoId);
+  // --- Reserva / Remoção ---
+  fastify.put("/produto/reservar/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const { id } = request.params;
+    const { cliente_id } = request.query;
+
+    const [produto, cliente] = await Promise.all([
+      ItemEstoque.findByPk(id),
+      Cliente.findByPk(cliente_id),
+    ]);
 
     if (!produto) return reply.err("Produto não encontrado", 404);
     if (!cliente) return reply.err("Cliente não encontrado", 404);
 
-    await ItemReservado.create({
-      cliente_id: clienteId,
-      itemEstoque_id: produtoId,
-      data: new Date(),
-    });
-
+    await ItemReservado.create({ cliente_id, itemEstoque_id: id, data: new Date() });
     await produto.update({ status: "Reservado" });
-
     return reply.ok({ produto }, "Produto reservado com sucesso");
   });
 
-  fastify.put("/produto/remover/:id", async (request, reply) => {
-    const itemId = request.params.id;
-    const data = request.body;
-
-    const item = await ItemEstoque.findByPk(itemId);
-    const itemReservado = await ItemReservado.findOne({
-      where: { itemEstoque_id: itemId },
-    });
+  fastify.put("/produto/remover/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const { id } = request.params;
+    const [item, itemReservado] = await Promise.all([
+      ItemEstoque.findByPk(id),
+      ItemReservado.findOne({ where: { itemEstoque_id: id } }),
+    ]);
 
     if (!item) return reply.err("Item não encontrado", 404);
     if (!itemReservado) return reply.err("Item reservado não encontrado", 404);
 
     await itemReservado.destroy();
-    await item.update(data);
-
+    await item.update(request.body);
     return reply.ok({ item }, "Item atualizado com sucesso");
   });
 
-  fastify.put("/produto/item/:id", async (request, reply) => {
-    const itemId = request.params.id;
-    const data = request.body;
-
-    const item = await ItemEstoque.findByPk(itemId);
+  // --- Atualização ---
+  fastify.put("/produto/item/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
-
-    await item.update(data);
+    await item.update(request.body);
     return reply.ok({ item }, "Item atualizado com sucesso");
   });
 
-  fastify.put("/produto/:id", async (request, reply) => {
-    const produtoId = request.params.id;
-    const data = request.body;
-
-    const produto = await Produto.findByPk(produtoId);
+  fastify.put("/produto/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const produto = await Produto.findByPk(request.params.id);
     if (!produto) return reply.err("Produto não encontrado", 404);
-
-    await produto.update(data);
+    await produto.update(request.body);
     return reply.ok({ produto }, "Produto atualizado com sucesso");
   });
 
-  fastify.delete("/produto/:id", async (request, reply) => {
-    const produtoId = request.params.id;
-
-    const produto = await Produto.findByPk(produtoId);
-
+  // --- Exclusão ---
+  fastify.delete("/produto/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const produto = await Produto.findByPk(request.params.id);
     if (!produto) return reply.err("Produto não encontrado", 404);
-
     await produto.destroy();
-    return reply.status(204).ok({}, "Produto deletado com sucesso");
+    return reply.code(204).send();
   });
 
-  fastify.delete("/produto/item/:id", async (request, reply) => {
-    const itemId = request.params.id;
-
-    const item = await ItemEstoque.findByPk(itemId);
+  fastify.delete("/produto/item/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
-
     await item.destroy();
-    return reply.status(204).ok({}, "Item deletado com sucesso");
+    return reply.code(204).send();
   });
-}
-
-export async function CadastroProduto(produtoData, imgFile) {
-  let imgPath = null;
-  if (imgFile && imgFile.buffer) {
-    const nomeUnico = `${randomUUID()}-${imgFile.filename}`;
-    const blob = await put(nomeUnico, imgFile.buffer, {
-      access: "public",
-    });
-    imgPath = blob.url; // Salvamos a URL completa retornada pelo Vercel Blob
-  }
-
-  const { nome, descricao, categoria_id, itens } = produtoData;
-
-  if (!nome) {
-    throw new Error('O campo "nome" é obrigatório no CadastroProduto');
-  }
-
-  let produto = await Produto.findOne({ where: { nome: nome } });
-
-  if (!produto) {
-    produto = await Produto.create({
-      nome,
-      descricao,
-      categoria_id,
-      itens,
-      img: imgPath,
-    });
-  }
-
-  let itensCriados = [];
-  if (itens && itens.length > 0) {
-    const novosItens = itens.map((item) => ({
-      nome,
-      nota_id: item.nota_id,
-      tamanho: item.tamanho,
-      cor: item.cor,
-      marca: item.marca,
-      codigo_barras: item.codigo_barras,
-      valor_compra: item.valor_compra,
-      valor_venda: item.valor_venda,
-      lucro: item.lucro,
-      produto_id: produto.id,
-      status: "Disponivel",
-    }));
-    itensCriados = await ItemEstoque.bulkCreate(novosItens, {
-      returning: true,
-    });
-  }
-
-  return { produto, itensEstoque: itensCriados };
-}
-
-export async function toBuffer(stream) {
-  const chunks = [];
-  for await (const chunk of stream) {
-    chunks.push(chunk);
-  }
-  return Buffer.concat(chunks);
 }

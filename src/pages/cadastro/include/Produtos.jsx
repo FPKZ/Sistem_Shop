@@ -8,6 +8,8 @@ export default function Produtos() {
   const {
     categoria,
     setCategoria,
+    cores,
+    setCores,
     nota,
     setNota,
     notas,
@@ -66,14 +68,53 @@ export default function Produtos() {
 
           <Col xs={2} md={1} className="d-flex flex-column align-items-center">
             <Form.Label htmlFor="corProduto">Cor</Form.Label>
-            <Form.Control
+            {/* <Form.Control
               className="form-control-color"
               name="cor"
               id="corProduto"
               type="color"
               value={formValue.cor}
               onChange={handleChange}
-            />
+            /> */}
+            <Dropdown >
+              <Dropdown.Toggle
+                variant="none"
+                className={`dropdown-toggle-none w-100 d-flex justify-content-center align-items-center border-0 p-0 ${
+                  validated ? (erros.cor ? "is-invalid" : "is-valid") : ""
+                }`}
+              >
+                <div className="d-flex flex-column align-items-center gap-1">
+                  <div 
+                    style={{
+                      backgroundColor: formValue.cor || 'transparent', 
+                      width: '2.3rem',
+                      height: '2.3rem',
+                      borderRadius: '50%',
+                      // border: '1px solid #aaaaaa',
+                      boxShadow: '0 0 0 1px #666666'
+                    }} 
+                  />
+                  {/* <span className="fw-normal text-[0.7rem]">
+                    {cores.find(c => c.hex === formValue.cor)?.name || "Selecione a Cor"}
+                  </span> */}
+                </div>
+              </Dropdown.Toggle>
+              <Form.Control
+                id="corProduto"
+                type="hidden"
+                name="cor"
+                value={formValue.cor || ""}
+                required
+              />
+              <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
+                <Cores cores={cores} formValue={formValue} handleChange={handleChange} />
+                <Dropdown.Divider className="m-0" />
+                {/* Nota: lembre-se de importar o setModalCores no topo do seu arquivo do hook */}
+                {/* <Dropdown.Item onClick={() => { if(typeof setModalCores !== 'undefined') setModalCores(true) }} className="text-center py-2 fw-bold text-primary">
+                  + Nova Cor
+                </Dropdown.Item> */}
+              </Dropdown.Menu>
+            </Dropdown>
           </Col>
 
           <Col xs={12} md={3}>
@@ -344,5 +385,47 @@ function Categoria({ categorias, setCategoria }) {
         </Dropdown.Item>
       ))}
     </>
+  );
+}
+
+
+function Cores({ cores, formValue, handleChange }) {
+  return (
+    <div className="d-flex flex-wrap gap-1 p-2 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
+      {cores.map((cor) => (
+        <Dropdown.Item
+          as="div"
+          key={cor.id} 
+          onClick={() => handleChange({ target: { name: 'cor', value: cor.hex } })}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            padding: '5px',
+            border: formValue.cor === cor.hex ? '2px solid #0d6efd' : '1px solid #eaeaea',
+            borderRadius: '5px',
+            width: '70px',
+            whiteSpace: 'normal',
+            transition: 'background-color 0.2s ease',
+          }}
+        >
+          {/* Círculo que mostra a cor dinamicamente */}
+          <div 
+            style={{
+              backgroundColor: cor.hex, // Aqui usamos a propriedade Hex
+              width: '30px',
+              height: '30px',
+              borderRadius: '50%', // Deixa redondo
+              marginBottom: '5px',
+              border: cor.hex === '#FFFFFF' ? '1px solid #ccc' : 'none' // Borda apenas no branco
+            }} 
+          />
+          <span style={{ fontSize: '10px', fontWeight: 'bold', textAlign: 'center', lineHeight: '1.1' }}>
+            {cor.name}
+          </span>
+        </Dropdown.Item>
+      ))}
+    </div>
   );
 }

@@ -5,6 +5,27 @@ import { useState } from "react";
  * @param {Object} initialState - Valor inicial do formulário.
  * @param {Object} config - Configurações de transformers (máscaras) e validators.
  * @returns {Object} utilitários de formulário.
+ * 
+ * @example
+ * const { formValue, erros, handleChange, validate, resetForm } = useForm(
+ *   { nome: "", email: "" },
+ *   {
+ *     transformers: {
+ *       nome: (val) => val.toUpperCase() // Exemplo: Tira máscara ou formata as letras
+ *     },
+ *     validators: {
+ *       nome: (val) => val.length < 3 ? "O nome deve ter no mínimo 3 letras" : null,
+ *       email: (val) => !val.includes("@") ? "E-mail inválido" : null
+ *     }
+ *   }
+ * );
+ * 
+ * const handleSubmit = (e) => {
+ *   e.preventDefault();
+ *   if (validate()) {
+ *     console.log("Validação passou! Enviando:", formValue);
+ *   }
+ * };
  */
 export function useForm(initialState = {}, config = {}) {
   const [formValue, setFormValue] = useState(initialState);
@@ -14,12 +35,12 @@ export function useForm(initialState = {}, config = {}) {
   const { transformers = {}, validators = {} } = config;
 
   /**
-   * Manipulador universal de mudanças em campos de formulário.
-   * @param {Event} e - Evento de mudança do input.
+   * Define o valor de um campo remotamente sem acionar evento via DOM.
+   * @param {string} name - O nome do campo do state.
+   * @param {any} rawValue - O valor do campo a ser processado.
    */
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    let newValue = type === "file" ? files[0] : value;
+  const setFieldValue = (name, rawValue) => {
+    let newValue = rawValue;
 
     // Aplica transformações (como máscaras) se existirem para o campo
     if (transformers[name]) {
@@ -42,6 +63,23 @@ export function useForm(initialState = {}, config = {}) {
         return newErrs;
       });
     }
+  };
+
+  /**
+   * Manipulador universal de mudanças em campos de formulário.
+   * Você pode passar o Evento HTML nativo ou passar o nome do campo como string: handleChange("nome", "meu Valor")
+   * @param {Event|string} e - Evento de mudança do input ou string do nome do campo.
+   * @param {any} [manualValue] - O valor a ser setado caso o primeiro seja string.
+   */
+  const handleChange = (e, manualValue) => {
+    if (typeof e === "string") {
+      return setFieldValue(e, manualValue);
+    }
+
+    const { name, value, type, files } = e.target;
+    const newValue = type === "file" ? files[0] : value;
+    
+    setFieldValue(name, newValue);
   };
 
   /**

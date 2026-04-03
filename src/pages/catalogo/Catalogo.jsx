@@ -1,39 +1,171 @@
-import Header from "./include/Header"
-import FooterCatalogo from "./include/Footer"
-import useCatalogo from "../../hooks/catalogo/useCatalogo"
-import Produtos from "./include/produtos"
-import Carrinho from "./include/Carrinho"
+import { useRef } from "react";
+import Header from "./include/Header";
+import FooterCatalogo from "./include/Footer";
+import Produtos from "./include/produtos";
+import Carrinho from "./include/Carrinho";
+import Produto from "./include/Produto";
+import Menu from "./include/Menu";
 
-export default function Catalogo(){
-    const { produtos, carrinho, handleChangeQuantity, totalItens, pedir, carrinhoAberto, setCarrinhoAberto, valorTotal } = useCatalogo()
-    
-    return(
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f8f9fa" }}>
-            <Header carrinhoAberto={carrinhoAberto} setCarrinhoAberto={setCarrinhoAberto} />
-            {
-                carrinhoAberto ? (
-                    <Carrinho produtos={produtos} carrinho={carrinho} handleChangeQuantity={handleChangeQuantity} totalItens={totalItens} valorTotal={valorTotal} pedir={pedir} />
-                ) : (
-                    <Produtos produtos={produtos} carrinho={carrinho} handleChangeQuantity={handleChangeQuantity} />
-                )
-            }
+//Hooks
+import useCatalogo from "../../hooks/catalogo/useCatalogo";
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
+import { useHistoryBack } from "../../hooks/useHistoryBack";
 
-            {totalItens > 0 && (
-                <div 
-                    className="fixed-bottom d-flex justify-content-center pb-4" 
-                    style={{ zIndex: 1000, pointerEvents: "none" }}
+export default function Catalogo() {
+  const {
+    produtos,
+    categorias,
+    produtoSelecionado,
+    selecionarProduto,
+    telaProduto,
+    setTelaProduto,
+    carrinho,
+    formValue,
+    handleChange,
+    handleChangeQuantity,
+    handleBadge,
+    adicionarAoCarrinho,
+    removerItemDoCarrinho,
+    alterarQuantidade,
+    totalItens,
+    valorTotal,
+    obs,
+    setObs,
+    pedir,
+    carrinhoAberto,
+    setCarrinhoAberto,
+    menu,
+    setMenu,
+    getCor
+  } = useCatalogo();
+
+  const { dadosProcessados, filtro, setFiltro, ordenarPorChave } = useFiltroOrdenacao(produtos, [
+    "nome",
+    "categoria",
+    { path: "tags", subCampos: ["label"] },
+  ]);
+
+  const topRef = useRef(null);
+
+  // 1. Controle de Posição de Rolagem Inteligente
+  useScrollRestoration(carrinhoAberto || telaProduto, topRef);
+
+  // 2. Controle do Botão Voltar (Android / Navegador)
+  useHistoryBack([
+    { isOpen: carrinhoAberto, close: () => setCarrinhoAberto(false) },
+    { isOpen: telaProduto, close: () => setTelaProduto(false) },
+    { isOpen: menu, close: () => setMenu(false) }
+  ]);
+
+  return (
+    <div className="d-flex flex-column" ref={topRef}>
+      {/* Header fixo no topo ocupando toda a largura */}
+      <Header
+        carrinhoAberto={carrinhoAberto}
+        telaProduto={telaProduto}
+        voltar={() => window.history.back()}
+        setMenuAberto={() => setMenu(true)}
+      />
+
+      <div className="d-lg-flex flex-grow-1">
+        {/* Sidebar Desktop - Abaixo do Header */}
+        {
+            !carrinhoAberto && !telaProduto && (
+                <aside
+                className="d-none d-lg-block border-end bg-white shadow-sm"
+                style={{
+                    minWidth: "20%",
+                    position: "sticky",
+                    top: "0px", // O Menu agora começa do topo da área de conteúdo (abaixo do header)
+                    height: "fit-content",
+                    maxHeight: "100vh",
+                    overflowY: "auto",
+                    zIndex: 10
+                }}
                 >
-                    <button 
-                        className="btn btn-lg shadow fs-5 fw-bold d-flex align-items-center gap-2 text-white"
-                        style={{ backgroundColor: "#25D366", pointerEvents: "auto", borderRadius: "30px", padding: "12px 30px" }}
-                        onClick={pedir}
-                    >
-                        <span>{carrinhoAberto ? "Finalizar Pedido" : "Ver Carrinho"}</span>
-                        <span className="badge bg-white text-dark rounded-pill ms-2">{totalItens}</span>
-                    </button>
-                </div>
-            )}
-            <FooterCatalogo />
+                <Menu categorias={categorias} setFiltro={setFiltro} filtro={filtro} />
+                </aside>
+            )
+        }
+
+        {/* Menu Mobile (Offcanvas) */}
+        <div className="d-lg-none">
+          <Menu
+            categorias={categorias}
+            setFiltro={setFiltro}
+            filtro={filtro}
+            isOpen={menu}
+            onClose={() => setMenu(false)}
+            isMobile
+          />
         </div>
-    )
+
+        <div className="flex-grow-1 d-flex flex-column bg-light bg-opacity-10">
+          <main className="flex-grow-1 container-fluid py-4 pt-3">
+            {carrinhoAberto ? (
+              <Carrinho
+                produtos={produtos}
+                carrinho={carrinho}
+                removerItemDoCarrinho={removerItemDoCarrinho}
+                alterarQuantidade={alterarQuantidade}
+                totalItens={totalItens}
+                valorTotal={valorTotal}
+                pedir={pedir}
+                obs={obs}
+                setObs={setObs}
+                getCor={getCor}
+              />
+            ) : telaProduto ? (
+              <Produto 
+                produto={produtoSelecionado} 
+                handleChangeQuantity={handleChangeQuantity} 
+                formValue={formValue} 
+                handleChange={handleChange} 
+                adicionarAoCarrinho={adicionarAoCarrinho}
+              />
+            ) : (
+              <Produtos
+                produtos={dadosProcessados}
+                ordenarPorChave={ordenarPorChave}
+                setFiltro={setFiltro}
+                filtro={filtro}
+                handleBadge={handleBadge}
+                handleChangeQuantity={handleChangeQuantity}
+                selecionarProduto={selecionarProduto}
+                setTelaProduto={setTelaProduto}
+              />
+            )}
+          </main>
+
+          {totalItens > 0 && (
+            <div
+              className="fixed-bottom d-flex justify-content-center pb-4"
+              style={{ zIndex: 1000, pointerEvents: "none" }}
+            >
+              <button
+                className="btn btn-lg shadow fs-5 fw-bold d-flex align-items-center gap-2 text-white"
+                style={{
+                  backgroundColor: "#25D366",
+                  pointerEvents: "auto",
+                  borderRadius: "30px",
+                  padding: "12px 30px",
+                }}
+                onClick={pedir}
+              >
+                <span>
+                  {carrinhoAberto ? "Finalizar Pedido" : "Ver Carrinho"}
+                </span>
+                <span className="badge bg-white text-dark rounded-pill ms-2">
+                  {totalItens}
+                </span>
+              </button>
+            </div>
+          )}
+          <FooterCatalogo />
+        </div>
+      </div>
+    </div>
+  );
+
 }

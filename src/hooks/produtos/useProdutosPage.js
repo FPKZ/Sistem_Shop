@@ -12,6 +12,8 @@ export default function useProdutosPage() {
   const [modalAddProduto, setModalAddProduto] = useState(false);
   const [modalInfoProduto, setModalInfoProduto] = useState(false);
 
+  const { data: cores } = API.getCores();
+
   const { data: produtos } = API.getProdutos();
   const cadastrarMutation = API.useCadastrarProduto();
   const deletarItemMutation = API.useDeletarItem();
@@ -64,6 +66,7 @@ export default function useProdutosPage() {
     produtos: produtos || [],
     produto,
     setProduto,
+    cores: cores || [],
     modalAddProduto,
     setModalAddProduto,
     modalInfoProduto,

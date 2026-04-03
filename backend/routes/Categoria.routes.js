@@ -1,74 +1,36 @@
 import { Produto, Categoria } from "../database/models/index.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 export default async function categoriaRoutes(fastify) {
 
-    fastify.get("/categorias", async (request, reply) => {
-        try{
-            const categoria = await Categoria.findAll({
-            include: [
-                { model: Produto, as: "produtos"}
-            ]
-            })
-            reply.send(categoria)
-        } catch(err){
-            console.log(err)
-            reply.code(500).send({error: "Erro ao buscar Categorias"})
-        }
-    })
+  fastify.get("/categorias", async (request, reply) => {
+    const categorias = await Categoria.findAll({
+      attributes: ["id", "nome", "descricao"],
+      order: [["nome", "ASC"]],
+    });
+    return reply.ok({ data: categorias });
+  });
 
-    fastify.post("/categoria", async (request, reply) => {
-        try{
-            //const query = request.query.query
+  fastify.post("/categoria", { preHandler: authMiddleware }, async (request, reply) => {
+    const data = request.body;
+    const existente = await Categoria.findOne({ where: { nome: data.nome } });
+    if (existente) return reply.err("Categoria já existente!", 409);
 
-            
-            const data = request.body
-            console.log(data)
-            const categoria_existente = await Categoria.findOne({ where: { nome: data.nome }})
-            if(categoria_existente) return reply.send({ message: "Categoria já existente!", ok: false})
+    const novacategoria = await Categoria.create(data);
+    return reply.code(201).ok({ novacategoria }, "Categoria cadastrada com sucesso!");
+  });
 
-            const novacategoria = await Categoria.create(data)
+  fastify.put("/categoria/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const categoria = await Categoria.findByPk(request.params.id);
+    if (!categoria) return reply.err("Categoria não encontrada", 404);
+    await categoria.update(request.body);
+    return reply.ok({ categoria }, "Categoria atualizada com sucesso");
+  });
 
-            reply.code(201).send({message: "Categoria cadastrada com sucesso!", ok: true, novacategoria})
-        } catch(err){
-            console.log(err)
-            reply.code(500).send({error: "Erro ao cadastrar categoria"})
-        }
-    })
-
-    fastify.put("/categoria/:id", async (request, reply) => {
-        try{
-            const categoria_Id = request.params.id
-            const data = request.body
-
-            const categoria = await Categoria.findByPk(categoria_Id)
-
-            if (!categoria) {
-            return reply.status(404).send({ error: 'Categoria não encontrado' })
-            }
-
-            await categoria.update(data)
-
-            reply.send({ message: 'Categoria atualizado com sucesso', categoria })
-        } catch(err){
-            console.log(err)
-            reply.code(500).send({ error: 'Erro ao atualizar categoria' })
-        }
-    })
-    fastify.delete("/categoria/:id", async (request, reply) => {
-        try{
-            const categoria_Id = request.params.id
-
-            const categoria =await Categoria.findByPk(categoria_Id)
-
-            if(!categoria){
-            return reply.status(404).send({error : "Categoria não encontrada"})
-            }
-            await categoria.destroy()
-
-            reply.status(204).send({message: "Categoria deletada com sucesso"})
-        } catch(err){
-            console.log(err)
-            reply.code(500).send({error: "Erro ao deletar categoria"})
-        }
-    })
+  fastify.delete("/categoria/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    const categoria = await Categoria.findByPk(request.params.id);
+    if (!categoria) return reply.err("Categoria não encontrada", 404);
+    await categoria.destroy();
+    return reply.code(204).send();
+  });
 }
