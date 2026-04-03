@@ -1,6 +1,7 @@
 import API from "@app/api"
 import { useEffect, useState } from "react"
 import { useForm } from "../useForm"
+import { DropdownItemText } from "react-bootstrap"
 
 export default function useCatalogo(){
     const [produtos, setProdutos] = useState([])
@@ -34,10 +35,6 @@ export default function useCatalogo(){
     })
 
 
-    console.log({
-        "formValue": formValue,
-        "carrinho": carrinho
-    })
     useEffect(() => {
         async function getProdutos(){
             const dados = await API.getProduto([])
@@ -91,7 +88,6 @@ export default function useCatalogo(){
     
     const alterarQuantidade = (i, id, quantidade) => {
         const produto = produtos.find(item => item.id === id);
-        console.log(produto)
         setCarrinho((prev) => {
             const item = prev[i]
             if(item){
@@ -139,10 +135,11 @@ export default function useCatalogo(){
     }
 
     const handleBadge = (id) => {
-        if(carrinho[id] > 0){
+        const item = carrinho.map(item => item.id === id ? item.quantidade : undefined).filter(item => item !== undefined).reduce((acc, item) => acc + item, 0);
+        if(item > 0){
             return (
                 <div 
-                    key={id}
+                    key={`badge-${item}`}
                     className="
                         position-absolute top-2 end-2 
                         bg-[#f333f3] 
@@ -152,7 +149,7 @@ export default function useCatalogo(){
                     " 
                     style={{ width: "1.7rem", height: "1.7rem", fontSize: "0.9rem" }}
                 >
-                    {carrinho[id]}
+                    {item}
                 </div>
             )
         }
