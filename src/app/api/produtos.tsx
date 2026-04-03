@@ -5,7 +5,8 @@ import api from "@app/httpClient";
 // Funções de fetch (usando httpClient — rotas protegidas)
 async function getProduto({ item = "", nome = "" }: getProdutosProps) {
   try {
-    return await api.get(`/produtos?itens=${item}&nome=${nome}`);
+    const query = new URLSearchParams({ itens: item, nome }).toString();
+    return await api.get(`/produtos?${query}`);
   } catch (error) {
     console.error("Erro ao buscar produtos", error);
   }
@@ -69,9 +70,8 @@ export async function getCategoria() {
 }
 export async function getCores({ id = "", hex = "", name = "" }: any = {}) {
   try {
-    console.log("entrou")
-    return await api.get(`/cores?id=${id}&hex=${hex}&name=${name}`);
-    
+    const query = new URLSearchParams({ id, hex, name }).toString();
+    return await api.get(`/cores?${query}`);
   } catch (error) {
     console.error("Erro ao buscar cores", error);
   }

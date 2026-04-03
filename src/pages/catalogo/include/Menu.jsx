@@ -38,17 +38,17 @@ export default function Menu({ categorias, setFiltro, filtro, isOpen, onClose, i
                         {(!filtro.categoria || filtro.categoria === "") && <div style={{ width: "6px", height: "6px", backgroundColor: "#9333b3", borderRadius: "50%" }}></div>}
                     </button>
 
-                    {categorias.map((cat, idx) => {
-                        const isActive = filtro.categoria === cat;
+                    {categorias?.map((categoria) => {
+                        const isActive = filtro.categoria === categoria;
 
                         return (
                             <button 
-                                key={idx}
+                                key={categoria.id}
                                 className={`list-group-item list-group-item-action border-0 rounded-3 mb-1 py-3 px-4 d-flex align-items-center justify-content-between ${isActive ? "active bg-roxo-soft text-roxo fw-bold" : "text-muted"}`}
-                                onClick={() => handleSelectCategory(cat)}
+                                onClick={() => handleSelectCategory(categoria.nome)}
                                 style={isActive ? { backgroundColor: "#f3e5f5", color: "#9333b3" } : {}}
                             >
-                                <span className="text-capitalize">{cat}</span>
+                                <span className="text-capitalize">{categoria.nome}</span>
                                 {isActive && <div style={{ width: "6px", height: "6px", backgroundColor: "#9333b3", borderRadius: "50%" }}></div>}
                             </button>
                         );

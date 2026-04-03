@@ -12,13 +12,19 @@ import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 export default function Catalogo() {
   const {
     produtos,
+    categorias,
     produtoSelecionado,
-    setProdutoSelecionado,
+    selecionarProduto,
     telaProduto,
     setTelaProduto,
     carrinho,
+    formValue,
+    handleChange,
     handleChangeQuantity,
     handleBadge,
+    adicionarAoCarrinho,
+    removerItemDoCarrinho,
+    alterarQuantidade,
     totalItens,
     valorTotal,
     obs,
@@ -28,6 +34,7 @@ export default function Catalogo() {
     setCarrinhoAberto,
     menu,
     setMenu,
+    getCor
   } = useCatalogo();
 
   const { dadosProcessados, filtro, setFiltro, ordenarPorChave } = useFiltroOrdenacao(produtos, [
@@ -36,14 +43,10 @@ export default function Catalogo() {
     { path: "tags", subCampos: ["label"] },
   ]);
 
-  const categorias = [
-    ...new Set(produtos.map((p) => p.categoria).filter(Boolean)),
-  ].sort();
-
 //   console.log(dadosProcessados);
 
   return (
-    <div className="d-flex flex-column" style={{ minHeight: "100vh" }}>
+    <div className="d-flex flex-column" >
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
@@ -97,25 +100,32 @@ export default function Catalogo() {
               <Carrinho
                 produtos={produtos}
                 carrinho={carrinho}
-                handleChangeQuantity={handleChangeQuantity}
+                removerItemDoCarrinho={removerItemDoCarrinho}
+                alterarQuantidade={alterarQuantidade}
                 totalItens={totalItens}
                 valorTotal={valorTotal}
                 pedir={pedir}
                 obs={obs}
                 setObs={setObs}
+                getCor={getCor}
               />
             ) : telaProduto ? (
-              <Produto produto={produtoSelecionado} handleChangeQuantity={handleChangeQuantity} carrinho={carrinho} />
+              <Produto 
+                produto={produtoSelecionado} 
+                handleChangeQuantity={handleChangeQuantity} 
+                formValue={formValue} 
+                handleChange={handleChange} 
+                adicionarAoCarrinho={adicionarAoCarrinho}
+              />
             ) : (
               <Produtos
                 produtos={dadosProcessados}
                 ordenarPorChave={ordenarPorChave}
                 setFiltro={setFiltro}
                 filtro={filtro}
-                carrinho={carrinho}
                 handleBadge={handleBadge}
                 handleChangeQuantity={handleChangeQuantity}
-                setProdutoSelecionado={setProdutoSelecionado}
+                selecionarProduto={selecionarProduto}
                 setTelaProduto={setTelaProduto}
               />
             )}
