@@ -2,6 +2,8 @@ import { Produto, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize";
 import { isNullOrUndefined } from "../utils/helpers.js";
 import { env } from "../config/env.js";
+import { getColorsList } from "./cores.service.js";
+
 
 /**
  * Lista os produtos do catálogo público aplicando filtros opcionais.
@@ -30,14 +32,13 @@ export async function listarCatalogo(query = {}) {
       { model: ItemEstoque, as: "itemEstoque" },
     ],
   });
-
-  return produtos.map((produto) => ({
+  const data = await Promise.all(produtos.map(async (produto) => ({
     id:         produto.id,
     nome:       produto.nome,
     descricao:  produto.descricao,
     categoria:  produto.categoria.nome,
     img:        produto.img,
-    cores: [...new Set(produto.itemEstoque.map((item) => item.cor))].sort(),
+    cores: await getColorsList([...new Set(produto.itemEstoque.map((item) => item.cor))].sort()),
     preco: produto.itemEstoque.some((item) => item.status === "Disponivel")
       ? Math.max(
           ...produto.itemEstoque
@@ -47,7 +48,9 @@ export async function listarCatalogo(query = {}) {
       : 0,
     quantidade: produto.itemEstoque.length,
     tamanho: [...new Set(produto.itemEstoque.map((item) => item.tamanho))].filter((item) => item !== "").sort()
-  }));
+  })));
+
+  return data;
 }
 
 /**

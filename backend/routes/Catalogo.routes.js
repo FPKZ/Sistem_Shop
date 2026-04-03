@@ -1,5 +1,3 @@
-import { Produto } from "../database/models/index.js";
-import { Op } from "sequelize";
 import { listarCatalogo, gerarLinkPedido } from "../services/catalogo.service.js";
 
 // Rotas públicas — sem authMiddleware
