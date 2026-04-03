@@ -64,7 +64,7 @@ export async function gerarLinkPedido(pedido, total, produtos, observacao) {
   const linhasPedidoPromises = pedido.map(async (item) => {
     const produto = produtos.find((p) => p.id === item.id);
     const corName = await getColorName(item.cor);
-    return `*${item.quantidade}x - ${produto.nome}* Cor: ${corName} | Tamanho: ${item.tamanho} - R$ ${produto.preco.toFixed(2)} Uni. `;
+    return `*${item.quantidade}x - ${produto.nome}* Cor: ${corName || "Sem Cor"} | Tamanho: ${item.tamanho} - R$ ${produto.preco.toFixed(2)} Uni. `;
   });
 
   const linhasPedidoArray = await Promise.all(linhasPedidoPromises);
