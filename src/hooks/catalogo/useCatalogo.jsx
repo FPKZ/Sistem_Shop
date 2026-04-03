@@ -163,9 +163,7 @@ export default function useCatalogo(){
 
 
     const getCor = async (cor) => {
-        console.log(cor)
         const result = await API.getCores({hex: cor})
-        console.log(result.data)
         return result.data
     }
 
