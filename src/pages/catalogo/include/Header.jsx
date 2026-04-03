@@ -4,7 +4,7 @@ import { ChevronLeft, Menu } from "lucide-react";
 export default function Header({carrinhoAberto, telaProduto, voltar, setMenuAberto}) {
     return (
         <header 
-            className="d-flex justify-content-center align-items-center p-3 shadow-sm position-relative"
+            className="d-flex justify-content-center align-items-center p-3 py-0 shadow-sm position-relative"
             style={{ backgroundColor: "rgba(147, 51, 179, 1)" }}
         >
             {

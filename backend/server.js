@@ -17,6 +17,7 @@ import {
   coresRoutes,
 } from "./routes/routers.js";
 import tableCores from "./database/interface/tableCores.js";
+import { syncCacheToBlob } from "./services/cache.service.js";
 
 const server = fastify({ logger: true, trustProxy: true });
 
@@ -67,6 +68,13 @@ server.addHook("onRequest", async (request) => {
   server.log.info(`[REQUISICAO] ${request.method} ${request.url} - IP: ${request.ip}`);
 });
 
+server.addHook("onResponse", async (request, reply) => {
+  // Dispara a sincronização de cache em background se foi uma operação de escrita/modificação/remoção com sucesso
+  if (["POST", "PUT", "DELETE"].includes(request.method) && reply.statusCode >= 200 && reply.statusCode < 300) {
+    syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização pós-requisição:", err));
+  }
+});
+
 // ──────────────────────────────────────────────
 // Tratamento de Erros Global
 // ──────────────────────────────────────────────
@@ -113,6 +121,9 @@ async function start() {
 
     const seedCores = new tableCores();
     await seedCores.seedCoresIniciais();
+
+    // Sincroniza o cache estático no Vercel Blob para que esteja atualizado no primeiro boot
+    syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização na inicialização:", err));
 
   } catch (err) {
     server.log.error("Erro ao iniciar o servidor:", err);

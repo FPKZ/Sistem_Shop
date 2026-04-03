@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import Header from "./include/Header";
 import FooterCatalogo from "./include/Footer";
 import Produtos from "./include/produtos";
@@ -8,6 +9,8 @@ import Menu from "./include/Menu";
 //Hooks
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
+import { useHistoryBack } from "../../hooks/useHistoryBack";
 
 export default function Catalogo() {
   const {
@@ -43,21 +46,25 @@ export default function Catalogo() {
     { path: "tags", subCampos: ["label"] },
   ]);
 
-//   console.log(dadosProcessados);
+  const topRef = useRef(null);
+
+  // 1. Controle de Posição de Rolagem Inteligente
+  useScrollRestoration(carrinhoAberto || telaProduto, topRef);
+
+  // 2. Controle do Botão Voltar (Android / Navegador)
+  useHistoryBack([
+    { isOpen: carrinhoAberto, close: () => setCarrinhoAberto(false) },
+    { isOpen: telaProduto, close: () => setTelaProduto(false) },
+    { isOpen: menu, close: () => setMenu(false) }
+  ]);
 
   return (
-    <div className="d-flex flex-column" >
+    <div className="d-flex flex-column" ref={topRef}>
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
         telaProduto={telaProduto}
-        voltar={() => {
-            if(carrinhoAberto){
-                setCarrinhoAberto(false);
-            }else if(telaProduto){
-                setTelaProduto(false);
-            }
-        }}
+        voltar={() => window.history.back()}
         setMenuAberto={() => setMenu(true)}
       />
 

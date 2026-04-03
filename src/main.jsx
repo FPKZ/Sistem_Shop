@@ -27,16 +27,44 @@ import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
 import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      gcTime: 1000 * 60 * 60 * 24, // 24 horas - Tempo para manter os dados no LocalStorage
       staleTime: 60000, // 1 minuto
       refetchOnWindowFocus: false, // Evita picos de rede/processamento ao voltar para a aba
     },
   },
 });
+
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+});
+
+const blobUrl = import.meta.env.VITE_BLOB_CACHE_URL;
+
+function prefetchBlobCache() {
+  if (!blobUrl) return;
+  fetch(blobUrl, { cache: "no-store" }) // Impede cache velho do navegador no blob
+    .then(res => res.ok ? res.json() : null)
+    .then(cache => {
+      if (!cache) return;
+      if (cache.catalogo) queryClient.setQueryData(["catalogo"], cache.catalogo);
+      if (cache.categorias) queryClient.setQueryData(["categorias"], cache.categorias);
+      if (cache.notas) queryClient.setQueryData(["notas"], cache.notas);
+      if (cache.produtos) queryClient.setQueryData(["produtos"], cache.produtos);
+      if (cache.cores) queryClient.setQueryData(["cores"], cache.cores);
+      
+      console.log("[CACHE] TanStack Query hidratado via Vercel Blob");
+    })
+    .catch(e => console.error("[CACHE] Falha ao hidratar do Vercel Blob:", e));
+}
+
+prefetchBlobCache();
 
 const router = createBrowserRouter([
   {
@@ -85,9 +113,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
       <ToastProvider>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
           <RouterProvider router={router} />
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </ToastProvider>
     </AuthProvider>
   </StrictMode>,

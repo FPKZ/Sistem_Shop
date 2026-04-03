@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import API from "@app/api";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
@@ -7,9 +8,6 @@ import useCurrencyInput from "@hooks/useCurrencyInput";
 export function useCadastroProduto(onSuccess) {
   const [categoria, setCategoria] = useState({});
   const [nota, setNota] = useState({});
-  const [notas, setNotas] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [cores, setCores] = useState([]);
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
   const [modalCores, setModalCores] = useState(false);
@@ -124,25 +122,35 @@ export function useCadastroProduto(onSuccess) {
     }
   }
 
-  useEffect(() => {
-    GetNotas();
-    GetCategorias();
-    GetCores();
-  }, [modalCadastroCategoria, modalCadastroNota, modalCores]);
+  // Integração com TanStack Query para os dropdowns da tela de cadastro
+  const { data: categoriasData } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: async () => {
+      const res = await API.getCategoria();
+      return res?.data || [];
+    }
+  });
 
-  const GetCategorias = async () => {
-    const categorias = await API.getCategoria();
-    setCategorias(categorias.data);
-  };
-  const GetNotas = async () => {
-    const notas = await API.getNotas();
-    setNotas(notas);
-  };
+  const { data: notasData } = useQuery({
+    queryKey: ["notas"],
+    queryFn: async () => {
+      const res = await API.getNotas();
+      return res || [];
+    }
+  });
 
-  const GetCores = async () => {
-    const cores = await API.getCores();
-    setCores(cores.data);
-  };
+  const { data: coresData } = useQuery({
+    queryKey: ["cores"],
+    queryFn: async () => {
+      const res = await API.getCores();
+      return res?.data || [];
+    }
+  });
+
+  const categorias = categoriasData?.data || categoriasData || [];
+  const notas = notasData || [];
+  const cores = coresData?.data || coresData || [];
+
 
   return {
     categoria,
