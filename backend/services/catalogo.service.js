@@ -2,7 +2,7 @@ import { Produto, Categoria, ItemEstoque } from "../database/models/index.js";
 import { Op } from "sequelize";
 import { isNullOrUndefined } from "../utils/helpers.js";
 import { env } from "../config/env.js";
-import { getColorsList } from "./cores.service.js";
+import { getColorsList, getColorName } from "./cores.service.js";
 
 
 /**
@@ -60,13 +60,15 @@ export async function listarCatalogo(query = {}) {
  * @param {Array} produtos - Produtos carregados do banco
  * @returns {string} URL do WhatsApp
  */
-export function gerarLinkPedido(pedido, total, produtos, observacao) {
-  const linhasPedido = pedido
-    .map((item) => {
-      const produto = produtos.find((p) => p.id === item.id);
-      return `*${item.quantidade}x - ${produto.nome}* - R$ ${produto.preco.toFixed(2)} Uni. `;
-    })
-    .join("\n");
+export async function gerarLinkPedido(pedido, total, produtos, observacao) {
+  const linhasPedidoPromises = pedido.map(async (item) => {
+    const produto = produtos.find((p) => p.id === item.id);
+    const corName = await getColorName(item.cor);
+    return `*${item.quantidade}x - ${produto.nome}* Cor: ${corName} | Tamanho: ${item.tamanho} - R$ ${produto.preco.toFixed(2)} Uni. `;
+  });
+
+  const linhasPedidoArray = await Promise.all(linhasPedidoPromises);
+  const linhasPedido = linhasPedidoArray.join("\n");
 
   const mensagem = `Olá, gostaria de fazer um pedido:\n\n${linhasPedido}\n\nTotal: R$ ${total
     .toFixed(2)

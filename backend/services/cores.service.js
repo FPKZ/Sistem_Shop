@@ -30,6 +30,11 @@ export function getColorsList(data = []) {
     });
 }
 
+export async function getColorName(hex) {
+    const cor = await Cores.findOne({ where: { hex }, ...config, attributes: ["name"] });
+    return cor ? cor.name : hex;
+}
+
 export function createColor(color) {
     return Cores.create(color);
 }

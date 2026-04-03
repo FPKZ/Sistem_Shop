@@ -14,7 +14,7 @@ export default async function catalogoRoutes(fastify) {
 
     const produtos = await listarCatalogo(pedido);
 
-    const url = gerarLinkPedido(pedido, total, produtos, observacao);
+    const url = await gerarLinkPedido(pedido, total, produtos, observacao);
     return reply.ok({ url });
   });
 }
