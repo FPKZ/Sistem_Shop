@@ -35,6 +35,7 @@ export async function syncCacheToBlob(logger = console) {
     const blob = await put('app-cache.json', JSON.stringify(payload), {
       access: 'public',
       addRandomSuffix: false,
+      allowOverwrite: true,
       contentType: 'application/json'
     });
 
