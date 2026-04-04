@@ -1,12 +1,11 @@
 import API from "@app/api"
 import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { useForm } from "../useForm"
 import { DropdownItemText } from "react-bootstrap"
 
 export default function useCatalogo(){
-    const [produtos, setProdutos] = useState([])
     const [produtoSelecionado, setProdutoSelecionado] = useState(null)
-    const [categorias, setCategorias] = useState([])
 
     const [telaProduto, setTelaProduto] = useState(false)
 
@@ -35,18 +34,24 @@ export default function useCatalogo(){
     })
 
 
-    useEffect(() => {
-        async function getProdutos(){
-            const dados = await API.getProduto([])
-            setProdutos(dados.data)
+    const { data: produtosData } = useQuery({
+        queryKey: ["catalogo"],
+        queryFn: async () => {
+            const dados = await API.getProduto({ categoria: "", nome: "" });
+            return dados?.data || [];
         }
-        async function getCategorias(){
-            const dados = await API.getCategoria()
-            setCategorias(dados.data)
+    });
+
+    const { data: categoriasData } = useQuery({
+        queryKey: ["categorias"],
+        queryFn: async () => {
+            const dados = await API.getCategoria();
+            return dados?.data || [];
         }
-        getProdutos()
-        getCategorias()
-    }, [])
+    });
+
+    const produtos = produtosData?.data || produtosData || [];
+    const categorias = categoriasData?.data || categoriasData || [];
 
     useEffect(() => {
         if (Object.keys(carrinho).length === 0) {

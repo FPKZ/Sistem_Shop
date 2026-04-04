@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import API from "@app/api.js";
 import usePopStateModal from "@hooks/usePopStateModal";
 import { useToast } from "@contexts/ToastContext";
@@ -12,7 +13,14 @@ export default function useProdutosPage() {
   const [modalAddProduto, setModalAddProduto] = useState(false);
   const [modalInfoProduto, setModalInfoProduto] = useState(false);
 
-  const { data: cores } = API.getCores();
+  const { data: coresData } = useQuery({
+    queryKey: ["cores"],
+    queryFn: async () => {
+      const res = await API.getCores();
+      return res?.data || [];
+    }
+  });
+  const cores = coresData?.data || coresData || [];
 
   const { data: produtos } = API.getProdutos();
   const cadastrarMutation = API.useCadastrarProduto();
