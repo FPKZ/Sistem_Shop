@@ -1,23 +1,14 @@
 import API from "@app/api";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
+import utils from "@app/utils";
 
 export function useCadastroCliente(onSuccess, clienteParaEditar = null) {
   const { isLoading, handleRequest } = useRequestHandler();
 
   // Configuração de transformações (MÁSCARAS)
   const transformers = {
-    telefone: (value) => {
-      let digits = value.replace(/\D/g, "");
-      if (digits.length > 11) digits = digits.slice(0, 11);
-      if (digits.length === 0) return "";
-      if (digits.length <= 2) return `(${digits}`;
-      if (digits.length <= 6)
-        return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-      if (digits.length <= 10)
-        return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
-    },
+    telefone: utils.formatPhone,
     nome: (value) =>
       value.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()),
   };
