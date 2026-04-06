@@ -27,6 +27,7 @@ import Layout from "./components/layout/Layout.jsx";
 import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
 import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
+import ModalProvider from "./contexts/ModalContext.jsx";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
@@ -113,9 +114,11 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
       <ToastProvider>
-        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-          <RouterProvider router={router} />
-        </PersistQueryClientProvider>
+        <ModalProvider>
+          <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+            <RouterProvider router={router} />
+          </PersistQueryClientProvider>
+        </ModalProvider>
       </ToastProvider>
     </AuthProvider>
   </StrictMode>,
