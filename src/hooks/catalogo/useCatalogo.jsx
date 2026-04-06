@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useForm } from "../useForm"
 import { DropdownItemText } from "react-bootstrap"
+import useModalConfirm from "../useModalConfirm"
 
 export default function useCatalogo(){
     const [produtoSelecionado, setProdutoSelecionado] = useState(null)
@@ -14,6 +15,7 @@ export default function useCatalogo(){
 
     const [menu, setMenu] = useState(false)
     const [obs, setObs] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const { formValue, handleChange } = useForm({
         id: 0,
@@ -32,6 +34,8 @@ export default function useCatalogo(){
             quantidade: (val) => val <= 0 ? "Quantidade inválida" : null,
         }
     })
+
+    const { openModal } = useModalConfirm();
 
 
     const { data: produtosData } = useQuery({
@@ -87,8 +91,12 @@ export default function useCatalogo(){
         })
     }
 
-    const removerItemDoCarrinho = (id) => {
-        setCarrinho((prev) => prev.filter(item => item.id !== id));
+    const removerItemDoCarrinho = (i) => {
+        openModal("Remover Item", "Tem certeza que deseja remover este item do carrinho?", {
+            confirm: () => {
+                setCarrinho((prev) => prev.filter((_, index) => index !== i));
+            }
+        });
     }
     
     const alterarQuantidade = (i, id, quantidade) => {
@@ -96,7 +104,9 @@ export default function useCatalogo(){
         setCarrinho((prev) => {
             const item = prev[i]
             if(item){
-                if(item.quantidade + quantidade <= 0) return prev.filter((item, index) => index !== i);
+                // Se a quantidade for chegar a 0, não faz nada (a remoção deve ser via removerItemDoCarrinho)
+                if(item.quantidade + quantidade <= 0) return prev;
+                
                 return prev.map((item, index) => 
                     index === i ? 
                         item.quantidade + quantidade > produto.quantidade ? 
@@ -129,6 +139,7 @@ export default function useCatalogo(){
         }));
 
         try {
+            setLoading(true);
             const result = await API.postPedido({ pedido: pedidoArray, total: valorTotal, observacao: obs });
             if (result && result.url) {
                 window.open(result.url, "_blank");
@@ -136,6 +147,8 @@ export default function useCatalogo(){
         } catch (error) {
             console.error("Erro ao fazer pedido:", error);
             alert("Ocorreu um erro ao finalizar o pedido.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -173,6 +186,12 @@ export default function useCatalogo(){
     }
 
 
+    const handleTalk = () => {
+        const number = import.meta.env.VITE_WHATSAPP_NUMBER;
+        const message = `Olá! Gostaria de tirar uma duvida!`
+        window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, "_blank");
+    }
+
     return {
         produtos,
         categorias,
@@ -197,6 +216,9 @@ export default function useCatalogo(){
         setObs,
         menu,
         setMenu,
-        getCor
+        loading,
+        getCor,
+        openModal,
+        handleTalk,
     }
 }

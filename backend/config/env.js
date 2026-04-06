@@ -25,7 +25,7 @@ export const env = {
   FRONTEND_URL: process.env.FRONTEND_URL,
 
   // Negócio
-  WHATSAPP_NUMBER: process.env.WHATSAPP_NUMBER || "5513997062443",
+  WHATSAPP_NUMBER: process.env.VITE_WHATSAPP_NUMBER,
 };
 
 export default env;

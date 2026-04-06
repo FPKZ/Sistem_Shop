@@ -1,6 +1,15 @@
-
+import { useState } from "react";
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Produto({produto, handleChangeQuantity, formValue, handleChange, adicionarAoCarrinho}) {
+    const [adicionado, setAdicionado] = useState(false);
+
+    const handleAdicionar = () => {
+        setAdicionado(true);
+        adicionarAoCarrinho();
+        setTimeout(() => setAdicionado(false), 2000);
+    }
 
     return (
         <>
@@ -36,15 +45,17 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                         <div className="d-flex gap-2">
                                             {/* Círculo que mostra a cor dinamicamente */}
                                             {produto.cores?.map(cor => (
-                                                <div 
+                                                <motion.div 
                                                     key={cor.id}
+                                                    whileHover={{ scale: formValue.cor === cor.hex ? 1 : 1.1 }}
+                                                    whileTap={{ scale: formValue.cor === cor.hex ? 1 : 0.9 }}
                                                     className="d-flex flex-column align-items-center cursor-pointer"
                                                     onClick={() => handleChange("cor", cor.hex)}
                                                 >
                                                     <div 
                                                         className={`
                                                             transition-all duration-200 ease-in-out
-                                                            ${formValue.cor === cor.hex ? 'scale-110 opacity-100 shadow-sm' : 'scale-90 opacity-60 hover:opacity-100 hover:scale-100'}
+                                                            ${formValue.cor === cor.hex ? ' shadow-sm' : 'scale-90 opacity-60 hover:opacity-100 '}
                                                         `}
                                                         style={{
                                                             backgroundColor: cor.hex, 
@@ -58,14 +69,17 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                                     <span className="text-muted" style={{ fontSize: '10px', fontWeight: formValue.cor === cor.hex ? 'bold' : 'normal', textAlign: 'center', lineHeight: '1.1' }}>
                                                         {cor.name}
                                                     </span>
-                                                </div>
+                                                </motion.div>
                                             ))}
                                         </div>
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <div className="flex gap-2 md:justify-end">
                                             {produto.tamanho?.map(tamanho => (
-                                                <div 
+                                                <motion.div 
+                                                    whileHover={{ scale: formValue.tamanho === tamanho ? 1 : 1.1 }}
+                                                    whileTap={{ scale: formValue.tamanho === tamanho ? 1 : 0.9 }}
+                                                    transition={{ duration: 0.2 }}
                                                     onClick={() => handleChange("tamanho", tamanho)}
                                                     className={`
                                                         d-flex flex-column align-items-center justify-content-center
@@ -76,7 +90,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                                     `} 
                                                     key={tamanho}>
                                                     <span className="fw-semibold text-[0.7rem]">{tamanho}</span>
-                                                </div>
+                                                </motion.div>
                                             ))}
                                         </div>
                                     </div>
@@ -87,33 +101,62 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                 <div className="mb-3">
                                     <p className="fw-bold">Quantidade disponível: {produto.quantidade}</p>
                                     <div className="d-flex align-items-center justify-content-between p-1 shadow-sm rounded-full" style={{ backgroundColor: "#e1e1e1" }}>
-                                        <button 
+                                        <motion.button 
+                                            whileTap={{ scale: 0.8 }}
                                             className="btn btn-sm btn-light fw-bold rounded-circle d-flex align-items-center justify-content-center"
                                             style={{ width: "32px", height: "32px", border: "1px solid #dee2e6" }} 
                                             onClick={() => handleChangeQuantity(produto.id, -1)}
                                             disabled={formValue.quantidade <= 1}
                                         >
                                             -
-                                        </button>
+                                        </motion.button>
                                         <span className="fw-bold fs-6">{formValue.quantidade}</span>
-                                        <button 
-                                        className={`btn btn-sm btn-light fw-bold rounded-circle d-flex align-items-center justify-content-center ${formValue.quantidade >= produto.quantidade ? "disabled" : ""}`}
+                                        <motion.button 
+                                            whileTap={{ scale: 0.8 }}
+                                            className={`btn btn-sm btn-light fw-bold rounded-circle d-flex align-items-center justify-content-center ${formValue.quantidade >= produto.quantidade ? "disabled" : ""}`}
                                             style={{ width: "32px", height: "32px", border: "1px solid #dee2e6" }}
                                             onClick={() => handleChangeQuantity(produto.id, 1)}
                                             disabled={formValue.quantidade >= produto.quantidade}
                                         >
                                             +
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 </div>
-                                <button 
+                                <motion.button 
+                                    whileHover={adicionado ? {} : { scale: 1.02 }}
+                                    whileTap={adicionado ? {} : { scale: 0.98 }}
                                     className="btn w-100 fw-bold border-0 text-white shadow-sm" 
-                                    style={{ backgroundColor: "rgba(147, 51, 179, 1)", borderRadius: "8px" }}
-                                    onClick={adicionarAoCarrinho}
-                                    disabled={formValue.quantidade <= 0}
+                                    style={{ 
+                                        backgroundColor: adicionado ? "#25D366" : "rgba(147, 51, 179, 1)", 
+                                        borderRadius: "8px",
+                                        transition: "background-color 0.3s ease"
+                                    }}
+                                    onClick={handleAdicionar}
+                                    disabled={formValue.quantidade <= 0 || adicionado}
                                 >
-                                    Adicionar ao Carrinho
-                                </button> 
+                                    <AnimatePresence mode="wait">
+                                        {adicionado ? (
+                                            <motion.span
+                                                key="added"
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.9 }}
+                                                className="d-flex align-items-center justify-content-center gap-2"
+                                            >
+                                                Produto adicionado!
+                                            </motion.span>
+                                        ) : (
+                                            <motion.span
+                                                key="normal"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                            >
+                                                Adicionar ao Carrinho
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.button> 
                             </div>
                         </div>
                     </div>

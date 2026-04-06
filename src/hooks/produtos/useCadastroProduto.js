@@ -156,7 +156,7 @@ export function useCadastroProduto(onSuccess) {
     categoria,
     setCategoria,
     cores,
-    setCores,
+    // setCores,
     nota,
     setNota,
     notas,

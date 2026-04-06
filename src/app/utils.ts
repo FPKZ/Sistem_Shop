@@ -108,9 +108,43 @@ const normalizeText = (str : string) : string => {
   return str.replace(/\s+/g, ' ').trim()
 }
 
-// 📛 Remove acentos (útil para buscas)
-const removeAccents = (str : string) : string => {
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-}
+// 📱 Formata telefone (mask) (00) 00000-0000 ou (00) 0000-0000
+const formatPhone = (value: string): string => {
+  if (!value) return "";
+  let digits = value.replace(/\D/g, "");
 
-export default { formatDate, formatMoney, formatDateTime, formatDistanceToNow, formatNumber, formatRelativeDate, capitalize, normalizeText, removeAccents, formatTimer, formatDifferenceInDays}
+  // Se começar com 55 e tiver 12 ou 13 dígitos, remove o 55
+  if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) {
+    digits = digits.slice(2);
+  }
+
+  if (digits.length > 11) digits = digits.slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 6)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+};
+
+// 📛 Remove acentos (útil para buscas)
+const removeAccents = (str: string): string => {
+  if (!str) return "";
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
+export default { 
+  formatPhone, 
+  formatDate, 
+  formatMoney, 
+  formatDateTime, 
+  formatDistanceToNow, 
+  formatNumber, 
+  formatRelativeDate, 
+  capitalize, 
+  normalizeText, 
+  removeAccents, 
+  formatTimer, 
+  formatDifferenceInDays
+}

@@ -1,8 +1,30 @@
 import { Dropdown } from "react-bootstrap";
 import { ArrowDown, ListFilter, ArrowDownWideNarrow, Search, X } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 
-export default function Produtos({produtos, ordenarPorChave, setFiltro, filtro, handleBadge, handleChangeQuantity, selecionarProduto, setTelaProduto}){
+export default function Produtos({produtos, ordenarPorChave, setFiltro, filtro, handleBadge, selecionarProduto, setTelaProduto}){
+    
+    const container = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+            staggerChildren: 0.1 // Anima os filhos um por um com atraso
+            }
+        }
+    }
+
+    const item = {
+        hidden: { opacity: 0, y: -15 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.3 }
+        }
+    }
+    
     return (
         <main className="px-2 flex-grow-1">
             <h2 className="flex items-center gap-2 mb-4">
@@ -37,13 +59,20 @@ export default function Produtos({produtos, ordenarPorChave, setFiltro, filtro, 
             {produtos === undefined || produtos.length === 0 ? (
                 <div className="text-center text-muted mt-5">Carregando produtos ou o catálogo está vazio...</div>
             ) : (
-                <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 align-items-stretch g-4 ">
+                <motion.ul variants={container} initial="hidden" animate="show" className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 align-items-stretch g-4 list-unstyled">
                     {produtos.map((produto) => {
                         return (
-                            <div className="col hover:translate-y-[-5px] transition-transform duration-300" key={produto.id} onClick={() => {
-                                selecionarProduto(produto);
-                                setTelaProduto(true);
-                            }}>
+                            <motion.li 
+                                layout
+                                variants={item}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="col cursor-pointer" 
+                                key={produto.id} 
+                                onClick={() => {
+                                    selecionarProduto(produto);
+                                    setTelaProduto(true);
+                                }}>
                                 <div className="rounded-4 bg-white shadow-sm border-0 h-100 min-h-[25rem] d-flex flex-column overflow-hidden position-relative">
                                     {handleBadge(produto.id)}
                                     <div
@@ -82,10 +111,10 @@ export default function Produtos({produtos, ordenarPorChave, setFiltro, filtro, 
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.li>
                         );
                     })}
-                </div>
+                </motion.ul>
             )}
         </main>
     )
