@@ -1,7 +1,7 @@
 import { Minus, Plus, Trash, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export default function Carrinho({produtos,carrinho,alterarQuantidade, valorTotal, obs, setObs, getCor}){
+export default function Carrinho({produtos, carrinho, alterarQuantidade, removerItemDoCarrinho, valorTotal, obs, setObs}){
     const [showObs, setShowObs] = useState(false);
 
     return (
@@ -45,7 +45,13 @@ export default function Carrinho({produtos,carrinho,alterarQuantidade, valorTota
                                                 text-[12px] fw-bold rounded-circle 
                                                 d-flex align-items-center justify-content-center`}
                                             style={{ width: "28px", height: "28px", border: "1px solid #dee2e6" }} 
-                                            onClick={() => alterarQuantidade(i, produto.id, -1)}
+                                            onClick={() => {
+                                                if (item.quantidade === 1) {
+                                                    removerItemDoCarrinho(i);
+                                                } else {
+                                                    alterarQuantidade(i, produto.id, -1);
+                                                }
+                                            }}
                                         >
                                             {item.quantidade === 1 ? <Trash2  size={13} strokeWidth={2.5} /> : <Minus size={13} strokeWidth={2.5} />}
                                         </button>
