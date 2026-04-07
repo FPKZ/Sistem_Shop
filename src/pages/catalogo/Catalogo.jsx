@@ -49,7 +49,7 @@ export default function Catalogo() {
     "nome",
     "categoria",
     { path: "tags", subCampos: ["label"] },
-  ]);
+  ], ["quantidade", "Esgotado"]);
 
   const { 
     currentPage,

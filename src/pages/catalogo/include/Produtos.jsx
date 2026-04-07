@@ -84,49 +84,61 @@ export default function Produtos({
                             <motion.li 
                             layout
                             variants={item}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: produto.quantidade === "Esgotado" ? 1 : 1.05 }}
+                            whileTap={{ scale: produto.quantidade === "Esgotado" ? 1 : 0.95 }}
                             className="col cursor-pointer" 
                             key={produto.id} 
                             onClick={() => {
                                 selecionarProduto(produto);
                                 setTelaProduto(true);
                             }}>
-                                <div className="rounded-4 bg-white shadow-sm border-0 h-[25rem] d-flex flex-column overflow-hidden position-relative">
-                                    {handleBadge(produto.id)}
+                                <div 
+                                    className="rounded-4 bg-neutral-800/40 shadow-sm border-0 h-[25rem] overflow-hidden">
                                     <div
-                                        className="produto-img-wrapper"
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            overflow: "hidden",
-                                            height: "55%",
-                                        }}
-                                        >
-                                        <img
-                                            className="card-img-top produto-img"
-                                            src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
-                                            alt={produto.nome}
+                                        className="bg-white w-100 h-100 flex flex-column position-relative"
+                                        style={{opacity: produto.quantidade === "Esgotado" ? "0.5" : "1"}}
+                                    >
+                                        {handleBadge(produto.id)}
+                                        <div
+                                            className="produto-img-wrapper"
                                             style={{
-                                                objectFit: "cover",
-                                                height: "100%",
-                                                width: "100%",
-                                                padding: "0",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                overflow: "hidden",
+                                                height: "55%",
                                             }}
-                                            />
-                                    </div>
-                                    <div className="card-body p-3 d-flex flex-column flex-grow-1">
-                                        <h5 className="card-title text-truncate fw-bold mb-1" title={produto.nome}>
-                                            {produto.nome}
-                                        </h5>
-                                        <p className="card-text text-muted small mb-0" style={{ flexGrow: 1 }}>
-                                            {produto.descricao ? 
-                                                (produto.descricao.length > 50 ? produto.descricao.substring(0, 80) + "..." : produto.descricao) 
-                                                : "Sem descrição"}
-                                        </p>
-                                        <div className="fw-bold fs-5 text-success text-end mb-0">
-                                            R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}
+                                            >
+                                            <img
+                                                className="card-img-top produto-img"
+                                                src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
+                                                alt={produto.nome}
+                                                style={{
+                                                    objectFit: "cover",
+                                                    height: "100%",
+                                                    width: "100%",
+                                                    padding: "0",
+                                                }}
+                                                />
+                                        </div>
+                                        <div className="card-body p-3 d-flex flex-column flex-grow-1">
+                                            <h5 className="card-title text-truncate fw-bold mb-1" title={produto.nome}>
+                                                {produto.nome}
+                                            </h5>
+                                            <p className="card-text text-muted small mb-0" style={{ flexGrow: 1 }}>
+                                                {produto.descricao ? 
+                                                    (produto.descricao.length > 50 ? produto.descricao.substring(0, 80) + "..." : produto.descricao) 
+                                                    : "Sem descrição"}
+                                            </p>
+                                            {produto.quantidade === "Esgotado" ? (
+                                                <div className="fw-bold fs-5 text-danger text-end mb-0">
+                                                    Esgotado
+                                                </div>
+                                            ) : (
+                                                <div className="fw-bold fs-5 text-success text-end mb-0">
+                                                    R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

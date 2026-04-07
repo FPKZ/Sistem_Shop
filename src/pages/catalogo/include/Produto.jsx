@@ -122,7 +122,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                                 className={`btn btn-sm btn-light fw-bold rounded-circle d-flex align-items-center justify-content-center ${formValue.quantidade >= produto.quantidade ? "disabled" : ""}`}
                                                 style={{ width: "32px", height: "32px", border: "1px solid #dee2e6" }}
                                                 onClick={() => handleChangeQuantity(produto.id, 1)}
-                                                disabled={formValue.quantidade >= produto.quantidade}
+                                                disabled={formValue.quantidade >= produto.quantidade || produto.quantidade === "Esgotado"}
                                             >
                                                 +
                                             </motion.button>

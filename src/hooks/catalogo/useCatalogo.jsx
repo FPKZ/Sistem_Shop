@@ -57,6 +57,8 @@ export default function useCatalogo(){
     const produtos = produtosData?.data || produtosData || [];
     const categorias = categoriasData?.data || categoriasData || [];
 
+    console.log(produtos)
+
     useEffect(() => {
         if (Object.keys(carrinho).length === 0) {
             setCarrinhoAberto(false)
@@ -74,7 +76,7 @@ export default function useCatalogo(){
         handleChange("id", produto.id)
         handleChange("cor", produto.cores[0]?.hex || "")
         handleChange("tamanho", produto.tamanho[0] || "")
-        handleChange("quantidade", 1)
+        handleChange("quantidade", produto.quantidade === "Esgotado" ? 0 : 1)
         setProdutoSelecionado(produto)
     }
 
