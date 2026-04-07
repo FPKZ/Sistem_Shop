@@ -82,6 +82,10 @@ export default function useCatalogo(){
         setCarrinho((prev) => {
             const itemExistente = prev.find(item => item.id === formValue.id && item.cor === formValue.cor && item.tamanho === formValue.tamanho);
             if(itemExistente){
+                if(itemExistente.quantidade + formValue.quantidade > produtoSelecionado.quantidade){
+                    // alert("Quantidade indisponível!");
+                    return prev;
+                }
                 return prev.map(item => item.id === formValue.id && item.cor === formValue.cor && item.tamanho === formValue.tamanho ? {...item, quantidade: item.quantidade + formValue.quantidade} : item);
             }
             return [
