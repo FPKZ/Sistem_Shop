@@ -1,6 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import API from "@app/api";
 
+/**
+ * Hook para buscar e gerenciar os dados principais do dashboard.
+ * Utiliza React Query para cacheamento, atualização em segundo plano e polling automático a cada 30 segundos.
+ * 
+ * @example
+ * const { stats, loading, refresh } = useDashboardData();
+ * if (loading) return <Spinner />;
+ * return <div onClick={refresh}> Vendas: {stats.totalVendas} </div>;
+ * 
+ * @returns {Object} Dados do dashboard e status de carregamento
+ */
 export function useDashboardData() {
   const { data, isLoading, refetch, isRefetching } = useQuery({
     queryKey: ["dashboardData"],
