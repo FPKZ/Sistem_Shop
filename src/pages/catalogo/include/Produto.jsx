@@ -13,7 +13,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
 
     return (
         <>
-            <main className="container-fluid">
+            <main className="container md:container-fluid">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -22,7 +22,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                 >
                     <div className="card rounded-4 overflow-hidden shadow-md">
                         <div className="row m-0 p-0">
-                            <div className="col-12 col-md-6 p-0">
+                            <div className="col-12 col-md-6 p-0 max-h-[80vh]">
                                 <div className="card-img"
                                     style={{
                                         width: "100%",
@@ -44,7 +44,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                 <div className="flex flex-column flex-shrink-1 p-3 gap-2">
                                     <h5 className="card-title fw-bold text-[2rem]!">{produto.nome}</h5>
                                     <p className="card-text text-muted">{produto.descricao}</p>
-                                    <p className="card-text text-success fw-bold text-[1.5rem] md:absolute! md:top-3 md:right-3">R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}</p>
+                                    <p className={`card-text ${produto.quantidade === "Esgotado" ? "text-gray-500 line-through opacity-50" : "text-success"} fw-bold text-[1.5rem] md:absolute! md:top-3 md:right-3`}>R$ {Number(produto.preco || 0).toFixed(2).replace('.', ',')}</p>
                                     
                                     <div className="row m-0 p-0 gap-3 gap-md-0">
                                         <div className="col-12 col-md-6">
@@ -105,7 +105,7 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                 </div>
                                 <div className="w-100 p-3 items-bottom">
                                     <div className="mb-3">
-                                        <p className="fw-bold">Quantidade disponível: {produto.quantidade}</p>
+                                        <p className="fw-bold">Quantidade disponível: <span className={produto.quantidade === "Esgotado" ? "text-danger" : ""}>{produto.quantidade}</span></p>
                                         <div className="d-flex align-items-center justify-content-between p-1 shadow-sm rounded-full" style={{ backgroundColor: "#e1e1e1" }}>
                                             <motion.button 
                                                 whileTap={{ scale: 0.8 }}
