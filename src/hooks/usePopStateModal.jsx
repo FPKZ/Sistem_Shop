@@ -2,6 +2,17 @@ import { useEffect, useRef } from "react"
 
 
 
+/**
+ * Hook para adicionar suporte ao botão "Voltar" (popstate) do navegador/celular
+ * fechando automaticamente modais abertos sem voltar de página real.
+ * 
+ * @example
+ * const [isModalAberto, setModalAberto] = useState(false);
+ * usePopStateModal([isModalAberto], [setModalAberto]);
+ * 
+ * @param {Array<boolean>} modals - Array dos estados booleanos dos modais.
+ * @param {Array<Function>} funcs - Array com as funções setter(false) correspondentes aos modais.
+ */
 export default function usePopStateModal(modals, funcs){
 
     const modalsRef = useRef(funcs)

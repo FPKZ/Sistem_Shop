@@ -5,6 +5,10 @@ import utils from "@app/utils";
  * Hook personalizado para inputs de moeda (BRL).
  * Implementa lógica estilo "ATM" (digitação de centavos).
  *
+ * @example
+ * const { displayValue, onChange } = useCurrencyInput({ initialValue: 10.50, max: 1000 });
+ * return <input value={displayValue} onChange={onChange} />;
+ *
  * @param {Object} options
  * @param {number} [options.initialValue=0] - Valor inicial numérico.
  * @param {number} [options.max] - Valor máximo permitido.

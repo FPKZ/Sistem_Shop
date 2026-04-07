@@ -10,6 +10,7 @@ import {
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
+import { Cores } from "../../../pages/cadastro/include/Produtos";
 import { useEffect } from "react";
 
 function CadastroIntenModal({
@@ -22,6 +23,7 @@ function CadastroIntenModal({
     categoria,
     setCategoria,
     nota,
+    cores,
     setNota,
     notas,
     categorias,
@@ -156,14 +158,45 @@ function CadastroIntenModal({
                 className="d-flex flex-column align-items-center"
               >
                 <Form.Label htmlFor="corProduto">Cor</Form.Label>
-                <Form.Control
-                  className="form-control-color"
-                  name="cor"
-                  id="corProduto"
-                  type="color"
-                  value={formValue.cor || "#000000"}
-                  onChange={handleChange}
-                />
+                <Dropdown >
+                  <Dropdown.Toggle
+                    variant="none"
+                    className={`dropdown-toggle-none w-100 d-flex justify-content-center align-items-center border-0 p-0 ${
+                      validated ? (erros.cor ? "is-invalid" : "is-valid") : ""
+                    }`}
+                  >
+                    <div className="d-flex flex-column align-items-center gap-1">
+                      <div 
+                        style={{
+                          backgroundColor: formValue.cor || 'transparent', 
+                          width: '2.3rem',
+                          height: '2.3rem',
+                          borderRadius: '50%',
+                          // border: '1px solid #aaaaaa',
+                          boxShadow: '0 0 0 1px #666666'
+                        }} 
+                      />
+                      {/* <span className="fw-normal text-[0.7rem]">
+                        {cores.find(c => c.hex === formValue.cor)?.name || "Selecione a Cor"}
+                      </span> */}
+                    </div>
+                  </Dropdown.Toggle>
+                  <Form.Control
+                    id="corProduto"
+                    type="hidden"
+                    name="cor"
+                    value={formValue.cor || ""}
+                    required
+                  />
+                  <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
+                    <Cores cores={cores} formValue={formValue} handleChange={handleChange} />
+                    <Dropdown.Divider className="m-0" />
+                    {/* Nota: lembre-se de importar o setModalCores no topo do seu arquivo do hook */}
+                    {/* <Dropdown.Item onClick={() => { if(typeof setModalCores !== 'undefined') setModalCores(true) }} className="text-center py-2 fw-bold text-primary">
+                      + Nova Cor
+                    </Dropdown.Item> */}
+                  </Dropdown.Menu>
+                </Dropdown>
               </Col>
               <Col xs={12} md={3}>
                 <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
@@ -377,10 +410,12 @@ function CadastroIntenModal({
                       : ""
                   }
                   name="descricao"
-                  type="text"
+                  as="textarea"
+                  rows={4}
+                  style={{ resize: "none" }}
                   id="descricaoProduto"
-                  placeholder="Descrição"
-                  value={formValue.descricao || ""}
+                  placeholder="Descrição do produto"
+                  value={formValue.descricao}
                   onChange={handleChange}
                   required
                 />

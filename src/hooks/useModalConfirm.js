@@ -2,6 +2,17 @@ import { useModal } from "../contexts/ModalContext";
 
 /**
  * Hook para facilitar o uso do modal de confirmação global.
+ * 
+ * @example
+ * const { openModal } = useModalConfirm();
+ * 
+ * const handleExcluir = () => {
+ *   openModal("Confirmar Exclusão", "Tem certeza?", {
+ *     confirm: () => api.deletar(),
+ *     cancel: () => console.log("Cancelado")
+ *   });
+ * };
+ * 
  * @returns {object} - Objeto com a função openModal
  */
 export default function useModalConfirm() {

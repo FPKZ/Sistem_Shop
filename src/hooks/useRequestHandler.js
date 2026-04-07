@@ -3,6 +3,14 @@ import { useToast } from "@contexts/ToastContext";
 
 /**
  * Hook para centralizar o tratamento de requisições API com feedback visual.
+ * 
+ * @example
+ * const { isLoading, handleRequest } = useRequestHandler();
+ * 
+ * const salvar = async () => {
+ *   await handleRequest(() => api.salvar(), { successMessage: "Salvo!" });
+ * };
+ * 
  * @returns {Object} { isLoading, handleRequest }
  */
 export function useRequestHandler() {

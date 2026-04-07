@@ -1,5 +1,6 @@
 import { Row, Col, InputGroup, Form, Button } from "react-bootstrap";
 import { Search } from "lucide-react";
+import { isObject } from "framer-motion";
 
 export function ClienteSearch({ filtro, setFiltro, onClear }) {
   return (
@@ -12,7 +13,7 @@ export function ClienteSearch({ filtro, setFiltro, onClear }) {
           <Form.Control
             type="text"
             placeholder="Buscar por nome, telefone..."
-            value={filtro}
+            value={isObject(filtro) ? "" : filtro}
             onChange={(e) => setFiltro(e.target.value)}
             className="border-start-0"
           />

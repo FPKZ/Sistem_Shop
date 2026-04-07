@@ -10,7 +10,6 @@ export function useCadastroProduto(onSuccess) {
   const [nota, setNota] = useState({});
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
-  const [modalCores, setModalCores] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
 
@@ -43,7 +42,7 @@ export function useCadastroProduto(onSuccess) {
       },
     },
   );
-
+  console.log(formValue)
   const valorCompraHook = useCurrencyInput({ initialValue: 0 });
   const valorVendaHook = useCurrencyInput({ initialValue: 0 });
   const lucroHook = useCurrencyInput({ initialValue: 0 });
@@ -156,7 +155,6 @@ export function useCadastroProduto(onSuccess) {
     categoria,
     setCategoria,
     cores,
-    // setCores,
     nota,
     setNota,
     notas,

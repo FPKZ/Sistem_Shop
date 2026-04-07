@@ -5,28 +5,26 @@ import { useEffect, useRef } from "react";
  * e restaurar quando modais/telas saírem da frente.
  * 
  * @example
- * // Exemplo simples de uso:
- * function Catalogo() {
- *   const [modalAberto, setModalAberto] = useState(false);
- *   const topRef = useRef(null);
- * 
- *   useScrollRestoration(modalAberto, topRef);
- * 
- *   return (
- *     <div ref={topRef} className="container">
- *        {modalAberto ? <Modal /> : <ListaDeRoupas />}
- *     </div>
- *   )
- * }
+ * // Exemplo com paginação:
+ * useScrollRestoration(modalAberto, topRef, [currentPage]);
  * 
  * @param {boolean} isModalOpen - Define se algum modal está aberto (pausando o rastreador e jogando o scroll pro topo)
  * @param {React.MutableRefObject} topRef - Ref para um elemento no topo, usado como fallback de scroll
+ * @param {Array} extraDeps - Dependências que, ao mudar, forçam o scroll para o topo (ex: página atual)
  */
-export function useScrollRestoration(isModalOpen, topRef) {
+export function useScrollRestoration(isModalOpen, topRef, extraDeps = []) {
   const scrollPosition = useRef(0);
   const scrollParent = useRef(null);
+  const prevDeps = useRef(extraDeps);
 
-  // Monitora o scroll de qualquer elemento da tela de forma invisível
+  // 1. Efeito de Reset: Deve vir antes do efeito de scroll para garantir que o valor seja 0
+  // Usamos a mudança das dependências extras para "limpar" a posição salva.
+  if (JSON.stringify(prevDeps.current) !== JSON.stringify(extraDeps)) {
+    scrollPosition.current = 0;
+    prevDeps.current = extraDeps;
+  }
+
+  // 2. Monitora o scroll de qualquer elemento da tela de forma invisível
   useEffect(() => {
     const handleScroll = (e) => {
       // Quando não há modal aberto, gravamos de onde veio o scroll
@@ -45,21 +43,37 @@ export function useScrollRestoration(isModalOpen, topRef) {
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [isModalOpen]);
 
-  // Restaura o scroll ou leva pro topo
+  // 3. Restaura o scroll ou leva pro topo
   useEffect(() => {
-    const scroller = scrollParent.current || window;
-    
-    if (isModalOpen) {
-      if (scroller.scrollTo) scroller.scrollTo(0, 0);
-      else scroller.scrollTop = 0;
+    // Usamos requestAnimationFrame para garantir que o scroll aconteça 
+    // APÓS o React terminar de renderizar os novos itens no DOM.
+    const animationFrame = requestAnimationFrame(() => {
+      const scroller = scrollParent.current || window;
       
-      // Fallback robusto
-      if (topRef?.current) {
-        topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+      if (isModalOpen) {
+        // Sobe ao topo se for um modal aberto
+        if (scroller.scrollTo) scroller.scrollTo(0, 0);
+        else scroller.scrollTop = 0;
+        
+        // Fallback robusto usando o ref do elemento de topo
+        if (topRef?.current) {
+          topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+        }
+      } else {
+        // Restaura a posição (será 0 se as extraDeps mudaram no render anterior)
+        if (scroller.scrollTo) scroller.scrollTo(0, scrollPosition.current);
+        else scroller.scrollTop = scrollPosition.current;
+
+        // Garantia adicional agressiva para casos de mudança de página (scrollPosition resetado para 0)
+        if (scrollPosition.current === 0) {
+          window.scrollTo(0, 0);
+          if (topRef?.current) {
+            topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+          }
+        }
       }
-    } else {
-      if (scroller.scrollTo) scroller.scrollTo(0, scrollPosition.current);
-      else scroller.scrollTop = scrollPosition.current;
-    }
-  }, [isModalOpen, topRef]);
+    });
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isModalOpen, topRef, ...extraDeps]);
 }

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./include/Header";
@@ -11,6 +11,7 @@ import Menu from "./include/Menu";
 //Hooks
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
+import { usePagination } from "@hooks/usePagination";
 import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 import { useHistoryBack } from "../../hooks/useHistoryBack";
 
@@ -48,19 +49,31 @@ export default function Catalogo() {
     "nome",
     "categoria",
     { path: "tags", subCampos: ["label"] },
-  ]);
+  ], ["quantidade", "Esgotado"]);
+
+  const { 
+    currentPage,
+    itemsPerPage,
+    currentItems,
+    totalPages,
+    totalItems,
+    indexOfFirstItem,
+    indexOfLastItem,
+    handlePageChange,
+    handleItemsPerPageChange,
+  } = usePagination(dadosProcessados, 20);
 
   const topRef = useRef(null);
   const [talkExpanded, setTalkExpanded] = (useCatalogo.expandedState || useState)(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const whatsappVariants = {
-    collapsed: { x: 115 },
-    expanded: { x: 15 }
+    collapsed: { x: "65%" },
+    expanded: { x: "10%" }
   };
 
   // 1. Controle de Posição de Rolagem Inteligente
-  useScrollRestoration(carrinhoAberto || telaProduto, topRef);
+  useScrollRestoration(carrinhoAberto || telaProduto, topRef, [currentPage, filtro]);
 
   // 2. Controle do Botão Voltar (Android / Navegador)
   useHistoryBack([
@@ -69,8 +82,28 @@ export default function Catalogo() {
     { isOpen: menu, close: () => setMenu(false) }
   ]);
 
+  // 3. Fechar botão do WhatsApp ao clicar fora
+  const whatsappRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (whatsappRef.current && !whatsappRef.current.contains(event.target)) {
+        setTalkExpanded(false);
+      }
+    }
+
+    if (talkExpanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [talkExpanded, setTalkExpanded]);
+
   return (
-    <div className="d-flex flex-column h-100" ref={topRef}>
+    <div className="d-flex flex-column h-100">
+      <div ref={topRef} style={{ height: 0, overflow: "hidden", position: "absolute", top: 0 }} />
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
@@ -138,6 +171,15 @@ export default function Catalogo() {
             ) : (
               <Produtos
                 produtos={dadosProcessados}
+                currentItems={currentItems}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={totalItems}
+                indexOfFirstItem={indexOfFirstItem}
+                indexOfLastItem={indexOfLastItem}
+                handlePageChange={handlePageChange}
+                handleItemsPerPageChange={handleItemsPerPageChange}
                 ordenarPorChave={ordenarPorChave}
                 setFiltro={setFiltro}
                 filtro={filtro}
@@ -150,6 +192,7 @@ export default function Catalogo() {
           </main>
 
           <motion.button
+            ref={whatsappRef}
             initial="collapsed"
             animate={talkExpanded ? "expanded" : "collapsed"}
             whileHover="expanded"
