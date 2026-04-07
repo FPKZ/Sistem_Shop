@@ -21,9 +21,11 @@ import { useState, useMemo, useEffect } from "react";
  * @param {Array} dadosIniciais - Array de objetos a serem filtrados e ordenados.
  * @param {Array} camposFiltragem - Campos para busca. Aceita string (ex: "nome") ou objeto para arrays internos 
  *                                 (ex: { path: "lista", subCampos: ["nome"] }).
+ * @param {Array} camposSeparacao - Campos para separação. Aceita string (ex: "nome") ou objeto para arrays internos 
+ 
  * @returns {Object} { filtro, setFiltro, order, dadosProcessados, setOrdem, requisitarOrdenacao }
  */
-export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
+export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparacao) => {
   const [filtroInput, setFiltroInput] = useState({});
   const [filtroDebounced, setFiltroDebounced] = useState({});
   const [order, setOrder] = useState({ chave: "id", direcao: "asc" });
@@ -116,6 +118,14 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem) => {
 
     // Lógica de Ordenação
     dadosFiltrados.sort((a, b) => {
+      // Prioridade 1: Disponibilidade (Esgotados sempre por último)
+      const esgotadoA = a.quantidade === camposSeparacao;
+      const esgotadoB = b.quantidade === camposSeparacao;
+
+      if (esgotadoA && !esgotadoB) return 1;
+      if (!esgotadoA && esgotadoB) return -1;
+
+      // Prioridade 2: Ordenação Principal (definida pelo usuário)
       const valorA = a[order.chave];
       const valorB = b[order.chave];
 
