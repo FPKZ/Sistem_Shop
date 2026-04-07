@@ -83,7 +83,8 @@ export default function Catalogo() {
   ]);
 
   return (
-    <div className="d-flex flex-column h-100" ref={topRef}>
+    <div className="d-flex flex-column h-100">
+      <div ref={topRef} style={{ height: 0, overflow: "hidden", position: "absolute", top: 0 }} />
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
