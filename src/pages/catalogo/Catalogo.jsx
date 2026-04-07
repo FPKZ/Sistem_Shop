@@ -11,6 +11,7 @@ import Menu from "./include/Menu";
 //Hooks
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
+import { usePagination } from "@hooks/usePagination";
 import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 import { useHistoryBack } from "../../hooks/useHistoryBack";
 
@@ -49,6 +50,18 @@ export default function Catalogo() {
     "categoria",
     { path: "tags", subCampos: ["label"] },
   ]);
+
+  const { 
+    currentPage,
+    itemsPerPage,
+    currentItems,
+    totalPages,
+    totalItems,
+    indexOfFirstItem,
+    indexOfLastItem,
+    handlePageChange,
+    handleItemsPerPageChange,
+  } = usePagination(dadosProcessados, 20);
 
   const topRef = useRef(null);
   const [talkExpanded, setTalkExpanded] = (useCatalogo.expandedState || useState)(false);
@@ -138,6 +151,15 @@ export default function Catalogo() {
             ) : (
               <Produtos
                 produtos={dadosProcessados}
+                currentItems={currentItems}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={totalItems}
+                indexOfFirstItem={indexOfFirstItem}
+                indexOfLastItem={indexOfLastItem}
+                handlePageChange={handlePageChange}
+                handleItemsPerPageChange={handleItemsPerPageChange}
                 ordenarPorChave={ordenarPorChave}
                 setFiltro={setFiltro}
                 filtro={filtro}

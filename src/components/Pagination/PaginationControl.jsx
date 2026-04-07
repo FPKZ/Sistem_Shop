@@ -7,14 +7,14 @@ import ItemsPerPageSelector from "./ItemsPerPageSelector";
  *
  * @example
  * <PaginationControl
- *   currentPage={currentPage}
- *   totalPages={totalPages}
- *   onPageChange={handlePageChange}
- *   itemsPerPage={itemsPerPage}
- *   onItemsPerPageChange={handleItemsPerPageChange}
- *   totalItems={totalItems}
- *   indexOfFirstItem={indexOfFirstItem}
- *   indexOfLastItem={indexOfLastItem}
+ *   currentPage={currentPage} // Página atual
+ *   totalPages={totalPages} // Total de páginas
+ *   onPageChange={handlePageChange} // Função para mudar de página
+ *   itemsPerPage={itemsPerPage} // Quantidade de itens por página
+ *   onItemsPerPageChange={handleItemsPerPageChange} // Função para mudar a quantidade de itens por página
+ *   totalItems={totalItems} // Total de itens
+ *   indexOfFirstItem={indexOfFirstItem} // Índice do primeiro item
+ *   indexOfLastItem={indexOfLastItem} // Índice do último item
  * />
  */
 const PaginationControl = ({

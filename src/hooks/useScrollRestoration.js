@@ -5,26 +5,30 @@ import { useEffect, useRef } from "react";
  * e restaurar quando modais/telas saírem da frente.
  * 
  * @example
- * // Exemplo simples de uso:
- * function Catalogo() {
- *   const [modalAberto, setModalAberto] = useState(false);
- *   const topRef = useRef(null);
- * 
- *   useScrollRestoration(modalAberto, topRef);
- * 
- *   return (
- *     <div ref={topRef} className="container">
- *        {modalAberto ? <Modal /> : <ListaDeRoupas />}
- *     </div>
- *   )
- * }
+ * // Exemplo com paginação:
+ * useScrollRestoration(modalAberto, topRef, [currentPage]);
  * 
  * @param {boolean} isModalOpen - Define se algum modal está aberto (pausando o rastreador e jogando o scroll pro topo)
  * @param {React.MutableRefObject} topRef - Ref para um elemento no topo, usado como fallback de scroll
+ * @param {Array} extraDeps - Dependências que, ao mudar, forçam o scroll para o topo (ex: página atual)
  */
-export function useScrollRestoration(isModalOpen, topRef) {
+export function useScrollRestoration(isModalOpen, topRef, extraDeps = []) {
   const scrollPosition = useRef(0);
   const scrollParent = useRef(null);
+
+  // Gatilho para resetar a posição de memória e subir ao topo quando dependências extras mudam
+  useEffect(() => {
+    if (extraDeps.length > 0) {
+      scrollPosition.current = 0;
+      const scroller = scrollParent.current || window;
+      if (scroller.scrollTo) scroller.scrollTo(0, 0);
+      else scroller.scrollTop = 0;
+
+      if (topRef?.current) {
+        topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+      }
+    }
+  }, [...extraDeps]); // Monitora mudanças nos gatilhos extras (ex: currentPage)
 
   // Monitora o scroll de qualquer elemento da tela de forma invisível
   useEffect(() => {
