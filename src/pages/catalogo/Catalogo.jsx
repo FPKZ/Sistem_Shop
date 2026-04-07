@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./include/Header";
@@ -68,8 +68,8 @@ export default function Catalogo() {
   const [isHovered, setIsHovered] = useState(false);
 
   const whatsappVariants = {
-    collapsed: { x: 115 },
-    expanded: { x: 15 }
+    collapsed: { x: "65%" },
+    expanded: { x: "10%" }
   };
 
   // 1. Controle de Posição de Rolagem Inteligente
@@ -81,6 +81,25 @@ export default function Catalogo() {
     { isOpen: telaProduto, close: () => setTelaProduto(false) },
     { isOpen: menu, close: () => setMenu(false) }
   ]);
+
+  // 3. Fechar botão do WhatsApp ao clicar fora
+  const whatsappRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (whatsappRef.current && !whatsappRef.current.contains(event.target)) {
+        setTalkExpanded(false);
+      }
+    }
+
+    if (talkExpanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [talkExpanded, setTalkExpanded]);
 
   return (
     <div className="d-flex flex-column h-100">
@@ -173,6 +192,7 @@ export default function Catalogo() {
           </main>
 
           <motion.button
+            ref={whatsappRef}
             initial="collapsed"
             animate={talkExpanded ? "expanded" : "collapsed"}
             whileHover="expanded"
