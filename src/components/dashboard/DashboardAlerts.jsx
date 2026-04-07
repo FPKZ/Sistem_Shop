@@ -5,13 +5,13 @@ export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
   return (
     <Row className="g-4 mb-4">
       {/* Estoque Baixo */}
-      <Col xs={12} lg={6}>
-        <Card className="shadow-sm border-0 h-100">
+      <Col xs={12} lg={6} className="max-h-150">
+        <Card className="shadow-sm border-0 h-100 overflow-hidden">
           <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
             <i className="bi bi-box-seam text-warning me-2 fs-5"></i>
             <h5 className="mb-0 fw-bold">Estoque Baixo</h5>
           </Card.Header>
-          <Card.Body className="p-0">
+          <Card.Body className="p-0 overflow-auto">
             {estoqueBaixo.length > 0 ? (
               <ListGroup variant="flush">
                 {estoqueBaixo.map((item) => (
@@ -39,13 +39,13 @@ export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
       </Col>
 
       {/* Notas Vencendo */}
-      <Col xs={12} lg={6}>
-        <Card className="shadow-sm border-0 h-100">
+      <Col xs={12} lg={6} className="max-h-150">
+        <Card className="shadow-sm border-0 h-100 overflow-hidden">
           <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
             <i className="bi bi-calendar-event text-danger me-2 fs-5"></i>
             <h5 className="mb-0 fw-bold">Notas Pendentes (Próx. 7 dias)</h5>
           </Card.Header>
-          <Card.Body className="p-0">
+          <Card.Body className="p-0 overflow-auto">
             {notasVencendo.length > 0 ? (
               <ListGroup variant="flush">
                 {notasVencendo.map((nota) => (
