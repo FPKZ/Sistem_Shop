@@ -319,9 +319,11 @@ export default function Produtos() {
                 validated ? (erros.descricao ? "is-invalid" : "is-valid") : ""
               }
               name="descricao"
-              type="text"
+              as="textarea"
+              rows={4}
+              style={{ resize: "none" }}
               id="descricaoProduto"
-              placeholder="Descrição"
+              placeholder="Descrição do produto"
               value={formValue.descricao}
               onChange={handleChange}
               required
@@ -389,7 +391,7 @@ function Categoria({ categorias, setCategoria }) {
 }
 
 
-function Cores({ cores, formValue, handleChange }) {
+export function Cores({ cores, formValue, handleChange }) {
   return (
     <div className="d-flex flex-wrap gap-1 p-2 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
       {cores.map((cor) => (
