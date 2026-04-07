@@ -32,6 +32,13 @@ export async function listarCatalogo(query = {}) {
       { model: ItemEstoque, as: "itemEstoque" },
     ],
   });
+
+
+  const quantidadeDisponivel = async (produto) => {
+    const disponiveis = produto.itemEstoque.filter((item) => item.status === "Disponivel");
+    return disponiveis.length > 0 ? disponiveis.length : "Esgotado";
+  }
+
   const data = await Promise.all(produtos.map(async (produto) => ({
     id:         produto.id,
     nome:       produto.nome,
@@ -46,7 +53,7 @@ export async function listarCatalogo(query = {}) {
             .map((item) => Number(item.valor_venda))
         )
       : 0,
-    quantidade: produto.itemEstoque.length,
+    quantidade: await quantidadeDisponivel(produto),
     tamanho: [...new Set(produto.itemEstoque.map((item) => item.tamanho))].filter((item) => item !== "").sort()
   })));
 
