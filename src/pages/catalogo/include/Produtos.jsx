@@ -92,7 +92,7 @@ export default function Produtos({
                                 selecionarProduto(produto);
                                 setTelaProduto(true);
                             }}>
-                                <div className="rounded-4 bg-white shadow-sm border-0 h-100 min-h-[25rem] d-flex flex-column overflow-hidden position-relative">
+                                <div className="rounded-4 bg-white shadow-sm border-0 h-[25rem] d-flex flex-column overflow-hidden position-relative">
                                     {handleBadge(produto.id)}
                                     <div
                                         className="produto-img-wrapper"
@@ -101,7 +101,7 @@ export default function Produtos({
                                             justifyContent: "center",
                                             alignItems: "center",
                                             overflow: "hidden",
-                                            height: "60%",
+                                            height: "55%",
                                         }}
                                         >
                                         <img
@@ -120,9 +120,9 @@ export default function Produtos({
                                         <h5 className="card-title text-truncate fw-bold mb-1" title={produto.nome}>
                                             {produto.nome}
                                         </h5>
-                                        <p className="card-text text-muted small mb-2" style={{ flexGrow: 1 }}>
+                                        <p className="card-text text-muted small mb-0" style={{ flexGrow: 1 }}>
                                             {produto.descricao ? 
-                                                (produto.descricao.length > 50 ? produto.descricao.substring(0, 50) + "..." : produto.descricao) 
+                                                (produto.descricao.length > 50 ? produto.descricao.substring(0, 80) + "..." : produto.descricao) 
                                                 : "Sem descrição"}
                                         </p>
                                         <div className="fw-bold fs-5 text-success text-end mb-0">

@@ -1,5 +1,5 @@
 import React from "react";
-import util from "@app/utils.js";
+import { motion } from "framer-motion";
 
 export const ProdutoGrid = React.memo(({
   dadosProcessados,
@@ -7,22 +7,50 @@ export const ProdutoGrid = React.memo(({
   setProduto,
   getEstoqueBadge,
 }) => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: -15 },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.1 }
+    }
+  };
+
   return (
-    <div className="
-      row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5
-      align-items-stretch
-      h-100 g-4 mb-4
-    ">
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="
+        row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5
+        align-items-stretch
+        h-100 g-4 mb-4
+      "
+    >
       {dadosProcessados.map((produto) => (
-        <div
-          className="col hover:translate-y-[-5px] transition-transform duration-300"
+        <motion.div
+          layout
+          variants={item}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="col cursor-pointer"
           key={produto.id}
           onClick={() => {
             setModalInfoProduto(true);
             setProduto(produto);
           }}
         >
-          <div className="card produto-card shadow-sm cursor-pointer border-0">
+          <div className="rounded-4 bg-white shadow-sm border-0 h-[25rem] d-flex flex-column overflow-hidden position-relative">
             <div
               className="produto-img-wrapper"
               style={{
@@ -30,42 +58,45 @@ export const ProdutoGrid = React.memo(({
                 justifyContent: "center",
                 alignItems: "center",
                 overflow: "hidden",
+                height: "55%",
               }}
             >
               <img
                 className="card-img-top produto-img"
-                src={produto.img || "assets/tube-spinner.svg"}
+                src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
                 alt={produto.nome}
                 style={{
-                  objectFit: "contain",
+                  objectFit: "cover",
                   height: "100%",
                   width: "100%",
-                  padding: "0.5rem",
+                  padding: "0",
                 }}
               />
             </div>
-            <div className="card-body p-2">
-              <h5 className="card-title text-truncate" title={produto.nome}>
+            <div className="card-body p-3 d-flex flex-column flex-grow-1">
+              <h5 className="card-title text-truncate fw-bold mb-1" title={produto.nome}>
                 {produto.nome}
               </h5>
-              <p className="card-text text-muted small">
-                {util.capitalize(produto.descricao, 50)}
+              <p className="card-text text-muted small mb-0" style={{ flexGrow: 1 }}>
+                {produto.descricao ? 
+                    (produto.descricao.length > 50 ? produto.descricao.substring(0, 80) + "..." : produto.descricao) 
+                    : "Sem descrição"}
               </p>
-            </div>
-            <div className="card-footer bg-transparent row border-top-0 d-flex justify-content-between align-items-center p-2 mb-0 mt-auto">
-              <div className="col-6 d-flex flex-wrap gap-1 justify-content-start align-items-end p-0 ps-2">
-                <span className="fw-bold fs-5">
-                  {produto.itemEstoque?.length || `0`}
-                </span>
-                <span className="text-muted small"> unidades</span>
-              </div>
-              <div className="col-6 d-flex justify-content-end align-items-center h-100 p-0 pe-2 text-end">
-                {getEstoqueBadge(produto.itemEstoque?.length)}
+              
+              <div className="d-flex justify-content-between align-items-center mt-auto">
+                <div className="d-flex flex-column">
+                  <div className="fw-bold" style={{ fontSize: '1rem' }}>
+                    {produto.itemEstoque?.length || 0} Uni.
+                  </div>
+                </div>
+                <div className="h-100">
+                  {getEstoqueBadge(produto.itemEstoque?.length)}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 });
