@@ -21,8 +21,8 @@ import { useState, useMemo, useEffect } from "react";
  * @param {Array} dadosIniciais - Array de objetos a serem filtrados e ordenados.
  * @param {Array} camposFiltragem - Campos para busca. Aceita string (ex: "nome") ou objeto para arrays internos 
  *                                 (ex: { path: "lista", subCampos: ["nome"] }).
- * @param {Array} camposSeparacao - Campos para separação. Aceita string (ex: "nome") ou objeto para arrays internos 
- 
+ * @param {Array} camposSeparacao - Campos para separação. Aceita dois parametros, o primeiro é o campo que será usado para separação e o segundo é o valor que será usado para separação.
+ *                                 Ex: ["quantidade", "Esgotado"]
  * @returns {Object} { filtro, setFiltro, order, dadosProcessados, setOrdem, requisitarOrdenacao }
  */
 export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparacao) => {
@@ -119,8 +119,8 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparac
     // Lógica de Ordenação
     dadosFiltrados.sort((a, b) => {
       // Prioridade 1: Disponibilidade (Esgotados sempre por último)
-      const esgotadoA = a.quantidade === camposSeparacao;
-      const esgotadoB = b.quantidade === camposSeparacao;
+      const esgotadoA = a[camposSeparacao[0]] === camposSeparacao[1];
+      const esgotadoB = b[camposSeparacao[0]] === camposSeparacao[1];
 
       if (esgotadoA && !esgotadoB) return 1;
       if (!esgotadoA && esgotadoB) return -1;
