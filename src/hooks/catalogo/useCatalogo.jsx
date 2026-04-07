@@ -57,7 +57,7 @@ export default function useCatalogo(){
     const produtos = produtosData?.data || produtosData || [];
     const categorias = categoriasData?.data || categoriasData || [];
 
-    console.log(produtos)
+    // console.log(produtos)
 
     useEffect(() => {
         if (Object.keys(carrinho).length === 0) {

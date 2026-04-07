@@ -9,7 +9,6 @@ export default function Produtos() {
     categoria,
     setCategoria,
     cores,
-    setCores,
     nota,
     setNota,
     notas,
