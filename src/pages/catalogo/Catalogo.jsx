@@ -73,7 +73,7 @@ export default function Catalogo() {
   };
 
   // 1. Controle de Posição de Rolagem Inteligente
-  useScrollRestoration(carrinhoAberto || telaProduto, topRef);
+  useScrollRestoration(carrinhoAberto || telaProduto, topRef, [currentPage, filtro]);
 
   // 2. Controle do Botão Voltar (Android / Navegador)
   useHistoryBack([
