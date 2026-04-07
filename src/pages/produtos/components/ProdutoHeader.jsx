@@ -1,6 +1,7 @@
 import { LayoutGrid, LayoutList, ListFilter, Search } from "lucide-react";
 import { Button, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 import { useState } from "react";
+import { isObject } from "framer-motion";
 
 export function ProdutoHeader({
   filtro,
@@ -25,7 +26,7 @@ export function ProdutoHeader({
               <Form.Control
                 type="text"
                 placeholder="Pesquisar produto..."
-                value={filtro}
+                value={isObject(filtro) ? "" : filtro}
                 onChange={(e) => setFiltro(e.target.value)}
                 autoFocus
                 className="me-2 shadow-sm rounded-pill search-input-expand"
