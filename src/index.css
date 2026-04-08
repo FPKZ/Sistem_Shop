@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/**
+ * Desativa o Scroll Anchoring do Chrome/Chromium.
+ *
+ * O Scroll Anchoring é uma feature exclusiva do Chrome que tenta manter
+ * o conteúdo visível "ancorado" na tela ao mudar o layout da página.
+ * Quando a última página do catálogo tem poucos itens, o Chrome re-ancora
+ * o scroll APÓS o reflow, sobrescrevendo qualquer scrollTo(0) que fizermos.
+ * O Firefox não tem esse comportamento, por isso funciona lá.
+ *
+ * overflow-anchor: none desativa isso globalmente.
+ */
+html,
+body,
+* {
+  overflow-anchor: none;
+}
+
 @theme {
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;

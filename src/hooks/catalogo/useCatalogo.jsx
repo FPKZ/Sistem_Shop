@@ -1,9 +1,13 @@
 import API from "@app/api"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useForm } from "../useForm"
 import { DropdownItemText } from "react-bootstrap"
 import useModalConfirm from "../useModalConfirm"
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao"
+import { usePagination } from "@hooks/usePagination"
+import { useScrollRestoration } from "../useScrollRestoration"
+import { useHistoryBack } from "../useHistoryBack"
 
 export default function useCatalogo(){
     const [produtoSelecionado, setProdutoSelecionado] = useState(null)
@@ -198,6 +202,63 @@ export default function useCatalogo(){
         window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, "_blank");
     }
 
+    // ============================================
+    // INTEGRAÇÃO DE COMPONENTES E FILTROS (MIGRADO)
+    // ============================================
+
+    const topRef = useRef(null);
+    const whatsappRef = useRef(null);
+    const [talkExpanded, setTalkExpanded] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const { dadosProcessados, filtro, setFiltro, ordenarPorChave } = useFiltroOrdenacao(produtos, [
+        "nome",
+        "categoria",
+        { path: "tags", subCampos: ["label"] },
+    ], ["quantidade", "Esgotado"]);
+
+    const { 
+        currentPage, itemsPerPage, currentItems, totalPages, totalItems,
+        indexOfFirstItem, indexOfLastItem, handlePageChange, handleItemsPerPageChange,
+    } = usePagination(dadosProcessados, 20);
+
+    // Controles de Scroll Seguro
+    const handlePageChangeSafely = (page) => {
+        window.scrollTo({ top: 0, behavior: "instant" });
+        if (topRef?.current) topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+        setTimeout(() => handlePageChange(page), 10);
+    };
+
+    const handleItemsPerPageChangeSafely = (e) => {
+        const value = e.target.value;
+        window.scrollTo({ top: 0, behavior: "instant" });
+        if (topRef?.current) topRef.current.scrollIntoView({ behavior: "instant", block: "start" });
+        setTimeout(() => handleItemsPerPageChange({ target: { value } }), 10);
+    };
+
+    useScrollRestoration(carrinhoAberto || telaProduto, topRef, [currentPage, filtro, totalPages, itemsPerPage], [carrinhoAberto, telaProduto]);
+
+    useHistoryBack([
+        { isOpen: carrinhoAberto, close: () => setCarrinhoAberto(false) },
+        { isOpen: telaProduto, close: () => setTelaProduto(false) },
+        { isOpen: menu, close: () => setMenu(false) }
+    ]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (whatsappRef.current && !whatsappRef.current.contains(event.target)) {
+                setTalkExpanded(false);
+            }
+        }
+        if (talkExpanded) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [talkExpanded]);
+
+
     return {
         produtos,
         categorias,
@@ -226,5 +287,13 @@ export default function useCatalogo(){
         getCor,
         openModal,
         handleTalk,
+
+        // Ref sources and States from UI
+        topRef, whatsappRef, talkExpanded, setTalkExpanded, isHovered, setIsHovered,
+        
+        // Pagination & Filter Sources
+        dadosProcessados, filtro, setFiltro, ordenarPorChave,
+        currentPage, itemsPerPage, currentItems, totalPages, totalItems,
+        indexOfFirstItem, indexOfLastItem, handlePageChangeSafely, handleItemsPerPageChangeSafely
     }
 }
