@@ -10,7 +10,7 @@ import {
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
-import { Cores } from "../../../pages/cadastro/include/Produtos";
+import { Cores } from "@components/Cores";
 import { useEffect } from "react";
 
 function CadastroIntenModal({
@@ -20,11 +20,7 @@ function CadastroIntenModal({
   cadastroNota = false,
 }) {
   const {
-    categoria,
-    setCategoria,
-    nota,
     cores,
-    setNota,
     notas,
     categorias,
     modalCadastroCategoria,
@@ -81,18 +77,19 @@ function CadastroIntenModal({
       setFormValue({ quantidade: 1 });
       setValidated(false);
       setErros({});
-      setNota({});
-      setCategoria({});
     }
-  }, [visible, setFormValue, setValidated, setErros, setNota, setCategoria]);
+  }, [visible, setFormValue, setValidated, setErros]);
 
   if (!visible) return null;
 
-  function NotaItems({ notas, setNota }) {
+  function NotaItems({ notas, handleChange }) {
     return (
       <>
         {notas.map((n) => (
-          <Dropdown.Item key={n.id} onClick={() => setNota(n)}>
+          <Dropdown.Item
+            key={n.id}
+            onClick={() => handleChange("nota_id", n.id)}
+          >
             {n.codigo}
           </Dropdown.Item>
         ))}
@@ -100,11 +97,14 @@ function CadastroIntenModal({
     );
   }
 
-  function CategoriaItems({ categorias, setCategoria }) {
+  function CategoriaItems({ categorias, handleChange }) {
     return (
       <>
         {categorias.map((c) => (
-          <Dropdown.Item key={c.id} onClick={() => setCategoria(c)}>
+          <Dropdown.Item
+            key={c.id}
+            onClick={() => handleChange("categoria_id", c.id)}
+          >
             {c.nome}
           </Dropdown.Item>
         ))}
@@ -158,7 +158,7 @@ function CadastroIntenModal({
                 className="d-flex flex-column align-items-center"
               >
                 <Form.Label htmlFor="corProduto">Cor</Form.Label>
-                <Dropdown >
+                <Dropdown>
                   <Dropdown.Toggle
                     variant="none"
                     className={`dropdown-toggle-none w-100 d-flex justify-content-center align-items-center border-0 p-0 ${
@@ -166,15 +166,15 @@ function CadastroIntenModal({
                     }`}
                   >
                     <div className="d-flex flex-column align-items-center gap-1">
-                      <div 
+                      <div
                         style={{
-                          backgroundColor: formValue.cor || 'transparent', 
-                          width: '2.3rem',
-                          height: '2.3rem',
-                          borderRadius: '50%',
+                          backgroundColor: formValue.cor || "transparent",
+                          width: "2.3rem",
+                          height: "2.3rem",
+                          borderRadius: "50%",
                           // border: '1px solid #aaaaaa',
-                          boxShadow: '0 0 0 1px #666666'
-                        }} 
+                          boxShadow: "0 0 0 1px #666666",
+                        }}
                       />
                       {/* <span className="fw-normal text-[0.7rem]">
                         {cores.find(c => c.hex === formValue.cor)?.name || "Selecione a Cor"}
@@ -188,8 +188,15 @@ function CadastroIntenModal({
                     value={formValue.cor || ""}
                     required
                   />
-                  <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
-                    <Cores cores={cores} formValue={formValue} handleChange={handleChange} />
+                  <Dropdown.Menu
+                    className="p-0 shadow-sm"
+                    style={{ width: "320px" }}
+                  >
+                    <Cores
+                      cores={cores}
+                      formValue={formValue}
+                      handleChange={handleChange}
+                    />
                     <Dropdown.Divider className="m-0" />
                     {/* Nota: lembre-se de importar o setModalCores no topo do seu arquivo do hook */}
                     {/* <Dropdown.Item onClick={() => { if(typeof setModalCores !== 'undefined') setModalCores(true) }} className="text-center py-2 fw-bold text-primary">
@@ -202,28 +209,22 @@ function CadastroIntenModal({
                 <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
                 <Dropdown>
                   <Dropdown.Toggle
-                    variant="outline-secondary"
-                    className={`w-100 d-flex justify-content-between align-items-center ${
+                    variant="none"
+                    className={`form-select w-100 d-flex justify-content-between align-items-center bg-white dropdown-toggle-none ${
                       validated
-                        ? erros.categoria
+                        ? erros.categoria_id
                           ? "is-invalid"
                           : "is-valid"
                         : ""
                     }`}
                   >
-                    {categoria.nome || "Selecione a Categoria"}
+                    {categorias.find((c) => c.id === formValue.categoria_id)
+                      ?.nome || "Selecione a Categoria"}
                   </Dropdown.Toggle>
-                  <Form.Control
-                    id="categoriaProduto"
-                    type="hidden"
-                    name="categoria"
-                    value={categoria.id || ""}
-                    required
-                  />
                   <Dropdown.Menu className="w-100">
                     <CategoriaItems
                       categorias={categorias}
-                      setCategoria={setCategoria}
+                      handleChange={handleChange}
                     />
                     <Dropdown.Divider />
                     <Dropdown.Item
@@ -272,26 +273,20 @@ function CadastroIntenModal({
                   <Form.Label htmlFor="notaProduto">Nota</Form.Label>
                   <Dropdown>
                     <Dropdown.Toggle
-                      variant="outline-secondary"
-                      className={`w-100 d-flex justify-content-between align-items-center ${
+                      variant="none"
+                      className={`form-select w-100 d-flex justify-content-between align-items-center bg-white dropdown-toggle-none ${
                         validated
-                          ? erros.nota
+                          ? erros.nota_id
                             ? "is-invalid"
                             : "is-valid"
                           : ""
                       }`}
                     >
-                      {nota.codigo || "Selecione a Nota"}
+                      {notas.find((n) => n.id === formValue.nota_id)?.codigo ||
+                        "Selecione a Nota"}
                     </Dropdown.Toggle>
-                    <Form.Control
-                      id="notaProduto"
-                      type="hidden"
-                      name="nota"
-                      value={nota.id || ""}
-                      required
-                    />
                     <Dropdown.Menu className="w-100">
-                      <NotaItems notas={notas} setNota={setNota} />
+                      <NotaItems notas={notas} handleChange={handleChange} />
                     </Dropdown.Menu>
                   </Dropdown>
                 </Col>
@@ -334,16 +329,14 @@ function CadastroIntenModal({
                 <Form.Label htmlFor="valorCompraProduto">
                   Vlr. Compra
                 </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
+                <InputGroup
+                  className={`overflow-hidden ${validated ? (erros.valor_compra ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}
+                >
+                  <InputGroup.Text className="bg-transparent border-0 text-muted">
+                    R$
+                  </InputGroup.Text>
                   <Form.Control
-                    className={
-                      validated
-                        ? erros.valor_compra
-                          ? "is-invalid"
-                          : "is-valid"
-                        : ""
-                    }
+                    className={`border-0 shadow-none ${validated ? (erros.valor_compra ? "is-invalid" : "is-valid") : ""}`}
                     name="valor_compra"
                     id="valorCompraProduto"
                     type="text"
@@ -357,16 +350,14 @@ function CadastroIntenModal({
 
               <Col xs={4} md={4}>
                 <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
+                <InputGroup
+                  className={`overflow-hidden ${validated ? (erros.valor_venda ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}
+                >
+                  <InputGroup.Text className="bg-transparent border-0 text-muted">
+                    R$
+                  </InputGroup.Text>
                   <Form.Control
-                    className={
-                      validated
-                        ? erros.valor_venda
-                          ? "is-invalid"
-                          : "is-valid"
-                        : ""
-                    }
+                    className={`border-0 shadow-none ${validated ? (erros.valor_venda ? "is-invalid" : "is-valid") : ""}`}
                     name="valor_venda"
                     id="valorVendaProduto"
                     type="text"
@@ -380,12 +371,14 @@ function CadastroIntenModal({
 
               <Col xs={4} md={4}>
                 <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
+                <InputGroup
+                  className={`overflow-hidden ${validated ? (erros.lucro ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}
+                >
+                  <InputGroup.Text className="bg-transparent border-0 text-muted">
+                    R$
+                  </InputGroup.Text>
                   <Form.Control
-                    className={
-                      validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
-                    }
+                    className={`border-0 shadow-none ${validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""}`}
                     name="lucro"
                     id="LucroProduto"
                     type="text"

@@ -6,8 +6,6 @@ import { useRequestHandler } from "@hooks/useRequestHandler";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
 export function useCadastroProduto(onSuccess) {
-  const [categoria, setCategoria] = useState({});
-  const [nota, setNota] = useState({});
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
@@ -28,17 +26,31 @@ export function useCadastroProduto(onSuccess) {
     {
       nome: "",
       img: null,
-      cor: "#000000",
+      cor: null,
+      categoria_id: null,
       marca: "",
       tamanho: "",
+      nota_id: null,
       codigo_barras: "",
-      descricao: "",
       quantidade: 1,
+      valor_compra: null,
+      valor_venda: null,
+      lucro: null,
+      descricao: "",
     },
     {
       validators: {
         nome: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        marca: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        tamanho: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        nota_id: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        categoria_id: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        codigo_barras: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
         quantidade: (v) => (!v || v < 1 ? "Quantidade mínima é 1" : null),
+        valor_compra: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        valor_venda: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        lucro: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        descricao: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
       },
     },
   );
@@ -83,12 +95,12 @@ export function useCadastroProduto(onSuccess) {
     finalFormData.append("nome", formValue.nome);
     finalFormData.append("descricao", formValue.descricao);
     finalFormData.append("img", formValue.img);
-    finalFormData.append("categoria_id", categoria.id || "");
+    finalFormData.append("categoria_id", formValue.categoria_id || "");
 
     const quantidade = parseInt(formValue.quantidade) || 1;
     const itens = Array.from({ length: quantidade }, () => ({
       codigo_barras: formValue.codigo_barras,
-      nota_id: nota.id || "",
+      nota_id: formValue.nota_id || "",
       tamanho: formValue.tamanho,
       cor: formValue.cor,
       marca: formValue.marca,
@@ -152,11 +164,7 @@ export function useCadastroProduto(onSuccess) {
 
 
   return {
-    categoria,
-    setCategoria,
     cores,
-    nota,
-    setNota,
     notas,
     categorias,
     modalCadastroNota,

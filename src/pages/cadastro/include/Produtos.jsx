@@ -2,15 +2,12 @@ import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
 import CadastrarNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
+import { Cores } from "@components/Cores";
 import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
 
 export default function Produtos() {
   const {
-    categoria,
-    setCategoria,
     cores,
-    nota,
-    setNota,
     notas,
     categorias,
     modalCadastroNota,
@@ -67,14 +64,6 @@ export default function Produtos() {
 
           <Col xs={2} md={1} className="d-flex flex-column align-items-center">
             <Form.Label htmlFor="corProduto">Cor</Form.Label>
-            {/* <Form.Control
-              className="form-control-color"
-              name="cor"
-              id="corProduto"
-              type="color"
-              value={formValue.cor}
-              onChange={handleChange}
-            /> */}
             <Dropdown >
               <Dropdown.Toggle
                 variant="none"
@@ -90,9 +79,16 @@ export default function Produtos() {
                       height: '2.3rem',
                       borderRadius: '50%',
                       // border: '1px solid #aaaaaa',
-                      boxShadow: '0 0 0 1px #666666'
+                      boxShadow: '0 0 0 1px #666666',
+                      overflow: 'hidden'
                     }} 
-                  />
+                  >
+                    {formValue.cor === null && (
+                      <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" >
+                        <line x1="10" y1="0" x2="0" y2="10" stroke="black" strokeWidth="1" />
+                      </svg>
+                    )}
+                  </div>
                   {/* <span className="fw-normal text-[0.7rem]">
                     {cores.find(c => c.hex === formValue.cor)?.name || "Selecione a Cor"}
                   </span> */}
@@ -120,24 +116,17 @@ export default function Produtos() {
             <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
             <Dropdown>
               <Dropdown.Toggle
-                variant="outline-secondary"
-                className={`w-100 d-flex justify-content-between align-items-center ${
-                  validated ? (erros.categoria ? "is-invalid" : "is-valid") : ""
+                variant="none"
+                className={`form-select w-100 d-flex justify-content-between align-items-center bg-white dropdown-toggle-none ${
+                  validated ? (erros.categoria_id ? "is-invalid" : "is-valid") : ""
                 }`}
               >
-                {categoria.nome || "Selecione a Categoria"}
+                {categorias.find(c => c.id === formValue.categoria_id)?.nome || "Selecione a Categoria"}
               </Dropdown.Toggle>
-              <Form.Control
-                id="categoriaProduto"
-                type="hidden"
-                name="categoria"
-                value={categoria.id || ""}
-                required
-              />
               <Dropdown.Menu className="w-100">
                 <Categoria
                   categorias={categorias}
-                  setCategoria={setCategoria}
+                  handleChange={handleChange}
                 />
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={() => setModalCadastroCategoia(true)}>
@@ -186,22 +175,15 @@ export default function Produtos() {
             <Form.Label htmlFor="notaProduto">Nota</Form.Label>
             <Dropdown>
               <Dropdown.Toggle
-                variant="outline-secondary"
-                className={`w-100 d-flex justify-content-between align-items-center ${
-                  validated ? (erros.nota ? "is-invalid" : "is-valid") : ""
+                variant="none"
+                className={`form-select w-100 d-flex justify-content-between align-items-center bg-white dropdown-toggle-none ${
+                  validated ? (erros.nota_id ? "is-invalid" : "is-valid") : ""
                 }`}
               >
-                {nota.codigo || "Selecione a Nota"}
+                {notas.find(n => n.id === formValue.nota_id)?.codigo || "Selecione a Nota"}
               </Dropdown.Toggle>
-              <Form.Control
-                id="notaProduto"
-                type="hidden"
-                name="nota"
-                value={nota.id || ""}
-                required
-              />
               <Dropdown.Menu className="w-100">
-                <Nota notas={notas} setNota={setNota} />
+                <Nota notas={notas} handleChange={handleChange} />
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={() => setModalCadastroNota(true)}>
                   Nova Nota
@@ -246,16 +228,10 @@ export default function Produtos() {
 
           <Col xs={4} md={4}>
             <Form.Label htmlFor="valorCompraProduto">Vlr. Compra</Form.Label>
-            <InputGroup>
-              <InputGroup.Text>R$</InputGroup.Text>
+            <InputGroup className={`overflow-hidden ${validated ? (erros.valor_compra ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
+              <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
               <Form.Control
-                className={
-                  validated
-                    ? erros.valor_compra
-                      ? "is-invalid"
-                      : "is-valid"
-                    : ""
-                }
+                className={`border-0 shadow-none ${validated ? (erros.valor_compra ? "is-invalid" : "is-valid") : ""}`}
                 name="valor_compra"
                 id="valorCompraProduto"
                 type="text"
@@ -269,16 +245,10 @@ export default function Produtos() {
 
           <Col xs={4} md={4}>
             <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
-            <InputGroup>
-              <InputGroup.Text>R$</InputGroup.Text>
+            <InputGroup className={`overflow-hidden ${validated ? (erros.valor_venda ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
+              <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
               <Form.Control
-                className={
-                  validated
-                    ? erros.valor_venda
-                      ? "is-invalid"
-                      : "is-valid"
-                    : ""
-                }
+                className={`border-0 shadow-none ${validated ? (erros.valor_venda ? "is-invalid" : "is-valid") : ""}`}
                 name="valor_venda"
                 id="valorVendaProduto"
                 type="text"
@@ -292,12 +262,10 @@ export default function Produtos() {
 
           <Col xs={4} md={4}>
             <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
-            <InputGroup>
-              <InputGroup.Text>R$</InputGroup.Text>
+            <InputGroup className={`overflow-hidden ${validated ? (erros.lucro ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
+              <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
               <Form.Control
-                className={
-                  validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
-                }
+                className={`border-0 shadow-none ${validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""}`}
                 name="lucro"
                 id="LucroProduto"
                 type="text"
@@ -362,11 +330,11 @@ export default function Produtos() {
   );
 }
 
-function Nota({ notas, setNota }) {
+function Nota({ notas, handleChange }) {
   return (
     <>
       {notas.map((nota) => (
-        <Dropdown.Item key={nota.id} onClick={() => setNota(nota)}>
+        <Dropdown.Item key={nota.id} onClick={() => handleChange("nota_id", nota.id)}>
           {nota.codigo}
         </Dropdown.Item>
       ))}
@@ -374,59 +342,17 @@ function Nota({ notas, setNota }) {
   );
 }
 
-function Categoria({ categorias, setCategoria }) {
+function Categoria({ categorias, handleChange }) {
   return (
     <>
       {categorias.map((categoria) => (
         <Dropdown.Item
           key={categoria.id}
-          onClick={() => setCategoria(categoria)}
+          onClick={() => handleChange("categoria_id", categoria.id)}
         >
           {categoria.nome}
         </Dropdown.Item>
       ))}
     </>
-  );
-}
-
-
-export function Cores({ cores, formValue, handleChange }) {
-  return (
-    <div className="d-flex flex-wrap gap-1 p-2 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
-      {cores.map((cor) => (
-        <Dropdown.Item
-          as="div"
-          key={cor.id} 
-          onClick={() => handleChange({ target: { name: 'cor', value: cor.hex } })}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            padding: '5px',
-            border: formValue.cor === cor.hex ? '2px solid #0d6efd' : '1px solid #eaeaea',
-            borderRadius: '5px',
-            width: '70px',
-            whiteSpace: 'normal',
-            transition: 'background-color 0.2s ease',
-          }}
-        >
-          {/* Círculo que mostra a cor dinamicamente */}
-          <div 
-            style={{
-              backgroundColor: cor.hex, // Aqui usamos a propriedade Hex
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%', // Deixa redondo
-              marginBottom: '5px',
-              border: cor.hex === '#FFFFFF' ? '1px solid #ccc' : 'none' // Borda apenas no branco
-            }} 
-          />
-          <span style={{ fontSize: '10px', fontWeight: 'bold', textAlign: 'center', lineHeight: '1.1' }}>
-            {cor.name}
-          </span>
-        </Dropdown.Item>
-      ))}
-    </div>
   );
 }
