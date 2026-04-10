@@ -4,18 +4,7 @@ import multipart from "@fastify/multipart";
 import process from "node:process";
 import { env } from "./config/env.js";
 import sequelize from "./database/sequelize.js";
-import {
-  produtoRoutes,
-  categoriaRoutes,
-  clienteRoutes,
-  notaRoutes,
-  vendaRoutes,
-  notaVendaRoutes,
-  contaRoutes,
-  dashboardRoutes,
-  catalogoRoutes,
-  coresRoutes,
-} from "./routes/routers.js";
+import RegistarRotas from "./routes/routers.js";
 import tableCores from "./database/interface/tableCores.js";
 import { syncCacheToBlob } from "./services/cache.service.js";
 
@@ -42,13 +31,12 @@ if (env.FRONTEND_URL === "ALL") {
 } else {
   if (env.FRONTEND_URL) origins.push(env.FRONTEND_URL);
   console.log("\n[CORS] Modo: Restrito às seguintes origens:", origins);
-  await server.register(cors, { ...CORS_OPTIONS, origin: origins });
 }
 
 // ──────────────────────────────────────────────
 // Plugins
 // ──────────────────────────────────────────────
-server.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } });
+server.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } }); // Conta: 100 MegaBytes * 1024 KiloBytes * 1024 Bytes = 104.857.600 bytes
 
 // ──────────────────────────────────────────────
 // Decorators de Resposta Padronizados
@@ -99,16 +87,7 @@ server.get("/", async (request, reply) => {
 // ──────────────────────────────────────────────
 // Registro de Rotas
 // ──────────────────────────────────────────────
-server.register(produtoRoutes);
-server.register(categoriaRoutes);
-server.register(clienteRoutes);
-server.register(notaRoutes);
-server.register(vendaRoutes);
-server.register(notaVendaRoutes);
-server.register(contaRoutes);
-server.register(dashboardRoutes);
-server.register(catalogoRoutes);
-server.register(coresRoutes);
+server.register(RegistarRotas)
 
 // ──────────────────────────────────────────────
 // Inicialização
@@ -126,7 +105,7 @@ async function start() {
     syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização na inicialização:", err));
 
   } catch (err) {
-    server.log.error("Erro ao iniciar o servidor:", err);
+    server.log.error(err);
     process.exit(1);
   }
 }
