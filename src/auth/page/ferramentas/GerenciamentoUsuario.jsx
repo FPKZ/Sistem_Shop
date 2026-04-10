@@ -24,6 +24,7 @@ import UsuarioCadastroModal from "@components/modal/Auth/UsuarioCadastroModal";
 
 import "../../../../public/css/components/footer.css";
 import "../../../../public/css/sistem/ferramentas.css";
+import { isObject } from "framer-motion";
 
 export default function GerenciamentoUsuario() {
   const {
@@ -104,7 +105,7 @@ export default function GerenciamentoUsuario() {
                       </InputGroup.Text>
                       <Form.Control
                         placeholder="Buscar usuário..."
-                        value={filtro}
+                        value={isObject(filtro) ? "" : filtro}
                         onChange={(e) => setFiltro(e.target.value)}
                       />
                     </InputGroup>
