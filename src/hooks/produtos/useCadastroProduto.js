@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import API from "@app/api";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
-export function useCadastroProduto(onSuccess) {
+export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
@@ -43,23 +43,59 @@ export function useCadastroProduto(onSuccess) {
         nome: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
         marca: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
         tamanho: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
-        nota_id: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
-        categoria_id: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
-        codigo_barras: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        nota_id: (v) => (!caseNota ? (v == null ? "Campo obrigatório!" : null) : null),
+        categoria_id: (v) => (v == null ? "Campo obrigatório!" : null),
+        codigo_barras: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
         quantidade: (v) => (!v || v < 1 ? "Quantidade mínima é 1" : null),
-        valor_compra: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
-        valor_venda: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
-        lucro: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        valor_compra: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
+        valor_venda: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
+        lucro: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
         descricao: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
       },
     },
   );
-  console.log(formValue)
+
   const valorCompraHook = useCurrencyInput({ initialValue: 0 });
   const valorVendaHook = useCurrencyInput({ initialValue: 0 });
   const lucroHook = useCurrencyInput({ initialValue: 0 });
 
   const { isLoading, handleRequest } = useRequestHandler();
+
+  useEffect(() => {
+    setFormValue((prev) => ({
+      ...prev,
+      valor_compra: valorCompraHook.value,
+      valor_venda: valorVendaHook.value,
+      lucro: lucroHook.value,
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valorCompraHook.value, valorVendaHook.value, lucroHook.value]);
+
+  useEffect(() => {
+    if(modalCriar){
+      setFormValue({
+        nome: "",
+        img: null,
+        cor: null,
+        categoria_id: null,
+        marca: "",
+        tamanho: "",
+        nota_id: null,
+        codigo_barras: "",
+        quantidade: 1,
+        valor_compra: null,
+        valor_venda: null,
+        lucro: null,
+        descricao: "",
+      })
+      setValidated(false);
+      setErros({});
+      valorCompraHook.setValue(0);
+      valorVendaHook.setValue(0);
+      lucroHook.setValue(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalCriar]);
 
   // Handlers de precificação (lógica complexa mantida localmente para clareza)
   const handleValorCompraChange = (e) => {

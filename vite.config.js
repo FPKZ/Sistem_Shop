@@ -25,6 +25,7 @@ export default defineConfig({
       "@auth-sistem": path.resolve(__dirname, "./src/auth/sistem"),
       "@contexts": path.resolve(__dirname, "./src/contexts"),
       "@assets": path.resolve(__dirname, "./public/assets"),
+      "@utils": path.resolve(__dirname, "./src/utils"),
     },
   },
 });
