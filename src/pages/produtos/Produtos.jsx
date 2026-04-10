@@ -10,11 +10,9 @@ function Produtos() {
     produtos,
     produto,
     setProduto,
-    modalAddProduto,
-    setModalAddProduto,
+    cadastrarProduto,
     modalInfoProduto,
     setModalInfoProduto,
-    cadastroProduto,
     deleteProduto,
   } = useProdutosPage();
 
@@ -27,18 +25,10 @@ function Produtos() {
         setProduto={setProduto}
         mobile={mobile}
       >
-        <HoverBtn mobile={mobile} func={setModalAddProduto}>
+        <HoverBtn mobile={mobile} func={cadastrarProduto}>
           Adicionar Produto
         </HoverBtn>
       </Produto>
-
-      <CadastroModal
-        visible={modalAddProduto}
-        onClose={() => setModalAddProduto(false)}
-        onSubmit={async (data) => await cadastroProduto(data)}
-        cadastrarProduto={cadastroProduto}
-        mobile={mobile}
-      />
       <ProdutosInfo
         visible={modalInfoProduto}
         onClose={() => setModalInfoProduto(false)}

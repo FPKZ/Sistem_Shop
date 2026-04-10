@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import API from "@app/api.js";
 import usePopStateModal from "@hooks/usePopStateModal";
@@ -13,6 +13,8 @@ export default function useProdutosPage() {
   const [modalAddProduto, setModalAddProduto] = useState(false);
   const [modalInfoProduto, setModalInfoProduto] = useState(false);
 
+  const navigate = useNavigate();
+
   const { data: coresData } = useQuery({
     queryKey: ["cores"],
     queryFn: async () => {
@@ -23,7 +25,6 @@ export default function useProdutosPage() {
   const cores = coresData?.data || coresData || [];
 
   const { data: produtos } = API.getProdutos();
-  const cadastrarMutation = API.useCadastrarProduto();
   const deletarItemMutation = API.useDeletarItem();
 
   // Sincronização: Se o produto selecionado estiver no modal, 
@@ -42,20 +43,6 @@ export default function useProdutosPage() {
     [setModalAddProduto, setModalInfoProduto]
   );
 
-  const cadastroProduto = async (data) => {
-    try {
-      const response = await cadastrarMutation.mutateAsync(data);
-      if (response.ok) {
-        showToast(response.message, "success");
-      } else {
-        showToast(response.message, "error");
-      }
-      return response;
-    } catch {
-      showToast("Erro ao cadastrar produto", "error");
-    }
-  };
-
   const deleteProduto = async (id) => {
     try {
       const response = await deletarItemMutation.mutateAsync(id);
@@ -69,17 +56,16 @@ export default function useProdutosPage() {
     }
   };
 
+
   return {
     mobile,
     produtos: produtos || [],
     produto,
     setProduto,
     cores: cores || [],
-    modalAddProduto,
-    setModalAddProduto,
+    cadastrarProduto: () => navigate("/cadastro/produto"),
     modalInfoProduto,
     setModalInfoProduto,
-    cadastroProduto,
     deleteProduto,
   };
 }
