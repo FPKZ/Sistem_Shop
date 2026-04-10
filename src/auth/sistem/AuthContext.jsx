@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
                 return { ok: false, message: response.error || "Login failed" };
             }
         } catch (error) {
-            console.error("Login error:", error);
+            console.error(error);
             return { ok: false, message: "Ocorreu um erro durante o login" };
         }
     }, []);
