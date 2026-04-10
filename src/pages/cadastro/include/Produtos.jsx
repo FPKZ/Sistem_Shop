@@ -21,13 +21,9 @@ export default function Produtos() {
     validated,
     formValue,
     isLoading,
-    valorCompraHook,
-    valorVendaHook,
-    lucroHook,
+    pricing,
+    imageUpload,
     handleChange,
-    handleValorCompraChange,
-    handleValorVendaChange,
-    handleLucroChange,
     handleSubimit,
   } = useCadastroProduto();
 
@@ -42,13 +38,9 @@ export default function Produtos() {
           cores={cores}
           notas={notas}
           categorias={categorias}
-          valorCompraHook={valorCompraHook}
-          valorVendaHook={valorVendaHook}
-          lucroHook={lucroHook}
+          pricing={pricing}
+          imageUpload={imageUpload}
           handleChange={handleChange}
-          handleValorCompraChange={handleValorCompraChange}
-          handleValorVendaChange={handleValorVendaChange}
-          handleLucroChange={handleLucroChange}
           setModalCadastroCategoia={setModalCadastroCategoia}
           setModalCadastroNota={setModalCadastroNota}
           isLoading={isLoading}

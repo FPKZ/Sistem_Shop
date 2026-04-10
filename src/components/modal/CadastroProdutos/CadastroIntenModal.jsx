@@ -36,31 +36,22 @@ function CadastroIntenModal({
     formValue,
     setFormValue,
     isLoading,
-    valorCompraHook,
-    valorVendaHook,
-    lucroHook,
+    pricing,
+    imageUpload,
     handleChange,
-    handleValorCompraChange,
-    handleValorVendaChange,
-    handleLucroChange,
     handleSubimit,
     validate,
     gerarFormData,
   } = useCadastroProduto((itens) => {
     if (cadastroNota && itens) {
       // No modo nota, apenas repassamos os itens para a nota pai
-      // O hook já faz o loop, mas aqui o modal original tinha uma lógica de cadastrarProduto(FormData)
-      // que vinha por props. Vamos manter a compatibilidade se necessário.
     }
   }, true);
 
   // Sincronização de props especiais (como cadastrarProduto manual da Nota)
-  // No modal original de Nota, o cadastrarProduto apenas adicionava ao array local da Nota.
-  // Vamos interceptar o submit se for cadastroNota
   const finalHandleSubmit = async (e) => {
     if (cadastroNota) {
-      e.preventDefault();
-      // Usamos o validate e gerarFormData do hook para garantir consistência
+      if (e && e.preventDefault) e.preventDefault();
       if (validate()) {
         const formData = gerarFormData();
         if (cadastrarProduto) {
@@ -76,11 +67,27 @@ function CadastroIntenModal({
   useEffect(() => {
     setModalCriar(visible)
     if (!visible) {
-      setFormValue({ quantidade: 1 })
+      setFormValue({
+        nome: "",
+        img: null,
+        cor: null,
+        categoria_id: null,
+        marca: "",
+        tamanho: "",
+        nota_id: null,
+        codigo_barras: "",
+        quantidade: 1,
+        valor_compra: null,
+        valor_venda: null,
+        lucro: null,
+        descricao: "",
+      });
       setValidated(false);
       setErros({});
+      pricing.handlers.resetPricing();
+      imageUpload.handlers.clearImage();
     }
-  }, [visible, setFormValue, setValidated, setErros]);
+  }, [visible, setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers, setModalCriar]);
 
   if (!visible) return null;
 
@@ -106,13 +113,9 @@ function CadastroIntenModal({
               cores={cores}
               notas={notas}
               categorias={categorias}
-              valorCompraHook={valorCompraHook}
-              valorVendaHook={valorVendaHook}
-              lucroHook={lucroHook}
+              pricing={pricing}
+              imageUpload={imageUpload}
               handleChange={handleChange}
-              handleValorCompraChange={handleValorCompraChange}
-              handleValorVendaChange={handleValorVendaChange}
-              handleLucroChange={handleLucroChange}
               setModalCadastroCategoia={setModalCadastroCategoia}
               cadastroNota={cadastroNota}
               isLoading={isLoading}

@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import API from "@app/api";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
-import useCurrencyInput from "@hooks/useCurrencyInput";
+import useImageUpload from "@hooks/useImageUpload";
+import useProductPricing from "@hooks/produtos/useProductPricing";
 
 export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
@@ -11,8 +12,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
 
-
-  // Configuração do useForm para os campos básicos do produto
+  // 1. Hook de Formulário Base
   const {
     formValue,
     erros,
@@ -55,24 +55,28 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     },
   );
 
-  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
-  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
-  const lucroHook = useCurrencyInput({ initialValue: 0 });
+  // 2. Hook de Precificação (Lucro/Valores)
+  const pricing = useProductPricing();
+  const { valorCompra, valorVenda, lucro } = pricing;
+
+  // 3. Hook de Imagem (Upload/Crop)
+  const imageUpload = useImageUpload((file) => handleChange("img", file));
 
   const { isLoading, handleRequest } = useRequestHandler();
 
+  // Sincronização automática dos valores decimais do hook de preço com o formValue
   useEffect(() => {
     setFormValue((prev) => ({
       ...prev,
-      valor_compra: valorCompraHook.value,
-      valor_venda: valorVendaHook.value,
-      lucro: lucroHook.value,
+      valor_compra: valorCompra.value,
+      valor_venda: valorVenda.value,
+      lucro: lucro.value,
     }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [valorCompraHook.value, valorVendaHook.value, lucroHook.value]);
+  }, [valorCompra.value, valorVenda.value, lucro.value, setFormValue]);
 
+  // Reset total quando o modal de sucesso fecha ou o fluxo reinicia
   useEffect(() => {
-    if(modalCriar){
+    if (modalCriar) {
       setFormValue({
         nome: "",
         img: null,
@@ -87,44 +91,13 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
         valor_venda: null,
         lucro: null,
         descricao: "",
-      })
+      });
       setValidated(false);
       setErros({});
-      valorCompraHook.setValue(0);
-      valorVendaHook.setValue(0);
-      lucroHook.setValue(0);
+      pricing.handlers.resetPricing();
+      imageUpload.handlers.clearImage();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modalCriar]);
-
-  // Handlers de precificação (lógica complexa mantida localmente para clareza)
-  const handleValorCompraChange = (e) => {
-    valorCompraHook.onChange(e);
-    const newValorCompra =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorVendaHook.value > 0) {
-      lucroHook.setValue(valorVendaHook.value - newValorCompra);
-    } else if (lucroHook.value > 0) {
-      valorVendaHook.setValue(newValorCompra + lucroHook.value);
-    }
-  };
-
-  const handleValorVendaChange = (e) => {
-    valorVendaHook.onChange(e);
-    const newValorVenda =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorCompraHook.value > 0) {
-      lucroHook.setValue(newValorVenda - valorCompraHook.value);
-    }
-  };
-
-  const handleLucroChange = (e) => {
-    lucroHook.onChange(e);
-    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorCompraHook.value > 0) {
-      valorVendaHook.setValue(valorCompraHook.value + newLucro);
-    }
-  };
+  }, [modalCriar, setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]); // Adicionadas dependências para consistência
 
   const gerarFormData = () => {
     const finalFormData = new FormData();
@@ -140,9 +113,9 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
       tamanho: formValue.tamanho,
       cor: formValue.cor,
       marca: formValue.marca,
-      valor_compra: valorCompraHook.value,
-      valor_venda: valorVendaHook.value,
-      lucro: lucroHook.value,
+      valor_compra: valorCompra.value,
+      valor_venda: valorVenda.value,
+      lucro: lucro.value,
     }));
 
     finalFormData.set("itens", JSON.stringify(itens));
@@ -155,9 +128,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     if (validate()) {
       const finalFormData = gerarFormData();
 
-      const response = await handleRequest(() =>
-        API.postProduto(finalFormData),
-      );
+      const response = await handleRequest(() => API.postProduto(finalFormData));
 
       if (response?.ok) {
         if (response.itensEstoque) {
@@ -169,13 +140,13 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     }
   }
 
-  // Integração com TanStack Query para os dropdowns da tela de cadastro
+  // Queries de Dados de Apoio (DropDowns)
   const { data: categoriasData } = useQuery({
     queryKey: ["categorias"],
     queryFn: async () => {
       const res = await API.getCategoria();
       return res?.data || [];
-    }
+    },
   });
 
   const { data: notasData } = useQuery({
@@ -183,7 +154,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     queryFn: async () => {
       const res = await API.getNotas();
       return res || [];
-    }
+    },
   });
 
   const { data: coresData } = useQuery({
@@ -191,41 +162,43 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     queryFn: async () => {
       const res = await API.getCores();
       return res?.data || [];
-    }
+    },
   });
 
   const categorias = categoriasData?.data || categoriasData || [];
   const notas = notasData || [];
   const cores = coresData?.data || coresData || [];
 
-
   return {
+    // Dados
     cores,
     notas,
     categorias,
+    itensCriados,
+    formValue,
+    erros,
+    validated,
+    isLoading,
+    
+    // Estados de UI
     modalCadastroNota,
     setModalCadastroNota,
     modalCadastroCategoria,
     setModalCadastroCategoia,
     modalCriar,
     setModalCriar,
-    itensCriados,
-    erros,
-    setErros,
-    validated,
-    setValidated,
-    formValue,
-    setFormValue,
-    isLoading,
-    valorCompraHook,
-    valorVendaHook,
-    lucroHook,
+    
+    // Hooks Acoplados (Exposição direta para o componente visual)
+    pricing,
+    imageUpload,
+    
+    // Handlers
     handleChange,
-    handleValorCompraChange,
-    handleValorVendaChange,
-    handleLucroChange,
-    validate,
-    gerarFormData,
     handleSubimit,
+    validate,
+    setFormValue,
+    setValidated,
+    setErros,
   };
 }
+
