@@ -1,4 +1,4 @@
-import { put } from "@vercel/blob";
+import { put } from "./blob.service.js";
 import { randomUUID } from "crypto";
 import { Produto, ItemEstoque } from "../database/models/index.js";
 import { toBuffer } from "../utils/stream.js";
