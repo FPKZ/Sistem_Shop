@@ -1,4 +1,4 @@
-import { put } from "@vercel/blob";
+import { put } from "./blob.service.js";
 import { Produto, Categoria, Nota, ItemEstoque } from "../database/models/index.js";
 import { listarCatalogo } from "./catalogo.service.js";
 import { getColors } from "./cores.service.js";
@@ -39,9 +39,11 @@ export async function syncCacheToBlob(logger = console) {
       contentType: 'application/json'
     });
 
-    logger.info(`[CACHE] Vercel Blob cache generated. URL: ${blob.url}`);
+    logger.info(`[CACHE] Vercel Blob cache generated successfully. Payload size: ${JSON.stringify(payload).length} bytes`);
+    logger.info(`[CACHE] URL: ${blob.url}`);
     return blob.url;
   } catch (error) {
-    logger.error("[CACHE] Error syncing cache to Vercel Blob: " + error.message);
+    logger.error("[CACHE] CRITICAL ERROR syncing cache: " + error.message);
+    if (error.stack) logger.error(error.stack);
   }
 }
