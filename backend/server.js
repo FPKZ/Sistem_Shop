@@ -7,6 +7,7 @@ import sequelize from "./database/sequelize.js";
 import RegistarRotas from "./routes/routers.js";
 import tableCores from "./database/interface/tableCores.js";
 import { syncCacheToBlob } from "./services/cache.service.js";
+import { limparImagensOrfas } from "./services/img.service.js";
 
 const server = fastify({ logger: true, trustProxy: true });
 
@@ -45,7 +46,8 @@ server.decorateReply("ok", function (data = {}, message = "Operação realizada 
   return this.code(this.statusCode === 200 ? 200 : this.statusCode).send({ ok: true, message, ...data });
 });
 
-server.decorateReply("err", function (message = "Ocorreu um erro", code = 400) {
+server.decorateReply("err", function (error = "Ocorreu um erro", code = 400) {
+  const message = error instanceof Error ? error.message : error;
   return this.code(code).send({ ok: false, error: message });
 });
 
@@ -103,6 +105,17 @@ async function start() {
 
     // Sincroniza o cache estático no Vercel Blob para que esteja atualizado no primeiro boot
     syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização na inicialização:", err));
+
+    // Agenda a limpeza de imagens órfãs (24 horas = 24 * 60 * 60 * 1000 ms)
+    const INTERVALO_LIMPEZA = 24 * 60 * 60 * 1000;
+    setInterval(() => {
+        limparImagensOrfas().catch(err => server.log.error("[CLEANUP] Falha na limpeza agendada:", err));
+    }, INTERVALO_LIMPEZA);
+
+    // Executa uma limpeza inicial após 1 hora para não sobrecarregar o boot
+    setTimeout(() => {
+        limparImagensOrfas().catch(err => server.log.error("[CLEANUP] Falha na limpeza inicial:", err));
+    }, 10 * 60 * 1000);
 
   } catch (err) {
     server.log.error(err);
