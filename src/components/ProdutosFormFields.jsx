@@ -22,6 +22,8 @@ export default function ProdutosFormFields({
     isLoading,
     modalImagens,
     setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
     removeImagem
 }) {
     const { valorCompra, valorVenda, lucro, handlers: pHandlers } = pricing;
@@ -34,6 +36,9 @@ export default function ProdutosFormFields({
                 onClose={() => setModalImagens(false)}
                 imagens={formValue.imgs}
                 onRemove={removeImagem}
+                activeTab={activeTabModalImagens}
+                onTabChange={setActiveTabModalImagens}
+                imageUpload={imageUpload}
             />
 
             <ImageCropModal
@@ -61,24 +66,19 @@ export default function ProdutosFormFields({
 
                 <Col xs={10} md={4}>
                     <Form.Label htmlFor="imgProduto">Imagens</Form.Label>
-                    <input
-                        ref={imageUpload.fileInputRef}
-                        type="file"
-                        id="imgProduto"
-                        accept={imageUpload.tiposAceitos}
-                        onChange={iHandlers.handleFileSelect}
-                        style={{ display: "none" }}
-                    />
                     <InputGroup>
                         <div
                             className={`form-control d-flex align-items-center gap-2 px-3 py-2 ${
                                 imageUpload.erro ? "is-invalid" : formValue.imgs?.length > 0 ? "is-valid" : ""
                             }`}
                             style={{ cursor: "pointer", minHeight: "38px" }}
-                            onClick={() => imageUpload.fileInputRef.current?.click()}
+                            onClick={() => {
+                                setActiveTabModalImagens("adicionar");
+                                setModalImagens(true);
+                            }}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => e.key === "Enter" && imageUpload.fileInputRef.current?.click()}
+                            onKeyDown={(e) => e.key === "Enter" && (setActiveTabModalImagens("adicionar"), setModalImagens(true))}
                         >
                             <i className="bi bi-plus-lg text-muted" />
                             <span
@@ -91,7 +91,10 @@ export default function ProdutosFormFields({
                         <Button 
                             variant="outline-secondary" 
                             className="d-flex align-items-center gap-1"
-                            onClick={() => setModalImagens(true)}
+                            onClick={() => {
+                                setActiveTabModalImagens("galeria");
+                                setModalImagens(true);
+                            }}
                         >
                             <i className="bi bi-images"></i>
                             <span className="badge bg-secondary">{formValue.imgs?.length || 0}</span>

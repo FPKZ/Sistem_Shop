@@ -12,6 +12,8 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [modalImagens, setModalImagens] = useState(false);
+  const [activeTabModalImagens, setActiveTabModalImagens] = useState("galeria");
 
   // 1. Hook de Formulário Base
   const {
@@ -81,7 +83,6 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     }
   });
 
-  const [modalImagens, setModalImagens] = useState(false);
   const removeImagem = async (url) => {
     const response = await handleRequest(() => API.deleteImagem(url));
     if (response?.ok) {
@@ -124,6 +125,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     setErros({});
     pricing.handlers.resetPricing();
     imageUpload.handlers.clearImage();
+    setActiveTabModalImagens("galeria");
   }, [setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]);
 
   // Reset automático quando o modal de sucesso fecha ou o fluxo reinicia
@@ -236,6 +238,8 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     imageUpload,
     modalImagens,
     setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
     removeImagem,
     
     // Handlers

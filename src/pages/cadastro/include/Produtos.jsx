@@ -25,6 +25,8 @@ export default function Produtos() {
     imageUpload,
     modalImagens,
     setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
     removeImagem,
     handleChange,
     handleSubimit,
@@ -49,6 +51,8 @@ export default function Produtos() {
           isLoading={isLoading}
           modalImagens={modalImagens}
           setModalImagens={setModalImagens}
+          activeTabModalImagens={activeTabModalImagens}
+          setActiveTabModalImagens={setActiveTabModalImagens}
           removeImagem={removeImagem}
         />
       </Form>

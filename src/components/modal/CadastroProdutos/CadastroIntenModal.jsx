@@ -39,6 +39,8 @@ function CadastroIntenModal({
     imageUpload,
     modalImagens,
     setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
     removeImagem,
     handleChange,
     handleSubimit,
@@ -108,6 +110,8 @@ function CadastroIntenModal({
               isLoading={isLoading}
               modalImagens={modalImagens}
               setModalImagens={setModalImagens}
+              activeTabModalImagens={activeTabModalImagens}
+              setActiveTabModalImagens={setActiveTabModalImagens}
               removeImagem={removeImagem}
             />
           </Modal.Body>
