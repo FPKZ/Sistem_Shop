@@ -34,28 +34,40 @@ function CadastroIntenModal({
     validated,
     setValidated,
     formValue,
-    setFormValue,
     isLoading,
     pricing,
     imageUpload,
+    modalImagens,
+    setModalImagens,
+    removeImagem,
     handleChange,
     handleSubimit,
     validate,
-    gerarFormData,
+    gerarPayloadData,
+    resetForm,
   } = useCadastroProduto((itens) => {
     if (cadastroNota && itens) {
       // No modo nota, apenas repassamos os itens para a nota pai
     }
   }, true);
 
+  // Reset do formulário ao abrir ou fechar o modal para garantir limpeza total
+  useEffect(() => {
+    resetForm();
+    return () => {
+      resetForm();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]); // resetForm removido daqui para evitar loop infinito com hooks internos
+
   // Sincronização de props especiais (como cadastrarProduto manual da Nota)
   const finalHandleSubmit = async (e) => {
     if (cadastroNota) {
       if (e && e.preventDefault) e.preventDefault();
       if (validate()) {
-        const formData = gerarFormData();
+        const payload = gerarPayloadData(); // Usar o novo payload JSON
         if (cadastrarProduto) {
-          cadastrarProduto(formData);
+          cadastrarProduto(payload);
         }
         onClose();
       }
@@ -64,37 +76,12 @@ function CadastroIntenModal({
     }
   };
 
-  useEffect(() => {
-    setModalCriar(visible)
-    if (!visible) {
-      setFormValue({
-        nome: "",
-        img: null,
-        cor: null,
-        categoria_id: null,
-        marca: "",
-        tamanho: "",
-        nota_id: null,
-        codigo_barras: "",
-        quantidade: 1,
-        valor_compra: null,
-        valor_venda: null,
-        lucro: null,
-        descricao: "",
-      });
-      setValidated(false);
-      setErros({});
-      pricing.handlers.resetPricing();
-      imageUpload.handlers.clearImage();
-    }
-  }, [visible, setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers, setModalCriar]);
-
   if (!visible) return null;
 
   return (
     <>
       <Modal
-        show={modalCriar}
+        show={visible}
         onHide={onClose}
         size="xl"
         centered
@@ -119,6 +106,9 @@ function CadastroIntenModal({
               setModalCadastroCategoia={setModalCadastroCategoia}
               cadastroNota={cadastroNota}
               isLoading={isLoading}
+              modalImagens={modalImagens}
+              setModalImagens={setModalImagens}
+              removeImagem={removeImagem}
             />
           </Modal.Body>
           <Modal.Footer>

@@ -244,12 +244,14 @@ export default function CadastroNotaModal({ visible, onClose }) {
           </Modal.Body>
         </Form>
       </Modal>
-      <CadastroIntenModal
-        visible={modalCadastroPrduto}
-        onClose={() => setmodalCadastroPrduto(false)}
-        cadastroNota={true}
-        cadastrarProduto={cadastrarProduto}
-      />
+      {modalCadastroPrduto && (
+        <CadastroIntenModal
+          visible={modalCadastroPrduto}
+          onClose={() => setmodalCadastroPrduto(false)}
+          cadastroNota={true}
+          cadastrarProduto={cadastrarProduto}
+        />
+      )}
       <ProdutoInfo
         visible={modalInfoProduto}
         onClose={() => setmodalInfoProduto(false)}

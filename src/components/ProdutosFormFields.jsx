@@ -1,6 +1,7 @@
 import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
 import { Cores } from "@components/Cores";
 import ImageCropModal from "@components/ImageCropModal";
+import GerenciarImagensModal from "@components/GerenciarImagensModal";
 
 /**
  * Componente visual para os campos do formulário de produtos.
@@ -16,16 +17,25 @@ export default function ProdutosFormFields({
     pricing,        // Novo: contém valorCompra, valorVenda, lucro e seus handlers
     imageUpload,    // Novo: contém estado e handlers da imagem
     handleChange, 
-    setModalCadastroCategoia, 
     setModalCadastroNota,
     cadastroNota,
-    isLoading
+    isLoading,
+    modalImagens,
+    setModalImagens,
+    removeImagem
 }) {
     const { valorCompra, valorVenda, lucro, handlers: pHandlers } = pricing;
     const { handlers: iHandlers } = imageUpload;
 
     return (
         <>
+            <GerenciarImagensModal
+                visible={modalImagens}
+                onClose={() => setModalImagens(false)}
+                imagens={formValue.imgs}
+                onRemove={removeImagem}
+            />
+
             <ImageCropModal
                 src={imageUpload.cropSrc}
                 visible={imageUpload.showCrop}
@@ -50,7 +60,7 @@ export default function ProdutosFormFields({
                 </Col>
 
                 <Col xs={10} md={4}>
-                    <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
+                    <Form.Label htmlFor="imgProduto">Imagens</Form.Label>
                     <input
                         ref={imageUpload.fileInputRef}
                         type="file"
@@ -59,27 +69,37 @@ export default function ProdutosFormFields({
                         onChange={iHandlers.handleFileSelect}
                         style={{ display: "none" }}
                     />
-                    <div
-                        className={`form-control d-flex align-items-center gap-2 px-3 py-2 ${
-                            imageUpload.erro ? "is-invalid" : formValue.img ? "is-valid" : ""
-                        }`}
-                        style={{ cursor: "pointer", minHeight: "38px" }}
-                        onClick={() => imageUpload.fileInputRef.current?.click()}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === "Enter" && imageUpload.fileInputRef.current?.click()}
-                    >
-                        <i className="bi bi-image text-muted" />
-                        <span
-                            className="text-truncate small"
-                            style={{ color: imageUpload.nomeArquivo ? "inherit" : "#adb5bd" }}
+                    <InputGroup>
+                        <div
+                            className={`form-control d-flex align-items-center gap-2 px-3 py-2 ${
+                                imageUpload.erro ? "is-invalid" : formValue.imgs?.length > 0 ? "is-valid" : ""
+                            }`}
+                            style={{ cursor: "pointer", minHeight: "38px" }}
+                            onClick={() => imageUpload.fileInputRef.current?.click()}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === "Enter" && imageUpload.fileInputRef.current?.click()}
                         >
-                            {imageUpload.nomeArquivo || `Selecionar imagem (${imageUpload.tiposLabel})`}
-                        </span>
-                    </div>
+                            <i className="bi bi-plus-lg text-muted" />
+                            <span
+                                className="text-truncate small"
+                                style={{ color: "#adb5bd" }}
+                            >
+                                Adicionar imagem
+                            </span>
+                        </div>
+                        <Button 
+                            variant="outline-secondary" 
+                            className="d-flex align-items-center gap-1"
+                            onClick={() => setModalImagens(true)}
+                        >
+                            <i className="bi bi-images"></i>
+                            <span className="badge bg-secondary">{formValue.imgs?.length || 0}</span>
+                        </Button>
+                    </InputGroup>
                     {imageUpload.erro && <div className="invalid-feedback d-block">{imageUpload.erro}</div>}
-                    {formValue.img && !imageUpload.erro && (
-                        <div className="valid-feedback d-block">Imagem recortada e pronta!</div>
+                    {formValue.imgs?.length > 0 && !imageUpload.erro && (
+                        <div className="valid-feedback d-block">Clique em gerenciar para ver as imagens.</div>
                     )}
                 </Col>
 

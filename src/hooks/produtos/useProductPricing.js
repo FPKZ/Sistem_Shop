@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import useCurrencyInput from "@hooks/useCurrencyInput";
 
 /**
@@ -50,11 +51,11 @@ export default function useProductPricing(initialValues = {}) {
     valorCompra,
     valorVenda,
     lucro,
-    handlers: {
+    handlers: useMemo(() => ({
       handleValorCompraChange,
       handleValorVendaChange,
       handleLucroChange,
       resetPricing
-    }
+    }), [valorCompra.value, valorVenda.value, lucro.value])
   };
 }

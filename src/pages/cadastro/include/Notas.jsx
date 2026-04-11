@@ -198,7 +198,7 @@ export default function Notas() {
           disabled={isLoading || modalCadastroPrduto}
           type="submit"
         >
-          Adicionar
+          {isLoading ? "Salvando..." : "Salvar Nota"}
         </Button>
       </Form>
       <CadastroModal
@@ -215,7 +215,10 @@ export default function Notas() {
       />
       <ProdutosCriados
         visible={modalCriar}
-        onClose={() => setModalCriar(false)}
+        onClose={() => {
+          setModalCriar(false);
+          navigate("/notas");
+        }}
         itens={itensCriados}
       />
     </div>

@@ -129,7 +129,11 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               </Col>
               <Col xs={1} className="p-1 d-flex justify-content-center">
                 <img
-                  src={produtos.img || "assets/tube-spinner.svg"}
+                  src={
+                    produtos.imgs && produtos.imgs.length > 0
+                      ? produtos.imgs[0]
+                      : "assets/tube-spinner.svg"
+                  }
                   alt={produto.nome}
                   className="img-fluid rounded border shadow-sm"
                   style={{

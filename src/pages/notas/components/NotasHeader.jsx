@@ -1,8 +1,10 @@
 import { Row, Col, Button } from "react-bootstrap";
 import { Plus } from "lucide-react";
 import HoverBtn from "@components/HoverBtn";
+import { useNavigate } from "react-router-dom";
 
-export function NotasHeader({ mobile, setIsModalCadastroOpen }) {
+export function NotasHeader({ mobile }) {
+  const navigate = useNavigate();
   return (
     <Row className="mb-4 align-items-center position-relative">
       <Col xs={9}>
@@ -18,7 +20,7 @@ export function NotasHeader({ mobile, setIsModalCadastroOpen }) {
         {mobile ? (
           <HoverBtn
             mobile={mobile}
-            func={setIsModalCadastroOpen}
+            func={() => navigate("/cadastro/nota")}
             upClass="position-absolute bottom-0"
           >
             Cadastrar Nota
@@ -26,7 +28,7 @@ export function NotasHeader({ mobile, setIsModalCadastroOpen }) {
         ) : (
           <Button
             className="btn btn-roxo d-flex align-items-center"
-            onClick={() => setIsModalCadastroOpen(true)}
+            onClick={() => navigate("/cadastro/nota")}
           >
             <Plus size={18} className="me-2" />
             Cadastrar Nota

@@ -46,78 +46,69 @@ export function useCadastroNota(onSuccess) {
     }
   }, [produtos, incluirProdutos, setFormValue]);
 
-  function cadastrarProduto(data) {
-    const obj = Object.fromEntries(data.entries());
-    const imgFile = data.get("img");
-    let itemsArray = [];
+  function cadastrarProduto(payload) {
+    if (!payload) return;
 
-    if (obj.itens && typeof obj.itens === "string") {
-      try {
-        itemsArray = JSON.parse(obj.itens);
-      } catch (error) {
-        console.error("Erro ao parsear itens:", error);
-      }
-    } else if (Array.isArray(obj.itens)) {
-      itemsArray = obj.itens;
-    }
+    // Geramos um identificador único simples apenas para controle da lista na tabela do front (remoção)
+    const novaEntrada = {
+      ...payload,
+      _id: `prod_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    };
 
-    const novasEntradas = itemsArray.map((item, index) => ({
-      ...obj,
-      itens: [item],
-      img: imgFile,
-      frontId: `prod_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
-    }));
-
-    setProdutos((prev) => prev.concat(novasEntradas));
+    setProdutos((prev) => [...prev, novaEntrada]);
   }
 
-  function removerProduto(frontId) {
-    setProdutos((prev) => prev.filter((p) => p.frontId !== frontId));
+  async function removerProduto(_id) {
+    const produtoParaRemover = produtos.find((p) => p._id === _id);
+    if (produtoParaRemover && produtoParaRemover.imgs?.length > 0) {
+      // Deletar as imagens do servidor físico (Vercel Blob) para evitar lixo
+      const delecoes = produtoParaRemover.imgs.map((url) => API.deleteImagem(url));
+      await Promise.all(delecoes).catch((err) =>
+        console.error("Erro ao deletar imagens de produto removido da nota:", err),
+      );
+    }
+    setProdutos((prev) => prev.filter((p) => p._id !== _id));
   }
 
   const handleSubimit = async (e) => {
     e.preventDefault();
 
     if (validate()) {
-      const finalFormData = new FormData();
-      finalFormData.append("codigo", formValue.codigo);
-      finalFormData.append("valor_total", valorTotalHook.value);
-      finalFormData.append("data", formValue.data);
-      finalFormData.append("data_vencimento", formValue.data_vencimento);
-      finalFormData.append("fornecedor", formValue.fornecedor);
       const quantidadeTotal = produtos.reduce(
         (acc, p) => acc + (p.itens?.length || 0),
         0,
       );
-      finalFormData.append(
-        "quantidade",
-        incluirProdutos ? quantidadeTotal : formValue.quantidade,
-      );
 
-      if (incluirProdutos && produtos.length > 0) {
-        const produtosParaEnviar = produtos.map(({ ...resto }) => resto);
-        finalFormData.append("itens", JSON.stringify(produtosParaEnviar));
-        produtos.forEach((p) => {
-          if (p.img) finalFormData.append(`imagem_${p.frontId}`, p.img);
-        });
-      }
+      const payload = {
+        codigo: formValue.codigo,
+        valor_total: valorTotalHook.value,
+        data: formValue.data,
+        data_vencimento: formValue.data_vencimento,
+        fornecedor: formValue.fornecedor,
+        quantidade: incluirProdutos ? quantidadeTotal : formValue.quantidade,
+        itens: incluirProdutos ? produtos : []
+      };
 
-      const response = await handleRequest(() => API.postNota(finalFormData));
+      const response = await handleRequest(() => API.postNota(payload));
 
       if (response?.ok) {
-        if (response.produtos) {
+        const data = response.data || response;
+        if (data.produtos) {
           let itensCriadosData = [];
-          for (const itens of response.produtos) {
-            itensCriadosData = itensCriadosData.concat(itens.itensEstoque);
+          for (const res of data.produtos) {
+            if (res.itensEstoque) {
+              itensCriadosData = itensCriadosData.concat(res.itensEstoque);
+            }
           }
           setItensCriados(itensCriadosData);
           setModalCriar(true);
+        } else if (onSuccess) {
+          onSuccess();
         }
-        if (onSuccess) onSuccess();
       }
     }
   };
-
+  
   return {
     formValue,
     erros,

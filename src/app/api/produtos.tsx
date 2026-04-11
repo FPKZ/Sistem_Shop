@@ -20,6 +20,26 @@ export async function postProduto(data: any) {
   }
 }
 
+export async function postImagens(files: File[]) {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("imagens", file);
+    });
+    return await api.post("/imagens/salvar", formData);
+  } catch (error) {
+    console.error("Erro ao fazer upload de imagens", error);
+  }
+}
+
+export async function deleteImagem(url: string) {
+  try {
+    return await api.delete("/imagen/deletar", { url });
+  } catch (error) {
+    console.error("Erro ao deletar imagem", error);
+  }
+}
+
 export async function reservarProduto(id: number, cliente: number) {
   try {
     return await api.put(`/produto/reservar/${id}?cliente_id=${cliente}`, {});

@@ -23,6 +23,9 @@ export default function Produtos() {
     isLoading,
     pricing,
     imageUpload,
+    modalImagens,
+    setModalImagens,
+    removeImagem,
     handleChange,
     handleSubimit,
   } = useCadastroProduto();
@@ -44,23 +47,32 @@ export default function Produtos() {
           setModalCadastroCategoia={setModalCadastroCategoia}
           setModalCadastroNota={setModalCadastroNota}
           isLoading={isLoading}
+          modalImagens={modalImagens}
+          setModalImagens={setModalImagens}
+          removeImagem={removeImagem}
         />
       </Form>
 
-      <CadastrarNotaModal
-        visible={modalCadastroNota}
-        onClose={() => setModalCadastroNota(false)}
-        produts={false}
-      />
-      <CadastroCategoria
-        visible={modalCadastroCategoria}
-        onClose={() => setModalCadastroCategoia(false)}
-      />
-      <ProdutosCriados
-        visible={modalCriar}
-        onClose={() => setModalCriar(false)}
-        itens={itensCriados}
-      />
+      {modalCadastroNota && (
+        <CadastrarNotaModal
+          visible={modalCadastroNota}
+          onClose={() => setModalCadastroNota(false)}
+          produts={false}
+        />
+      )}
+      {modalCadastroCategoria && (
+        <CadastroCategoria
+          visible={modalCadastroCategoria}
+          onClose={() => setModalCadastroCategoia(false)}
+        />
+      )}
+      {modalCriar && (
+        <ProdutosCriados
+          visible={modalCriar}
+          onClose={() => setModalCriar(false)}
+          itens={itensCriados}
+        />
+      )}
     </div>
   );
 }

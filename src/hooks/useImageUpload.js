@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 
 const TIPOS_IMAGEM_ACEITOS = ["image/jpeg", "image/png", "image/webp"];
 const TIPOS_LABEL = "JPG, PNG ou WebP";
@@ -75,11 +75,11 @@ export default function useImageUpload(onImageChange) {
     fileInputRef,
     tiposLabel: TIPOS_LABEL,
     tiposAceitos: TIPOS_IMAGEM_ACEITOS.join(","),
-    handlers: {
+    handlers: useMemo(() => ({
       handleFileSelect,
       handleCropConfirm,
       handleCropCancel,
       clearImage
-    }
+    }), [onImageChange, cropSrc])
   };
 }

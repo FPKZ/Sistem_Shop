@@ -27,8 +27,11 @@ export default function TabelaProdutosNota({
         <Col xs={4} sm={4}>
           Nome
         </Col>
-        <Col xs={3} sm={2} className="text-end">
+        <Col xs={3} sm={1} className="text-end">
           Valor
+        </Col>
+        <Col xs={1} sm={1} className="text-center ps-3">
+          Qtd
         </Col>
         <Col xs={2} sm={2} className="text-center">
           Status
@@ -113,14 +116,12 @@ function Produtos({
             >
               <img
                 src={
-                  produtos.img
-                    ? typeof produtos.img === "string"
-                      ? produtos.img
-                      : URL.createObjectURL(produtos.img)
+                  produtos.imgs && produtos.imgs.length > 0
+                    ? produtos.imgs[0]
                     : img
                 }
                 onError={(e) => {
-                  e.target.onerror = null; // Previne loop infinito
+                  e.target.onerror = null;
                   e.target.src = img;
                 }}
                 alt={produtos.nome}
@@ -142,13 +143,20 @@ function Produtos({
           </Col>
 
           {/* Valor */}
-          <Col xs={3} sm={2} className="text-end">
+          <Col xs={3} sm={1} className="text-end">
             <div className="fw-bold text-dark">
               {utils.formatMoney(itemDetalhe.valor_venda || 0)}
             </div>
             <div className="text-muted small" style={{ fontSize: "0.75rem" }}>
               Comp: {utils.formatMoney(itemDetalhe.valor_compra || 0)}
             </div>
+          </Col>
+          
+          {/* Quantidade */}
+          <Col xs={1} sm={1} className="text-center ps-3">
+             <div className="fw-bold text-roxo">
+                {produtos.itens?.length || 0}
+             </div>
           </Col>
 
           {/* Status */}
@@ -170,7 +178,7 @@ function Produtos({
               className="p-0 text-danger shadow-none"
               onClick={(e) => {
                 e.stopPropagation();
-                removerProduto?.(produtos.frontId);
+                removerProduto?.(produtos._id);
               }}
             >
               <X size={18} />

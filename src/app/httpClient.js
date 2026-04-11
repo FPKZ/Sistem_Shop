@@ -87,7 +87,7 @@ export const api = {
   get:    (path, opts = {}) => request(path, { method: "GET",    ...opts }),
   post:   (path, body, opts = {}) => request(path, { method: "POST",   body: body instanceof FormData ? body : JSON.stringify(body), ...opts }),
   put:    (path, body, opts = {}) => request(path, { method: "PUT",    body: body instanceof FormData ? body : JSON.stringify(body), ...opts }),
-  delete: (path, opts = {}) => request(path, { method: "DELETE", ...opts }),
+  delete: (path, body, opts = {}) => request(path, { method: "DELETE", body: body instanceof FormData ? body : JSON.stringify(body), ...opts }),
   /**
    * Versão raw que retorna o Response original (sem parsear).
    * Útil quando o chamador precisa verificar status manualmente.

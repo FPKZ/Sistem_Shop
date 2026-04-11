@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import API from "@app/api";
 import { useForm } from "@hooks/useForm";
@@ -11,6 +11,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // 1. Hook de Formulário Base
   const {
@@ -25,7 +26,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
   } = useForm(
     {
       nome: "",
-      img: null,
+      imgs: [],
       cor: null,
       categoria_id: null,
       marca: "",
@@ -60,7 +61,36 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
   const { valorCompra, valorVenda, lucro } = pricing;
 
   // 3. Hook de Imagem (Upload/Crop)
-  const imageUpload = useImageUpload((file) => handleChange("img", file));
+  const imageUpload = useImageUpload(async (file) => {
+    if (file) {
+      setIsUploadingImage(true);
+      try {
+        // Fazemos o upload de forma "silenciosa" (sem usar o handleRequest para não disparar o loading global)
+        const response = await API.postImagens([file]);
+        if (response?.ok && response.data) {
+          setFormValue((prev) => ({
+            ...prev,
+            imgs: [...(prev.imgs || []), ...(response.data || [])],
+          }));
+        }
+      } catch (error) {
+        console.error("Erro no upload silencioso de imagem:", error);
+      } finally {
+        setIsUploadingImage(false);
+      }
+    }
+  });
+
+  const [modalImagens, setModalImagens] = useState(false);
+  const removeImagem = async (url) => {
+    const response = await handleRequest(() => API.deleteImagem(url));
+    if (response?.ok) {
+      setFormValue((prev) => ({
+        ...prev,
+        imgs: prev.imgs.filter((img) => img !== url),
+      }));
+    }
+  };
 
   const { isLoading, handleRequest } = useRequestHandler();
 
@@ -74,38 +104,36 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     }));
   }, [valorCompra.value, valorVenda.value, lucro.value, setFormValue]);
 
-  // Reset total quando o modal de sucesso fecha ou o fluxo reinicia
+  const resetForm = useCallback(() => {
+    setFormValue({
+      nome: "",
+      imgs: [],
+      cor: null,
+      categoria_id: null,
+      marca: "",
+      tamanho: "",
+      nota_id: null,
+      codigo_barras: "",
+      quantidade: 1,
+      valor_compra: null,
+      valor_venda: null,
+      lucro: null,
+      descricao: "",
+    });
+    setValidated(false);
+    setErros({});
+    pricing.handlers.resetPricing();
+    imageUpload.handlers.clearImage();
+  }, [setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]);
+
+  // Reset automático quando o modal de sucesso fecha ou o fluxo reinicia
   useEffect(() => {
     if (modalCriar) {
-      setFormValue({
-        nome: "",
-        img: null,
-        cor: null,
-        categoria_id: null,
-        marca: "",
-        tamanho: "",
-        nota_id: null,
-        codigo_barras: "",
-        quantidade: 1,
-        valor_compra: null,
-        valor_venda: null,
-        lucro: null,
-        descricao: "",
-      });
-      setValidated(false);
-      setErros({});
-      pricing.handlers.resetPricing();
-      imageUpload.handlers.clearImage();
+      resetForm();
     }
-  }, [modalCriar, setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]); // Adicionadas dependências para consistência
+  }, [modalCriar]); // Simplificado pois resetForm é estável ou as dependências internas já são tratadas
 
-  const gerarFormData = () => {
-    const finalFormData = new FormData();
-    finalFormData.append("nome", formValue.nome);
-    finalFormData.append("descricao", formValue.descricao);
-    finalFormData.append("img", formValue.img);
-    finalFormData.append("categoria_id", formValue.categoria_id || "");
-
+  const gerarPayloadData = () => {
     const quantidade = parseInt(formValue.quantidade) || 1;
     const itens = Array.from({ length: quantidade }, () => ({
       codigo_barras: formValue.codigo_barras,
@@ -118,24 +146,38 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
       lucro: lucro.value,
     }));
 
-    finalFormData.set("itens", JSON.stringify(itens));
-    return finalFormData;
+    return {
+      nome: formValue.nome,
+      descricao: formValue.descricao,
+      imgs: formValue.imgs,
+      categoria_id: formValue.categoria_id,
+      itens: itens,
+    };
   };
 
   async function handleSubimit(e) {
     if (e && e.preventDefault) e.preventDefault();
 
-    if (validate()) {
-      const finalFormData = gerarFormData();
+    if (isUploadingImage) {
+      // Opcional: mostrar um alerta ou simplesmente bloquear
+      return;
+    }
 
-      const response = await handleRequest(() => API.postProduto(finalFormData));
+    if (validate()) {
+      const payload = gerarPayloadData();
+
+      const response = await handleRequest(() => API.postProduto(payload));
 
       if (response?.ok) {
-        if (response.itensEstoque) {
-          setItensCriados(response.itensEstoque);
+        const data = response.data || response;
+        if (data.itensEstoque) {
+          const dadosItens = Array.isArray(data.itensEstoque)
+            ? data.itensEstoque
+            : [data.itensEstoque];
+          setItensCriados(dadosItens);
           setModalCriar(true);
         }
-        if (onSuccess) onSuccess(response.itensEstoque);
+        if (onSuccess) onSuccess(data.itensEstoque);
       }
     }
   }
@@ -178,7 +220,8 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     formValue,
     erros,
     validated,
-    isLoading,
+    isLoading: isLoading || isUploadingImage,
+    isUploadingImage,
     
     // Estados de UI
     modalCadastroNota,
@@ -191,11 +234,16 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     // Hooks Acoplados (Exposição direta para o componente visual)
     pricing,
     imageUpload,
+    modalImagens,
+    setModalImagens,
+    removeImagem,
     
     // Handlers
     handleChange,
     handleSubimit,
     validate,
+    gerarPayloadData,
+    resetForm,
     setFormValue,
     setValidated,
     setErros,

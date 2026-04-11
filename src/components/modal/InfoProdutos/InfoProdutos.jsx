@@ -8,6 +8,9 @@ import {
   Card,
   Container,
   Badge,
+  Tabs,
+  Tab,
+  Carousel,
 } from "react-bootstrap";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
 import {
@@ -38,8 +41,21 @@ export default function ProdutoInfo({
   const detailsRef = useRef(null);
 
   useEffect(() => {
-    if (visible && !tableShow) {
-      setItemEstoque(produto);
+    if (visible && !tableShow && produto) {
+      // Se o produto vier do fluxo de nota (objeto com array 'itens'), 
+      // normalizamos para que as propriedades do primeiro item sejam acessíveis no nível raiz
+      if (produto.itens && Array.isArray(produto.itens) && produto.itens.length > 0) {
+        const itemPrincipal = produto.itens[0];
+        setItemEstoque({
+          ...itemPrincipal,
+          imgs: produto.imgs, // Preserva as imagens do objeto pai
+          nome: produto.nome, // Preserva o nome do objeto pai
+          descricao: produto.descricao, // Preserva a descrição
+          ...produto // Sobrescreve com o resto para redundância
+        });
+      } else {
+        setItemEstoque(produto);
+      }
     }
   }, [visible, tableShow, produto]);
 
@@ -164,7 +180,7 @@ export default function ProdutoInfo({
             xl={tableShow ? 7 : 12}
             className={`order-2 ${mobile ? "" : "h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
           >
-            {!itemEstoque.id ? (
+            {(!itemEstoque.id && !itemEstoque._id) ? (
               <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
                 <div className="bg-roxo-subtle p-4 rounded-circle mb-3">
                   <Package size={48} className="text-roxo" />
@@ -189,7 +205,11 @@ export default function ProdutoInfo({
                   >
                     <img
                       className="w-100 h-100 rounded-3 object-fit-cover"
-                      src={produto.img || "assets/tube-spinner.svg"}
+                      src={
+                        itemEstoque.imgs && itemEstoque.imgs.length > 0
+                          ? itemEstoque.imgs[0]
+                          : "assets/tube-spinner.svg"
+                      }
                       alt={produto.nome}
                     />
                   </div>
@@ -232,64 +252,120 @@ export default function ProdutoInfo({
                 <Row className="g-3">
                   <Col xl={8} lg={12}>
                     <Card className="border-0 shadow-sm rounded-4 h-100">
-                      <Card.Body className="p-2">
-                        <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
-                          <InfoIcon size={20} className="text-roxo" />{" "}
-                          Informações Técnicas
-                        </h5>
-                        <Row className="g-3">
-                          <InfoBlock
-                            label="Marca"
-                            value={itemEstoque.marca}
-                            icon={Package}
-                            colIdx={6}
-                          />
-                          <InfoBlock
-                            label="Tamanho"
-                            value={itemEstoque.tamanho}
-                            icon={Layers}
-                            colIdx={4}
-                          />
-                          <Col md={2} xs={2} className="mb-2">
-                            <div className="p-3 rounded-4 bg-light border border-opacity-10 h-100 shadow-sm d-flex flex-column align-items-center">
-                              <span
-                                className="text-muted small fw-bold text-uppercase mb-2"
-                                style={{ fontSize: "0.6rem" }}
-                              >
-                                COR
+                      <Card.Body className="p-3">
+                        <Tabs
+                          defaultActiveKey="tecnico"
+                          id="produto-detalhes-tabs"
+                          className="mb-3 custom-tabs"
+                        >
+                          <Tab
+                            eventKey="tecnico"
+                            title={
+                              <span className="d-flex align-items-center gap-2">
+                                <InfoIcon size={18} /> Info. Técnica
                               </span>
-                              <div
-                                className="rounded-circle border shadow-sm"
-                                style={{
-                                  width: "1.5rem",
-                                  height: "1.5rem",
-                                  backgroundColor: itemEstoque.cor || "#000",
-                                }}
+                            }
+                          >
+                            <Row className="g-3 animate-fade-in">
+                              <InfoBlock
+                                label="Marca"
+                                value={itemEstoque.marca}
+                                icon={Package}
+                                colIdx={6}
                               />
+                              <InfoBlock
+                                label="Tamanho"
+                                value={itemEstoque.tamanho}
+                                icon={Layers}
+                                colIdx={4}
+                              />
+                              <Col md={2} xs={2} className="mb-2">
+                                <div className="p-3 rounded-4 bg-light border border-opacity-10 h-100 shadow-sm d-flex flex-column align-items-center">
+                                  <span
+                                    className="text-muted small fw-bold text-uppercase mb-2"
+                                    style={{ fontSize: "0.6rem" }}
+                                  >
+                                    COR
+                                  </span>
+                                  <div
+                                    className="rounded-circle border shadow-sm"
+                                    style={{
+                                      width: "1.5rem",
+                                      height: "1.5rem",
+                                      backgroundColor:
+                                        itemEstoque.cor || "#000",
+                                    }}
+                                  />
+                                </div>
+                              </Col>
+                              <InfoBlock
+                                label="Código de Barras"
+                                value={itemEstoque.codigo_barras}
+                                icon={Barcode}
+                                colIdx={12}
+                                xs={12}
+                              />
+                              <InfoBlock
+                                label="Origem (Nota)"
+                                value={
+                                  itemEstoque.nota
+                                    ? `#${itemEstoque.nota.codigo}`
+                                    : "Nenhuma nota associada"
+                                }
+                                icon={Archive}
+                                colIdx={12}
+                                xs={12}
+                                color={
+                                  itemEstoque.nota ? "text-roxo" : "text-danger"
+                                }
+                              />
+                            </Row>
+                          </Tab>
+                          <Tab
+                            eventKey="imagens"
+                            title={
+                              <span className="d-flex align-items-center gap-2">
+                                <Package size={18} /> Imagens
+                              </span>
+                            }
+                          >
+                            <div className="p-2 animate-fade-in">
+                              {itemEstoque.imgs &&
+                              itemEstoque.imgs.length > 0 ? (
+                                <Carousel
+                                  interval={null}
+                                  variant="dark"
+                                  className="rounded-4 overflow-hidden border shadow-sm bg-light"
+                                >
+                                  {itemEstoque.imgs.map((img, idx) => (
+                                    <Carousel.Item key={idx}>
+                                      <div
+                                        className="d-flex align-items-center justify-content-center bg-light"
+                                        style={{ height: "300px" }}
+                                      >
+                                        <img
+                                          src={img}
+                                          className="mh-100 mw-100 object-fit-contain"
+                                          alt={`Imagem ${idx + 1}`}
+                                        />
+                                      </div>
+                                    </Carousel.Item>
+                                  ))}
+                                </Carousel>
+                              ) : (
+                                <div className="text-center p-5 bg-light rounded-4 border border-dashed">
+                                  <Package
+                                    size={48}
+                                    className="text-muted mb-2"
+                                  />
+                                  <p className="text-muted mb-0">
+                                    Nenhuma imagem disponível.
+                                  </p>
+                                </div>
+                              )}
                             </div>
-                          </Col>
-                          <InfoBlock
-                            label="Código de Barras"
-                            value={itemEstoque.codigo_barras}
-                            icon={Barcode}
-                            colIdx={12}
-                            xs={12}
-                          />
-                          <InfoBlock
-                            label="Origem (Nota)"
-                            value={
-                              itemEstoque.nota
-                                ? `#${itemEstoque.nota.codigo}`
-                                : "Nenhuma nota associada"
-                            }
-                            icon={Archive}
-                            colIdx={12}
-                            xs={12}
-                            color={
-                              itemEstoque.nota ? "text-roxo" : "text-danger"
-                            }
-                          />
-                        </Row>
+                          </Tab>
+                        </Tabs>
                       </Card.Body>
                     </Card>
                   </Col>
