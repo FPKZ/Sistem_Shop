@@ -1,6 +1,7 @@
 import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
+import ImageCarousel from "@components/ImageCarousel";
 
 export default function Produto({produto, handleChangeQuantity, formValue, handleChange, adicionarAoCarrinho}) {
     const [adicionado, setAdicionado] = useState(false);
@@ -30,14 +31,13 @@ export default function Produto({produto, handleChangeQuantity, formValue, handl
                                         objectFit: "cover",
                                     }}
                                 >
-                                    <img src={produto.imagem || produto.img || "assets/tube-spinner.svg"}
-                                        alt={produto.nome}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
+                                    <div className="p-2 animate-fade-in">
+                                      <ImageCarousel 
+                                        imgs={produto.imgs} 
+                                        height="100%" 
+                                        objectFit="cover" 
+                                      />
+                                    </div>
                                 </div>
                             </div>
                             <div className="card-body col-12 col-md-6 p-0 position-relative flex flex-column justify-between">

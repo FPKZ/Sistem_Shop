@@ -55,7 +55,6 @@ export default function useProdutosPage() {
       showToast("Erro ao deletar item", "error");
     }
   };
-  console.log(produtos)
 
   return {
     mobile,

@@ -10,8 +10,8 @@ import {
   Badge,
   Tabs,
   Tab,
-  Carousel,
 } from "react-bootstrap";
+import ImageCarousel from "@components/ImageCarousel";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
 import {
   Tag,
@@ -40,6 +40,8 @@ export default function ProdutoInfo({
   const [itemEstoque, setItemEstoque] = useState({});
   const detailsRef = useRef(null);
 
+  console.log(produto)
+
   useEffect(() => {
     if (visible && !tableShow && produto) {
       // Se o produto vier do fluxo de nota (objeto com array 'itens'), 
@@ -58,6 +60,8 @@ export default function ProdutoInfo({
       }
     }
   }, [visible, tableShow, produto]);
+
+  console.log(itemEstoque)
 
   useEffect(() => {
     if (visible && tableShow) setItemEstoque({});
@@ -178,7 +182,7 @@ export default function ProdutoInfo({
           <Col
             lg={tableShow ? 7 : 12}
             xl={tableShow ? 7 : 12}
-            className={`order-2 ${mobile ? "" : "h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
+            className={`${mobile ? "order-1" : "order-md-2 h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
           >
             {(!itemEstoque.id && !itemEstoque._id) ? (
               <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
@@ -206,8 +210,8 @@ export default function ProdutoInfo({
                     <img
                       className="w-100 h-100 rounded-3 object-fit-cover"
                       src={
-                        itemEstoque.imgs && itemEstoque.imgs.length > 0
-                          ? itemEstoque.imgs[0]
+                        produto.imgs && produto.imgs.length > 0
+                          ? produto.imgs[0]
                           : "assets/tube-spinner.svg"
                       }
                       alt={produto.nome}
@@ -330,39 +334,11 @@ export default function ProdutoInfo({
                             }
                           >
                             <div className="p-2 animate-fade-in">
-                              {itemEstoque.imgs &&
-                              itemEstoque.imgs.length > 0 ? (
-                                <Carousel
-                                  interval={null}
-                                  variant="dark"
-                                  className="rounded-4 overflow-hidden border shadow-sm bg-light"
-                                >
-                                  {itemEstoque.imgs.map((img, idx) => (
-                                    <Carousel.Item key={idx}>
-                                      <div
-                                        className="d-flex align-items-center justify-content-center bg-light"
-                                        style={{ height: "300px" }}
-                                      >
-                                        <img
-                                          src={img}
-                                          className="mh-100 mw-100 object-fit-contain"
-                                          alt={`Imagem ${idx + 1}`}
-                                        />
-                                      </div>
-                                    </Carousel.Item>
-                                  ))}
-                                </Carousel>
-                              ) : (
-                                <div className="text-center p-5 bg-light rounded-4 border border-dashed">
-                                  <Package
-                                    size={48}
-                                    className="text-muted mb-2"
-                                  />
-                                  <p className="text-muted mb-0">
-                                    Nenhuma imagem disponível.
-                                  </p>
-                                </div>
-                              )}
+                              <ImageCarousel 
+                                imgs={produto.imgs} 
+                                height="300px" 
+                                objectFit="contain" 
+                              />
                             </div>
                           </Tab>
                         </Tabs>

@@ -14,7 +14,7 @@ export default function TabelaProdutos({
     <>
       <Col
         md={width}
-        className={`order-1 m-0 p-0 d-flex flex-column border  ${custom} ${mobile ? "" : "h-100"}`}
+        className={`order-2 order-md-1 m-0 p-0 d-flex flex-column border ${custom} ${mobile ? "" : "h-100"}`}
       >
         <Row
           className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light align-items-center"

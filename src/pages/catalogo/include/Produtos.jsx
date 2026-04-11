@@ -93,7 +93,7 @@ export default function Produtos({
                                     setTelaProduto(true);
                                 }}>
                                     <div 
-                                        className="rounded-4 bg-neutral-800/40 shadow-sm border-0 h-[25rem] overflow-hidden">
+                                        className="rounded-4 bg-neutral-800/40 shadow-sm border-0 h-[22rem] overflow-hidden">
                                         <div
                                             className="bg-white w-100 h-100 flex flex-column position-relative"
                                             style={{opacity: produto.quantidade === "Esgotado" ? "0.5" : "1"}}
@@ -106,12 +106,12 @@ export default function Produtos({
                                                     justifyContent: "center",
                                                     alignItems: "center",
                                                     overflow: "hidden",
-                                                    height: "55%",
+                                                    height: "50%",
                                                 }}
                                                 >
                                                 <img
                                                     className="card-img-top produto-img"
-                                                    src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
+                                                    src={Array.isArray(produto.imgs) ? produto.imgs[0] : produto.imagem || "assets/tube-spinner.svg"}
                                                     alt={produto.nome}
                                                     style={{
                                                         objectFit: "cover",

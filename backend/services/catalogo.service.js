@@ -44,7 +44,7 @@ export async function listarCatalogo(query = {}) {
     nome:       produto.nome,
     descricao:  produto.descricao,
     categoria:  produto.categoria.nome,
-    img:        produto.img,
+    imgs:       produto.imgs,
     cores: await getColorsList([...new Set(produto.itemEstoque.map((item) => item.status === "Disponivel" ? item.cor : null))].sort()),
     preco: produto.itemEstoque.some((item) => item.status === "Disponivel")
       ? Math.max(

@@ -63,7 +63,7 @@ export const ProdutoGrid = React.memo(({
             >
               <img
                 className="card-img-top produto-img"
-                src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
+                src={Array.isArray(produto.imgs) ? produto.imgs[0] : produto.imagem || "assets/tube-spinner.svg"}
                 alt={produto.nome}
                 style={{
                   objectFit: "cover",
