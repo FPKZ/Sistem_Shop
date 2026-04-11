@@ -55,8 +55,9 @@ export default async function ImagensRoute(fastify) {
             console.log(`URL: ${url}`)
             const blob = await deletarImagem(url)
             console.log(`Blob: ${blob}`)
-            reply.ok({ data: blob })
+            reply.ok(blob)
         } catch (err){
+            reply.err(err)
         }
     })
 

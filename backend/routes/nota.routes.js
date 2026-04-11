@@ -1,5 +1,5 @@
 import { Nota, ItemEstoque } from "../database/models/index.js";
-import { cadastrarProduto, toBuffer } from "../services/produto.service.js";
+import { cadastrarProduto } from "../services/produto.service.js";
 import { verificarVencimentos } from "../services/nota.service.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
@@ -17,45 +17,34 @@ export default async function notaRoutes(fastify) {
   });
 
   fastify.post("/nota", { preHandler: authMiddleware }, async (request, reply) => {
-    let body = {};
-    const imgFiles = {};
+    try {
+      let body = request.body;
 
-    if (request.isMultipart()) {
-      const parts = await request.parts();
-      for await (const part of parts) {
-        if (part.type === "file") {
-          imgFiles[part.fieldname] = { buffer: await toBuffer(part.file), filename: part.filename };
-        } else {
-          body[part.fieldname] = part.value;
+      if (body.itens && typeof body.itens === "string") body.itens = JSON.parse(body.itens);
+
+      const { codigo, valor_total, data, fornecedor, quantidade, data_vencimento, itens } = body;
+
+      const notaExistente = await Nota.findOne({ where: { codigo } });
+      if (notaExistente) throw new Error("Nota já cadastrada");
+
+      const novaNota = await Nota.create({ codigo, valor_total, data, data_vencimento, fornecedor, quantidade, status: "pendente" });
+
+      if (!itens || itens.length === 0) {
+        return reply.code(201).ok({ novaNota }, "Nota cadastrada com sucesso!");
+      }
+
+      const resultadosCadastro = [];
+      for (const produtoData of itens) {
+        if (produtoData.itens?.length > 0) {
+          produtoData.itens.forEach((item) => { item.nota_id = novaNota.id; });
         }
+        resultadosCadastro.push(await cadastrarProduto(produtoData));
       }
-    } else {
-      body = request.body;
+
+      return reply.code(201).ok({ nota: novaNota, produtos: resultadosCadastro }, "Nota e produtos cadastrados com sucesso!");
+    } catch (err) {
+      reply.err(err)
     }
-
-    if (body.itens && typeof body.itens === "string") body.itens = JSON.parse(body.itens);
-
-    const { codigo, valor_total, data, fornecedor, quantidade, data_vencimento } = body;
-
-    const notaExistente = await Nota.findOne({ where: { codigo } });
-    if (notaExistente) return reply.err("Nota já cadastrada", 400);
-
-    const novaNota = await Nota.create({ codigo, valor_total, data, data_vencimento, fornecedor, quantidade, status: "pendente" });
-
-    if (!body.itens || body.itens.length === 0) {
-      return reply.code(201).ok({ novaNota }, "Nota cadastrada com sucesso!");
-    }
-
-    const resultadosCadastro = [];
-    for (const produtoData of body.itens) {
-      if (produtoData.itens?.length > 0) {
-        produtoData.itens.forEach((item) => { item.nota_id = novaNota.id; });
-      }
-      const imgFile = imgFiles[`imagem_${produtoData.frontId}`];
-      resultadosCadastro.push(await cadastrarProduto(produtoData, imgFile));
-    }
-
-    return reply.code(201).ok({ nota: novaNota, produtos: resultadosCadastro }, "Nota e produtos cadastrados com sucesso!");
   });
 
   fastify.put("/nota/:id", { preHandler: authMiddleware }, async (request, reply) => {

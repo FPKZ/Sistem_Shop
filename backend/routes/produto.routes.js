@@ -7,7 +7,7 @@ import {
   ItemReservado,
 } from "../database/models/index.js";
 import { Op } from "sequelize";
-import { cadastrarProduto, toBuffer } from "../services/produto.service.js";
+import { cadastrarProduto } from "../services/produto.service.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const INCLUDE_PRODUTO_COM_CATEGORIA = [
@@ -62,27 +62,16 @@ export default async function produtoRoutes(fastify) {
 
   // --- Criação ---
   fastify.post("/produto", { preHandler: authMiddleware }, async (request, reply) => {
-    let body = {};
-    let imgFile = null;
+    try {
+      let body = request.body
 
-    if (request.isMultipart()) {
-      const data = await request.parts();
-      for await (const part of data) {
-        if (part.type === "file") {
-          imgFile = { buffer: await toBuffer(part.file), filename: part.filename };
-        } else {
-          body[part.fieldname] = part.value;
-        }
-      }
-    } else {
-      body = request.body;
+      if (body.itens && typeof body.itens === "string") body.itens = JSON.parse(body.itens);
+
+      const result = await cadastrarProduto(body);
+      return reply.ok({ data: result, message: "Estoque atualizado com sucesso!" });
+    } catch (err) {
+      reply.err(err)
     }
-
-    if (body.itens && typeof body.itens === "string") body.itens = JSON.parse(body.itens);
-    if (!body.nome) return reply.err('O campo "nome" é obrigatório');
-
-    const result = await cadastrarProduto(body, imgFile);
-    return reply.code(201).ok(result, "Estoque atualizado com sucesso!");
   });
 
   // --- Reserva / Remoção ---

@@ -30,7 +30,11 @@ export async function deletarImagem(url) {
     if (!url) throw new Error("A URL da imagem é obrigatória");
 
     // 1. Verificar se a imagem está em uso no banco de dados
-    const emUso = await Produto.findOne({ where: { img: url } });
+    const emUso = await Produto.findOne({ 
+        where: { 
+            imgs: { [Op.contains]: [url] } 
+        } 
+    });
     if (emUso) {
         throw new Error("Não é possível deletar esta imagem pois ela está vinculada a um produto");
     }
@@ -91,17 +95,18 @@ export async function limparImagensOrfas() {
         if (blobs.length === 0) return console.log("[CLEANUP] Nenhum blob encontrado.");
 
         // 2. Buscar todas as URLs de imagens em uso no banco
-        const produtosComImg = await Produto.findAll({
-            attributes: ['img'],
+        const produtosComImgs = await Produto.findAll({
+            attributes: ['imgs'],
             where: {
-                img: { [Op.ne]: null } // Garantir que não pegamos nulos
+                imgs: { [Op.ne]: null }
             },
             raw: true
         });
         
-        // Atualmente o Sequelize pode usar Op.ne ou strings dependendo da config, 
-        // mas vamos extrair as URLs de forma segura.
-        const urlsEmUso = new Set(produtosComImg.map(p => p.img).filter(Boolean));
+        // Extrair todas as URLs de todos os arrays 'imgs' de todos os produtos
+        const urlsEmUso = new Set(
+            produtosComImgs.flatMap(p => Array.isArray(p.imgs) ? p.imgs : []).filter(Boolean)
+        );
 
         console.log(`[CLEANUP] Validando ${blobs.length} blobs contra ${urlsEmUso.size} imagens em uso.`);
 

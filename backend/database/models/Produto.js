@@ -3,7 +3,7 @@ import sequelize from "../sequelize.js";
 
 const Produto = sequelize.define('Produto', {
     nome: DataTypes.STRING,
-    img: DataTypes.TEXT,
+    imgs: DataTypes.ARRAY(DataTypes.TEXT),
     descricao: DataTypes.TEXT,
 }, {
     tableName: 'Produtos'
