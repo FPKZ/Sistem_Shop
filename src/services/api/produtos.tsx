@@ -3,9 +3,10 @@ import api from "@services/http/client";
 import { ApiResponse, Produto, ProdutoFiltros, ItemEstoque, Categoria, Cor, CategoriaFiltros } from "@services/types";
 
 // Funções de fetch (usando httpClient — rotas protegidas)
-export async function getProduto({ item = "", nome = "" }: ProdutoFiltros = {}): Promise<ApiResponse<Produto[]>> {
+export async function getProduto({ item, nome }: ProdutoFiltros = {}): Promise<ApiResponse<Produto[]>> {
   try {
-    const query = new URLSearchParams({ itens: item, nome }).toString();
+    const query = new URLSearchParams({ itens: item || "", nome: nome || "" }).toString();
+    console.log(query)
     return await api.get(`/produtos?${query}`);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }

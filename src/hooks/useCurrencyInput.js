@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import utils from "@services/utils";
+// import utils from "@services/utils";
 
 /**
  * Hook personalizado para inputs de moeda (BRL).
@@ -46,7 +46,8 @@ export default function useCurrencyInput({
 
   return {
     value,
-    displayValue: utils.formatMoney(value),
+    // displayValue: utils.formatMoney(value),
+    displayValue: parseFloat(value).toFixed(2),
     onChange,
     setValue,
   };

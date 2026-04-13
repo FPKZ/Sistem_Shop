@@ -8,12 +8,13 @@ import useProductPricing from "@hooks/produtos/useProductPricing";
 
 export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
-  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
+  const [modalCadastroCategoria, setModalCadastroCategoria] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [modalImagens, setModalImagens] = useState(false);
   const [activeTabModalImagens, setActiveTabModalImagens] = useState("galeria");
+  const [isProdutoExistente, setIsProdutoExistente] = useState(false);
 
   // 1. Hook de Formulário Base
   const {
@@ -127,6 +128,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     pricing.handlers.resetPricing();
     imageUpload.handlers.clearImage();
     setActiveTabModalImagens("galeria");
+    setIsProdutoExistente(false);
   }, [setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]);
 
   // Reset automático quando o modal de sucesso fecha ou o fluxo reinicia
@@ -134,7 +136,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     if (modalCriar) {
       resetForm();
     }
-  }, [modalCriar]); // Simplificado pois resetForm é estável ou as dependências internas já são tratadas
+  }, [modalCriar, resetForm]); // Simplificado pois resetForm é estável ou as dependências internas já são tratadas
 
   const gerarPayloadData = () => {
     const quantidade = parseInt(formValue.quantidade) || 1;
@@ -210,18 +212,45 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     },
   });
 
+  const { data: produtosData } = API.getProdutos({itens: "none"})
+  // console.log(produtosData)
   // Reverte unwrap condicional — certas versões cacheadas ou rotas
   // podem retornar objetos inteiros em vez de apenas a propriedade "data",
   // o que impede arrays de funcionarem com funções nativas como `.find()`
   const categorias = categoriasData?.data || categoriasData || [];
   const notas = notasData?.data || notasData || [];
   const cores = coresData?.data || coresData || [];
+  const produtos = Array.isArray(produtosData?.data) ? produtosData.data : (Array.isArray(produtosData) ? produtosData : []);
+  // console.log(produtos)
+  const handleSelectProduto = useCallback((event, newValue) => {
+    if (typeof newValue === 'string') {
+      // FreeSolo text (digitou um nome que não está na lista)
+      setFormValue((prev) => ({ ...prev, nome: newValue }));
+      setIsProdutoExistente(false);
+    } else if (newValue && newValue.id) {
+      // Selecionou um produto existente
+      setFormValue((prev) => ({
+        ...prev,
+        nome: newValue.nome,
+        imgs: newValue.imgs || [],
+        categoria_id: newValue.categoria_id,
+        descricao: newValue.descricao || ""
+      }));
+      // Cor não vem no root do produto normalmente, mas se vier a gente seta, caso contrário manter neutra/null
+      setIsProdutoExistente(true);
+    } else {
+      // Limpou o autocomplete
+      setFormValue((prev) => ({ ...prev, nome: "" }));
+      setIsProdutoExistente(false);
+    }
+  }, [setFormValue]);
 
   return {
     // Dados
     cores,
     notas,
     categorias,
+    produtos,
     itensCriados,
     formValue,
     erros,
@@ -233,9 +262,10 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     modalCadastroNota,
     setModalCadastroNota,
     modalCadastroCategoria,
-    setModalCadastroCategoia,
+    setModalCadastroCategoria,
     modalCriar,
     setModalCriar,
+    isProdutoExistente,
     
     // Hooks Acoplados (Exposição direta para o componente visual)
     pricing,
@@ -248,6 +278,7 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     
     // Handlers
     handleChange,
+    handleSelectProduto,
     handleSubimit,
     validate,
     gerarPayloadData,

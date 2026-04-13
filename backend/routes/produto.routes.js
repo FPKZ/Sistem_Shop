@@ -55,6 +55,12 @@ export default async function produtoRoutes(fastify) {
       return reply.code(200).send(produtos);
     }
 
+    if (itens === "none") {
+      const produtos = await Produto.findAll({ include : INCLUDE_PRODUTO_COM_CATEGORIA});
+      console.log(produtos)
+      return reply.code(200).send(produtos)
+    }
+
     const where = nome && nome !== " " ? { nome: { [Op.like]: `%${nome}%` } } : {};
     const produtos = await Produto.findAll({ where, include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
     return reply.code(200).send(produtos);

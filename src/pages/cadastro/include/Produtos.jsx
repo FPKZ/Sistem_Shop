@@ -13,7 +13,7 @@ export default function Produtos() {
     modalCadastroNota,
     setModalCadastroNota,
     modalCadastroCategoria,
-    setModalCadastroCategoia,
+    setModalCadastroCategoria,
     modalCriar,
     setModalCriar,
     itensCriados,
@@ -28,6 +28,9 @@ export default function Produtos() {
     activeTabModalImagens,
     setActiveTabModalImagens,
     removeImagem,
+    produtos,
+    isProdutoExistente,
+    handleSelectProduto,
     handleChange,
     handleSubimit,
   } = useCadastroProduto();
@@ -43,10 +46,13 @@ export default function Produtos() {
           cores={cores}
           notas={notas}
           categorias={categorias}
+          produtos={produtos}
+          isProdutoExistente={isProdutoExistente}
+          handleSelectProduto={handleSelectProduto}
           pricing={pricing}
           imageUpload={imageUpload}
           handleChange={handleChange}
-          setModalCadastroCategoia={setModalCadastroCategoia}
+          setModalCadastroCategoria={setModalCadastroCategoria}
           setModalCadastroNota={setModalCadastroNota}
           isLoading={isLoading}
           modalImagens={modalImagens}
@@ -67,7 +73,7 @@ export default function Produtos() {
       {modalCadastroCategoria && (
         <CadastroCategoria
           visible={modalCadastroCategoria}
-          onClose={() => setModalCadastroCategoia(false)}
+          onClose={() => setModalCadastroCategoria(false)}
         />
       )}
       {modalCriar && (

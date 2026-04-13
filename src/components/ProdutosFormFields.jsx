@@ -1,4 +1,5 @@
 import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
+import { Autocomplete, TextField } from "@mui/material";
 import { Cores } from "@components/Cores";
 import ImageCropModal from "@components/modal/ImageCropModal";
 import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
@@ -13,10 +14,14 @@ export default function ProdutosFormFields({
     validated, 
     cores, 
     notas, 
-    categorias, 
+    categorias,
+    produtos,
+    isProdutoExistente,
+    handleSelectProduto,
     pricing,        // Novo: contém valorCompra, valorVenda, lucro e seus handlers
     imageUpload,    // Novo: contém estado e handlers da imagem
     handleChange, 
+    setModalCadastroCategoria,
     setModalCadastroNota,
     cadastroNota,
     isLoading,
@@ -28,7 +33,9 @@ export default function ProdutosFormFields({
 }) {
     const { valorCompra, valorVenda, lucro, handlers: pHandlers } = pricing;
     const { handlers: iHandlers } = imageUpload;
-
+    const porcentagem = valorCompra.value > 0
+        ? ((lucro.value / valorCompra.value) * 100).toFixed(2)
+        : "0.00";
     return (
         <>
             <GerenciarImagensModal
@@ -52,15 +59,62 @@ export default function ProdutosFormFields({
             <Row className="g-3 mb-3 pb-4 border-bottom">
                 <Col xs={12}>
                     <Form.Label htmlFor="nomeProduto">Nome</Form.Label>
-                    <Form.Control
-                        className={validated ? (erros.nome ? "is-invalid" : "is-valid") : ""}
-                        name="nome"
+                    {/* {console.log(produtos)} */}
+                    <Autocomplete
+                        freeSolo
                         id="nomeProduto"
-                        type="text"
-                        placeholder="Nome do produto"
-                        value={formValue.nome}
-                        onChange={handleChange}
-                        required
+                        options={produtos || []}
+                        getOptionLabel={(option) => typeof option === 'string' ? option : (option.nome || "")}
+                        onChange={handleSelectProduto}
+                        onInputChange={(event, newInputValue, reason) => {
+                            if (reason === 'input' || reason === 'clear') {
+                                handleChange({ target: { name: 'nome', value: newInputValue } });
+                            }
+                        }}
+                        value={produtos?.find(p => p.nome === formValue.nome) || formValue.nome || ""}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                placeholder="Nome do produto"
+                                required
+                                error={validated && !!erros.nome}
+                                variant="standard"
+                                // Usamos slotProps (MUI v5.14+) ou InputProps com segurança
+                                InputProps={{
+                                    ...params.InputProps, // Mantém os comportamentos do Autocomplete
+                                    disableUnderline: true,
+                                    className: `form-control ${params.InputProps?.className || ""} ${validated ? (erros.nome ? "is-invalid" : "is-valid") : ""}`,
+                                    style: { 
+                                        padding: '0.375rem 0.75rem', 
+                                        height: '38px', // Altura padrão do form-control Bootstrap
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }
+                                }}
+                                sx={{
+                                    // Remove as linhas que o MUI coloca antes e depois do foco
+                                    '& .MuiInput-root:before': { display: 'none' },
+                                    '& .MuiInput-root:after': { display: 'none' },
+                                    '& .MuiInput-root:hover:not(.Mui-disabled):before': { display: 'none' },
+
+                                    '& .MuiInput-root': { 
+                                        marginTop: '0 !important',
+                                        backgroundColor: 'white',
+                                        borderRadius: '0.375rem',
+                                        transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                    },
+                                    '& .MuiInput-input': { 
+                                        padding: '0.5rem !important',
+                                        // Garante que o texto ocupe o espaço correto
+                                    },
+                                    // Simulação do Focus do Bootstrap
+                                    '& .MuiInput-root.Mui-focused': {
+                                        borderColor: '#86b7fe',
+                                        boxShadow: '0 0 0 0.25rem rgba(13, 110, 253, 0.25)',
+                                    }
+                                }}
+                            />
+                        )}
                     />
                 </Col>
 
@@ -70,15 +124,22 @@ export default function ProdutosFormFields({
                         <div
                             className={`form-control d-flex align-items-center gap-2 px-3 py-2 ${
                                 imageUpload.erro ? "is-invalid" : formValue.imgs?.length > 0 ? "is-valid" : ""
-                            }`}
-                            style={{ cursor: "pointer", minHeight: "38px" }}
+                            } ${isProdutoExistente ? "opacity-50 bg-light" : ""}`}
+                            style={{ cursor: isProdutoExistente ? "not-allowed" : "pointer", minHeight: "38px" }}
                             onClick={() => {
+                                if (isProdutoExistente) return;
                                 setActiveTabModalImagens("adicionar");
                                 setModalImagens(true);
                             }}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => e.key === "Enter" && (setActiveTabModalImagens("adicionar"), setModalImagens(true))}
+                            onKeyDown={(e) => {
+                                if (isProdutoExistente) return;
+                                if (e.key === "Enter") {
+                                    setActiveTabModalImagens("adicionar");
+                                    setModalImagens(true);
+                                }
+                            }}
                         >
                             <i className="bi bi-plus-lg text-muted" />
                             <span
@@ -91,6 +152,7 @@ export default function ProdutosFormFields({
                         <Button 
                             variant="outline-secondary" 
                             className="d-flex align-items-center gap-1"
+                            disabled={isProdutoExistente}
                             onClick={() => {
                                 setActiveTabModalImagens("galeria");
                                 setModalImagens(true);
@@ -111,6 +173,7 @@ export default function ProdutosFormFields({
                     <Dropdown>
                         <Dropdown.Toggle
                             variant="none"
+                            disabled={isProdutoExistente}
                             className={`dropdown-toggle-none w-100 d-flex justify-content-center align-items-center border-0 p-0 ${
                                 validated ? (erros.cor ? "is-invalid" : "is-valid") : ""
                             }`}
@@ -146,7 +209,10 @@ export default function ProdutosFormFields({
                     <Dropdown>
                         <Dropdown.Toggle
                             variant="none"
-                            className={`form-select w-100 d-flex justify-content-between align-items-center bg-white dropdown-toggle-none ${
+                            disabled={isProdutoExistente}
+                            className={`form-select w-100 d-flex justify-content-between align-items-center dropdown-toggle-none ${
+                                isProdutoExistente ? "bg-light" : "bg-white"
+                            } ${
                                 validated ? (erros.categoria_id ? "is-invalid" : "is-valid") : ""
                             }`}
                         >
@@ -155,7 +221,7 @@ export default function ProdutosFormFields({
                         <Dropdown.Menu className="w-100">
                             <Categoria categorias={categorias} handleChange={handleChange} />
                             <Dropdown.Divider />
-                            <Dropdown.Item onClick={() => setModalCadastroCategoia(true)}>Nova Categoria</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setModalCadastroCategoria(true)}>Nova Categoria</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Col>
@@ -239,7 +305,7 @@ export default function ProdutosFormFields({
                     />
                 </Col>
 
-                <Col xs={4} md={4}>
+                <Col xs={6} md={4}>
                     <Form.Label htmlFor="valorCompraProduto">Vlr. Compra</Form.Label>
                     <InputGroup className={`overflow-hidden ${validated ? (erros.valor_compra ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
                         <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
@@ -256,7 +322,7 @@ export default function ProdutosFormFields({
                     </InputGroup>
                 </Col>
 
-                <Col xs={4} md={4}>
+                <Col xs={6} md={4}>
                     <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
                     <InputGroup className={`overflow-hidden ${validated ? (erros.valor_venda ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
                         <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
@@ -273,7 +339,7 @@ export default function ProdutosFormFields({
                     </InputGroup>
                 </Col>
 
-                <Col xs={4} md={4}>
+                <Col xs={12} md={4}>
                     <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
                     <InputGroup className={`overflow-hidden ${validated ? (erros.lucro ? "border border-danger rounded-2" : "border border-success rounded-2") : "border rounded-2"}`}>
                         <InputGroup.Text className="bg-transparent border-0 text-muted">R$</InputGroup.Text>
@@ -287,6 +353,7 @@ export default function ProdutosFormFields({
                             onChange={pHandlers.handleLucroChange}
                             required
                         />
+                        <InputGroup.Text className="bg-transparent border-0 text-muted">{porcentagem}%</InputGroup.Text>
                     </InputGroup>
                 </Col>
             </Row>
@@ -299,6 +366,7 @@ export default function ProdutosFormFields({
                         name="descricao"
                         as="textarea"
                         rows={4}
+                        disabled={isProdutoExistente}
                         style={{ resize: "none" }}
                         id="descricaoProduto"
                         placeholder="Descrição do produto"

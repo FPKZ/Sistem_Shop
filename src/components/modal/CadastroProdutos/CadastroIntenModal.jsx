@@ -25,14 +25,12 @@ function CadastroIntenModal({
     notas,
     categorias,
     modalCadastroCategoria,
-    setModalCadastroCategoia,
+    setModalCadastroCategoria,
     modalCriar,
     setModalCriar,
     itensCriados,
     erros,
-    setErros,
     validated,
-    setValidated,
     formValue,
     isLoading,
     pricing,
@@ -42,6 +40,9 @@ function CadastroIntenModal({
     activeTabModalImagens,
     setActiveTabModalImagens,
     removeImagem,
+    produtos,
+    isProdutoExistente,
+    handleSelectProduto,
     handleChange,
     handleSubimit,
     validate,
@@ -102,10 +103,13 @@ function CadastroIntenModal({
               cores={cores}
               notas={notas}
               categorias={categorias}
+              produtos={produtos}
+              isProdutoExistente={isProdutoExistente}
+              handleSelectProduto={handleSelectProduto}
               pricing={pricing}
               imageUpload={imageUpload}
               handleChange={handleChange}
-              setModalCadastroCategoia={setModalCadastroCategoia}
+              setModalCadastroCategoria={setModalCadastroCategoria}
               cadastroNota={cadastroNota}
               isLoading={isLoading}
               modalImagens={modalImagens}
@@ -129,7 +133,7 @@ function CadastroIntenModal({
 
       <CadastroCategoria
         visible={modalCadastroCategoria}
-        onClose={() => setModalCadastroCategoia(false)}
+        onClose={() => setModalCadastroCategoria(false)}
       />
 
       <ProdutosCriados
