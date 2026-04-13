@@ -19,6 +19,7 @@ function CadastroIntenModal({
   onClose,
   cadastrarProduto,
   cadastroNota = false,
+  mobile
 }) {
   const {
     cores,
@@ -117,6 +118,7 @@ function CadastroIntenModal({
               activeTabModalImagens={activeTabModalImagens}
               setActiveTabModalImagens={setActiveTabModalImagens}
               removeImagem={removeImagem}
+              mobile={mobile}
             />
           </Modal.Body>
           <Modal.Footer>
