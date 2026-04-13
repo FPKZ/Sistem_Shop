@@ -1,4 +1,5 @@
 import { Produto, ItemEstoque } from "../database/models/index.js";
+import { deletarImagem } from "./img.service.js";
 
 /**
  * Cadastra ou atualiza um produto e seus itens de estoque.
@@ -18,7 +19,7 @@ export async function cadastrarProduto(produtoData) {
     let produto = await Produto.findOne({ where: { nome } });
   
     if (!produto) {
-      produto = await Produto.create({ nome, descricao, categoria_id, imgs });
+      produto = await Produto.create({ nome, descricao, categoria_id, img: imgs[0], imgs });
     }
   
     let itensCriados = [];

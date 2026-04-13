@@ -80,8 +80,21 @@ export default async function produtoRoutes(fastify) {
     }
   });
 
+  // --- Atualizar Produto ---
+  fastify.put("/produto/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+    try {
+      const { id } = request.params;
+      const produto = await Produto.findByPk(id);
+      if (!produto) return reply.err("Produto não encontrado", 404);
+      await produto.update(request.body);
+      return reply.ok({ produto }, "Produto atualizado com sucesso");
+    } catch (err) {
+      reply.err(err)
+    }
+  });
+
   // --- Reserva / Remoção ---
-  fastify.put("/produto/reservar/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/produto/reservar/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente", "Vendedor")] }, async (request, reply) => {
     const { id } = request.params;
     const { cliente_id } = request.query;
 
@@ -114,18 +127,11 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Atualização ---
-  fastify.put("/produto/item/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
     const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
     await item.update(request.body);
     return reply.ok({ item }, "Item atualizado com sucesso");
-  });
-
-  fastify.put("/produto/:id", { preHandler: authMiddleware }, async (request, reply) => {
-    const produto = await Produto.findByPk(request.params.id);
-    if (!produto) return reply.err("Produto não encontrado", 404);
-    await produto.update(request.body);
-    return reply.ok({ produto }, "Produto atualizado com sucesso");
   });
 
   // --- Exclusão ---
