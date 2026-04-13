@@ -29,7 +29,8 @@ export default function ProdutosFormFields({
     setModalImagens,
     activeTabModalImagens,
     setActiveTabModalImagens,
-    removeImagem
+    removeImagem,
+    mobile
 }) {
     const { valorCompra, valorVenda, lucro, handlers: pHandlers } = pricing;
     const { handlers: iHandlers } = imageUpload;
@@ -46,6 +47,7 @@ export default function ProdutosFormFields({
                 activeTab={activeTabModalImagens}
                 onTabChange={setActiveTabModalImagens}
                 imageUpload={imageUpload}
+                mobile={mobile}
             />
 
             <ImageCropModal

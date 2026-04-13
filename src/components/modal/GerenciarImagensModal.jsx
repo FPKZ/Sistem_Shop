@@ -9,14 +9,16 @@ export default function GerenciarImagensModal({
   onRemove,
   activeTab = "galeria",
   onTabChange,
-  imageUpload
+  imageUpload,
+  mobile
 }) {
+  console.log(mobile)
   return (
-    <Modal show={visible} onHide={onClose} size="xl" centered>
+    <Modal show={visible} onHide={onClose} size="xl" fullscreen={mobile} centered>
       <Modal.Header closeButton className="rounded-3 border-0">
         <Modal.Title>Gerenciar Imagens do Produto</Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ height: "40rem" }} className="bg-white p-0 rounded-3 d-flex flex-column overflow-hidden">
+      <Modal.Body style={{ minHeight: "40rem" }} className="bg-white p-0 rounded-3 d-flex flex-column overflow-hidden">
         {/* Navegação de Abas Manual */}
         <Nav 
           variant="tabs" 

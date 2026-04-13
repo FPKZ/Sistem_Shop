@@ -4,6 +4,7 @@ import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCateg
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
 import ProdutosFormFields from "@components/ProdutosFormFields";
+import { useOutletContext } from "react-router-dom";
 
 export default function Produtos() {
   const {
@@ -34,7 +35,8 @@ export default function Produtos() {
     handleChange,
     handleSubimit,
   } = useCadastroProduto();
-
+  const { mobile } = useOutletContext();
+  console.log(mobile)
   return (
     <div className="w-100 p-3 pt-0 m-0">
       <Form onSubmit={handleSubimit} noValidate>
@@ -60,6 +62,7 @@ export default function Produtos() {
           activeTabModalImagens={activeTabModalImagens}
           setActiveTabModalImagens={setActiveTabModalImagens}
           removeImagem={removeImagem}
+          mobile={mobile}
         />
       </Form>
 
