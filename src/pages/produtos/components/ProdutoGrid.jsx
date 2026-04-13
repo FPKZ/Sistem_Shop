@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 export const ProdutoGrid = React.memo(({
@@ -63,7 +64,7 @@ export const ProdutoGrid = React.memo(({
             >
               <img
                 className="card-img-top produto-img"
-                src={Array.isArray(produto.imgs) ? produto.imgs[0] : produto.imagem || "assets/tube-spinner.svg"}
+                src={produto.img ? produto.img : produto.imagem || "assets/tube-spinner.svg"}
                 alt={produto.nome}
                 style={{
                   objectFit: "cover",

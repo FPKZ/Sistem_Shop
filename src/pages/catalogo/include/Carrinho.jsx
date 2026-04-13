@@ -22,7 +22,7 @@ export default function Carrinho({produtos, carrinho, alterarQuantidade, remover
                             <div className="card shadow-sm border-0 flex-row align-items-stretch p-0 overflow-hidden" key={`${item.id}-${item.cor}-${item.tamanho}`}>
                                 <div style={{ width: "6rem", minHeight: "6rem", flexShrink: 0, backgroundColor: "#fff", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
                                     <img 
-                                        src={Array.isArray(produto.imgs) ? produto.imgs[0] : produto.imagem || "assets/tube-spinner.svg"} 
+                                        src={produto.img ? produto.img : produto.imagem || "assets/tube-spinner.svg"} 
                                         alt={produto.nome} 
                                         style={{ objectFit: "cover", height: "100%", width: "100%" }}
                                     />

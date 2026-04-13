@@ -111,7 +111,7 @@ export default function Produtos({
                                                 >
                                                 <img
                                                     className="card-img-top produto-img"
-                                                    src={Array.isArray(produto.imgs) ? produto.imgs[0] : produto.imagem || "assets/tube-spinner.svg"}
+                                                    src={produto.img ? produto.img : produto.imagem || "assets/tube-spinner.svg"}
                                                     alt={produto.nome}
                                                     style={{
                                                         objectFit: "cover",

@@ -28,7 +28,7 @@ export async function listarCatalogo(query = {}) {
 
   const produtos = await Produto.findAll({
     where,
-    attributes: ["id", "nome", "descricao", "imgs"],
+    attributes: ["id", "nome", "descricao", "img", "imgs"],
     include: [
       { model: Categoria, as: "categoria", attributes: ["id", "nome"] },
       {
@@ -50,6 +50,7 @@ export async function listarCatalogo(query = {}) {
     nome:       produto.nome,
     descricao:  produto.descricao,
     categoria:  produto.categoria.nome,
+    img:        produto.img,
     imgs:       produto.imgs,
     cores: await getColorsList([...new Set(produto.itemEstoque.map((item) => item.status === "Disponivel" ? item.cor : null))].sort()),
     preco: produto.itemEstoque.some((item) => item.status === "Disponivel")

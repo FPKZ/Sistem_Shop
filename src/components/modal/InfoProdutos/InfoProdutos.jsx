@@ -40,7 +40,6 @@ export default function ProdutoInfo({
   const [itemEstoque, setItemEstoque] = useState({});
   const detailsRef = useRef(null);
 
-  console.log(produto)
 
   useEffect(() => {
     if (visible && !tableShow && produto) {
@@ -51,6 +50,7 @@ export default function ProdutoInfo({
         setItemEstoque({
           ...itemPrincipal,
           imgs: produto.imgs, // Preserva as imagens do objeto pai
+          img: produto.img, // Preserva a imagem do objeto pai
           nome: produto.nome, // Preserva o nome do objeto pai
           descricao: produto.descricao, // Preserva a descrição
           ...produto // Sobrescreve com o resto para redundância
@@ -61,7 +61,6 @@ export default function ProdutoInfo({
     }
   }, [visible, tableShow, produto]);
 
-  console.log(itemEstoque)
 
   useEffect(() => {
     if (visible && tableShow) setItemEstoque({});
@@ -210,8 +209,8 @@ export default function ProdutoInfo({
                     <img
                       className="w-100 h-100 rounded-3 object-fit-cover"
                       src={
-                        produto.imgs && produto.imgs.length > 0
-                          ? produto.imgs[0]
+                        produto.img
+                          ? produto.img
                           : "assets/tube-spinner.svg"
                       }
                       alt={produto.nome}
