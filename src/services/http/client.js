@@ -29,7 +29,15 @@ async function httpClient(path, options = {}) {
     ...options.headers,
   };
 
-  const response = await fetch(`${back}${path}`, { ...options, headers });
+  let response;
+  try {
+    response = await fetch(`${back}${path}`, { ...options, headers });
+  } catch {
+    // Erro de rede (ECONNREFUSED, servidor offline, timeout de DNS, etc.)
+    // Dispara evento global para que o AuthContext exiba o loading e inicie o retry
+    window.dispatchEvent(new CustomEvent("server:offline"));
+    throw new Error("Servidor indisponível. Tentando reconectar...");
+  }
 
   if (response.status === 401) {
     window.dispatchEvent(new CustomEvent("auth:401"));

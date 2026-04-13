@@ -1,7 +1,7 @@
 import { Row, Col } from "react-bootstrap";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState, useEffect } from "react";
-import API from "@app/api";
+import API from "@services";
 
 import ModalSelecionarCliente from "@components/modal/Vendas/ModalSelecionarCliente";
 import ModalAdicionarProduto from "@components/modal/Vendas/ModalAdicionarProduto";

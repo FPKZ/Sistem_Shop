@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import API from "@app/api.js";
+import API from "@services";
 import usePopStateModal from "@hooks/usePopStateModal";
 import { useToast } from "@contexts/ToastContext";
 

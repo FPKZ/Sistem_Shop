@@ -18,7 +18,8 @@ export async function listarCatalogo(query = {}) {
   }
 
   if (!isNullOrUndefined(query.nome)) {
-    where.nome = { [Op.like]: `%${query.nome}%` };
+    // iLike = case-insensitive para PostgreSQL
+    where.nome = { [Op.iLike]: `%${query.nome}%` };
   }
 
   if (!isNullOrUndefined(query.id)) {
@@ -27,9 +28,14 @@ export async function listarCatalogo(query = {}) {
 
   const produtos = await Produto.findAll({
     where,
+    attributes: ["id", "nome", "descricao", "imgs"],
     include: [
-      { model: Categoria, as: "categoria" },
-      { model: ItemEstoque, as: "itemEstoque" },
+      { model: Categoria, as: "categoria", attributes: ["id", "nome"] },
+      {
+        model: ItemEstoque,
+        as: "itemEstoque",
+        attributes: ["id", "status", "cor", "tamanho", "valor_venda"],
+      },
     ],
   });
 

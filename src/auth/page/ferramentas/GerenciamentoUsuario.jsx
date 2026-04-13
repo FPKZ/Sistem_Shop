@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-bootstrap";
 import { Bell, Search, User, UserPlus, Edit, Trash2 } from "lucide-react";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import PaginationButtons from "@components/Pagination/PaginationButtons";
 import Solicitacoes from "./include/Solicitacoes";
 import { useGerenciamentoUsuario } from "@hooks/auth/useGerenciamentoUsuario";

@@ -10,7 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 
-import utils from "../../../app/utils";
+import utils from "@services/utils";
 
 const ClientDetailsModal = ({ show, onHide, cliente }) => {
   if (!cliente) return null;

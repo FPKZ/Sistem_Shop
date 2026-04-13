@@ -3,7 +3,7 @@ import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@auth-sistem/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 const Header = React.memo(({ mobile }) => {
   const navigate = useNavigate();
@@ -26,13 +26,13 @@ const Header = React.memo(({ mobile }) => {
         className="p-0 px-2 px-md-3 d-flex align-items-center justify-content-between"
       >
         <div className="d-flex justify-content-center flex-wrap flex-md-nowarp align-items-center gap-4 position-relative">
-          {pathParts.length > 0 ? (
+          {pathParts.length > 1 ? (
             <>
               <Button
                 className="btn btn-roxo "
                 size={mobile && "sm"}
                 onClick={() => {
-                  pathParts.length > 1 ? navigate(-1) : navigate("/");
+                  pathParts.length > 2 ? navigate(-1) : navigate("/painel");
                 }}
               >
                 <i className="bi bi-chevron-left"></i>

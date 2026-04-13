@@ -1,4 +1,4 @@
-import API from "@app/api"
+import API from "@services"
 import { useEffect, useState, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useForm } from "../useForm"

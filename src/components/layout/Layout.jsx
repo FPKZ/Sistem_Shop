@@ -1,13 +1,24 @@
 import Header from "./components/Header";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 
 
 export default function Layout() {
   const [menuExpand, setMenuExpand] = useState(false);
   const [mobile, setMobile] = useState(window.innerWidth < 766);
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // BUG FIX: O scroll da área administrativa ocorre dentro da div #root,
+    // não na janela inteira. Ao trocar de rota, resetamos o scroll para o topo.
+    const rootElement = document.getElementById("root");
+    if (rootElement) {
+      rootElement.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [pathname]);
 
   useEffect(() => {
     

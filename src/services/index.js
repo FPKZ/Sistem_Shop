@@ -1,11 +1,11 @@
-import * as admin from "./api/admin.js";
-import * as auth from "./api/auth.js";
-import * as clientes from "./api/clientes.tsx";
-import * as notas from "./api/notas.js";
-import * as produtos from "./api/produtos.tsx";
-import * as vendas from "./api/vendas.js";
-import * as dashboard from "./api/dashboard.js";
-import * as catalogo from "./api/catalogo.js";
+import * as admin from "./api/admin";
+import * as auth from "./api/auth";
+import * as clientes from "./api/clientes";
+import * as notas from "./api/notas";
+import * as produtos from "./api/produtos";
+import * as vendas from "./api/vendas";
+import * as dashboard from "./api/dashboard";
+import * as catalogo from "./api/catalogo";
 
 const back = import.meta.env.VITE_BACKEND_URL;
 

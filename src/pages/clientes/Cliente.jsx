@@ -1,5 +1,5 @@
 import { Card, Spinner } from "react-bootstrap";
-import API from "../../app/api.js";
+import API from "@services";
 import { useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import usePopStateModal from "@hooks/usePopStateModal";

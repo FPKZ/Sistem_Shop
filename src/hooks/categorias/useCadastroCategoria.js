@@ -1,5 +1,5 @@
 import { useForm } from "@hooks/useForm";
-import API from "@app/api";
+import API from "@services";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCadastroCategoria(onSuccess) {

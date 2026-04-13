@@ -1,4 +1,4 @@
-import { put, del, list, head } from "./blob.service.js";
+import { put, del, list } from "./blob.service.js";
 import { randomUUID } from "crypto";
 import { Produto } from "../database/models/index.js";
 import { Op } from "sequelize";
@@ -26,31 +26,36 @@ async function uploadImagem(imgFile) {
  * 
  * @param {string} url - URL da imagem a ser deletada
  */
+/**
+ * Deleta uma imagem do Vercel Blob, desde que não esteja vinculada a nenhum produto.
+ * Não usa head() antes de del() — o próprio del() já lança erro 404 se a URL não existir,
+ * evitando um round-trip de rede desnecessário (economia de ~400–700ms por operação).
+ *
+ * @param {string} url - URL pública da imagem a ser deletada
+ * @returns {Promise<{message: string, url: string}>}
+ */
 export async function deletarImagem(url) {
     if (!url) throw new Error("A URL da imagem é obrigatória");
 
-    // 1. Verificar se a imagem está em uso no banco de dados
+    // 1. Verificar se a imagem está vinculada a algum produto no banco
+    //    Feito antes do del() para evitar apagar imagens ainda em uso
     const emUso = await Produto.findOne({ 
         where: { 
             imgs: { [Op.contains]: [url] } 
-        } 
+        },
+        attributes: ["id"] // Só precisamos saber se existe, sem buscar dados extras
     });
+
     if (emUso) {
         throw new Error("Não é possível deletar esta imagem pois ela está vinculada a um produto");
     }
 
     try {
-        // 2. Verificar se a imagem existe no Vercel Blob usando head()
-        const blob = await head(url);
-        
-        if (!blob) throw new Error("Imagem não encontrada no servidor de arquivos");
-
-        // 3. Deletar do Vercel Blob
+        // 2. Deletar diretamente do Vercel Blob
+        //    del() lança um erro com status 404 se a URL não for encontrada
         await del(url);
-        
         return { message: "Imagem deletada com sucesso", url };
     } catch (error) {
-        // Se for um erro 404 do head(), tratamos como imagem não encontrada
         if (error.status === 404 || error.message?.includes("404")) {
             throw new Error("Imagem não encontrada no servidor de arquivos (Vercel Blob)");
         }

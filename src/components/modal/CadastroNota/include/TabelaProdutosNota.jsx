@@ -1,5 +1,5 @@
 import { Container, Card, Col, Row, Badge, Button } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import img from "@assets/logo.svg?url";
 import { X } from "lucide-react";
 

@@ -58,10 +58,23 @@ server.addHook("onRequest", async (request) => {
   server.log.info(`[REQUISICAO] ${request.method} ${request.url} - IP: ${request.ip}`);
 });
 
+// Prefixos de rotas cujas mutações afetam os dados do catálogo público.
+// Apenas essas rotas disparam a sincronização do cache no Vercel Blob.
+// Rotas como /venda, /nota, /cliente, /imagem não impactam dados públicos
+// e não precisam re-gerar o cache a cada operação.
+const ROTAS_QUE_AFETAM_CACHE = ["/produto", "/categoria", "/cores"];
+
 server.addHook("onResponse", async (request, reply) => {
-  // Dispara a sincronização de cache em background se foi uma operação de escrita/modificação/remoção com sucesso
-  if (["POST", "PUT", "DELETE"].includes(request.method) && reply.statusCode >= 200 && reply.statusCode < 300) {
-    syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização pós-requisição:", err));
+  const afetoCache = ROTAS_QUE_AFETAM_CACHE.some(r => request.url.startsWith(r));
+
+  if (
+    ["POST", "PUT", "DELETE"].includes(request.method) &&
+    reply.statusCode >= 200 && reply.statusCode < 300 &&
+    afetoCache
+  ) {
+    syncCacheToBlob(server.log).catch(err =>
+      server.log.error("[CACHE] Falha na sincronização pós-requisição:", err)
+    );
   }
 });
 
@@ -96,8 +109,15 @@ server.register(RegistarRotas)
 // ──────────────────────────────────────────────
 async function start() {
   try {
-    await sequelize.sync({ alter: true });
-    server.log.info("Conectado ao banco de dados com sucesso!");
+    // DB_SYNC=true faz o Sequelize verificar e alterar colunas — útil em desenvolvimento.
+    // Em produção (Render), deixar desligado para acelerar o boot.
+    if (process.env.DB_SYNC === 'true') {
+      await sequelize.sync({ alter: true });
+      server.log.info("[BD] Sincronizado com alter:true");
+    } else {
+      await sequelize.authenticate();
+      server.log.info("[BD] Conexão verificada (sem sync)");
+    }
     await server.listen({ port: env.PORT, host: "0.0.0.0" });
 
     const seedCores = new tableCores();

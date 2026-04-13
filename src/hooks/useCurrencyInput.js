@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 /**
  * Hook personalizado para inputs de moeda (BRL).

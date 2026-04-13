@@ -1,6 +1,6 @@
 import { Modal, Button, Form, Table, Badge, Spinner } from "react-bootstrap";
 import { useState } from "react";
-import API from "@app/api";
+import API from "@services";
 import { Alert } from "bootstrap";
 
 export default function ModalSelecionarCliente({

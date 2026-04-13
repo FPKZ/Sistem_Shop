@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "@app/api";
+import API from "@services";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";

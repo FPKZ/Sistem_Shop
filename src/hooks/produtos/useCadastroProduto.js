@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import API from "@app/api";
+import API from "@services";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
-import useImageUpload from "@hooks/useImageUpload";
+import useImageUpload from "@hooks/produtos/useImageUpload";
 import useProductPricing from "@hooks/produtos/useProductPricing";
 
 export function useCadastroProduto(onSuccess, caseNota = false) {
@@ -83,17 +83,18 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     }
   });
 
-  const removeImagem = async (url) => {
-    const response = await handleRequest(() => API.deleteImagem(url));
+  // useRequestHandler deve vir antes de removeImagem, que usa handleRequest
+  const { isLoading, handleRequest } = useRequestHandler();
+
+  const removeImagem = useCallback(async (url) => {
+    const response = await API.deleteImagem(url);
     if (response?.ok) {
       setFormValue((prev) => ({
         ...prev,
         imgs: prev.imgs.filter((img) => img !== url),
       }));
     }
-  };
-
-  const { isLoading, handleRequest } = useRequestHandler();
+  }, [setFormValue]);
 
   // Sincronização automática dos valores decimais do hook de preço com o formValue
   useEffect(() => {
@@ -209,8 +210,11 @@ export function useCadastroProduto(onSuccess, caseNota = false) {
     },
   });
 
+  // Reverte unwrap condicional — certas versões cacheadas ou rotas
+  // podem retornar objetos inteiros em vez de apenas a propriedade "data",
+  // o que impede arrays de funcionarem com funções nativas como `.find()`
   const categorias = categoriasData?.data || categoriasData || [];
-  const notas = notasData || [];
+  const notas = notasData?.data || notasData || [];
   const cores = coresData?.data || coresData || [];
 
   return {

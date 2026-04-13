@@ -1,5 +1,5 @@
 import { Card, Button, Row, Col, Dropdown } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 export function VendaCart({
   mobile,

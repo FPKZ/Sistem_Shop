@@ -69,7 +69,7 @@ const formatTimer = (totalSeconds : number) : string => {
 // console.log(formatTimer(3672));   // "01:01:12"
 
 // 💰 Formata número como valor monetário BRL
-const formatMoney = (valor : number, config : {style: string, currency: string} = {
+const formatMoney = (valor : number, config : Intl.NumberFormatOptions = {
     style: 'currency',
     currency: 'BRL',
   }) : string => {

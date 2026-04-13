@@ -1,5 +1,5 @@
 import { Card, Row, Col } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import {
   BarChart,
   Bar,

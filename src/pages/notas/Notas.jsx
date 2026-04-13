@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useOutletContext } from "react-router-dom";
-import API from "@app/api";
+import API from "@services";
 
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
 
 import ModalDetailNota from "@components/modal/Notas/ModalDetailNota";
 import TableNota from "./include/TableNota";
-import { printPDF, getRecebimentoConfig } from "@app/generatePDF";
+import { printPDF, getRecebimentoConfig } from "@services/generatePDF";
 
 import { NotasHeader } from "./components/NotasHeader";
 import { NotasFilter } from "./components/NotasFilter";

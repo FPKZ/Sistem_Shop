@@ -4,14 +4,16 @@ import pedidosRegistros from "../database/pedidos-registros.js";
 import bcrypt from "bcryptjs";
 import { autenticar, criarConta, resetarSenha } from "../services/conta.service.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { requireCargo } from "../middlewares/auth.middleware.js";
+import { getPermissoes } from "../config/permissoes.js";
 
 export default async function contaRoutes(fastify) {
 
   // Rotas Públicas
   fastify.post("/login", async (request, reply) => {
     const { email, senha } = request.body;
-    const { conta, token } = await autenticar(email, senha);
-    return reply.ok({ conta, token }, "Login bem-sucedido");
+    const { conta, token, permissoes } = await autenticar(email, senha);
+    return reply.ok({ conta, token, permissoes }, "Login bem-sucedido");
   });
 
   fastify.post("/register", async (request, reply) => {
@@ -32,7 +34,7 @@ export default async function contaRoutes(fastify) {
     return reply.code(200).send(contas);
   });
 
-  fastify.post("/cadastrar-conta", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.post("/cadastrar-conta", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const novaConta = await criarConta(request.body);
     return reply.code(201).ok({ novaConta }, "Conta cadastrada com sucesso!");
   });
@@ -49,7 +51,7 @@ export default async function contaRoutes(fastify) {
     return reply.ok({ conta, senhaPadrao }, "Senha redefinida com sucesso!");
   });
 
-  fastify.delete("/delete-user/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.delete("/delete-user/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const conta = await Conta.findByPk(request.params.id);
     if (!conta) return reply.err("Conta não encontrada", 404);
     await conta.destroy();
@@ -61,7 +63,7 @@ export default async function contaRoutes(fastify) {
     return reply.code(200).send(solicitacoes);
   });
 
-  fastify.put("/aprovar/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/aprovar/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const solicitacao = await Solicitacao.findByPk(request.params.id);
     if (!solicitacao) return reply.err("Solicitação não encontrada", 404);
 
@@ -76,10 +78,24 @@ export default async function contaRoutes(fastify) {
     return reply.ok({ novaConta }, "Solicitação aprovada!");
   });
 
-  fastify.delete("/negar/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.delete("/negar/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const solicitacao = await Solicitacao.findByPk(request.params.id);
     if (!solicitacao) return reply.err("Solicitação não encontrada", 404);
     await solicitacao.destroy();
     return reply.ok({}, "Solicitação negada!");
+  });
+
+  /**
+   * Rota de validação de sessão.
+   * Chamada pelo frontend no boot para confirmar que o usuário ainda existe no banco.
+   * Se o usuário foi deletado ou não existe, retorna 404 → frontend faz logout.
+   */
+  fastify.get("/perfil", { preHandler: authMiddleware }, async (request, reply) => {
+    const conta = await Conta.findByPk(request.user.id, {
+      attributes: { exclude: ["senha"] },
+    });
+    if (!conta) return reply.err("Usuário não encontrado", 404);
+    const permissoes = getPermissoes(conta.cargo);
+    return reply.ok({ conta, permissoes }, "Perfil carregado com sucesso");
   });
 }

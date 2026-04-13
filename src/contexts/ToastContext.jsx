@@ -22,6 +22,14 @@ const ToastProvider = ({ children }) => {
     setToasts(currentToasts => [...currentToasts, { id, message, bg }]);
   }, []);
 
+  React.useEffect(() => {
+    const handleGlobalToast = (e) => {
+      showToast(e.detail.message, e.detail.type);
+    };
+    window.addEventListener("global:toast", handleGlobalToast);
+    return () => window.removeEventListener("global:toast", handleGlobalToast);
+  }, [showToast]);
+
   const removeToast = id => {
     setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id));
   };

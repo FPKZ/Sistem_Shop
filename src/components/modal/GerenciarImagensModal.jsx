@@ -1,5 +1,5 @@
 import { Modal, Button, Row, Col, Card, Nav } from "react-bootstrap";
-import DropZone from "./DropZone";
+import DropZone from "@components/DropZone";
 import { Image as ImageIcon, PlusCircle } from "lucide-react";
 
 export default function GerenciarImagensModal({ 

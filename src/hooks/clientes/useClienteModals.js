@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../../app/api.js";
+import API from "@services";
 import { useToast } from "@contexts/ToastContext";
 
 export function useClienteModals() {

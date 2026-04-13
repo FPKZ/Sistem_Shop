@@ -3,41 +3,31 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import api from "@app/httpClient";
+import api from "@services/http/client";
+import { ApiResponse, Cliente, ClientePayload } from "@services/types";
 
-async function getClientesfunc() {
+async function getClientesfunc(): Promise<ApiResponse<Cliente[]>> {
   try {
     return await api.get("/clientes");
-  } catch (error) {
-    console.error("Erro ao buscar Clientes", error);
-  }
+  } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
-async function postClients(data: any) {
+async function postClients(data: ClientePayload): Promise<ApiResponse<Cliente>> {
   try {
     return await api.post("/cliente", data);
-  } catch (error) {
-    console.error("Erro ao cadastrar cliente", error);
-    throw error;
-  }
+  } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
-async function putClient({ id, ...data }: { id: number; [key: string]: any }) {
+async function putClient({ id, ...data }: { id: number } & Partial<ClientePayload>): Promise<ApiResponse<{ cliente: Cliente }>> {
   try {
     return await api.put(`/cliente/${id}`, data);
-  } catch (error) {
-    console.error("Erro ao atualizar cliente", error);
-    throw error;
-  }
+  } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
-async function deleteClient(id: number) {
+async function deleteClient(id: number): Promise<ApiResponse> {
   try {
     return await api.delete(`/cliente/${id}`);
-  } catch (error) {
-    console.error("Erro ao deletar cliente", error);
-    throw error;
-  }
+  } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
 // React Query

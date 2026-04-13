@@ -8,7 +8,7 @@ import {
 } from "../database/models/index.js";
 import { Op } from "sequelize";
 import { cadastrarProduto } from "../services/produto.service.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js";
 
 const INCLUDE_PRODUTO_COM_CATEGORIA = [
   { model: Categoria, as: "categoria" },
@@ -61,7 +61,7 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Criação ---
-  fastify.post("/produto", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.post("/produto", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
     try {
       let body = request.body
 
@@ -123,14 +123,14 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Exclusão ---
-  fastify.delete("/produto/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.delete("/produto/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
     const produto = await Produto.findByPk(request.params.id);
     if (!produto) return reply.err("Produto não encontrado", 404);
     await produto.destroy();
     return reply.code(204).send();
   });
 
-  fastify.delete("/produto/item/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.delete("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
     const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
     await item.destroy();

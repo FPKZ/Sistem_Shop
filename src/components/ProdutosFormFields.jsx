@@ -1,7 +1,7 @@
 import { Row, Col, Form, Button, Dropdown, InputGroup } from "react-bootstrap";
 import { Cores } from "@components/Cores";
-import ImageCropModal from "@components/ImageCropModal";
-import GerenciarImagensModal from "@components/GerenciarImagensModal";
+import ImageCropModal from "@components/modal/ImageCropModal";
+import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
 
 /**
  * Componente visual para os campos do formulário de produtos.

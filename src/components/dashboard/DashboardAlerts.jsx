@@ -1,5 +1,5 @@
 import { Card, ListGroup, Badge, Row, Col } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
   return (

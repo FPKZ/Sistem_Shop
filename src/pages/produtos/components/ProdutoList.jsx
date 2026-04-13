@@ -1,5 +1,5 @@
 import React from "react";
-import util from "@app/utils.js";
+import util from "@services/utils.js";
 
 export const ProdutoList = React.memo(({
   dadosProcessados,

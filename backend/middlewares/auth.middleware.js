@@ -31,6 +31,29 @@ export async function authMiddleware(request, reply) {
 }
 
 /**
+ * Middleware factory de autorização por cargo (RBAC).
+ * Verifica se o usuário logado tem o cargo necessário para acessar a rota.
+ * Deve ser usado APÓS o authMiddleware (que popula request.user).
+ *
+ * @param {...string} cargos - Cargos permitidos (ex: "Admin", "Gerente")
+ * @returns {Function} Middleware do Fastify
+ *
+ * @example
+ * fastify.delete("/rota", { preHandler: [authMiddleware, requireCargo("Admin")] }, handler)
+ */
+export function requireCargo(...cargos) {
+  return async function (request, reply) {
+    const cargoUsuario = request.user?.cargo;
+    if (!cargoUsuario || !cargos.includes(cargoUsuario)) {
+      return reply.code(403).send({
+        ok: false,
+        error: `Acesso negado. Apenas ${cargos.join(" ou ")} pode executar esta ação.`,
+      });
+    }
+  };
+}
+
+/**
  * Lista de rotas públicas que não precisam de autenticação.
  * Formato: "METHOD /path"
  */

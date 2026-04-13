@@ -1,5 +1,5 @@
 import { Container, Card, Row, Col, Badge } from "react-bootstrap";
-import util from "@app/utils.js";
+import util from "@services/utils.js";
 
 export default function TabelaProdutos({
   mobile,

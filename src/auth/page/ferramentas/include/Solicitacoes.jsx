@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { Table, Card, Button, Image } from "react-bootstrap"
-import utils from "@app/utils"
+import utils from "@services/utils"
 import { CheckCircle, XCircle } from "lucide-react"
 //paginação
 import { usePagination } from "@hooks/usePagination"

@@ -1,4 +1,4 @@
-import API from "@app/api";
+import API from "@services";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 

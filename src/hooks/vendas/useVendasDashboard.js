@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "@app/api";
+import API from "@services";
 
 export function useVendasDashboard() {
   const [vendas, setVendas] = useState([]);

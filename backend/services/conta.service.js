@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Conta } from "../database/models/index.js";
 import { env } from "../config/env.js";
+import { getPermissoes } from "../config/permissoes.js";
 
 const SALT_ROUNDS = 10;
 const SENHA_PADRAO_RESET = "mudar123";
@@ -29,13 +30,16 @@ export async function autenticar(email, senha) {
     throw err;
   }
 
+  // Incluir cargo no JWT para que o middleware requireCargo possa validar nas rotas
   const token = jwt.sign(
-    { id: conta.id, email: conta.email, nome: conta.nome, img: conta.img },
+    { id: conta.id, email: conta.email, nome: conta.nome, img: conta.img, cargo: conta.cargo },
     env.JWT_SECRET,
     { expiresIn: "4h" }
   );
 
-  return { conta, token };
+  const permissoes = getPermissoes(conta.cargo);
+
+  return { conta, token, permissoes };
 }
 
 /**

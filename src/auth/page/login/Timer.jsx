@@ -1,4 +1,4 @@
-import utils from "@app/utils"
+import utils from "@services/utils"
 import { useState, useEffect } from "react"
 import { Card } from "react-bootstrap"
 

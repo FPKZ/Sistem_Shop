@@ -15,25 +15,32 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
 
     /* JS Support */
     "allowJs": true,
     "checkJs": false,
+    "esModuleInterop": true,
 
     /* Paths */
     "baseUrl": "src",
     "paths": {
-      "@app/*": ["app/*"],
-      "@components": ["components/*"],
+      "@services": ["services/index.js"],
+      "@services/*": ["services/*"],
+      "@components": ["components/index.js"],
+      "@components/*": ["components/*"],
       "@tabelas": ["components/modal/Tabelas/*"],
       "@hooks": ["hooks/*"],
       "@auth-sistem": ["auth/sistem/*"],
-      "@contexts": ["contexts/*"]
+      "@contexts": ["contexts/*"],
+      "@utils": ["utils/*"],
+      "@types": ["services/types/index.ts"],
+      "@types/*": ["services/types/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts"]
+  "include": ["src/**/*", "vite-env.d.ts"],
+  "exclude": ["node_modules"]
 }

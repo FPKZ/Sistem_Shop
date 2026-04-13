@@ -7,6 +7,7 @@ import Carrinho from "./include/Carrinho";
 import Produto from "./include/Produto";
 import Menu from "./include/Menu";
 
+import { useEffect } from "react";
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
 
 export default function Catalogo() {
@@ -27,6 +28,16 @@ export default function Catalogo() {
     currentPage, itemsPerPage, currentItems, totalPages, totalItems,
     indexOfFirstItem, indexOfLastItem, handlePageChangeSafely, handleItemsPerPageChangeSafely
   } = useCatalogo();
+
+  useEffect(() => {
+    // BUG FIX: O estilo padrão do body (style.css) tem overflow: hidden para o Dashboard.
+    // Como o Catálogo renderiza por fora do Layout.jsx, o Lazy Loading perdeu a herança.
+    // Forçamos o body-scroll-visible para que a página possa rolar livremente nativamente.
+    document.body.classList.add("body-scroll-visible");
+    return () => {
+      document.body.classList.remove("body-scroll-visible");
+    };
+  }, []);
 
   const whatsappVariants = {
     collapsed: { x: "65%" },
