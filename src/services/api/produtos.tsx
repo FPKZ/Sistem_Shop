@@ -27,6 +27,12 @@ export async function postImagens(files: File[]): Promise<ApiResponse> {
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
+export async function updateProduto(id: number | string, data: Partial<Produto>): Promise<ApiResponse<Produto>> {
+  try {
+    return await api.put(`/produto/${id}`, data);
+  } catch (err) { console.error("Erro na API", err); throw err; }
+}
+
 export async function deleteImagem(url: string): Promise<ApiResponse> {
   try {
     return await api.delete("/imagen/deletar", { url });

@@ -10,6 +10,7 @@ import {
   Badge,
   Tabs,
   Tab,
+  Dropdown,
 } from "react-bootstrap";
 import ImageCarousel from "@components/ImageCarousel";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
@@ -40,10 +41,9 @@ export default function ProdutoInfo({
   const [itemEstoque, setItemEstoque] = useState({});
   const detailsRef = useRef(null);
 
-
   useEffect(() => {
     if (visible && !tableShow && produto) {
-      // Se o produto vier do fluxo de nota (objeto com array 'itens'), 
+      // Se o produto vier do fluxo de nota (objeto com array 'itens'),
       // normalizamos para que as propriedades do primeiro item sejam acessíveis no nível raiz
       if (produto.itens && Array.isArray(produto.itens) && produto.itens.length > 0) {
         const itemPrincipal = produto.itens[0];
@@ -53,14 +53,13 @@ export default function ProdutoInfo({
           img: produto.img, // Preserva a imagem do objeto pai
           nome: produto.nome, // Preserva o nome do objeto pai
           descricao: produto.descricao, // Preserva a descrição
-          ...produto // Sobrescreve com o resto para redundância
+          ...produto, // Sobrescreve com o resto para redundância
         });
       } else {
         setItemEstoque(produto);
       }
     }
   }, [visible, tableShow, produto]);
-
 
   useEffect(() => {
     if (visible && tableShow) setItemEstoque({});
@@ -183,7 +182,7 @@ export default function ProdutoInfo({
             xl={tableShow ? 7 : 12}
             className={`${mobile ? "order-1" : "order-md-2 h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
           >
-            {(!itemEstoque.id && !itemEstoque._id) ? (
+            {!itemEstoque.id && !itemEstoque._id ? (
               <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
                 <div className="bg-roxo-subtle p-4 rounded-circle mb-3">
                   <Package size={48} className="text-roxo" />
@@ -198,24 +197,62 @@ export default function ProdutoInfo({
               <div className="animate-fade-in">
                 {/* Cabeçalho do Produto */}
                 <div className="d-flex flex-column flex-md-row gap-3 mb-2 pb-2 border-bottom align-items-start align-items-md-center">
-                  <div
-                    className="bg-light rounded-4 border p-2 shadow-sm"
-                    style={{
-                      width: "140px",
-                      height: "140px",
-                      minWidth: "140px",
-                    }}
-                  >
-                    <img
-                      className="w-100 h-100 rounded-3 object-fit-cover"
-                      src={
-                        produto.img
-                          ? produto.img
-                          : "assets/tube-spinner.svg"
-                      }
-                      alt={produto.nome}
-                    />
-                  </div>
+                  <Dropdown className="group">
+                    <Dropdown.Toggle
+                      variant="none"
+                      className="bg-light rounded-4 border p-2 shadow-sm position-relative dropdown-toggle-no-caret overflow-hidden"
+                      style={{
+                        width: "140px",
+                        height: "140px",
+                        minWidth: "140px",
+                      }}
+                    >
+                      <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300">
+                      </div>
+                      <div
+                        className="position-absolute top-[45%] left-[45%] translate-middle m-2 rounded-3 opacity-0 group-hover:opacity-100! transition-all ease-in-out duration-300"
+                        style={{ zIndex: 10 }}
+                      >
+                        <Edit size={24} className="text-white/80" />
+                      </div>
+                      <div className="w-100 h-100">
+                        <img
+                          className="w-100 h-100 rounded-3 object-fit-cover"
+                          src={
+                            produto.img
+                              ? produto.img
+                              : "assets/tube-spinner.svg"
+                          }
+                          alt={produto.nome}
+                        />
+                      </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
+                      <div className="d-flex flex-wrap gap-1 p-0 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
+                        {produto.imgs.map((img, index) => (
+                          <Dropdown.Item
+                            className="w-auto cursor-pointer hover:bg-transparent! active:bg-transparent!"
+                            key={index}
+                            as="div"
+                          >
+                            <div
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                width: '5rem',
+                                height: '5rem',
+                                borderRadius: '10%',
+                                marginBottom: '5px',
+                                border: '1px solid #ccc',
+                                overflow: "hidden"
+                              }}
+                            >
+                              <img src={img} alt={produto.nome} />
+                            </div>
+                          </Dropdown.Item>
+                        ))}
+                      </div>
+                    </Dropdown.Menu>
+                  </Dropdown>
                   <div className="grow">
                     <div className="d-flex align-items-center gap-2 mb-2">
                       {getStatusBadge(itemEstoque.status)}
@@ -333,10 +370,10 @@ export default function ProdutoInfo({
                             }
                           >
                             <div className="p-2 animate-fade-in">
-                              <ImageCarousel 
-                                imgs={produto.imgs} 
-                                height="300px" 
-                                objectFit="contain" 
+                              <ImageCarousel
+                                imgs={produto.imgs}
+                                height="300px"
+                                objectFit="contain"
                               />
                             </div>
                           </Tab>
