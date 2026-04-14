@@ -15,7 +15,10 @@ const SENHA_PADRAO_RESET = "mudar123";
  * @throws {Error} com statusCode 401 se credenciais inválidas
  */
 export async function autenticar(email, senha) {
-  const conta = await Conta.findOne({ where: { email } });
+  const conta = await Conta.findOne({ 
+    where: { email }, 
+    attributes: ["id", "email", "nome", "img", "cargo", "senha"] 
+  });
 
   if (!conta) {
     const err = new Error("Credenciais inválidas");
@@ -30,16 +33,20 @@ export async function autenticar(email, senha) {
     throw err;
   }
 
+  // Converter para objeto simples e remover a senha antes de gerar o token e retornar
+  const contaData = conta.get({ plain: true });
+  const { senha: _, ...dadosPublicos } = contaData;
+
   // Incluir cargo no JWT para que o middleware requireCargo possa validar nas rotas
   const token = jwt.sign(
-    { id: conta.id, email: conta.email, nome: conta.nome, img: conta.img, cargo: conta.cargo },
+    { id: dadosPublicos.id, email: dadosPublicos.email, nome: dadosPublicos.nome, img: dadosPublicos.img, cargo: dadosPublicos.cargo },
     env.JWT_SECRET,
     { expiresIn: "4h" }
   );
 
-  const permissoes = getPermissoes(conta.cargo);
+  const permissoes = getPermissoes(dadosPublicos.cargo);
 
-  return { conta, token, permissoes };
+  return { conta: dadosPublicos, token, permissoes };
 }
 
 /**
