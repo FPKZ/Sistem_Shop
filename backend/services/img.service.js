@@ -39,16 +39,16 @@ export async function deletarImagem(url) {
 
     // 1. Verificar se a imagem está vinculada a algum produto no banco
     //    Feito antes do del() para evitar apagar imagens ainda em uso
-    // const emUso = await Produto.findOne({ 
-    //     where: { 
-    //         imgs: { [Op.contains]: [url] } 
-    //     },
-    //     attributes: ["id"] // Só precisamos saber se existe, sem buscar dados extras
-    // });
+    const emUso = await Produto.findOne({ 
+        where: { 
+            img: url 
+        },
+        attributes: ["id", "img"] // Só precisamos saber se existe, sem buscar dados extras
+    });
 
-    // if (emUso) {
-    //     throw new Error("Não é possível deletar esta imagem pois ela está vinculada a um produto");
-    // }
+    if (emUso) {
+        await Produto.update({ img: null }, { where: { id: emUso.id } });
+    }
 
     try {
         // 2. Deletar diretamente do Vercel Blob

@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 horas - Tempo para manter os dados no LocalStorage
       staleTime: 60000, // 1 minuto
-      refetchOnWindowFocus: false, // Evita picos de rede/processamento ao voltar para a aba
+      refetchOnWindowFocus: true, // Evita picos de rede/processamento ao voltar para a aba
     },
   },
 });
@@ -48,8 +48,6 @@ function prefetchBlobCache() {
       if (!cache) return;
       if (cache.catalogo) queryClient.setQueryData(["catalogo"], cache.catalogo);
       if (cache.categorias) queryClient.setQueryData(["categorias"], cache.categorias);
-      if (cache.notas) queryClient.setQueryData(["notas"], cache.notas);
-      if (cache.produtos) queryClient.setQueryData(["produtos"], cache.produtos);
       if (cache.cores) queryClient.setQueryData(["cores"], cache.cores);
       
       console.log("[CACHE] TanStack Query hidratado via Vercel Blob");
