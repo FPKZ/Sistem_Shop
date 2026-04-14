@@ -91,11 +91,11 @@ export const ProdutoGrid = React.memo(({
               <div className="d-flex justify-content-between align-items-center mt-auto">
                 <div className="d-flex flex-column">
                   <div className="fw-bold" style={{ fontSize: '1rem' }}>
-                    {produto.itemEstoque?.length || 0} Uni.
+                    {produto.itemEstoque.filter((item) => item.status === "Disponivel").length} Uni.
                   </div>
                 </div>
                 <div className="h-100">
-                  {getEstoqueBadge(produto.itemEstoque?.length)}
+                  {getEstoqueBadge(produto.itemEstoque.filter((item) => item.status === "Disponivel").length)}
                 </div>
               </div>
             </div>
