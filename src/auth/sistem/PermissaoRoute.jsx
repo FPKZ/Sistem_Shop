@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useOutletContext } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 /**
@@ -14,10 +14,11 @@ import { useAuth } from "./AuthContext";
  *   <Route index element={<GerenciamentoUsuario />} />
  * </Route>
  */
-export default function PermissaoRoute({ permissao, redirectTo = "/" }) {
+export default function PermissaoRoute({ permissao, redirectTo = "/painel" }) {
     const { pode, loading } = useAuth();
+    const context = useOutletContext();
 
     if (loading) return null;
 
-    return pode(permissao) ? <Outlet /> : <Navigate to={redirectTo} replace />;
+    return pode(permissao) ? <Outlet context={context} /> : <Navigate to={redirectTo} replace />;
 }

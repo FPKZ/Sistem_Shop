@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Button, Figure, Dropdown } from "react-bootstrap";
 import { useAuth } from "@auth-sistem/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 // eslint-disable-next-line no-unused-vars
 import utils from "@services/utils";
 
 const Header = React.memo(({ mobile }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { pode } = usePermissoes();
 
   const location = useLocation();
   const pathParts = location.pathname.split("/").filter((part) => part);
@@ -44,14 +46,14 @@ const Header = React.memo(({ mobile }) => {
         </div>
         <div id="user-menu" className="d-flex align-items-center h-100">
           <h1 className="me-2 m-0 text-[1rem]!">Sistem Shop</h1>
-          <ProfileMenu user={user} logout={logout} />
+          <ProfileMenu user={user} logout={logout} pode={pode} />
         </div>
       </header>
     </>
   );
 });
 
-const ProfileMenu = React.memo(({ user, logout }) => {
+const ProfileMenu = React.memo(({ user, logout, pode }) => {
   const [show, setShow] = useState(false);
 
   const navigate = useNavigate();
@@ -67,15 +69,15 @@ const ProfileMenu = React.memo(({ user, logout }) => {
   return (
     <Dropdown
       align="end"
-      show={show}
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      // show={show}
+      // onMouseEnter={() => setShow(true)}
+      // onMouseLeave={() => setShow(false)}
     >
       <Dropdown.Toggle
         as="div"
         id="dropdown-custom-components"
         className="d-flex dropdown-toggle-no-caret"
-        onClick={() => handleShowMenu()}
+        // onClick={() => setShow(!show)}
       >
         <Figure className="d-flex m-0 p-0 align-items-center profile-trigger">
           <Figure.Image
@@ -100,12 +102,14 @@ const ProfileMenu = React.memo(({ user, logout }) => {
         >
           Perfil
         </Dropdown.Item>
-        <Dropdown.Item
-          className="text-start"
-          onClick={() => navigate("usuarios")}
-        >
-          Ferramentas
-        </Dropdown.Item>
+        {pode("gerenciarUsuarios") && (
+          <Dropdown.Item
+            className="text-start"
+            onClick={() => navigate("usuarios")}
+          >
+            Ferramentas
+          </Dropdown.Item>
+        )}
         <Dropdown.Divider />
         <Dropdown.Item onClick={() => logout()}>
           <i className="bi bi-power me-2"></i>Sair

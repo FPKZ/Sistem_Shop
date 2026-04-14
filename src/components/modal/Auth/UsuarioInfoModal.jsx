@@ -65,8 +65,9 @@ export default function UsuarioInfoModal({
                   onChange={onChange}
                   required
                 >
-                  <option value="User">User</option>
-                  <option value="Adm">Adm</option>
+                  <option value="User">Vendedor</option>
+                  <option value="Gerente">Gerente</option>
+                  <option value="Admin">Administrador</option>
                 </Form.Select>
               </Form.Group>
             </Col>

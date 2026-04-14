@@ -35,10 +35,18 @@ const Menu = React.memo(({menuExpand, setMenuExpand , mobile}) => {
         )}
         <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/painel`)}>Inicio</ItenMenu>
         <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/painel/vendas`)}>Vendas</ItenMenu>
-        <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/painel/cadastro`)}>Cadastro</ItenMenu>
-        <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/painel/produtos`)}>Produtos</ItenMenu>
-        <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/painel/clientes`)}>Clientes</ItenMenu>
-        <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/painel/notas`)}>Notas</ItenMenu>
+        {pode("cadastrarProduto") && (
+          <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/painel/cadastro`)}>Cadastro</ItenMenu>
+        )}
+        {pode("cadastrarProduto") && (
+          <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/painel/produtos`)}>Produtos</ItenMenu>
+        )}
+        {pode("gerenciarClientes") && (
+          <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/painel/clientes`)}>Clientes</ItenMenu>
+        )}
+        {pode("gerenciarNotas") && (
+          <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/painel/notas`)}>Notas</ItenMenu>
+        )}
         {pode("gerenciarUsuarios") && (
           <ItenMenu mobile={mobile} icon="people-fill" onClick={() => handleNavigate(`/painel/usuarios`)}>Usuários</ItenMenu>
         )}

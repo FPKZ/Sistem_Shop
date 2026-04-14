@@ -47,8 +47,9 @@ export default function UsuarioCadastroModal({ show, onHide, onSubmit }) {
               <Form.Group>
                 <Form.Label>Permissão:</Form.Label>
                 <Form.Select name="cargo" required>
-                  <option value="User">User</option>
-                  <option value="Adm">Adm</option>
+                  <option value="User">Vendedor</option>
+                  <option value="Gerente">Gerente</option>
+                  <option value="Admin">Administrador</option>
                 </Form.Select>
               </Form.Group>
             </Col>
