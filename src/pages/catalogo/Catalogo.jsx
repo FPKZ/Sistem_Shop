@@ -8,9 +8,13 @@ import Produto from "./include/Produto";
 import Menu from "./include/Menu";
 
 import { useEffect } from "react";
+import { useNavigationType } from "react-router-dom";
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
 
 export default function Catalogo() {
+  const navType = useNavigationType();
+  const shouldAnimate = navType !== "POP";
+
   const {
     // States and Variables
     produtos, categorias, produtoSelecionado, selecionarProduto,
@@ -138,6 +142,7 @@ export default function Catalogo() {
                 handleChangeQuantity={handleChangeQuantity}
                 selecionarProduto={selecionarProduto}
                 setTelaProduto={setTelaProduto}
+                shouldAnimate={shouldAnimate}
               />
             )}
           </main>

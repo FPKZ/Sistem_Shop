@@ -1,36 +1,35 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 /**
- * Hook para gerenciar paginação de dados locais.
- *
- * @example
- * const {
- *   currentItems,
- *   currentPage,
- *   totalPages,
- *   itemsPerPage,
- *   handlePageChange,
- *   handleItemsPerPageChange,
- *   indexOfFirstItem,
- *   indexOfLastItem,
- *   totalItems
- * } = usePagination(todosOsDados, 10);
- *
- * @param {Array} data - Array com todos os dados a serem paginados
- * @param {number} initialItemsPerPage - Quantidade inicial de itens por página (padrão: 10)
+ * Hook para gerenciar paginação de dados locais com suporte opcional a URL.
  */
-export function usePagination(data = [], initialItemsPerPage = 10) {
-  const [currentPage, setCurrentPage] = useState(1);
+export function usePagination(data = [], initialItemsPerPage = 10, syncKey = null) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Se syncKey existe, tenta pegar da URL, senão usa 1
+  const initialPage = syncKey ? Number(searchParams.get(syncKey)) || 1 : 1;
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
 
   const safeData = Array.isArray(data) ? data : [];
   const totalItems = safeData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
 
+  // Sincroniza estado interno se a URL mudar (ex: botão voltar do navegador)
+  useEffect(() => {
+    if (syncKey) {
+      const pageFromUrl = Number(searchParams.get(syncKey)) || 1;
+      if (pageFromUrl !== currentPage) {
+        setCurrentPage(pageFromUrl);
+      }
+    }
+  }, [searchParams, syncKey]);
+
   // Garante que a página atual nunca exceda o total de páginas ao filtrar/excluir
   useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
+    if (currentPage > totalPages && totalPages > 0) {
+      handlePageChange(totalPages);
     }
   }, [totalPages, currentPage]);
 
@@ -41,12 +40,18 @@ export function usePagination(data = [], initialItemsPerPage = 10) {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+    if (syncKey) {
+      setSearchParams((prev) => {
+        prev.set(syncKey, pageNumber);
+        return prev;
+      }, { replace: true });
+    }
   };
 
   const handleItemsPerPageChange = (e) => {
     const newValue = Number(e.target.value);
     setItemsPerPage(newValue);
-    setCurrentPage(1);
+    handlePageChange(1);
   };
 
   return {

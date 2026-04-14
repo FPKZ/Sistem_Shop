@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 export const ProdutoGrid = React.memo(({
   dadosProcessados,
-  setModalInfoProduto,
-  setProduto,
+  // setModalInfoProduto,
+  // setProduto,
   getEstoqueBadge,
+  shouldAnimate = true,
 }) => {
   const navigate = useNavigate();
   const container = {
@@ -32,7 +33,7 @@ export const ProdutoGrid = React.memo(({
   return (
     <motion.div 
       variants={container}
-      initial="hidden"
+      initial={shouldAnimate ? "hidden" : false}
       animate="show"
       className="
         row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5

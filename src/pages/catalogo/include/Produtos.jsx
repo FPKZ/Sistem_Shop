@@ -21,7 +21,8 @@ export default function Produtos({
     filtro, 
     handleBadge, 
     selecionarProduto, 
-    setTelaProduto
+    setTelaProduto,
+    shouldAnimate = true
 }){
     
     const container = {
@@ -78,7 +79,12 @@ export default function Produtos({
                 <div className="text-center text-muted mt-5 flex-grow-1">Carregando produtos ou o catálogo está vazio...</div>
             ) : (
                 <div className="d-flex flex-column gap-3 justify-content-between flex-grow-1" >
-                    <motion.ul variants={container} initial="hidden" animate="show" className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 align-items-stretch g-4 list-unstyled">
+                    <motion.ul 
+                        variants={container} 
+                        initial={shouldAnimate ? "hidden" : false} 
+                        animate="show" 
+                        className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 align-items-stretch g-4 list-unstyled"
+                    >
                         {currentItems.map((produto) => {
                             return (
                                 <motion.li 

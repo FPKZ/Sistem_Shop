@@ -1,27 +1,49 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 /**
- * Hook para salvar a posição do scroll e restaurar quando modais/telas saírem da frente.
- *
- * ARQUITETURA:
- * O problema de scroll no Chrome Android na última página (com poucos itens) era causado
- * pelo layout encolhendo APÓS nosso scrollTo(0), tornando nossa posição inválida.
- * A solução arquitetural é garantir min-height:100dvh no container de produtos (Produtos.jsx),
- * para que o scrollMax nunca diminua abruptamente. Com isso, este hook pode ser simples.
+ * Hook para salvar a posição do scroll e restaurar condicionalmente.
  *
  * @param {boolean} isModalOpen - Define se algum modal está aberto
- * @param {React.MutableRefObject} topRef - Ref para elemento âncora no topo (deve ser position:fixed)
+ * @param {React.MutableRefObject} topRef - Ref para elemento âncora no topo
  * @param {Array} extraDeps  - Deps que RESETAM a memória de scroll e forçam scroll ao topo
  * @param {Array} triggerDeps - Deps que forçam scroll ao topo mas NÃO resetam a memória
+ * @param {string} persistenceKey - Chave para salvar no sessionStorage (opcional)
+ * @param {React.MutableRefObject} containerRef - Ref para o container SCROLLÁVEL
+ * @param {boolean} shouldRestore - Se falso, ignora a memória e limpa o cache
  */
-export function useScrollRestoration(isModalOpen, topRef, extraDeps = [], triggerDeps = []) {
-  const scrollPosition = useRef(0);
+export function useScrollRestoration(
+  isModalOpen, 
+  topRef, 
+  extraDeps = [], 
+  triggerDeps = [], 
+  persistenceKey = null, 
+  containerRef = null,
+  shouldRestore = true
+) {
+  const getInitialPos = () => {
+    if (persistenceKey && shouldRestore) {
+      const saved = sessionStorage.getItem(`scroll_${persistenceKey}`);
+      return saved ? Number(saved) : 0;
+    }
+    return 0;
+  };
+
+  const scrollPosition = useRef(getInitialPos());
   const scrollParent = useRef(null);
   const prevDeps = useRef(extraDeps);
+
+  // Se shouldRestore for falso no carregamento, garantimos que a memória esteja limpa
+  useLayoutEffect(() => {
+    if (!shouldRestore) {
+      scrollPosition.current = 0;
+      if (persistenceKey) sessionStorage.removeItem(`scroll_${persistenceKey}`);
+    }
+  }, [shouldRestore, persistenceKey]);
 
   // Reset síncrono de memória quando extraDeps mudam (ex: troca de página)
   if (JSON.stringify(prevDeps.current) !== JSON.stringify(extraDeps)) {
     scrollPosition.current = 0;
+    if (persistenceKey) sessionStorage.removeItem(`scroll_${persistenceKey}`);
     prevDeps.current = extraDeps;
   }
 
@@ -29,6 +51,8 @@ export function useScrollRestoration(isModalOpen, topRef, extraDeps = [], trigge
   useEffect(() => {
     const handleScroll = (e) => {
       if (!isModalOpen) {
+        if (containerRef && containerRef.current && e.target !== containerRef.current) return;
+
         const target = e.target;
         const top =
           target.scrollTop ??
@@ -36,68 +60,54 @@ export function useScrollRestoration(isModalOpen, topRef, extraDeps = [], trigge
           target.documentElement?.scrollTop ??
           window.scrollY ??
           0;
+        
         scrollPosition.current = top;
         scrollParent.current = target === document ? window : target;
+
+        if (persistenceKey && top > 0) {
+          sessionStorage.setItem(`scroll_${persistenceKey}`, top);
+        }
       }
     };
-    // Fase de captura para pegar eventos de qualquer elemento scrollável
-    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
-    return () => window.removeEventListener("scroll", handleScroll, { capture: true });
-  }, [isModalOpen]);
+
+    const targetEl = containerRef?.current || window;
+    targetEl.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    return () => targetEl.removeEventListener("scroll", handleScroll, { capture: true });
+  }, [isModalOpen, persistenceKey, containerRef]);
 
   // ─── Reseta ou restaura o scroll ──────────────────────────────────────────
-  // useLayoutEffect roda ANTES da tela piscar para o usuário, eliminando o delay.
   useLayoutEffect(() => {
+    const scroller = containerRef?.current || scrollParent.current || window;
+
     const goToTop = () => {
-      // Tenta o scroller natural identificado
-      const scroller = scrollParent.current || window;
       try { scroller.scrollTo({ top: 0, behavior: "instant" }); } catch { scroller.scrollTop = 0; }
-
-      // Tenta explícito na window / dom (fallback seguro)
-      try { window.scrollTo({ top: 0, behavior: "instant" }); } catch { /* silencia fallback */ }
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-
-      // topRef como âncora via scrollIntoView
+      if (scroller === window) {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
       topRef?.current?.scrollIntoView({ behavior: "instant", block: "start" });
     };
 
     const restoreScroll = (pos) => {
-      const scroller = scrollParent.current || window;
       try { scroller.scrollTo({ top: pos, behavior: "instant" }); } catch { scroller.scrollTop = pos; }
     };
 
-    const pos = scrollPosition.current;
+    const pos = shouldRestore ? scrollPosition.current : 0;
 
     if (isModalOpen) {
-      // Modal aberto — leva pro topo sem restaurar
       goToTop();
       return;
     }
 
     if (pos === 0) {
-      // ── RESET DE PÁGINA / FILTRO ──
-      // Executa em dois momentos:
-      // 1. Imediatamente (antes do paint) — captura o scroll antes do reflow
       goToTop();
-
-      // 2. Após o próximo ciclo de renderização — garante que o novo layout
-      //    (mais curto na última página) já foi pintado e nosso scroll se mantém.
-      //    Com min-height:100dvh no container, o scrollMax nunca encolhe,
-      //    então este segundo disparo é sempre suficiente.
       const raf = requestAnimationFrame(() => {
         goToTop();
-
-        // Terceiro disparo com delay extra para dispositivos lentos
         setTimeout(goToTop, 100);
       });
-
       return () => cancelAnimationFrame(raf);
     } else {
-      // ── RESTAURAÇÃO (voltando de produto/carrinho) ──
       restoreScroll(pos);
     }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isModalOpen, topRef, ...extraDeps, ...triggerDeps]);
+  }, [isModalOpen, topRef, containerRef, shouldRestore, ...extraDeps, ...triggerDeps]);
 }
