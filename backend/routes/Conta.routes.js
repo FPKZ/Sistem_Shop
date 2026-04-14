@@ -39,14 +39,14 @@ export default async function contaRoutes(fastify) {
     return reply.code(201).ok({ novaConta }, "Conta cadastrada com sucesso!");
   });
 
-  fastify.put("/editar-user/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/editar-user/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const conta = await Conta.findByPk(request.params.id);
     if (!conta) return reply.err("Usuário não encontrado", 404);
     await conta.update(request.body);
     return reply.ok({ conta }, "Usuário alterado com sucesso!");
   });
 
-  fastify.put("/reset-senha/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/reset-senha/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const { conta, senhaPadrao } = await resetarSenha(request.params.id);
     return reply.ok({ conta, senhaPadrao }, "Senha redefinida com sucesso!");
   });
