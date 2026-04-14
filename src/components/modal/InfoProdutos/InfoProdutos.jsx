@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from "react";
 import util from "@services/utils.js";
 import {
   Modal,
@@ -6,7 +5,6 @@ import {
   Col,
   Button,
   Card,
-  Container,
   Badge,
   Tabs,
   Tab,
@@ -14,6 +12,10 @@ import {
 } from "react-bootstrap";
 import ImageCarousel from "@components/ImageCarousel";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
+import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
+import ImageCropModal from "@components/modal/ImageCropModal";
+import useInfoProdutos from "@hooks/produtos/useInfoProdutos";
+import useEditarProduto from "@hooks/produtos/useEditarProduto";
 import {
   Tag,
   Package,
@@ -38,38 +40,19 @@ export default function ProdutoInfo({
   mobile,
   tableShow = true,
 }) {
-  const [itemEstoque, setItemEstoque] = useState({});
-  const detailsRef = useRef(null);
+  const {
+    itemEstoque,
+    setItemEstoque,
+    detailsRef,
+    activeTab,
+    setActiveTab,
+    modalImagens,
+    setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
+  } = useInfoProdutos({ visible, tableShow, produto });
 
-  useEffect(() => {
-    if (visible && !tableShow && produto) {
-      // Se o produto vier do fluxo de nota (objeto com array 'itens'),
-      // normalizamos para que as propriedades do primeiro item sejam acessíveis no nível raiz
-      if (produto.itens && Array.isArray(produto.itens) && produto.itens.length > 0) {
-        const itemPrincipal = produto.itens[0];
-        setItemEstoque({
-          ...itemPrincipal,
-          imgs: produto.imgs, // Preserva as imagens do objeto pai
-          img: produto.img, // Preserva a imagem do objeto pai
-          nome: produto.nome, // Preserva o nome do objeto pai
-          descricao: produto.descricao, // Preserva a descrição
-          ...produto, // Sobrescreve com o resto para redundância
-        });
-      } else {
-        setItemEstoque(produto);
-      }
-    }
-  }, [visible, tableShow, produto]);
-
-  useEffect(() => {
-    if (visible && tableShow) setItemEstoque({});
-  }, [visible, produto, tableShow]);
-
-  useEffect(() => {
-    if (visible && detailsRef.current) {
-      detailsRef.current.scrollTop = 0;
-    }
-  }, [visible, itemEstoque]);
+  const { imageUpload, removeImagem, updateImage, isLoading: isUpdating } = useEditarProduto(produto);
 
   if (!visible) return null;
 
@@ -139,9 +122,30 @@ export default function ProdutoInfo({
       </div>
     </Col>
   );
-
+  console.log(produto)
   return (
-    <Modal
+    <>
+      {/* Modais de Gerenciamento de Imagem (Apenas renderiza junto com o pai) */}
+      <GerenciarImagensModal
+        visible={modalImagens}
+        onClose={() => setModalImagens(false)}
+        imagens={produto?.imgs || []}
+        onRemove={removeImagem}
+        activeTab={activeTabModalImagens}
+        onTabChange={setActiveTabModalImagens}
+        imageUpload={imageUpload}
+        mobile={mobile}
+      />
+
+      <ImageCropModal
+        src={imageUpload.cropSrc}
+        visible={imageUpload.showCrop}
+        onClose={imageUpload.handlers.handleCropCancel}
+        onConfirm={imageUpload.handlers.handleCropConfirm}
+        aspect={1}
+      />
+
+      <Modal
       show={visible}
       onHide={onClose}
       size="xl"
@@ -215,9 +219,9 @@ export default function ProdutoInfo({
                       >
                         <Edit size={24} className="text-white/80" />
                       </div>
-                      <div className="w-100 h-100">
+                      <div className="w-100 h-100 position-relative">
                         <img
-                          className="w-100 h-100 rounded-3 object-fit-cover"
+                          className={`w-100 h-100 rounded-3 object-fit-cover transition-all duration-300 ${isUpdating ? 'opacity-50 blur-sm' : ''}`}
                           src={
                             produto.img
                               ? produto.img
@@ -225,15 +229,23 @@ export default function ProdutoInfo({
                           }
                           alt={produto.nome}
                         />
+                        {isUpdating && (
+                          <div className="position-absolute top-50 start-50 translate-middle">
+                            <div className="spinner-border text-roxo" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
                       <div className="d-flex flex-wrap gap-1 p-0 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
-                        {produto.imgs.map((img, index) => (
+                        {produto?.imgs?.map((img, index) => (
                           <Dropdown.Item
                             className="w-auto cursor-pointer hover:bg-transparent! active:bg-transparent!"
                             key={index}
                             as="div"
+                            onClick={() => updateImage(img)}
                           >
                             <div
                               style={{
@@ -292,9 +304,20 @@ export default function ProdutoInfo({
                 <Row className="g-3">
                   <Col xl={8} lg={12}>
                     <Card className="border-0 shadow-sm rounded-4 h-100">
-                      <Card.Body className="p-3">
+                      <Card.Body className="p-3 position-relative">
+                        {activeTab === "imagens" && (
+                          <div 
+                            className="position-absolute top-0 end-0 m-3 cursor-pointer d-flex align-items-center gap-1 hover-opacity shadow-sm bg-white p-2 rounded-3 border z-10"
+                            style={{ zIndex: 10, cursor: "pointer" }}
+                            onClick={() => setModalImagens(true)}
+                          >
+                            <Edit size={16} className="text-roxo" /> 
+                            <span className="small fw-semibold text-roxo">Gerenciar Imagens</span>
+                          </div>
+                        )}
                         <Tabs
-                          defaultActiveKey="tecnico"
+                          activeKey={activeTab}
+                          onSelect={(k) => setActiveTab(k)}
                           id="produto-detalhes-tabs"
                           className="mb-3 custom-tabs"
                         >
@@ -441,5 +464,6 @@ export default function ProdutoInfo({
         </Row>
       </Modal.Body>
     </Modal>
+  </>
   );
 }

@@ -125,3 +125,12 @@ export function useDeletarItem() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["produtos"] }); },
   });
 }
+
+export function useAtualizarProduto() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number | string; data: Partial<Produto> }) =>
+      updateProduto(id, data),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["produtos"] }); },
+  });
+}
