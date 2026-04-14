@@ -43,7 +43,7 @@ export default function ProdutoInfo({
   const {
     itemEstoque,
     setItemEstoque,
-    detailsRef,
+    // detailsRef,
     activeTab,
     setActiveTab,
     modalImagens,
@@ -162,11 +162,11 @@ export default function ProdutoInfo({
 
       <Modal.Body
         style={{
-          height: mobile ? "auto" : "75dvh",
-          minHeight: mobile ? "auto" : "550px",
+          // height: mobile ? "auto" : "75dvh",
+          // minHeight: mobile ? "auto" : "550px",
           padding: 0,
         }}
-        className={`${mobile ? "overflow-auto" : "overflow-hidden"} bg-white`}
+        className={`rounded-bottom-4 ${mobile ? "overflow-auto" : "overflow-hidden"} bg-white`}
       >
         <Row className="h-100 g-0">
           {/* Tabela lateral opcional */}
@@ -176,7 +176,7 @@ export default function ProdutoInfo({
               produto={produto}
               setItemEstoque={setItemEstoque}
               width={mobile ? 12 : 5}
-              custom={`border-end ${mobile ? "border-bottom" : ""}`}
+              custom={` ${mobile ? "border-bottom" : ""}`}
             />
           )}
 
@@ -184,20 +184,8 @@ export default function ProdutoInfo({
           <Col
             lg={tableShow ? 7 : 12}
             xl={tableShow ? 7 : 12}
-            className={`${mobile ? "order-1" : "order-md-2 h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
+            className={`${mobile ? "order-1" : "order-md-2 h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-3 pt-md-0 `}
           >
-            {!itemEstoque.id && !itemEstoque._id ? (
-              <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
-                <div className="bg-roxo-subtle p-4 rounded-circle mb-3">
-                  <Package size={48} className="text-roxo" />
-                </div>
-                <h4 className="fw-bold">Nenhum item selecionado</h4>
-                <p className="text-muted">
-                  Selecione um item da lista lateral para visualizar as
-                  especificações, valores e status atualizado.
-                </p>
-              </div>
-            ) : (
               <div className="animate-fade-in">
                 {/* Cabeçalho do Produto */}
                 <div className="d-flex flex-column flex-md-row gap-3 mb-2 pb-2 border-bottom align-items-start align-items-md-center">
@@ -211,7 +199,7 @@ export default function ProdutoInfo({
                         minWidth: "140px",
                       }}
                     >
-                      <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300">
+                      <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300 z-10">
                       </div>
                       <div
                         className="position-absolute top-[45%] left-[45%] translate-middle m-2 rounded-3 opacity-0 group-hover:opacity-100! transition-all ease-in-out duration-300"
@@ -267,7 +255,7 @@ export default function ProdutoInfo({
                   </Dropdown>
                   <div className="grow">
                     <div className="d-flex align-items-center gap-2 mb-2">
-                      {getStatusBadge(itemEstoque.status)}
+                      {!itemEstoque.id && !itemEstoque._id ? null : getStatusBadge(itemEstoque.status)}
                       <Badge
                         bg="roxo-subtle"
                         className="text-roxo px-3 py-2 rounded-pill d-flex align-items-center gap-1"
@@ -299,8 +287,23 @@ export default function ProdutoInfo({
                     </div>
                   </div>
                 </div>
-
                 {/* Grid de Informações */}
+                {!itemEstoque.id && !itemEstoque._id ? (
+                  <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
+                    <div className="mb-3">
+                      <img
+                        src="assets/tube-spinner.svg"
+                        alt="Sem Imagem"
+                        className="img-fluid"
+                        style={{ maxWidth: "100px" }}
+                      />
+                    </div>
+                    <h4 className="fw-bold text-muted">Nenhum produto selecionado</h4>
+                    <p className="text-muted small">
+                      Selecione um produto na lista ao lado para visualizar suas informações detalhadas.
+                    </p>
+                  </div>
+                ) : (
                 <Row className="g-3">
                   <Col xl={8} lg={12}>
                     <Card className="border-0 shadow-sm rounded-4 h-100">
@@ -458,8 +461,8 @@ export default function ProdutoInfo({
                     </Card>
                   </Col>
                 </Row>
+                )}
               </div>
-            )}
           </Col>
         </Row>
       </Modal.Body>

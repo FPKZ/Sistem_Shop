@@ -28,7 +28,9 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
   // Extrai categorias únicas dos produtos para o filtro
   const categoriasUnicas = Array.from(
     new Set(
-      produtos.filter((p) => p.categoria?.nome).map((p) => p.categoria.nome),
+      (Array.isArray(produtos) ? produtos : [])
+        .filter((p) => p.categoria?.nome)
+        .map((p) => p.categoria.nome),
     ),
   );
 

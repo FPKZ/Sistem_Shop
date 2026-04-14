@@ -41,6 +41,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparac
 
   // Processamento principal: Filtragem -> Ordenação
   const dadosProcessados = useMemo(() => {
+    if (!dadosIniciais || !Array.isArray(dadosIniciais)) return [];
     let dadosFiltrados = [...dadosIniciais];
 
     // Lógica de Filtragem

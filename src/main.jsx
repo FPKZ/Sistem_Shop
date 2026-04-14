@@ -1,31 +1,8 @@
 import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import "./imports.jsx";
-import {
-  Cadastro,
-  Clientes,
-  Produtos,
-  Notas,
-  Vendas,
-  NovaVenda,
-  TelaVendas,
-  Extorno,
-  Devolucao,
-  CadastroCliente,
-  CadastroNota,
-  CadastroProduto,
-  TelaCadastro,
-  Login,
-  CadastroUser,
-  PerfilPage,
-  GerenciamentoUsuario,
-  Catalogo,
-} from "./Router.jsx";
-import Layout from "./components/layout/Layout.jsx";
-import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
-import PermissaoRoute from "./auth/sistem/PermissaoRoute.jsx";
+import router from "./Router.jsx";
 import LoadingPage from "./auth/sistem/LoadingPage.jsx";
 import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
@@ -82,80 +59,7 @@ function prefetchBlobCache() {
 
 prefetchBlobCache();
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Catalogo />,
-    errorElement: <GlobalError />
-  },
-  {
-    path: "/painel",
-    errorElement: <GlobalError />,
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <Layout />,
-        children: [
-          { index: true, element: <App /> },
-          {
-            path: "cadastro",
-            element: <PermissaoRoute permissao="cadastrarProduto" />,
-            children: [
-              {
-                path: "",
-                element: <Cadastro />,
-                children: [
-                  { index: true, element: <TelaCadastro /> },
-                  { path: "produto", element: <CadastroProduto /> },
-                  { path: "nota", element: <CadastroNota /> },
-                  { path: "cliente", element: <CadastroCliente /> },
-                ],
-              },
-            ],
-          },
-          { path: "clientes", 
-            element: <PermissaoRoute permissao="gerenciarClientes" />, 
-            children: [
-              { index: true, element: <Clientes /> },
-            ] 
-          },
-          { path: "produtos", 
-            element: <PermissaoRoute permissao="cadastrarProduto" />, 
-            children: [
-              { index: true, element: <Produtos /> },
-            ] 
-          },
-          { path: "notas", 
-            element: <PermissaoRoute permissao="gerenciarNotas" />, 
-            children: [
-              { index: true, element: <Notas /> },
-            ] 
-          },
-          {
-            path: "vendas",
-            element: <Vendas />,
-            children: [
-              { index: true, element: <TelaVendas /> },
-              { path: "Nova-Venda", element: <NovaVenda /> },
-              { path: "Extorno", element: <Extorno /> },
-              { path: "Devolucao", element: <Devolucao /> },
-            ],
-          },
-          { path: "perfil", element: <PerfilPage /> },
-          {
-            path: "usuarios",
-            element: <PermissaoRoute permissao="gerenciarUsuarios" />,
-            children: [
-              { index: true, element: <GerenciamentoUsuario /> },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  { path: "login", element: <Login />, errorElement: <GlobalError /> },
-  { path: "cadastro-user", element: <CadastroUser />, errorElement: <GlobalError /> },
-]);
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

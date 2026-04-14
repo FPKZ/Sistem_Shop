@@ -1,6 +1,7 @@
 import React from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export const ProdutoGrid = React.memo(({
   dadosProcessados,
@@ -8,6 +9,7 @@ export const ProdutoGrid = React.memo(({
   setProduto,
   getEstoqueBadge,
 }) => {
+  const navigate = useNavigate();
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -26,7 +28,7 @@ export const ProdutoGrid = React.memo(({
       transition: { duration: 0.1 }
     }
   };
-
+  // console.log(dadosProcessados)
   return (
     <motion.div 
       variants={container}
@@ -47,8 +49,9 @@ export const ProdutoGrid = React.memo(({
           className="col cursor-pointer"
           key={produto.id}
           onClick={() => {
-            setModalInfoProduto(true);
-            setProduto(produto);
+            // setModalInfoProduto(true);
+            // setProduto(produto);
+            navigate(`/painel/produtos/info/${produto.id}`);
           }}
         >
           <div className="rounded-4 bg-white shadow-sm border-0 h-[25rem] d-flex flex-column overflow-hidden position-relative">

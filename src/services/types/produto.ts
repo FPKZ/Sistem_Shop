@@ -46,6 +46,7 @@ export interface ProdutoImagem extends BaseEntity {
 export interface ProdutoFiltros {
     item?: "estoque" | "vendidos" | "reservado" | "all" | string;
     nome?: string;
+    id?: string;
 }
 
 export interface CategoriaFiltros {

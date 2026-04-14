@@ -30,8 +30,9 @@ export default function useProdutosPage() {
   // Sincronização: Se o produto selecionado estiver no modal, 
   // e a lista de produtos mudar (ex: após deletar item), atualiza o estado local 'produto' com os novos dados
   useEffect(() => {
-    if (modalInfoProduto && produto?.id && produtos) {
-      const produtoAtualizado = produtos.find(p => p.id === produto.id);
+    const listaProdutos = produtos?.data || produtos || [];
+    if (modalInfoProduto && produto?.id && Array.isArray(listaProdutos)) {
+      const produtoAtualizado = listaProdutos.find(p => p.id === produto.id);
       if (produtoAtualizado) {
         setProduto(produtoAtualizado);
       }
@@ -58,7 +59,7 @@ export default function useProdutosPage() {
 
   return {
     mobile,
-    produtos: produtos || [],
+    produtos: (produtos?.data || produtos) && Array.isArray(produtos?.data || produtos) ? (produtos?.data || produtos) : [],
     produto,
     setProduto,
     cores: cores || [],

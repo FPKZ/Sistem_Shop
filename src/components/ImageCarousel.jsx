@@ -7,10 +7,12 @@ import { Package } from "lucide-react";
  * @param {Object} props
  * @param {Array} props.imgs - Lista de URLs das imagens.
  * @param {string} props.height - Altura fixa do container (ex: "450px").
+ * @param {string} props.maxHeight - Altura máxima do container (ex: "450px").
+ * @param {string} props.minHeight - Altura mínima do container (ex: "450px").
  * @param {string} props.objectFit - Estilo de preenchimento ("cover" ou "contain"). Por padrão "cover".
  * @param {string} props.className - Classes CSS adicionais para o container do Carousel.
  */
-export default function ImageCarousel({ imgs, height = "400px", objectFit = "cover", className = "" }) {
+export default function ImageCarousel({ imgs, height, maxHeight, minHeight, objectFit = "cover", className = "" }) {
   const hasImages = imgs && Array.isArray(imgs) && imgs.length > 0;
 
   if (!hasImages) {
@@ -35,7 +37,7 @@ export default function ImageCarousel({ imgs, height = "400px", objectFit = "cov
         <Carousel.Item key={idx}>
           <div
             className="d-flex align-items-center justify-content-center bg-light"
-            style={{ height }}
+            style={{ height, maxHeight, minHeight }}
           >
             <img
               src={img}

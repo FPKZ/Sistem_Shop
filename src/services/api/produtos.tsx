@@ -3,9 +3,10 @@ import api from "@services/http/client";
 import { ApiResponse, Produto, ProdutoFiltros, ItemEstoque, Categoria, Cor, CategoriaFiltros } from "@services/types";
 
 // Funções de fetch (usando httpClient — rotas protegidas)
-export async function getProduto({ item, nome }: ProdutoFiltros = {}): Promise<ApiResponse<Produto[]>> {
+export async function getProduto({ item, nome, id }: ProdutoFiltros = {}): Promise<ApiResponse<Produto[]>> {
   try {
-    const query = new URLSearchParams({ itens: item || "", nome: nome || "" }).toString();
+    const query = new URLSearchParams({ itens: item || "", nome: nome || "", id: id || "" }).toString();
+    console.log(`/produtos?${query}`);
     return await api.get(`/produtos?${query}`);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
@@ -94,10 +95,10 @@ export async function deleteCategoria(id: number | string): Promise<ApiResponse>
 }
 
 // React Query
-export function getProdutos({ item, nome }: ProdutoFiltros = {}) {
+export function getProdutos({ item, nome, id }: ProdutoFiltros = {}) {
   return useQuery({
-    queryKey: ["produtos"],
-    queryFn: () => getProduto({ item, nome }),
+    queryKey: ["produtos", { item, nome, id }],
+    queryFn: () => getProduto({ item, nome, id }),
   });
 }
 

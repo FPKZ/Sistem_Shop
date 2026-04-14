@@ -1,4 +1,7 @@
 import { lazy } from "react";
+import { createBrowserRouter } from "react-router-dom";
+
+
 
 /**
  * ============================================================================
@@ -21,10 +24,11 @@ import { lazy } from "react";
  * componente <Suspense> na árvore de renderização (veja o src/main.jsx) para exibir 
  * a tela de "Carregando" enquanto o navegador baixa o arquivo da página.
  */
-
+const App                  = lazy(() => import("./App.jsx"));
 const Cadastro             = lazy(() => import("./pages/cadastro/Cadastro.jsx"));
 const Clientes             = lazy(() => import("./pages/clientes/Cliente.jsx"));
 const Produtos             = lazy(() => import("./pages/produtos/Produtos.jsx"));
+const InfoProduto          = lazy(() => import("./pages/produtos/include/InfoProduto.jsx"));
 const Notas                = lazy(() => import("./pages/notas/Notas.jsx"));
 const Vendas               = lazy(() => import("./pages/vendas/Vendas.jsx"));
 const NovaVenda            = lazy(() => import("./pages/vendas/subPages/NovaVenda.jsx"));
@@ -41,23 +45,92 @@ const PerfilPage           = lazy(() => import("./auth/page/perfil/Perfil.jsx"))
 const GerenciamentoUsuario = lazy(() => import("./auth/page/ferramentas/GerenciamentoUsuario.jsx"));
 const Catalogo             = lazy(() => import("./pages/catalogo/Catalogo.jsx"));
 
-export {
-  Cadastro,
-  Clientes,
-  Produtos,
-  Notas,
-  Vendas,
-  NovaVenda,
-  TelaVendas,
-  Extorno,
-  Devolucao,
-  CadastroCliente,
-  CadastroNota,
-  CadastroProduto,
-  TelaCadastro,
-  Login,
-  CadastroUser,
-  PerfilPage,
-  GerenciamentoUsuario,
-  Catalogo,
-};
+const GlobalError          = lazy(() => import("./pages/erros/GlobalError.jsx"));
+const ProtectedRoute       = lazy(() => import("./auth/sistem/ProtectedRoute.jsx"));
+const PermissaoRoute       = lazy(() => import("./auth/sistem/PermissaoRoute.jsx"));
+const Layout               = lazy(() => import("./components/layout/Layout.jsx"));
+
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Catalogo />,
+    errorElement: <GlobalError />
+  },
+  {
+    path: "/painel",
+    errorElement: <GlobalError />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <Layout />,
+        children: [
+          { index: true, element: <App /> },
+          {
+            path: "cadastro",
+            element: <PermissaoRoute permissao="cadastrarProduto" />,
+            children: [
+              {
+                path: "",
+                element: <Cadastro />,
+                children: [
+                  { index: true, element: <TelaCadastro /> },
+                  { path: "produto", element: <CadastroProduto /> },
+                  { path: "nota", element: <CadastroNota /> },
+                  { path: "cliente", element: <CadastroCliente /> },
+                ],
+              },
+            ],
+          },
+          { path: "clientes", 
+            element: <PermissaoRoute permissao="gerenciarClientes" />, 
+            children: [
+              { index: true, element: <Clientes /> },
+            ] 
+          },
+          { path: "produtos", 
+            element: <PermissaoRoute permissao="cadastrarProduto" />, 
+            children: [
+              { 
+                index: true,
+                element: <Produtos /> 
+              },
+              {
+                path: "info/:id",
+                element: <InfoProduto />
+              }
+            ] 
+          },
+          { path: "notas", 
+            element: <PermissaoRoute permissao="gerenciarNotas" />, 
+            children: [
+              { index: true, element: <Notas /> },
+            ] 
+          },
+          {
+            path: "vendas",
+            element: <Vendas />,
+            children: [
+              { index: true, element: <TelaVendas /> },
+              { path: "Nova-Venda", element: <NovaVenda /> },
+              { path: "Extorno", element: <Extorno /> },
+              { path: "Devolucao", element: <Devolucao /> },
+            ],
+          },
+          { path: "perfil", element: <PerfilPage /> },
+          {
+            path: "usuarios",
+            element: <PermissaoRoute permissao="gerenciarUsuarios" />,
+            children: [
+              { index: true, element: <GerenciamentoUsuario /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  { path: "login", element: <Login />, errorElement: <GlobalError /> },
+  { path: "cadastro-user", element: <CadastroUser />, errorElement: <GlobalError /> },
+]);
+
+export default router;
