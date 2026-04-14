@@ -12,7 +12,7 @@ export default function GerenciarImagensModal({
   imageUpload,
   mobile
 }) {
-  console.log(mobile)
+  
   return (
     <Modal show={visible} onHide={onClose} size="xl" fullscreen={mobile} centered>
       <Modal.Header closeButton className="rounded-3 border-0">

@@ -122,7 +122,7 @@ export default function ProdutoInfo({
       </div>
     </Col>
   );
-  console.log(produto)
+  
   return (
     <>
       {/* Modais de Gerenciamento de Imagem (Apenas renderiza junto com o pai) */}
