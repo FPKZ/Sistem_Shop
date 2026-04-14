@@ -44,7 +44,7 @@ export default function InfoProduto() {
     const { mobile } = useOutletContext();
     const { data: produto, isLoading, error } = API.getProdutos({ id });
 
-    console.log(`id: ${id} | data:`, produto, ` | isLoading: ${isLoading} | error: ${error}`);
+    // console.log(`id: ${id} | data:`, produto, ` | isLoading: ${isLoading} | error: ${error}`);
 
     const {
     itemEstoque,

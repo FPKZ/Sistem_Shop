@@ -6,7 +6,7 @@ import { ApiResponse, Produto, ProdutoFiltros, ItemEstoque, Categoria, Cor, Cate
 export async function getProduto({ item, nome, id }: ProdutoFiltros = {}): Promise<ApiResponse<Produto[]>> {
   try {
     const query = new URLSearchParams({ itens: item || "", nome: nome || "", id: id || "" }).toString();
-    console.log(`/produtos?${query}`);
+    // console.log(`/produtos?${query}`);
     return await api.get(`/produtos?${query}`);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
