@@ -28,7 +28,12 @@ export default async function produtoRoutes(fastify) {
 
   // --- Leitura ---
   fastify.get("/produtos", { preHandler: authMiddleware }, async (request, reply) => {
-    const { itens, nome } = request.query;
+    const { itens, nome, id } = request.query;
+
+    if (id) {
+      const produto = await Produto.findByPk(id, { include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
+      return reply.code(200).send(produto);
+    }
 
     if (itens === "all") {
       const produtos = await ItemEstoque.findAll({ include: INCLUDE_ITEM_COM_PRODUTO });
