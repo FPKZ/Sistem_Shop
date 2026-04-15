@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Container,
   Row,
@@ -10,6 +10,8 @@ import {
 } from "react-bootstrap";
 import { Pencil } from "lucide-react";
 import { usePerfil } from "@hooks/auth/usePerfil";
+import ImageCropModal from "@components/modal/ImageCropModal";
+
 
 export default function PerfilPage() {
   const {
@@ -21,10 +23,22 @@ export default function PerfilPage() {
     handlePasswordChange,
     handlePerfilSubmit,
     handlePasswordSubmit,
+    showModal,
+    setShowModal,
+    imageUpload,
   } = usePerfil();
+
+  // O preview agora é simples pois o form recebe URLs do back imediatamente pós-recorte
+  const profileImagePreview = perfilData.img || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   return (
     <Row>
+      <ImageCropModal 
+        visible={imageUpload.showCrop} 
+        onClose={imageUpload.handlers.handleCropCancel} 
+        src={imageUpload.cropSrc} 
+        onConfirm={imageUpload.handlers.handleCropConfirm} 
+      />
       <Col className="d-flex flex-column overflow-hidden">
         <main className="grow overflow-y-auto p-4 md:p-8">
           <Container fluid="xl" className="d-flex flex-column gap-4">
@@ -45,18 +59,26 @@ export default function PerfilPage() {
                     <Col xs="auto" className="text-center mb-4 mb-md-0">
                       <div className="position-relative d-inline-block">
                         <Image
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgI_tQjxP6nWW7J19a2eyRLQHdzGRXd6aEPEDceI89NfMlHQPPg-mDXggu2ORMnhcgU3nbnVTZeU2CH_LJt_zZFLzM-agpJX3MnfkoRCn7sr8-RuXrj7gR0ImONTjbgHX3FV76TKo_HHMKCPxO7kX0ke4x0qbneVli4Hcga7R7PW6Ufs0vLXOfkrR3-Y_ikZMn3xKoidBBDmXE4Ob-Hd-yD13m4pidsJ2Vwi-_Cv0hppVlQBKSYjC_HviMeYOaXah2EUDyRWlSSj58"
+                          src={profileImagePreview}
                           alt="User avatar"
-                          style={{ width: "6rem", height: "6rem" }}
+                          style={{ width: "6rem", height: "6rem", objectFit: "cover" }}
                           roundedCircle
                         />
                         <Button
                           variant="primary"
                           className="position-absolute bottom-0 end-0 p-1 rounded-circle d-flex align-items-center justify-content-center"
                           style={{ width: "2rem", height: "2rem" }}
+                          onClick={() => imageUpload.fileInputRef.current.click()}
                         >
                           <Pencil size={16} />
                         </Button>
+                        <Form.Control
+                          type="file"
+                          ref={imageUpload.fileInputRef}
+                          className="d-none"
+                          accept={imageUpload.tiposAceitos}
+                          onChange={imageUpload.handlers.handleFileSelect}
+                        />
                       </div>
                     </Col>
                     <Col>

@@ -43,3 +43,14 @@ export async function getPerfil(): Promise<ApiResponse<{ conta: Usuario }>> {
     return await api.get("/perfil");
   } catch (err) { console.error("Erro ao buscar perfil", err); throw err; }
 }
+export async function updatePerfil(id: number | string, data: Partial<Usuario>): Promise<ApiResponse<Usuario>> {
+  try {
+    return await api.put(`/user-edit/${id}`, data);
+  } catch (err) { console.error("Erro ao atualizar perfil", err); throw err; }
+}
+
+export async function mudarSenha(data: { id: number | string; senhaAtual: string; novaSenha: string }): Promise<ApiResponse> {
+  try {
+    return await api.put("/mudar-senha", data);
+  } catch (err) { console.error("Erro ao mudar senha", err); throw err; }
+}
