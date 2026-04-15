@@ -44,8 +44,8 @@ export async function autenticar(email, senha) {
     { expiresIn: "4h" }
   );
 
-  const permissoes = getPermissoes(cargo);
-
+  let permissoes = getPermissoes(cargo);
+  permissoes = Object.fromEntries(Object.entries(permissoes).filter(([_,value]) => value === true));
   return { conta: {id, nome, cargo}, token, permissoes };
 }
 

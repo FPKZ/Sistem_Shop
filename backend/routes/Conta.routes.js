@@ -108,7 +108,8 @@ export default async function contaRoutes(fastify) {
       attributes: { exclude: ["senha"] },
     });
     if (!conta) return reply.err("Usuário não encontrado", 404);
-    const permissoes = getPermissoes(conta.cargo);
+    let permissoes = getPermissoes(conta.cargo);
+    permissoes = Object.fromEntries(Object.entries(permissoes).filter(([_,value]) => value === true));
     return reply.ok({ conta, permissoes }, "Perfil carregado com sucesso");
   });
 }
