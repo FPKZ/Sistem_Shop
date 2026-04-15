@@ -24,7 +24,6 @@
     "@tanstack/react-query-persist-client": "^5.96.2",
     "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.2",
-    "boostrap": "^2.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "cors": "^2.8.5",
@@ -73,5 +72,8 @@
   },
   "overrides": {
     "tar": "^7.5.8"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
