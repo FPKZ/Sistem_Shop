@@ -72,7 +72,6 @@ export default async function contaRoutes(fastify) {
             email: { type: "string" },
             img: { type: "string" },
           },
-          required: ["nome", "email", "img"],
         },
       },
       preHandler: authMiddleware,
@@ -81,12 +80,12 @@ export default async function contaRoutes(fastify) {
       try {
         const conta = await Conta.findByPk(request.params.id);
         const user = request.user;
-        console.log(`conta`, conta);
-        console.log(`user`, user);
 
         if (user.id !== conta.id) throw new Error("Não autorizado", 403);
 
         if (!conta) throw new Error("Usuário não encontrado", 404);
+
+        if (Object.keys(request.body).length === 0) throw new Error("Nenhum dado para atualizar", 400);
 
         const { nome, email, img } = request.body;
 

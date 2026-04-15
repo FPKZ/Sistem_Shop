@@ -87,7 +87,15 @@ export function usePerfil() {
         email: perfilForm.formValue.email === user.email ? null : perfilForm.formValue.email,
         img: perfilForm.formValue.img === user.img ? null : perfilForm.formValue.img,
       };
-      console.log(`playload`, playload);
+      Object.keys(playload).forEach((key) => {
+        if (playload[key] === null) {
+          delete playload[key];
+        }
+      });
+      if (Object.keys(playload).length === 0) {
+        showToast("Nenhum dado para atualizar", "error");
+        return;
+      }
       mutation.mutate(playload);
     }
   };
