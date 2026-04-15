@@ -36,7 +36,7 @@ export default function Produtos() {
     handleSubimit,
   } = useCadastroProduto();
   const { mobile } = useOutletContext();
-  console.log(mobile)
+  
   return (
     <div className="w-100 p-3 pt-0 m-0">
       <Form onSubmit={handleSubimit} noValidate>
