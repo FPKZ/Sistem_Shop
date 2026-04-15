@@ -3,7 +3,6 @@ import { useToast } from "@contexts/ToastContext";
 import API from "@services";
 import { useForm } from "@hooks/useForm";
 import useImageUpload from "@hooks/produtos/useImageUpload";
-import useProductPricing from "@hooks/produtos/useProductPricing";
 
 /**
  * Hook de lógica para edição de um produto existente.
@@ -35,36 +34,17 @@ export default function useEditarProduto(produto, onSuccess) {
       descricao:     produto?.descricao     ?? "",
       img:           produto?.img           ?? "",
       imgs:          produto?.imgs          ?? [],
-      cor:           produto?.cor           ?? null,
       categoria_id:  produto?.categoria_id  ?? null,
-      marca:         produto?.marca         ?? "",
-      tamanho:       produto?.tamanho       ?? "",
-      codigo_barras: produto?.codigo_barras ?? "",
-      valor_compra:  produto?.valor_compra  ?? null,
-      valor_venda:   produto?.valor_venda   ?? null,
-      lucro:         produto?.lucro         ?? null,
     },
     {
       validators: {
         nome:          (v) => (!v?.trim()            ? "Campo obrigatório!" : null),
-        marca:         (v) => (!v?.trim()            ? "Campo obrigatório!" : null),
-        tamanho:       (v) => (!v?.trim()            ? "Campo obrigatório!" : null),
         categoria_id:  (v) => (v == null             ? "Campo obrigatório!" : null),
-        codigo_barras: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
-        valor_compra:  (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
-        valor_venda:   (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
-        lucro:         (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
         descricao:     (v) => (!v?.trim()            ? "Campo obrigatório!" : null),
       },
     }
   );
 
-  // ─── Precificação ─────────────────────────────────────────────────────────
-  const pricing = useProductPricing({
-    initialCompra: produto?.valor_compra,
-    initialVenda:  produto?.valor_venda,
-  });
-  const { valorCompra, valorVenda, lucro } = pricing;
 
   // Sincroniza o formValue quando produto muda (seleção diferente ou refetch do cache)
   // Garante que campos como imgs nunca fiquem com dados do produto anterior.
@@ -75,26 +55,10 @@ export default function useEditarProduto(produto, onSuccess) {
       descricao:     produto.descricao     ?? "",
       img:           produto.img           ?? "",
       imgs:          produto.imgs          ?? [],
-      cor:           produto.cor           ?? null,
       categoria_id:  produto.categoria_id  ?? null,
-      marca:         produto.marca         ?? "",
-      tamanho:       produto.tamanho       ?? "",
-      codigo_barras: produto.codigo_barras ?? "",
-      valor_compra:  produto.valor_compra  ?? null,
-      valor_venda:   produto.valor_venda   ?? null,
-      lucro:         produto.lucro         ?? null,
     });
   }, [produto?.id, setFormValue]);
 
-  // Sincroniza valores de precificação com o formValue
-  useEffect(() => {
-    setFormValue((prev) => ({
-      ...prev,
-      valor_compra: valorCompra.value,
-      valor_venda:  valorVenda.value,
-      lucro:        lucro.value,
-    }));
-  }, [valorCompra.value, valorVenda.value, lucro.value, setFormValue]);
 
   // ─── Upload de Imagens ────────────────────────────────────────────────────
   // Após o upload no Blob, persiste o array imgs atualizado no produto via mutation.
@@ -134,17 +98,10 @@ export default function useEditarProduto(produto, onSuccess) {
     nome:          formValue.nome,
     descricao:     formValue.descricao,
     img:           formValue.img,
-    imgs:          produto?.imgs ?? formValue.imgs, // prop fresco do React Query
-    cor:           formValue.cor,
+    imgs:          formValue.imgs, // Usar o imgs do formValue que é atualizado pelos handlers
     categoria_id:  formValue.categoria_id,
-    marca:         formValue.marca,
-    tamanho:       formValue.tamanho,
-    codigo_barras: formValue.codigo_barras,
-    valor_compra:  valorCompra.value,
-    valor_venda:   valorVenda.value,
-    lucro:         lucro.value,
     ...overrides, // sobrescreve apenas o que foi passado
-  }), [formValue, produto, valorCompra.value, valorVenda.value, lucro.value]);
+  }), [formValue]);
 
   // ─── Atualizar Capa ───────────────────────────────────────────────────────
   const updateImage = useCallback((url) => {
@@ -229,9 +186,6 @@ export default function useEditarProduto(produto, onSuccess) {
     setFormValue,
     setValidated,
     setErros,
-
-    // Precificação
-    pricing,
 
     // Imagens
     imageUpload,

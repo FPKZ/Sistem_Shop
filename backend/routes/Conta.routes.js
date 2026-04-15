@@ -47,8 +47,8 @@ export default async function contaRoutes(fastify) {
   });
 
   fastify.put("/reset-senha/:id", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
-    const { conta, senhaPadrao } = await resetarSenha(request.params.id);
-    return reply.ok({ conta, senhaPadrao }, "Senha redefinida com sucesso!");
+    await resetarSenha(request.params.id);
+    return reply.ok({}, "Senha redefinida com sucesso!");
   });
 
   fastify.put("/mudar-senha", { preHandler: authMiddleware }, async (request, reply) => {
@@ -109,6 +109,7 @@ export default async function contaRoutes(fastify) {
     });
     if (!conta) return reply.err("Usuário não encontrado", 404);
     let permissoes = getPermissoes(conta.cargo);
+    // eslint-disable-next-line no-unused-vars
     permissoes = Object.fromEntries(Object.entries(permissoes).filter(([_,value]) => value === true));
     return reply.ok({ conta, permissoes }, "Perfil carregado com sucesso");
   });

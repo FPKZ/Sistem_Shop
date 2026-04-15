@@ -134,3 +134,25 @@ export function useAtualizarProduto() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["produtos"] }); },
   });
 }
+
+export function useAtualizarItemEstoque() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number | string; data: Partial<ItemEstoque> }) =>
+      updateItemEstoque(id, data),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["produtos"] }); },
+  });
+}
+export function useCategorias() {
+  return useQuery({
+    queryKey: ["categorias"],
+    queryFn: () => getCategoria(),
+  });
+}
+
+export function useCores(filtros: CategoriaFiltros = {}) {
+  return useQuery({
+    queryKey: ["cores", filtros],
+    queryFn: () => getCores(filtros),
+  });
+}

@@ -1,11 +1,12 @@
-import { Container, Card, Row, Col, Badge } from "react-bootstrap";
-import { Package } from "lucide-react";
+import { Container, Card, Row, Col, Badge, Button } from "react-bootstrap";
+import { Package, Edit } from "lucide-react";
 import util from "@services/utils.js";
 
 export default function TabelaProdutos({
   // mobile,
   produto,
   setItemEstoque,
+  onEditItem,
   width,
   custom,
   setmodalInfoProduto,
@@ -28,7 +29,7 @@ export default function TabelaProdutos({
           <Col xs={1} className="text-center">
             <strong>IMG</strong>
           </Col>
-          <Col xs={4}>
+          <Col xs={3}>
             <strong>NOME</strong>
           </Col>
           <Col xs={2}>
@@ -39,6 +40,9 @@ export default function TabelaProdutos({
           </Col>
           <Col xs={2} className="text-center">
             <strong>STATUS</strong>
+          </Col>
+          <Col xs={1} className="text-center">
+            <strong>AÇÕES</strong>
           </Col>
         </Row>
 
@@ -51,9 +55,10 @@ export default function TabelaProdutos({
           <div
             className={`grow p-1 overflow-y-auto`}
           >
-              <Produtos
+               <Produtos
                 produtos={produto}
                 setItemEstoque={setItemEstoque}
+                onEditItem={onEditItem}
                 setmodalInfoProduto={setmodalInfoProduto}
                 active={active}
               />
@@ -64,7 +69,7 @@ export default function TabelaProdutos({
   );
 }
 
-function Produtos({ produtos, setItemEstoque, setmodalInfoProduto, active }) {
+function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, active }) {
   if (!produtos) return;
   const itens = produtos.itemEstoque;
 
@@ -154,7 +159,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto, active }) {
                   }}
                 />
               </Col>
-              <Col xs={4} className="ps-2 text-truncate fw-semibold">
+              <Col xs={3} className="ps-2 text-truncate fw-semibold">
                 {produto.nome}
               </Col>
               <Col xs={2} className="p-0 text-truncate text-muted">
@@ -165,6 +170,19 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto, active }) {
               </Col>
               <Col xs={2} className="p-0 d-flex justify-content-center">
                 {getStatusBadge(produto.status)}
+              </Col>
+              <Col xs={1} className="d-flex justify-content-center p-0">
+                <Button 
+                  variant="none" 
+                  size="sm" 
+                  className="p-1 px-2 text-roxo hover:bg-roxo-subtle rounded-circle"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditItem?.(produto);
+                  }}
+                >
+                  <Edit size={14} />
+                </Button>
               </Col>
             </Row>
           </Card.Body>

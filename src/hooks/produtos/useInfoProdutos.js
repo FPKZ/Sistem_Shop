@@ -22,6 +22,16 @@ export default function useInfoProdutos({ visible, tableShow, produto }) {
   const [modalImagens, setModalImagens] = useState(false);
   const [activeTabModalImagens, setActiveTabModalImagens] = useState("galeria");
 
+  // Estados dos modais de edição
+  const [showEditProduto, setShowEditProduto] = useState(false);
+  const [showEditItem, setShowEditItem] = useState(false);
+  const [itemParaEditar, setItemParaEditar] = useState(null);
+
+  const handleEditItem = (item) => {
+    setItemParaEditar(item);
+    setShowEditItem(true);
+  };
+
   // Normaliza o produto para item de estoque quando não há tabela lateral
   useEffect(() => {
     if (visible && !tableShow && produto) {
@@ -87,5 +97,12 @@ export default function useInfoProdutos({ visible, tableShow, produto }) {
     setModalImagens,
     activeTabModalImagens,
     setActiveTabModalImagens,
+    showEditProduto,
+    setShowEditProduto,
+    showEditItem,
+    setShowEditItem,
+    itemParaEditar,
+    setItemParaEditar,
+    handleEditItem,
   };
 }

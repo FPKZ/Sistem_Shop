@@ -8,6 +8,8 @@ import ImageCropModal from "@components/modal/ImageCropModal";
 import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
 import ImageCarousel from "@components/ImageCarousel";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
+import EditarProdutoModal from "@components/modal/InfoProdutos/EditarProdutoModal";
+import EditarItemEstoqueModal from "@components/modal/InfoProdutos/EditarItemEstoqueModal";
 
 import {
   Tag,
@@ -56,7 +58,14 @@ export default function InfoProduto() {
     setModalImagens,
     activeTabModalImagens,
     setActiveTabModalImagens,
-  } = useInfoProdutos({ visible: false, tableShow: false, produto });
+    showEditProduto,
+    setShowEditProduto,
+    showEditItem,
+    setShowEditItem,
+    itemParaEditar,
+    // setItemParaEditar,
+    handleEditItem,
+  } = useInfoProdutos({ visible: true, tableShow: true, produto });
 
   const { imageUpload, removeImagem, updateImage, deletarProduto, isLoading: isUpdating } = useEditarProduto(produto);
 
@@ -167,6 +176,19 @@ export default function InfoProduto() {
                     onConfirm={imageUpload.handlers.handleCropConfirm}
                     aspect={1}
                 />
+
+                <EditarProdutoModal 
+                    visible={showEditProduto} 
+                    onClose={() => setShowEditProduto(false)} 
+                    produto={produto} 
+                />
+
+                <EditarItemEstoqueModal 
+                    visible={showEditItem} 
+                    onClose={() => setShowEditItem(false)} 
+                    item={itemParaEditar} 
+                />
+
                 <Container fluid>
                     <div className="animate-fade-in">
                         {/* Cabeçalho do Produto */}
@@ -258,6 +280,7 @@ export default function InfoProduto() {
                                     <Button
                                         variant="roxo"
                                         className="d-flex align-items-center gap-2 px-4 shadow-sm"
+                                        onClick={() => setShowEditProduto(true)}
                                     >
                                         <Edit size={18} /> Editar
                                     </Button>
@@ -316,9 +339,19 @@ export default function InfoProduto() {
                                                 <Card.Body className="p-3 position-relative">
                                                     
                                                     <Row className="g-3 animate-fade-in">
-                                                        <span className="d-flex align-items-center fw-semibold fs-5 text-roxo gap-2">
-                                                            <InfoIcon size={18} strokeWidth={3} /> Informações Técnicas
-                                                        </span>
+                                                        <div className="d-flex align-items-center justify-content-between w-100">
+                                                            <span className="d-flex align-items-center fw-semibold fs-5 text-roxo gap-2">
+                                                                <InfoIcon size={18} strokeWidth={3} /> Informações Técnicas
+                                                            </span>
+                                                            <Button 
+                                                                variant="outline-roxo" 
+                                                                size="sm" 
+                                                                className="d-flex align-items-center gap-2 rounded-pill px-3"
+                                                                onClick={() => handleEditItem(itemEstoque)}
+                                                            >
+                                                                <Edit size={14} /> Editar Item
+                                                            </Button>
+                                                        </div>
                                                     
                                                         <InfoBlock
                                                             label="Marca"
@@ -443,6 +476,7 @@ export default function InfoProduto() {
                                             mobile={mobile}
                                             produto={produto}
                                             setItemEstoque={setItemEstoque}
+                                            onEditItem={handleEditItem}
                                             active={itemEstoque.id}
                                             width={12}
                                             custom={` ${mobile ? "border-bottom" : ""}`}
