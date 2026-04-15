@@ -29,7 +29,7 @@ export default function PerfilPage() {
   } = usePerfil();
 
   // O preview agora é simples pois o form recebe URLs do back imediatamente pós-recorte
-  const profileImagePreview = perfilData.img || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+  const profileImagePreview = perfilData.img;
 
   return (
     <Row>
