@@ -9,7 +9,17 @@ import tableCores from "./database/interface/tableCores.js";
 import { syncCacheToBlob } from "./services/cache.service.js";
 import { limparImagensOrfas } from "./services/img.service.js";
 
-const server = fastify({ logger: true, trustProxy: true });
+const server = fastify({ 
+  logger: true,
+  trustProxy: true,
+  ajv: {
+    customOptions: {
+      removeAdditional: false,
+      useDefaults: true,
+      allErrors: true
+    }
+  }
+});
 
 // ──────────────────────────────────────────────
 // CORS
@@ -83,6 +93,19 @@ server.addHook("onResponse", async (request, reply) => {
 // ──────────────────────────────────────────────
 server.setErrorHandler((error, request, reply) => {
   server.log.error(error);
+
+  if(error.validation) {
+    return reply.status(400).send({
+      status: "error_validacao",
+      message: "Erro de validação",
+      detalhes: error.validation.map(err => ({
+        campo: err.instancePath.replace("/", "") || err.params.missingProperty,
+        regra: err.keyword,
+        mensagem: err.message
+      })),
+      ok: false
+    })
+  }
 
   // Erros de negócio lançados pelos services com statusCode
   const statusCode = error.statusCode || 500;
