@@ -4,6 +4,7 @@ import Footer from "../include/Footer";
 import { useNavigate } from "react-router-dom";
 import { useCadastroUser } from "@hooks/auth/useCadastroUser";
 import Erros from "@components/Erros";
+import PasswordField from "@components/common/PasswordField";
 import React, { useEffect } from "react";
 
 export default function CadastroUser() {
@@ -60,35 +61,27 @@ export default function CadastroUser() {
                   placeholder="Digite seu email"
                 />
               </Col>
-              <Col className="mb-3">
-                <Form.Label htmlFor="password" className="form-label">
-                  Senha
-                </Form.Label>
-                <Form.Control
-                  type="password"
-                  className={`form-control ${validated ? (erros.senha ? `is-invalid` : `is-valid`) : ""}`}
-                  name="senha"
-                  value={formValue.senha || ""}
-                  onChange={handleChange}
-                  required
-                  placeholder="Digite sua senha"
-                />
-              </Col>
-              <Col className="mb-3">
-                <Form.Label htmlFor="confirmPassword" className="form-label">
-                  Confirme a Senha
-                </Form.Label>
-                <Form.Control
-                  type="password"
-                  className={`form-control ${validated ? (erros.confirmSenha ? `is-invalid` : `is-valid`) : ""}`}
-                  name="confirmSenha"
-                  value={formValue.confirmSenha || ""}
-                  onChange={handleChange}
-                  required
-                  id="confirmPassword"
-                  placeholder="Confirme sua senha"
-                />
-              </Col>
+              <PasswordField
+                label="Senha"
+                name="senha"
+                value={formValue.senha || ""}
+                onChange={handleChange}
+                placeholder="Digite sua senha"
+                required
+                isInvalid={validated && !!erros.senha}
+                error={erros.senha}
+              />
+              <PasswordField
+                label="Confirme a Senha"
+                name="confirmSenha"
+                value={formValue.confirmSenha || ""}
+                onChange={handleChange}
+                placeholder="Confirme sua senha"
+                required
+                id="confirmPassword"
+                isInvalid={validated && !!erros.confirmSenha}
+                error={erros.confirmSenha}
+              />
               <Button type="submit" className="btn btn-roxo w-100">
                 Cadastrar
               </Button>

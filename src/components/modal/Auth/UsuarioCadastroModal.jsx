@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, Form, Row, Col, Button } from "react-bootstrap";
+import PasswordField from "@components/common/PasswordField";
 
 export default function UsuarioCadastroModal({ show, onHide, onSubmit }) {
   return (
@@ -32,17 +33,12 @@ export default function UsuarioCadastroModal({ show, onHide, onSubmit }) {
                 />
               </Form.Group>
             </Col>
-            <Col xs={12}>
-              <Form.Group>
-                <Form.Label>Senha:</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="senha"
-                  placeholder="mudar123"
-                  required
-                />
-              </Form.Group>
-            </Col>
+              <PasswordField
+                label="Senha:"
+                name="senha"
+                placeholder="mudar123"
+                required
+              />
             <Col xs={12}>
               <Form.Group>
                 <Form.Label>Permissão:</Form.Label>

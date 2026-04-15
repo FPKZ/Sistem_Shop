@@ -4,6 +4,7 @@ import Footer from "../include/Footer";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "@hooks/auth/useLogin";
 import Erros from "@components/Erros";
+import PasswordField from "@components/common/PasswordField";
 import React, { useEffect } from "react";
 
 export default function Login() {
@@ -38,18 +39,16 @@ export default function Login() {
                     required
                   />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    className={`form-control ${validated ? (erros.senha ? `is-invalid` : `is-valid`) : ""}`}
-                    name="senha"
-                    value={formValue.senha || ""}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                  />
-                </Form.Group>
+                <PasswordField
+                  label="Password"
+                  name="senha"
+                  value={formValue.senha || ""}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  required
+                  isInvalid={validated && !!erros.senha}
+                  error={erros.senha}
+                />
                 <Button type="submit" className="btn-roxo w-100">
                   Submit
                 </Button>

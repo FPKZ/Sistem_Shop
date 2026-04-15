@@ -12,6 +12,8 @@ import { Pencil } from "lucide-react";
 import { usePerfil } from "@hooks/auth/usePerfil";
 import ImageCropModal from "@components/modal/ImageCropModal";
 
+import PasswordField from "@components/common/PasswordField";
+
 
 export default function PerfilPage() {
   const {
@@ -110,7 +112,10 @@ export default function PerfilPage() {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <div className="d-flex justify-content-end mt-4">
+                  <div className="d-flex justify-content-end mt-4 gap-2">
+                    <Button variant="secondary" >
+                      Cancelar
+                    </Button>
                     <Button variant="primary" type="submit">
                       Salvar Alterações
                     </Button>
@@ -125,46 +130,37 @@ export default function PerfilPage() {
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handlePasswordSubmit}>
-                  <Form.Group controlId="current-password" className="mb-3">
-                    <Form.Label>Senha Atual</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="current"
-                      value={passwords.current}
-                      onChange={handlePasswordChange}
-                      isInvalid={!!passwordErrors.current}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {passwordErrors.current}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group controlId="new-password" className="mb-3">
-                    <Form.Label>Nova Senha</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="new"
-                      value={passwords.new}
-                      onChange={handlePasswordChange}
-                      isInvalid={!!passwordErrors.new}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {passwordErrors.new}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group controlId="confirm-password" className="mb-3">
-                    <Form.Label>Confirmar Nova Senha</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="confirm"
-                      value={passwords.confirm}
-                      onChange={handlePasswordChange}
-                      isInvalid={!!passwordErrors.confirm}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {passwordErrors.confirm}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                  <div className="d-flex justify-content-end mt-4">
+                  <PasswordField
+                    label="Senha Atual"
+                    name="current"
+                    value={passwords.current}
+                    onChange={handlePasswordChange}
+                    isInvalid={!!passwordErrors.current}
+                    error={passwordErrors.current}
+                    placeholder="Sua senha atual"
+                  />
+                  <PasswordField
+                    label="Nova Senha"
+                    name="new"
+                    value={passwords.new}
+                    onChange={handlePasswordChange}
+                    isInvalid={!!passwordErrors.new}
+                    error={passwordErrors.new}
+                    placeholder="Sua nova senha"
+                  />
+                  <PasswordField
+                    label="Confirmar Nova Senha"
+                    name="confirm"
+                    value={passwords.confirm}
+                    onChange={handlePasswordChange}
+                    isInvalid={!!passwordErrors.confirm}
+                    error={passwordErrors.confirm}
+                    placeholder="Confirme a nova senha"
+                  />
+                  <div className="d-flex justify-content-end mt-4 gap-2">
+                    <Button variant="secondary">
+                      Cancelar
+                    </Button>
                     <Button variant="primary" type="submit">
                       Atualizar Senha
                     </Button>
