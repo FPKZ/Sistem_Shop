@@ -23,6 +23,52 @@ const INCLUDE_ITEM_COM_PRODUTO = [
   { model: Nota, as: "nota" },
   { model: Produto, as: "produto", include: [{ model: Categoria, as: "categoria" }] },
 ];
+const putSchemaProduto = {
+  body: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      nome: { type: "string" },
+      img: { type: "string" },
+      imgs: { type: "array", items: { type: "string" } },
+      descricao: { type: "string" },
+      categoria_id: { type: "number" },
+    },
+  },
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "number" }
+    },
+    required: ["id"]
+  }
+}
+
+const putSchemaItem = {
+    body: {
+      type: "object",
+      //bloqueia campos que não estão definidos abaixo
+      additionalProperties: false,
+      properties: {
+        tamanho: { type: "string" }, 
+        cor: { type: "string" }, // nome: "Azul", hex: "#000000"
+        marca: { type: "string" },
+        codigo_barras: { type: "string" },
+        valor_compra: { type: "number" },
+        valor_venda: { type: "number" },
+        lucro: { type: "number" },
+        status: { type: "string" },
+      },
+      // required: ["nome"]
+    },
+    params: {
+      type: "object",
+      properties: {
+        id: { type: "number" }
+      },
+      required: ["id"]
+    }
+  }
 
 export default async function produtoRoutes(fastify) {
 
@@ -86,17 +132,41 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Atualizar Produto ---
-  fastify.put("/produto/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
+  fastify.put("/produto/:id", { schema: putSchemaProduto, preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     try {
       const { id } = request.params;
+
+      if(!id) throw new Error("ID do produto não fornecido", 400)
+
       const produto = await Produto.findByPk(id);
       if (!produto) return reply.err("Produto não encontrado", 404);
+
       await produto.update(request.body);
+      
       return reply.ok({ produto }, "Produto atualizado com sucesso");
     } catch (err) {
       reply.err(err)
     }
   });
+
+  // --- Atualizar ItemEstoque ---
+  fastify.put("/produto/item/:id", { schema: putSchemaItem, preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
+    try{
+      const { id } = request.params;
+
+      if(!id) throw new Error("ID do item não fornecido", 400)
+      
+      const item = await ItemEstoque.findByPk(id);
+      
+      if (!item) return reply.err("Item não encontrado", 404);
+      
+      await item.update(request.body);
+      
+      return reply.ok({ message: `Produto ${item.nome} atualizado com sucesso`})
+    } catch (err) {
+      return reply.err(err)
+    }
+  })
 
   // --- Reserva / Remoção ---
   fastify.put("/produto/reservar/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente", "vendedor")] }, async (request, reply) => {
@@ -127,14 +197,6 @@ export default async function produtoRoutes(fastify) {
     if (!itemReservado) return reply.err("Item reservado não encontrado", 404);
 
     await itemReservado.destroy();
-    await item.update(request.body);
-    return reply.ok({ item }, "Item atualizado com sucesso");
-  });
-
-  // --- Atualização ---
-  fastify.put("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
-    const item = await ItemEstoque.findByPk(request.params.id);
-    if (!item) return reply.err("Item não encontrado", 404);
     await item.update(request.body);
     return reply.ok({ item }, "Item atualizado com sucesso");
   });
