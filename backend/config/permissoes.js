@@ -69,7 +69,7 @@ export const PERMISSOES = {
  * @param {string} cargo
  */
 export function getPermissoes(cargo) {
-  return PERMISSOES[cargo] ?? PERMISSOES.User;
+  return PERMISSOES[cargo] ?? PERMISSOES.vendedor;
 }
 
 export function getAllPermissoes() {

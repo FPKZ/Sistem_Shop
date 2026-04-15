@@ -61,10 +61,10 @@ prefetchBlobCache();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <ToastProvider>
-        <ModalProvider>
-          <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+      <AuthProvider>
+        <ToastProvider>
+          <ModalProvider>
             {/* 
               O <Suspense> trabalha em conjunto com o React.lazy() do Router.jsx.
               Sempre que o usuário navegar para uma rota em que o arquivo JS (chunk) 
@@ -74,9 +74,9 @@ createRoot(document.getElementById("root")).render(
             <Suspense fallback={<LoadingPage />}>
               <RouterProvider router={router} />
             </Suspense>
-          </PersistQueryClientProvider>
-        </ModalProvider>
-      </ToastProvider>
-    </AuthProvider>
+          </ModalProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </PersistQueryClientProvider>
   </StrictMode>,
 );

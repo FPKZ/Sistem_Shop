@@ -49,7 +49,7 @@ export async function listarCatalogo(query = {}) {
     id:         produto.id,
     nome:       produto.nome,
     descricao:  produto.descricao,
-    categoria:  produto.categoria.nome,
+    categoria:  produto.categoria?.nome || "Sem Categoria",
     img:        produto.img,
     imgs:       produto.imgs,
     cores: await getColorsList([...new Set(produto.itemEstoque.map((item) => item.status === "Disponivel" ? item.cor : null))].sort()),
