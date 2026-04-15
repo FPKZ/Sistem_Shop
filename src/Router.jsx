@@ -41,7 +41,7 @@ const CadastroNota         = lazy(() => import("./pages/cadastro/include/Notas.j
 const TelaCadastro         = lazy(() => import("./pages/cadastro/include/TelaCadastro.jsx"));
 const Login                = lazy(() => import("./auth/page/login/Login.jsx"));
 const CadastroUser         = lazy(() => import("./auth/page/cadastro/CadastroUser.jsx"));
-const PerfilPage           = lazy(() => import("./auth/page/perfil/Perfil.jsx"));
+const PerfilPage           = lazy(() => import("./pages/perfil/Perfil.jsx"));
 const GerenciamentoUsuario = lazy(() => import("./auth/page/ferramentas/GerenciamentoUsuario.jsx"));
 const Catalogo             = lazy(() => import("./pages/catalogo/Catalogo.jsx"));
 
