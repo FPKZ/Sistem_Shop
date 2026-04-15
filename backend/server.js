@@ -42,6 +42,7 @@ if (env.FRONTEND_URL === "ALL") {
 } else {
   if (env.FRONTEND_URL) origins.push(env.FRONTEND_URL);
   console.log("\n[CORS] Modo: Restrito às seguintes origens:", origins);
+  await server.register(cors, { ...CORS_OPTIONS, origin: origins });
 }
 
 // ──────────────────────────────────────────────
