@@ -35,18 +35,18 @@ export async function autenticar(email, senha) {
 
   // Converter para objeto simples e remover a senha antes de gerar o token e retornar
   const contaData = conta.get({ plain: true });
-  const { senha: _, ...dadosPublicos } = contaData;
+  const { id, nome, cargo } = contaData;
 
   // Incluir cargo no JWT para que o middleware requireCargo possa validar nas rotas
   const token = jwt.sign(
-    { id: dadosPublicos.id, email: dadosPublicos.email, nome: dadosPublicos.nome, img: dadosPublicos.img, cargo: dadosPublicos.cargo },
+    { id, nome, cargo },
     env.JWT_SECRET,
     { expiresIn: "4h" }
   );
 
-  const permissoes = getPermissoes(dadosPublicos.cargo);
+  const permissoes = getPermissoes(cargo);
 
-  return { conta: dadosPublicos, token, permissoes };
+  return { conta: {id, nome, cargo}, token, permissoes };
 }
 
 /**
@@ -83,4 +83,21 @@ export async function resetarSenha(id) {
   await conta.update({ senha: senhaHash });
 
   return { conta, senhaPadrao: SENHA_PADRAO_RESET };
+}
+
+export async function mudarSenha(id, senhaAtual, novaSenha) {
+  const conta = await Conta.findOne({ 
+    where: { id },
+    attributes: ["id", "senha"]
+  })
+
+  if(!conta) throw new Error("Usuario não encontrado")
+  
+  const validate = await bcrypt.compare(senhaAtual, conta.senha)
+  if(!validate) throw new Error("Senha atual incorreta")
+
+  const novaSenhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS)
+  await conta.update({ senha: novaSenhaHash })
+
+  return { messager: "Senha alterada com sucesso!" };
 }

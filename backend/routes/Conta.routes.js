@@ -2,7 +2,7 @@ import { Conta } from "../database/models/index.js";
 import Solicitacao from "../database/models/Solicitacao.js";
 import pedidosRegistros from "../database/pedidos-registros.js";
 import bcrypt from "bcryptjs";
-import { autenticar, criarConta, resetarSenha } from "../services/conta.service.js";
+import { autenticar, criarConta, resetarSenha, mudarSenha } from "../services/conta.service.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { requireCargo } from "../middlewares/auth.middleware.js";
 import { getPermissoes } from "../config/permissoes.js";
@@ -50,6 +50,19 @@ export default async function contaRoutes(fastify) {
     const { conta, senhaPadrao } = await resetarSenha(request.params.id);
     return reply.ok({ conta, senhaPadrao }, "Senha redefinida com sucesso!");
   });
+
+  fastify.put("/mudar-senha", { preHandler: authMiddleware }, async (request, reply) => {
+    try{
+      const { id, senhaAtual, novaSenha } = request.body;
+      const user = request.user;
+  
+      if (user.id !== id) return reply.err("Não autorizado", 403);
+      const result = await mudarSenha(id, senhaAtual, novaSenha)
+      return reply.ok({ result });
+    } catch (err) {
+      reply.err(err)
+    }
+  })
 
   fastify.delete("/delete-user/:id", { preHandler: [authMiddleware, requireCargo("Admin")] }, async (request, reply) => {
     const conta = await Conta.findByPk(request.params.id);
