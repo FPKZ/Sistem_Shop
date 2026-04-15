@@ -45,6 +45,7 @@ export async function autenticar(email, senha) {
   );
 
   let permissoes = getPermissoes(cargo);
+  // eslint-disable-next-line no-unused-vars
   permissoes = Object.fromEntries(Object.entries(permissoes).filter(([_,value]) => value === true));
   return { conta: {id, nome, cargo}, token, permissoes };
 }

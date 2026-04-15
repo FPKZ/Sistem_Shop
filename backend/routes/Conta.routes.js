@@ -29,14 +29,14 @@ export default async function contaRoutes(fastify) {
   });
 
   // Rotas Protegidas
-  fastify.get("/contas", { preHandler: authMiddleware }, async (request, reply) => {
-    const contas = await Conta.findAll();
+  fastify.get("/contas", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
+    const contas = await Conta.findAll({ attributes: { exclude: ["senha"] } });
     return reply.code(200).send(contas);
   });
 
   fastify.post("/cadastrar-conta", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
-    const novaConta = await criarConta(request.body);
-    return reply.code(201).ok({ novaConta }, "Conta cadastrada com sucesso!");
+    await criarConta(request.body);
+    return reply.ok({ message: "Conta cadastrada com sucesso!" }, 201);
   });
 
   fastify.put("/editar-user/:id", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
@@ -51,7 +51,20 @@ export default async function contaRoutes(fastify) {
     return reply.ok({}, "Senha redefinida com sucesso!");
   });
 
-  fastify.put("/mudar-senha", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/mudar-senha", { 
+    schema: {
+      body: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          senhaAtual: { type: "string" },
+          novaSenha: { type: "string" },
+        },
+        required: ["id", "senhaAtual", "novaSenha"],
+      }
+    },
+    preHandler: authMiddleware 
+  }, async (request, reply) => {
     try{
       const { id, senhaAtual, novaSenha } = request.body;
       const user = request.user;
@@ -71,7 +84,7 @@ export default async function contaRoutes(fastify) {
     return reply.ok({}, "Conta deletada com sucesso");
   });
 
-  fastify.get("/pendentes", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.get("/pendentes", { preHandler: [ authMiddleware, requireCargo("admin")] }, async (request, reply) => {
     const solicitacoes = await Solicitacao.findAll({ where: { status: "pendente" } });
     return reply.code(200).send(solicitacoes);
   });
@@ -88,7 +101,8 @@ export default async function contaRoutes(fastify) {
     });
 
     await solicitacao.destroy();
-    return reply.ok({ novaConta }, "Solicitação aprovada!");
+    const conta = novaConta.get({ plain: true, attributes: { exclude: ["senha"] } })
+    return reply.ok({ conta }, "Solicitação aprovada!");
   });
 
   fastify.delete("/negar/:id", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
