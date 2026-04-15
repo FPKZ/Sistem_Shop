@@ -1,6 +1,6 @@
 import { put, del, list } from "./blob.service.js";
 import { randomUUID } from "crypto";
-import { Produto } from "../database/models/index.js";
+import { Conta, Produto } from "../database/models/index.js";
 import { Op } from "sequelize";
 import { env } from "../config/env.js";
 
@@ -100,18 +100,16 @@ export async function limparImagensOrfas() {
         if (blobs.length === 0) return console.log("[CLEANUP] Nenhum blob encontrado.");
 
         // 2. Buscar todas as URLs de imagens em uso no banco
-        const produtosComImgs = await Produto.findAll({
-            attributes: ['imgs'],
-            where: {
-                imgs: { [Op.ne]: null }
-            },
-            raw: true
-        });
-        
-        // Extrair todas as URLs de todos os arrays 'imgs' de todos os produtos
-        const urlsEmUso = new Set(
-            produtosComImgs.flatMap(p => Array.isArray(p.imgs) ? p.imgs : []).filter(Boolean)
-        );
+        // 1. Buscar tudo em paralelo para ganhar performance
+          const [produtos, contas] = await Promise.all([
+            Produto.findAll({ attributes: ['imgs'], raw: true }),
+            Conta.findAll({ attributes: ['img'], raw: true })
+        ]);
+        // 3. Extrair todas as URLs de forma única
+        const urlsEmUso = new Set([
+            ...produtos.flatMap(p => p.imgs || []), // Array de imagens do produto
+            ...contas.map(c => c.img)               // Imagem de perfil da conta
+        ].filter(Boolean));
 
         console.log(`[CLEANUP] Validando ${blobs.length} blobs contra ${urlsEmUso.size} imagens em uso.`);
 
