@@ -114,6 +114,20 @@ server.setErrorHandler((error, request, reply) => {
   reply.code(statusCode).send({ ok: false, error: message });
 });
 
+server.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
+  if (body === '') {
+    done(null, {}); // Se vier vazio, transforma em um objeto vazio
+    return;
+  }
+  try {
+    const json = JSON.parse(body);
+    done(null, json);
+  } catch (err) {
+    err.statusCode = 400;
+    done(err, undefined);
+  }
+});
+
 // ──────────────────────────────────────────────
 // Rota de Health Check
 // ──────────────────────────────────────────────

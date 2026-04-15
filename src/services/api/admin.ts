@@ -22,7 +22,6 @@ export async function cadastrarUser(data: Partial<Usuario>): Promise<ApiResponse
 
 export async function editarUser(data: Partial<Usuario> & { id: number | string }): Promise<ApiResponse<Usuario>> {
   try {
-    console.log(data)
     return await api.put(`/editar-user/${data.id}`, data);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
