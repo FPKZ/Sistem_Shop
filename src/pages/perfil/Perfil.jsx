@@ -8,11 +8,12 @@ import {
   Button,
   Image,
 } from "react-bootstrap";
-import { Pencil } from "lucide-react";
+import { Pencil, ChevronDown } from "lucide-react";
 import { usePerfil } from "@hooks/auth/usePerfil";
 import ImageCropModal from "@components/modal/ImageCropModal";
 
 import PasswordField from "@components/common/PasswordField";
+import { Collapsible } from "radix-ui";
 
 
 export default function PerfilPage() {
@@ -25,9 +26,12 @@ export default function PerfilPage() {
     handlePasswordChange,
     handlePerfilSubmit,
     handlePasswordSubmit,
-    showModal,
-    setShowModal,
     imageUpload,
+    edit,
+    setEdit,
+    openPassword,
+    setOpenPassword,
+    handlePasswordCancel,
   } = usePerfil();
 
   // O preview agora é simples pois o form recebe URLs do back imediatamente pós-recorte
@@ -66,14 +70,16 @@ export default function PerfilPage() {
                           style={{ width: "6rem", height: "6rem", objectFit: "cover" }}
                           roundedCircle
                         />
-                        <Button
-                          variant="primary"
-                          className="position-absolute bottom-0 end-0 p-1 rounded-circle d-flex align-items-center justify-content-center"
-                          style={{ width: "2rem", height: "2rem" }}
-                          onClick={() => imageUpload.fileInputRef.current.click()}
-                        >
-                          <Pencil size={16} />
-                        </Button>
+                        {edit && (
+                          <Button
+                            variant=""
+                            className="btn-roxo position-absolute bottom-0 end-0 p-1 rounded-circle d-flex align-items-center justify-content-center"
+                            style={{ width: "2rem", height: "2rem" }}
+                            onClick={() => imageUpload.fileInputRef.current.click()}
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                        )}
                         <Form.Control
                           type="file"
                           ref={imageUpload.fileInputRef}
@@ -85,26 +91,30 @@ export default function PerfilPage() {
                     </Col>
                     <Col>
                       <Form.Group controlId="nome" className="mb-4">
-                        <Form.Label>Nome Completo</Form.Label>
+                        <Form.Label>Nome Completo:</Form.Label>
                         <Form.Control
                           type="text"
                           name="nome"
                           value={perfilData.nome}
                           onChange={handlePerfilChange}
                           isInvalid={!!perfilErrors.nome}
+                          disabled={!edit}
+                          className={`${edit ? "" : "bg-white! border-white"}`}
                         />
                         <Form.Control.Feedback type="invalid">
                           {perfilErrors.nome}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group controlId="email">
-                        <Form.Label>Endereço de E-mail</Form.Label>
+                        <Form.Label>Endereço de E-mail:</Form.Label>
                         <Form.Control
                           type="email"
                           name="email"
                           value={perfilData.email}
                           onChange={handlePerfilChange}
                           isInvalid={!!perfilErrors.email}
+                          disabled={!edit}
+                          className={`${edit ? "" : "bg-white! border-white"}`}
                         />
                         <Form.Control.Feedback type="invalid">
                           {perfilErrors.email}
@@ -113,60 +123,95 @@ export default function PerfilPage() {
                     </Col>
                   </Row>
                   <div className="d-flex justify-content-end mt-4 gap-2">
-                    <Button variant="secondary" >
-                      Cancelar
-                    </Button>
-                    <Button variant="primary" type="submit">
-                      Salvar Alterações
-                    </Button>
+                    {edit ? (<>
+                        <Button
+                          size="sm"
+                          variant=""
+                          className="btn-roxo-secondary"
+                          onClick={() => setEdit(false)}>
+                          Cancelar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant=""
+                          className="btn-roxo"
+                          type="submit">
+                          Salvar Alterações
+                        </Button>
+                    </>) : (
+                        <Button
+                          size="sm"
+                          variant 
+                          className="
+                            font-semibold! text-roxo bg-roxo-subtle
+                            hover:bg-[#c63cf4]! hover:text-white!
+                            flex! items-center gap-2
+                          "
+                          onClick={() => setEdit(true)}>
+                          <Pencil size={16} />
+                          Editar
+                        </Button>
+                    )}
                   </div>
                 </Form>
               </Card.Body>
             </Card>
 
             <Card className="shadow-md">
-              <Card.Header as="h3" className="text-xl font-semibold">
-                Alterar Senha
-              </Card.Header>
-              <Card.Body>
-                <Form onSubmit={handlePasswordSubmit}>
-                  <PasswordField
-                    label="Senha Atual"
-                    name="current"
-                    value={passwords.current}
-                    onChange={handlePasswordChange}
-                    isInvalid={!!passwordErrors.current}
-                    error={passwordErrors.current}
-                    placeholder="Sua senha atual"
-                  />
-                  <PasswordField
-                    label="Nova Senha"
-                    name="new"
-                    value={passwords.new}
-                    onChange={handlePasswordChange}
-                    isInvalid={!!passwordErrors.new}
-                    error={passwordErrors.new}
-                    placeholder="Sua nova senha"
-                  />
-                  <PasswordField
-                    label="Confirmar Nova Senha"
-                    name="confirm"
-                    value={passwords.confirm}
-                    onChange={handlePasswordChange}
-                    isInvalid={!!passwordErrors.confirm}
-                    error={passwordErrors.confirm}
-                    placeholder="Confirme a nova senha"
-                  />
-                  <div className="d-flex justify-content-end mt-4 gap-2">
-                    <Button variant="secondary">
-                      Cancelar
-                    </Button>
-                    <Button variant="primary" type="submit">
-                      Atualizar Senha
-                    </Button>
-                  </div>
-                </Form>
-              </Card.Body>
+              <Collapsible.Root open={openPassword} onOpenChange={setOpenPassword}>
+                    <Collapsible.Trigger asChild>
+                        <Card.Header as="h3" className="text-xl font-semibold cursor-pointer hover:bg-gray-50 transition-colors d-flex justify-content-between align-items-center group">
+                            Alterar Senha
+                            <ChevronDown className="group-data-[state=open]:rotate-180 transition-transform" />
+                        </Card.Header>
+                    </Collapsible.Trigger>
+                    <Collapsible.Content className="overflow-hidden data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up group">
+                        <Card.Body>
+                            <Form onSubmit={handlePasswordSubmit}>
+                                <PasswordField
+                                    label="Senha Atual"
+                                    name="current"
+                                    value={passwords.current}
+                                    onChange={handlePasswordChange}
+                                    isInvalid={!!passwordErrors.current}
+                                    error={passwordErrors.current}
+                                    placeholder="Sua senha atual"
+                                />
+                                <PasswordField
+                                    label="Nova Senha"
+                                    name="new"
+                                    value={passwords.new}
+                                    onChange={handlePasswordChange}
+                                    isInvalid={!!passwordErrors.new}
+                                    error={passwordErrors.new}
+                                    placeholder="Sua nova senha"
+                                />
+                                <PasswordField
+                                    label="Confirmar Nova Senha"
+                                    name="confirm"
+                                    value={passwords.confirm}
+                                    onChange={handlePasswordChange}
+                                    isInvalid={!!passwordErrors.confirm}
+                                    error={passwordErrors.confirm}
+                                    placeholder="Confirme sua nova senha"
+                                />
+                                <div className="d-flex justify-content-end mt-4 gap-2">
+                                    <Button 
+                                      variant="none" 
+                                      type="button"
+                                      onClick={handlePasswordCancel}
+                                      className="btn-roxo-secondary"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                    <Button variant="none" type="submit" className="btn-roxo">
+                                        Salvar Alterações
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Collapsible.Content>
+              </Collapsible.Root>
             </Card>
           </Container>
         </main>

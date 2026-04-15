@@ -1,5 +1,5 @@
 import API from "@services";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import { useAuth } from "@auth-sistem/AuthContext";
@@ -8,6 +8,8 @@ import { useToast } from "@contexts/ToastContext";
 import useImageUpload from "@hooks/produtos/useImageUpload";
 
 export function usePerfil() {
+  const  [ edit, setEdit ] = useState(false);
+  const  [ openPassword, setOpenPassword ] = useState(false);
   const { handleRequest } = useRequestHandler();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -120,6 +122,11 @@ export function usePerfil() {
     }
   };
 
+  const handlePasswordCancel = () => {
+    passwordForm.resetForm();
+    setOpenPassword(false);
+  };
+
   return {
     perfilData: perfilForm.formValue,
     passwords: passwordForm.formValue,
@@ -130,5 +137,10 @@ export function usePerfil() {
     handlePerfilSubmit,
     handlePasswordSubmit,
     imageUpload,
+    edit,
+    setEdit,
+    openPassword,
+    setOpenPassword,
+    handlePasswordCancel,
   };
 }

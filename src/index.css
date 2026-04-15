@@ -24,6 +24,18 @@ body,
   --breakpoint-xl: 1200px;
   --breakpoint-2xl: 1400px;
   --color-roxo: #6f42c1;
+
+  --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+
+  @keyframes slideDown {
+    from { height: 0; opacity: 0; }
+    to { height: var(--radix-collapsible-content-height); opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { height: var(--radix-collapsible-content-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
+  }
 }
 
 /* Custom Dropdown Styles */
@@ -109,6 +121,19 @@ body,
   background-color: #5a32a3;
   border-color: #5a32a3;
   color: white;
+}
+
+.btn-roxo-secondary {
+  background-color: #edd0ff !important;
+  border-color: #edd0ff !important;  
+  color: rgb(120, 34, 145) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.btn-roxo-secondary:hover {
+  background-color: #eee2ff !important;
+  border-color: #b487f3 !important;
+  color: rgb(120, 34, 145) !important;
 }
 
 .transition-hover {
