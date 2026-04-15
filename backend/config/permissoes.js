@@ -5,7 +5,7 @@
  * Cargos disponíveis: Admin, Gerente, User
  */
 export const PERMISSOES = {
-  Admin: {
+  admin: {
     // Usuários
     gerenciarUsuarios:    true,
     aprovarSolicitacoes:  true,
@@ -24,7 +24,7 @@ export const PERMISSOES = {
     // Clientes
     gerenciarClientes:    true,
   },
-  Gerente: {
+  gerente: {
     // Usuários
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
@@ -43,7 +43,7 @@ export const PERMISSOES = {
     // Clientes
     gerenciarClientes:    true,
   },
-  User: {
+  vendedor: {
     // Usuários
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
@@ -70,4 +70,8 @@ export const PERMISSOES = {
  */
 export function getPermissoes(cargo) {
   return PERMISSOES[cargo] ?? PERMISSOES.User;
+}
+
+export function getAllPermissoes() {
+  return PERMISSOES;
 }

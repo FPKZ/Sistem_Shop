@@ -72,7 +72,7 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Criação ---
-  fastify.post("/produto", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+  fastify.post("/produto", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     try {
       let body = request.body
 
@@ -86,7 +86,7 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Atualizar Produto ---
-  fastify.put("/produto/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+  fastify.put("/produto/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     try {
       const { id } = request.params;
       const produto = await Produto.findByPk(id);
@@ -99,7 +99,7 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Reserva / Remoção ---
-  fastify.put("/produto/reservar/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente", "Vendedor")] }, async (request, reply) => {
+  fastify.put("/produto/reservar/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente", "vendedor")] }, async (request, reply) => {
     const { id } = request.params;
     const { cliente_id } = request.query;
 
@@ -132,7 +132,7 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Atualização ---
-  fastify.put("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+  fastify.put("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
     await item.update(request.body);
@@ -140,14 +140,14 @@ export default async function produtoRoutes(fastify) {
   });
 
   // --- Exclusão ---
-  fastify.delete("/produto/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+  fastify.delete("/produto/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     const produto = await Produto.findByPk(request.params.id);
     if (!produto) return reply.err("Produto não encontrado", 404);
     await produto.destroy();
     return reply.code(204).send();
   });
 
-  fastify.delete("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("Admin", "Gerente")] }, async (request, reply) => {
+  fastify.delete("/produto/item/:id", { preHandler: [authMiddleware, requireCargo("admin", "gerente")] }, async (request, reply) => {
     const item = await ItemEstoque.findByPk(request.params.id);
     if (!item) return reply.err("Item não encontrado", 404);
     await item.destroy();
