@@ -7,7 +7,7 @@ export default function UsuarioSenhaModal({ show, onHide, user, onReset }) {
       <Modal.Body className="d-flex flex-column justify-content-center align-items-center gap-3">
         <Row>
           <Modal.Title className="text-center">
-            Deseja resetar a senha do usuário?
+            Deseja resetar a senha do usuário {user?.nome}?
           </Modal.Title>
         </Row>
         <Row>
@@ -15,11 +15,11 @@ export default function UsuarioSenhaModal({ show, onHide, user, onReset }) {
         </Row>
         <Row className="mt-3">
           <Col className="d-flex gap-2">
-            <Button variant="success" onClick={onReset}>
-              Resetar
-            </Button>
-            <Button variant="danger" onClick={onHide}>
+            <Button variant="secondary" onClick={onHide}>
               Cancelar
+            </Button>
+            <Button variant="danger" onClick={onReset}>
+              Resetar
             </Button>
           </Col>
         </Row>

@@ -10,7 +10,7 @@ import {
   Form,
   Image,
 } from "react-bootstrap";
-import { Bell, Search, User, UserPlus, Edit, Trash2 } from "lucide-react";
+import { Bell, Search, User, UserPlus, Edit, Trash2, Key, IdCard } from "lucide-react";
 import utils from "@services/utils";
 import PaginationButtons from "@components/Pagination/PaginationButtons";
 import Solicitacoes from "./include/Solicitacoes";
@@ -21,6 +21,7 @@ import UsuarioInfoModal from "@components/modal/Auth/UsuarioInfoModal";
 import UsuarioSenhaModal from "@components/modal/Auth/UsuarioSenhaModal";
 import UsuarioDeleteModal from "@components/modal/Auth/UsuarioDeleteModal";
 import UsuarioCadastroModal from "@components/modal/Auth/UsuarioCadastroModal";
+import UsuarioPermissionModal from "@components/modal/Auth/UsuarioPermissionModal";
 
 import "../../../../public/css/components/footer.css";
 import "../../../../public/css/sistem/ferramentas.css";
@@ -49,8 +50,13 @@ export default function GerenciamentoUsuario() {
     handleSubmitCreate,
     handleSubmitEdit,
     handleUserEditChange,
+    setUserEdit,
     handleModalSenha,
     resetSenha,
+    modalPermissionUser,
+    setModalPermissionUser,
+    activeTab,
+    setActiveTab,
   } = useGerenciamentoUsuario();
 
   const {
@@ -65,6 +71,12 @@ export default function GerenciamentoUsuario() {
     totalItems,
   } = pagination;
 
+  const tabClassName = (tab) => `bg-transparent! border-0! py-3 transition-all ${
+        activeTab === tab 
+        ? "text-roxo! border-bottom! border-roxo! fw-bold" 
+        : "text-muted hover:text-roxo"
+    }`
+    
   return (
     <>
       <main className="grow overflow-y-auto p-4 md:p-8">
@@ -81,17 +93,19 @@ export default function GerenciamentoUsuario() {
           </div>
 
           <Tabs
-            defaultActiveKey="users"
             id="user-management-tabs"
             className="mb-3"
+            activeKey={activeTab}
+            onSelect={(k) => setActiveTab(k)}
           >
             <Tab
               eventKey="users"
               title={
-                <>
+                <div className="flex">
                   <User size={16} className="me-3" /> Todos os Usuários
-                </>
+                </div>
               }
+              tabClassName={tabClassName("users")}
             >
               <Card className="shadow-sm">
                 <Card.Body>
@@ -124,7 +138,7 @@ export default function GerenciamentoUsuario() {
                         <th>Usuário</th>
                         <th>Permissões</th>
                         <th>Data de Criação</th>
-                        <th>Ações</th>
+                        <th className="text-center">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -152,17 +166,37 @@ export default function GerenciamentoUsuario() {
                           </td>
                           <td>{user.cargo}</td>
                           <td>{utils.formatDateTime(user.createdAt)}</td>
-                          <td>
+                          <td className="text-center">
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="text-secondary"
+                              onClick={() => {
+                                setModalPermissionUser(true);
+                                setUserEdit(user);
+                              }}
+                            >
+                              <IdCard size={16} />
+                            </Button>
                             <Button
                               variant="link"
                               size="sm"
                               className="text-secondary"
                               onClick={() => {
                                 setModalInfoUser(true);
-                                handleUserEditChange(user);
+                                setUserEdit(user);
                               }}
                             >
                               <Edit size={16} />
+                            </Button>
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="text-danger"
+                              onClick={() => handleModalSenha(user)}
+                            >
+                              {" "}
+                              <Key size={16} />
                             </Button>
                             <Button
                               variant="link"
@@ -196,7 +230,7 @@ export default function GerenciamentoUsuario() {
             <Tab
               eventKey={"requests"}
               title={
-                <>
+                <div className="flex">
                   <Bell size={16} className="me-2" /> solicitaçoes de Acesso{" "}
                   {solicitacoes.length ? (
                     <Badge pill bg="danger">
@@ -205,8 +239,9 @@ export default function GerenciamentoUsuario() {
                   ) : (
                     ""
                   )}{" "}
-                </>
+                </div>
               }
+              tabClassName={tabClassName("requests")}
             >
               <Solicitacoes
                 solicitacoes={solicitacoes}
@@ -225,6 +260,14 @@ export default function GerenciamentoUsuario() {
         onChange={handleUserEditChange}
         onSubmit={handleSubmitEdit}
         onResetPassword={handleModalSenha}
+      />
+
+      <UsuarioPermissionModal
+        show={modalPermissionUser}
+        onHide={() => setModalPermissionUser(false)}
+        user={userEdit}
+        onChange={handleUserEditChange}
+        onSubmit={handleSubmitEdit}
       />
 
       <UsuarioSenhaModal

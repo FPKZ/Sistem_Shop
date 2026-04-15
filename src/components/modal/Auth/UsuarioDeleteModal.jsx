@@ -15,11 +15,11 @@ export default function UsuarioDeleteModal({ show, onHide, user, onDelete }) {
         </Row>
         <Row className="mt-3">
           <Col className="d-flex gap-2">
-            <Button variant="success" onClick={onDelete}>
-              Excluir
-            </Button>
-            <Button variant="danger" onClick={onHide}>
+            <Button variant="secondary" onClick={onHide}>
               Cancelar
+            </Button>
+            <Button variant="danger" onClick={onDelete}>
+              Excluir
             </Button>
           </Col>
         </Row>
