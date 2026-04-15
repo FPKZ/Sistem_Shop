@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useOutletContext } from "react-router-dom";
-import API from "@app/api";
+import API from "@services";
 
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
 
-import CadastroNotaModal from "@components/modal/CadastroNota/CadastroNotaModal";
 import ModalDetailNota from "@components/modal/Notas/ModalDetailNota";
 import TableNota from "./include/TableNota";
-import { printPDF, getRecebimentoConfig } from "@app/generatePDF";
+import { printPDF, getRecebimentoConfig } from "@services/generatePDF";
 
 import { NotasHeader } from "./components/NotasHeader";
 import { NotasFilter } from "./components/NotasFilter";
@@ -18,7 +17,6 @@ export default function Notas() {
   const [notas, setNotas] = useState([]);
   const [selectNota, setSelectNota] = useState(null);
   const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
-  const [isModalCadastroOpen, setIsModalCadastroOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("Todas");
 
   const { mobile } = useOutletContext();
@@ -67,7 +65,6 @@ export default function Notas() {
     <Container fluid className="py-4 m-0 px-0">
       <NotasHeader
         mobile={mobile}
-        setIsModalCadastroOpen={setIsModalCadastroOpen}
       />
 
       <NotasFilter
@@ -149,14 +146,6 @@ export default function Notas() {
         handleBuy={handleBuy}
         handlePrintCustom={handlePrintCustom}
       />
-      {isModalCadastroOpen && (
-        <CadastroNotaModal
-          visible={isModalCadastroOpen}
-          onClose={() => setIsModalCadastroOpen(false)}
-          produts={true}
-          fullScrean={true}
-        />
-      )}
     </Container>
   );
 }

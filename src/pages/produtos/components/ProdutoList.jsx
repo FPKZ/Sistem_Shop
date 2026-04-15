@@ -1,5 +1,6 @@
 import React from "react";
-import util from "@app/utils.js";
+import util from "@services/utils.js";
+import { useNavigate } from "react-router-dom";
 
 export const ProdutoList = React.memo(({
   dadosProcessados,
@@ -7,6 +8,7 @@ export const ProdutoList = React.memo(({
   setProduto,
   getEstoqueBadge,
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="table-responsive bg-white rounded shadow-sm mb-4">
       <table className="table table-hover align-middle mb-0">
@@ -25,8 +27,9 @@ export const ProdutoList = React.memo(({
             <tr
               key={produto.id}
               onClick={() => {
-                setModalInfoProduto(true);
-                setProduto(produto);
+                // setModalInfoProduto(true);
+                // setProduto(produto);
+                navigate(`/painel/produtos/info/${produto.id}`);
               }}
               style={{ cursor: "pointer" }}
             >
@@ -34,7 +37,7 @@ export const ProdutoList = React.memo(({
               <td>
                 <div className="d-flex align-items-center gap-3">
                   <img
-                    src={produto.img || "assets/tube-spinner.svg"}
+                    src={produto.img ? produto.img : produto.imagem || "assets/tube-spinner.svg"}
                     alt={produto.nome}
                     className="rounded object-fit-contain bg-light"
                     style={{ width: "40px", height: "40px" }}

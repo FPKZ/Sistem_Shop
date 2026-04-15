@@ -1,12 +1,16 @@
 import React from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export const ProdutoGrid = React.memo(({
   dadosProcessados,
-  setModalInfoProduto,
-  setProduto,
+  // setModalInfoProduto,
+  // setProduto,
   getEstoqueBadge,
+  shouldAnimate = true,
 }) => {
+  const navigate = useNavigate();
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -25,11 +29,11 @@ export const ProdutoGrid = React.memo(({
       transition: { duration: 0.1 }
     }
   };
-
+  // console.log(dadosProcessados)
   return (
     <motion.div 
       variants={container}
-      initial="hidden"
+      initial={shouldAnimate ? "hidden" : false}
       animate="show"
       className="
         row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5
@@ -46,8 +50,9 @@ export const ProdutoGrid = React.memo(({
           className="col cursor-pointer"
           key={produto.id}
           onClick={() => {
-            setModalInfoProduto(true);
-            setProduto(produto);
+            // setModalInfoProduto(true);
+            // setProduto(produto);
+            navigate(`/painel/produtos/info/${produto.id}`);
           }}
         >
           <div className="rounded-4 bg-white shadow-sm border-0 h-[25rem] d-flex flex-column overflow-hidden position-relative">
@@ -63,7 +68,7 @@ export const ProdutoGrid = React.memo(({
             >
               <img
                 className="card-img-top produto-img"
-                src={produto.img || produto.imagem || "assets/tube-spinner.svg"}
+                src={produto.img ? produto.img : produto.imagem || "assets/tube-spinner.svg"}
                 alt={produto.nome}
                 style={{
                   objectFit: "cover",
@@ -86,11 +91,11 @@ export const ProdutoGrid = React.memo(({
               <div className="d-flex justify-content-between align-items-center mt-auto">
                 <div className="d-flex flex-column">
                   <div className="fw-bold" style={{ fontSize: '1rem' }}>
-                    {produto.itemEstoque?.length || 0} Uni.
+                    {produto.itemEstoque.filter((item) => item.status === "Disponivel").length} Uni.
                   </div>
                 </div>
                 <div className="h-100">
-                  {getEstoqueBadge(produto.itemEstoque?.length)}
+                  {getEstoqueBadge(produto.itemEstoque.filter((item) => item.status === "Disponivel").length)}
                 </div>
               </div>
             </div>

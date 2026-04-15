@@ -1,11 +1,13 @@
-import { COMPANY_INFO } from "@app/companyConfig";
+import { COMPANY_INFO } from "@services/companyConfig";
 import { ChevronLeft, Menu } from "lucide-react";
 
 export default function Header({carrinhoAberto, telaProduto, voltar, setMenuAberto}) {
     return (
         <header 
             className="d-flex justify-content-center align-items-center p-3 py-0 shadow-sm position-relative"
-            style={{ backgroundColor: "rgba(147, 51, 179, 1)" }}
+            style={{ 
+                backgroundColor: "rgba(147, 51, 179, 1)"
+            }}
         >
             {
                 carrinhoAberto || telaProduto ? (

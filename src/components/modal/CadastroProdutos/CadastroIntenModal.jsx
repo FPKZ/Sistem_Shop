@@ -9,8 +9,9 @@ import {
 } from "react-bootstrap";
 import CadastroCategoria from "@components/modal/CadastroCategoria/CadastroCategoria";
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
+import ProdutosFormFields from "@components/ProdutosFormFields";
 import { useCadastroProduto } from "@hooks/produtos/useCadastroProduto";
-import { Cores } from "../../../pages/cadastro/include/Produtos";
+import { Cores } from "@components/Cores";
 import { useEffect } from "react";
 
 function CadastroIntenModal({
@@ -18,56 +19,59 @@ function CadastroIntenModal({
   onClose,
   cadastrarProduto,
   cadastroNota = false,
+  mobile
 }) {
   const {
-    categoria,
-    setCategoria,
-    nota,
     cores,
-    setNota,
     notas,
     categorias,
     modalCadastroCategoria,
-    setModalCadastroCategoia,
+    setModalCadastroCategoria,
     modalCriar,
     setModalCriar,
     itensCriados,
     erros,
-    setErros,
     validated,
-    setValidated,
     formValue,
-    setFormValue,
     isLoading,
-    valorCompraHook,
-    valorVendaHook,
-    lucroHook,
+    pricing,
+    imageUpload,
+    modalImagens,
+    setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
+    removeImagem,
+    produtos,
+    isProdutoExistente,
+    handleSelectProduto,
     handleChange,
-    handleValorCompraChange,
-    handleValorVendaChange,
-    handleLucroChange,
     handleSubimit,
     validate,
-    gerarFormData,
+    gerarPayloadData,
+    resetForm,
   } = useCadastroProduto((itens) => {
     if (cadastroNota && itens) {
       // No modo nota, apenas repassamos os itens para a nota pai
-      // O hook já faz o loop, mas aqui o modal original tinha uma lógica de cadastrarProduto(FormData)
-      // que vinha por props. Vamos manter a compatibilidade se necessário.
     }
-  });
+  }, true);
+
+  // Reset do formulário ao abrir ou fechar o modal para garantir limpeza total
+  useEffect(() => {
+    resetForm();
+    return () => {
+      resetForm();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]); // resetForm removido daqui para evitar loop infinito com hooks internos
 
   // Sincronização de props especiais (como cadastrarProduto manual da Nota)
-  // No modal original de Nota, o cadastrarProduto apenas adicionava ao array local da Nota.
-  // Vamos interceptar o submit se for cadastroNota
   const finalHandleSubmit = async (e) => {
     if (cadastroNota) {
-      e.preventDefault();
-      // Usamos o validate e gerarFormData do hook para garantir consistência
+      if (e && e.preventDefault) e.preventDefault();
       if (validate()) {
-        const formData = gerarFormData();
+        const payload = gerarPayloadData(); // Usar o novo payload JSON
         if (cadastrarProduto) {
-          cadastrarProduto(formData);
+          cadastrarProduto(payload);
         }
         onClose();
       }
@@ -76,46 +80,12 @@ function CadastroIntenModal({
     }
   };
 
-  useEffect(() => {
-    if (!visible) {
-      setFormValue({ quantidade: 1 });
-      setValidated(false);
-      setErros({});
-      setNota({});
-      setCategoria({});
-    }
-  }, [visible, setFormValue, setValidated, setErros, setNota, setCategoria]);
-
   if (!visible) return null;
-
-  function NotaItems({ notas, setNota }) {
-    return (
-      <>
-        {notas.map((n) => (
-          <Dropdown.Item key={n.id} onClick={() => setNota(n)}>
-            {n.codigo}
-          </Dropdown.Item>
-        ))}
-      </>
-    );
-  }
-
-  function CategoriaItems({ categorias, setCategoria }) {
-    return (
-      <>
-        {categorias.map((c) => (
-          <Dropdown.Item key={c.id} onClick={() => setCategoria(c)}>
-            {c.nome}
-          </Dropdown.Item>
-        ))}
-      </>
-    );
-  }
 
   return (
     <>
       <Modal
-        show={visible && !modalCriar}
+        show={visible}
         onHide={onClose}
         size="xl"
         centered
@@ -127,300 +97,29 @@ function CadastroIntenModal({
             <Modal.Title>Cadastrar Item</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Row className="g-3 mb-3 pb-4 border-bottom">
-              <Col xs={12}>
-                <Form.Label htmlFor="nomeProduto">Nome</Form.Label>
-                <Form.Control
-                  className={
-                    validated ? (erros.nome ? "is-invalid" : "is-valid") : ""
-                  }
-                  name="nome"
-                  id="nomeProduto"
-                  type="text"
-                  placeholder="Nome do produto"
-                  value={formValue.nome || ""}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-              <Col xs={10} md={4}>
-                <Form.Label htmlFor="imgProduto">Imagem</Form.Label>
-                <Form.Control
-                  name="img"
-                  id="imgProduto"
-                  type="file"
-                  onChange={handleChange}
-                />
-              </Col>
-              <Col
-                xs={2}
-                md={1}
-                className="d-flex flex-column align-items-center"
-              >
-                <Form.Label htmlFor="corProduto">Cor</Form.Label>
-                <Dropdown >
-                  <Dropdown.Toggle
-                    variant="none"
-                    className={`dropdown-toggle-none w-100 d-flex justify-content-center align-items-center border-0 p-0 ${
-                      validated ? (erros.cor ? "is-invalid" : "is-valid") : ""
-                    }`}
-                  >
-                    <div className="d-flex flex-column align-items-center gap-1">
-                      <div 
-                        style={{
-                          backgroundColor: formValue.cor || 'transparent', 
-                          width: '2.3rem',
-                          height: '2.3rem',
-                          borderRadius: '50%',
-                          // border: '1px solid #aaaaaa',
-                          boxShadow: '0 0 0 1px #666666'
-                        }} 
-                      />
-                      {/* <span className="fw-normal text-[0.7rem]">
-                        {cores.find(c => c.hex === formValue.cor)?.name || "Selecione a Cor"}
-                      </span> */}
-                    </div>
-                  </Dropdown.Toggle>
-                  <Form.Control
-                    id="corProduto"
-                    type="hidden"
-                    name="cor"
-                    value={formValue.cor || ""}
-                    required
-                  />
-                  <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
-                    <Cores cores={cores} formValue={formValue} handleChange={handleChange} />
-                    <Dropdown.Divider className="m-0" />
-                    {/* Nota: lembre-se de importar o setModalCores no topo do seu arquivo do hook */}
-                    {/* <Dropdown.Item onClick={() => { if(typeof setModalCores !== 'undefined') setModalCores(true) }} className="text-center py-2 fw-bold text-primary">
-                      + Nova Cor
-                    </Dropdown.Item> */}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Col>
-              <Col xs={12} md={3}>
-                <Form.Label htmlFor="categoriaProduto">Categoria</Form.Label>
-                <Dropdown>
-                  <Dropdown.Toggle
-                    variant="outline-secondary"
-                    className={`w-100 d-flex justify-content-between align-items-center ${
-                      validated
-                        ? erros.categoria
-                          ? "is-invalid"
-                          : "is-valid"
-                        : ""
-                    }`}
-                  >
-                    {categoria.nome || "Selecione a Categoria"}
-                  </Dropdown.Toggle>
-                  <Form.Control
-                    id="categoriaProduto"
-                    type="hidden"
-                    name="categoria"
-                    value={categoria.id || ""}
-                    required
-                  />
-                  <Dropdown.Menu className="w-100">
-                    <CategoriaItems
-                      categorias={categorias}
-                      setCategoria={setCategoria}
-                    />
-                    <Dropdown.Divider />
-                    <Dropdown.Item
-                      onClick={() => setModalCadastroCategoia(true)}
-                    >
-                      Nova Categoria
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Col>
-              <Col xs={6} md={2}>
-                <Form.Label htmlFor="marcaProduto">Marca</Form.Label>
-                <Form.Control
-                  className={
-                    validated ? (erros.marca ? "is-invalid" : "is-valid") : ""
-                  }
-                  name="marca"
-                  id="marcaProduto"
-                  type="text"
-                  placeholder="Marca"
-                  value={formValue.marca || ""}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-              <Col xs={6} md={2}>
-                <Form.Label htmlFor="tamanhoProduto">Tamanho</Form.Label>
-                <Form.Control
-                  className={
-                    validated ? (erros.tamanho ? "is-invalid" : "is-valid") : ""
-                  }
-                  name="tamanho"
-                  id="tamanhoProduto"
-                  type="text"
-                  value={formValue.tamanho || ""}
-                  onChange={handleChange}
-                  placeholder="Tamanho"
-                  required
-                />
-              </Col>
-            </Row>
-
-            <Row className="g-3 mb-3 pb-4 border-bottom">
-              {!cadastroNota && (
-                <Col xs={12} md={4}>
-                  <Form.Label htmlFor="notaProduto">Nota</Form.Label>
-                  <Dropdown>
-                    <Dropdown.Toggle
-                      variant="outline-secondary"
-                      className={`w-100 d-flex justify-content-between align-items-center ${
-                        validated
-                          ? erros.nota
-                            ? "is-invalid"
-                            : "is-valid"
-                          : ""
-                      }`}
-                    >
-                      {nota.codigo || "Selecione a Nota"}
-                    </Dropdown.Toggle>
-                    <Form.Control
-                      id="notaProduto"
-                      type="hidden"
-                      name="nota"
-                      value={nota.id || ""}
-                      required
-                    />
-                    <Dropdown.Menu className="w-100">
-                      <NotaItems notas={notas} setNota={setNota} />
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </Col>
-              )}
-
-              <Col xs={10} md={!cadastroNota ? 6 : 9}>
-                <Form.Label htmlFor="codigoBarras">Código de Barras</Form.Label>
-                <Form.Control
-                  className={
-                    validated
-                      ? erros.codigo_barras
-                        ? "is-invalid"
-                        : "is-valid"
-                      : ""
-                  }
-                  name="codigo_barras"
-                  id="codigoBarras"
-                  type="number"
-                  placeholder="Código de Barras"
-                  value={formValue.codigo_barras || ""}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-
-              <Col xs={2} md={!cadastroNota ? 2 : 3}>
-                <Form.Label htmlFor="quantidadeProduto">Qtd.</Form.Label>
-                <Form.Control
-                  name="quantidade"
-                  id="quantidadeProduto"
-                  type="text"
-                  placeholder="1"
-                  value={formValue.quantidade || 1}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-
-              <Col xs={4} md={4}>
-                <Form.Label htmlFor="valorCompraProduto">
-                  Vlr. Compra
-                </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
-                  <Form.Control
-                    className={
-                      validated
-                        ? erros.valor_compra
-                          ? "is-invalid"
-                          : "is-valid"
-                        : ""
-                    }
-                    name="valor_compra"
-                    id="valorCompraProduto"
-                    type="text"
-                    placeholder="R$ 0,00"
-                    value={valorCompraHook.displayValue}
-                    onChange={handleValorCompraChange}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-
-              <Col xs={4} md={4}>
-                <Form.Label htmlFor="valorVendaProduto">Vlr. Venda</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
-                  <Form.Control
-                    className={
-                      validated
-                        ? erros.valor_venda
-                          ? "is-invalid"
-                          : "is-valid"
-                        : ""
-                    }
-                    name="valor_venda"
-                    id="valorVendaProduto"
-                    type="text"
-                    placeholder="R$ 0,00"
-                    value={valorVendaHook.displayValue}
-                    onChange={handleValorVendaChange}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-
-              <Col xs={4} md={4}>
-                <Form.Label htmlFor="LucroProduto">Lucro</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>R$</InputGroup.Text>
-                  <Form.Control
-                    className={
-                      validated ? (erros.lucro ? "is-invalid" : "is-valid") : ""
-                    }
-                    name="lucro"
-                    id="LucroProduto"
-                    type="text"
-                    placeholder="R$ 0,00"
-                    value={lucroHook.displayValue}
-                    onChange={handleLucroChange}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-
-            <Row className="g-3 mb-3">
-              <Col xs={12}>
-                <Form.Label htmlFor="descricaoProduto">Descrição</Form.Label>
-                <Form.Control
-                  className={
-                    validated
-                      ? erros.descricao
-                        ? "is-invalid"
-                        : "is-valid"
-                      : ""
-                  }
-                  name="descricao"
-                  as="textarea"
-                  rows={4}
-                  style={{ resize: "none" }}
-                  id="descricaoProduto"
-                  placeholder="Descrição do produto"
-                  value={formValue.descricao}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-            </Row>
+            <ProdutosFormFields
+              formValue={formValue}
+              erros={erros}
+              validated={validated}
+              cores={cores}
+              notas={notas}
+              categorias={categorias}
+              produtos={produtos}
+              isProdutoExistente={isProdutoExistente}
+              handleSelectProduto={handleSelectProduto}
+              pricing={pricing}
+              imageUpload={imageUpload}
+              handleChange={handleChange}
+              setModalCadastroCategoria={setModalCadastroCategoria}
+              cadastroNota={cadastroNota}
+              isLoading={isLoading}
+              modalImagens={modalImagens}
+              setModalImagens={setModalImagens}
+              activeTabModalImagens={activeTabModalImagens}
+              setActiveTabModalImagens={setActiveTabModalImagens}
+              removeImagem={removeImagem}
+              mobile={mobile}
+            />
           </Modal.Body>
           <Modal.Footer>
             <Button
@@ -436,7 +135,7 @@ function CadastroIntenModal({
 
       <CadastroCategoria
         visible={modalCadastroCategoria}
-        onClose={() => setModalCadastroCategoia(false)}
+        onClose={() => setModalCadastroCategoria(false)}
       />
 
       <ProdutosCriados

@@ -1,8 +1,11 @@
-import utils from "@app/utils";
+import utils from "@services/utils";
+import { useNavigate } from "react-router-dom";
 
 const number = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 export default function Footer() {
+  const navigate = useNavigate();
+
   return (
     <footer
       id="footer"
@@ -12,9 +15,16 @@ export default function Footer() {
         <div className="row g-4">
           <div className="col-12 col-md-4 text-center text-md-start">
             <h5 className="fw-bold mb-3">Sistem Shop</h5>
-            <p className="small opacity-75">
+            <p className="small opacity-75 mb-2">
               Sua melhor experiência de compra online. Produtos de qualidade com as melhores condições do mercado.
             </p>
+            <button 
+              onClick={() => navigate("/painel")} 
+              className="btn btn-sm text-white opacity-50 p-0 border-0"
+              style={{ fontSize: "0.75rem", textDecoration: "underline" }}
+            >
+              Área Restrita
+            </button>
           </div>
           <div className="col-12 col-md-4 text-center text-md-center">
             <h5 className="fw-bold mb-3">Contato</h5>

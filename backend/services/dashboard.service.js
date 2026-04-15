@@ -128,6 +128,10 @@ export async function gerarDashboard() {
   const trintaDiasAtras = new Date();
   trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
 
+  // Limite de 1 ano para o histórico total (evitar query sem fundo de banco grande)
+  const umAnoAtras = new Date();
+  umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
+
   const includeItensVendidos = {
     model: ItemVendido,
     as: "itensVendidos",
@@ -140,7 +144,10 @@ export async function gerarDashboard() {
         where: { data_venda: { [Op.gte]: trintaDiasAtras } },
         include: [includeItensVendidos],
       }),
-      Venda.findAll({ include: [includeItensVendidos] }),
+      Venda.findAll({
+        where: { data_venda: { [Op.gte]: umAnoAtras } },
+        include: [includeItensVendidos],
+      }),
       Nota.findAll({
         where: {
           [Op.or]: [

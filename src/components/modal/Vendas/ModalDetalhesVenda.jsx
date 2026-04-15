@@ -1,5 +1,5 @@
 import { Modal, Button, Table, Row, Col } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import { useOutletContext } from "react-router-dom";
 
 export default function ModalDetalhesVenda({ show, onHide, venda }) {

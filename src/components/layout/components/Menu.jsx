@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 const Menu = React.memo(({menuExpand, setMenuExpand , mobile}) => {
   const menuRef = useRef(null)
   const navigate = useNavigate()
+  const { pode } = usePermissoes();
   
   const handleMouseEnter = () => {
     if (!mobile) setMenuExpand(true);
@@ -31,12 +33,23 @@ const Menu = React.memo(({menuExpand, setMenuExpand , mobile}) => {
         {mobile && (
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>
         )}
-        <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/`)}>Inicio</ItenMenu>
-        <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/vendas`)}>Vendas</ItenMenu>
-        <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/cadastro`)}>Cadastro</ItenMenu>
-        <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/produtos`)}>Produtos</ItenMenu>
-        <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/clientes`)}>Clientes</ItenMenu>
-        <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/notas`)}>Notas</ItenMenu>
+        <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/painel`)}>Inicio</ItenMenu>
+        <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/painel/vendas`)}>Vendas</ItenMenu>
+        {pode("cadastrarProduto") && (
+          <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/painel/cadastro`)}>Cadastro</ItenMenu>
+        )}
+        {pode("cadastrarProduto") && (
+          <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/painel/produtos`)}>Produtos</ItenMenu>
+        )}
+        {pode("gerenciarClientes") && (
+          <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/painel/clientes`)}>Clientes</ItenMenu>
+        )}
+        {pode("gerenciarNotas") && (
+          <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/painel/notas`)}>Notas</ItenMenu>
+        )}
+        {pode("gerenciarUsuarios") && (
+          <ItenMenu mobile={mobile} icon="people-fill" onClick={() => handleNavigate(`/painel/usuarios`)}>Usuários</ItenMenu>
+        )}
       </ul>
     </nav>
   )

@@ -1,22 +1,20 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import LoadingPage from "./LoadingPage"
+import LoadingPage from "./LoadingPage";
 
-import { Container, Row, Col} from "react-bootstrap";
-
+/**
+ * Rota protegida: redireciona para /login se o usuário não estiver autenticado.
+ *
+ * A verificação de token ocorre UMA VEZ no boot via AuthProvider.
+ * O logout automático por expiração mid-session é coberto pelo event listener
+ * "auth:401" registrado no httpClient — não é necessário re-verificar a cada navegação.
+ */
 export default function ProtectedRoute() {
-    const { isAutenticated, loading, verificLogin } = useAuth();
-    const location = useLocation()
+    const { isAutenticated, loading } = useAuth();
+    const location = useLocation();
 
-    useEffect(() => {
-        verificLogin()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[location])
+    if (loading) return <LoadingPage />;
 
-
-    if (loading) return <LoadingPage />
-
-    return isAutenticated() ? <Outlet /> : <Navigate to="/login"/>;
-    
+    return isAutenticated() ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
 }

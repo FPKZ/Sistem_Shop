@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Conta } from "../database/models/index.js";
 import { env } from "../config/env.js";
+import { getPermissoes } from "../config/permissoes.js";
 
 const SALT_ROUNDS = 10;
 const SENHA_PADRAO_RESET = "mudar123";
@@ -14,7 +15,18 @@ const SENHA_PADRAO_RESET = "mudar123";
  * @throws {Error} com statusCode 401 se credenciais inválidas
  */
 export async function autenticar(email, senha) {
-  const conta = await Conta.findOne({ where: { email } });
+  const conta = await Conta.findOne({
+    where: { email },
+    attributes: [
+      "id",
+      "email",
+      "nome",
+      "img",
+      "cargo",
+      "senha",
+      "tokenVersion",
+    ],
+  });
 
   if (!conta) {
     const err = new Error("Credenciais inválidas");
@@ -29,13 +41,21 @@ export async function autenticar(email, senha) {
     throw err;
   }
 
-  const token = jwt.sign(
-    { id: conta.id, email: conta.email, nome: conta.nome, img: conta.img },
-    env.JWT_SECRET,
-    { expiresIn: "4h" }
-  );
+  // Converter para objeto simples e remover a senha antes de gerar o token e retornar
+  const contaData = conta.get({ plain: true });
+  const { senha:_, ...contaSemSenha } = contaData;
 
-  return { conta, token };
+  // Incluir cargo no JWT para que o middleware requireCargo possa validar nas rotas
+  const token = jwt.sign(contaSemSenha, env.JWT_SECRET, {
+    expiresIn: "4h",
+  });
+
+  let permissoes = getPermissoes(contaSemSenha.cargo);
+  permissoes = Object.fromEntries(
+    // eslint-disable-next-line no-unused-vars
+    Object.entries(permissoes).filter(([_, value]) => value === true),
+  );
+  return { conta: contaSemSenha, token, permissoes };
 }
 
 /**
@@ -69,7 +89,30 @@ export async function resetarSenha(id) {
   }
 
   const senhaHash = await bcrypt.hash(SENHA_PADRAO_RESET, SALT_ROUNDS);
-  await conta.update({ senha: senhaHash });
+  await conta.update({
+    senha: senhaHash,
+    tokenVersion: (conta.tokenVersion || 0) + 1,
+  });
 
   return { conta, senhaPadrao: SENHA_PADRAO_RESET };
+}
+
+export async function mudarSenha(id, senhaAtual, novaSenha) {
+  const conta = await Conta.findOne({
+    where: { id },
+    attributes: ["id", "senha"],
+  });
+
+  if (!conta) throw new Error("Usuario não encontrado");
+
+  const validate = await bcrypt.compare(senhaAtual, conta.senha);
+  if (!validate) throw new Error("Senha atual incorreta");
+
+  const novaSenhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS);
+  await conta.update({
+    senha: novaSenhaHash,
+    tokenVersion: (conta.tokenVersion || 0) + 1,
+  });
+
+  return { messager: "Senha alterada com sucesso!" };
 }

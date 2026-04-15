@@ -1,8 +1,8 @@
 import { Row, Col, Button, Badge, Dropdown } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import { EyeIcon, CheckCircle, Printer, MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { printPDF, getVendaConfig } from "@app/generatePDF";
+import { printPDF, getVendaConfig } from "@services/generatePDF";
 
 export default function TabelaVendas({ vendas, onView }) {
   const navigate = useNavigate();

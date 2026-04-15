@@ -10,8 +10,8 @@ import {
 } from "react-bootstrap";
 import { Hash, Icon } from "lucide-react";
 import { useState, useEffect } from "react";
-import utils from "@app/utils";
-import API from "@app/api";
+import utils from "@services/utils";
+import API from "@services";
 
 export default function ModalAdicionarProduto({
   show,

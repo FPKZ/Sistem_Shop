@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useNavigationType } from "react-router-dom";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
+import { useScrollRestoration } from "@hooks/useScrollRestoration";
 import { ProdutoHeader } from "./ProdutoHeader";
 import { ProdutoGrid } from "./ProdutoGrid";
 import { ProdutoList } from "./ProdutoList";
@@ -8,6 +10,12 @@ import { Pagination } from "react-bootstrap";
 
 function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
   const [viewMode, setViewMode] = useState("grid"); // "grid" ou "list"
+  const topRef = useRef(null);
+  const navType = useNavigationType();
+
+  // Definimos se devemos restaurar (apenas no POP) e se devemos animar (apenas no PUSH/REPLACE)
+  const isBackNavigation = navType === "POP";
+  const shouldAnimate = !isBackNavigation;
 
   const camposFiltragem = [
     "nome",
@@ -18,17 +26,31 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
   const { filtro, setFiltro, order, dadosProcessados, requisitarOrdenacao } =
     useFiltroOrdenacao(produtos, camposFiltragem);
 
+  // Paginação sincronizada com a URL (parâmetro 'p')
   const {
     currentItems,
     currentPage,
     totalPages,
     handlePageChange,
-  } = usePagination(dadosProcessados, 15);
+  } = usePagination(dadosProcessados, 15, "p");
+
+  // Gerenciamento de Scroll (focado no container #root do layout)
+  useScrollRestoration(
+    false, 
+    topRef,
+    [currentPage], 
+    [], 
+    "produtos",
+    { current: document.getElementById("root") }, // Alvo real do scroll
+    isBackNavigation // shouldRestore
+  );
 
   // Extrai categorias únicas dos produtos para o filtro
   const categoriasUnicas = Array.from(
     new Set(
-      produtos.filter((p) => p.categoria?.nome).map((p) => p.categoria.nome),
+      (Array.isArray(produtos) ? produtos : [])
+        .filter((p) => p.categoria?.nome)
+        .map((p) => p.categoria.nome),
     ),
   );
 
@@ -53,7 +75,10 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
   };
 
   return (
-    <div className="d-flex flex-column h-100">
+    <div className="d-flex flex-column h-100 position-relative">
+      {/* Âncora secreta para o scrollRestoration */}
+      <div ref={topRef} className="position-absolute top-0 start-0 w-0 h-0" style={{ pointerEvents: "none" }} />
+
       <ProdutoHeader
         filtro={filtro}
         setFiltro={setFiltro}
@@ -66,13 +91,14 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
         {children}
       </ProdutoHeader>
 
-      <div className="grow custom-scrollbar px-1">
+      <div className="px-1">
         {viewMode === "grid" ? (
           <ProdutoGrid
             dadosProcessados={currentItems}
             setModalInfoProduto={setModalInfoProduto}
             setProduto={setProduto}
             getEstoqueBadge={getEstoqueBadge}
+            shouldAnimate={shouldAnimate}
           />
         ) : (
           <ProdutoList
@@ -80,6 +106,7 @@ function Produto({ produtos, setModalInfoProduto, setProduto, children }) {
             setModalInfoProduto={setModalInfoProduto}
             setProduto={setProduto}
             getEstoqueBadge={getEstoqueBadge}
+            shouldAnimate={shouldAnimate}
           />
         )}
       </div>

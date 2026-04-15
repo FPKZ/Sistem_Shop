@@ -1,23 +1,26 @@
-import { Container, Card, Row, Col, Badge } from "react-bootstrap";
-import util from "@app/utils.js";
+import { Container, Card, Row, Col, Badge, Button } from "react-bootstrap";
+import { Package, Edit } from "lucide-react";
+import util from "@services/utils.js";
 
 export default function TabelaProdutos({
-  mobile,
+  // mobile,
   produto,
   setItemEstoque,
+  onEditItem,
   width,
   custom,
   setmodalInfoProduto,
+  active
 }) {
   if (!produto || produto === null || produto === undefined) return;
   return (
     <>
       <Col
         md={width}
-        className={`order-1 m-0 p-0 d-flex flex-column border  ${custom} ${mobile ? "" : "h-100"}`}
+        className={`order-2 order-md-1 m-0 p-0 d-flex flex-column h-100! ${custom}`}
       >
         <Row
-          className="g-0 p-2 m-0 border-bottom position-sticky top-0 bg-light align-items-center"
+          className="g-0 p-2 m-0  position-sticky top-0 align-items-center"
           style={{ zIndex: 1, fontSize: "0.75rem" }}
         >
           <Col xs={1} className="text-center">
@@ -26,7 +29,7 @@ export default function TabelaProdutos({
           <Col xs={1} className="text-center">
             <strong>IMG</strong>
           </Col>
-          <Col xs={4}>
+          <Col xs={3}>
             <strong>NOME</strong>
           </Col>
           <Col xs={2}>
@@ -38,23 +41,35 @@ export default function TabelaProdutos({
           <Col xs={2} className="text-center">
             <strong>STATUS</strong>
           </Col>
+          <Col xs={1} className="text-center">
+            <strong>AÇÕES</strong>
+          </Col>
         </Row>
 
-        <div
-          className={`grow p-0 overflow-hidden ${mobile ? "" : "overflow-y-auto"}`}
-        >
-          <Produtos
-            produtos={produto}
-            setItemEstoque={setItemEstoque}
-            setmodalInfoProduto={setmodalInfoProduto}
-          />
-        </div>
+        {produto.itemEstoque.length === 0 ? (
+          <div className="text-center dashed d-flex flex-column align-items-center justify-content-center h-full!">
+            <Package size={48} className="mb-2 opacity-60" />
+            <p className="text-muted mb-0">Nenhum item cadastrado!</p>
+          </div>
+        ) : (
+          <div
+            className={`grow p-1 overflow-y-auto`}
+          >
+               <Produtos
+                produtos={produto}
+                setItemEstoque={setItemEstoque}
+                onEditItem={onEditItem}
+                setmodalInfoProduto={setmodalInfoProduto}
+                active={active}
+              />
+          </div>
+        )}
       </Col>
     </>
   );
 }
 
-function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
+function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, active }) {
   if (!produtos) return;
   const itens = produtos.itemEstoque;
 
@@ -109,15 +124,16 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
       {itens?.map((produto) => (
         <Card
           key={produto.id}
-          className={`alert p-0 m-0
+          className={`alert p-0 m-0 transition-all duration-300 ease-in-out 
+                      ${active === produto.id ? "opacity-60" : ""}
                       ${produto.status === "Disponivel" ? "alert-light" : ""}
                       ${produto.status === "Vendido" ? "alert-danger" : ""} 
                       ${produto.status === "Reservado" ? "alert-warning" : ""}`}
           onClick={() => {
-            setItemEstoque?.(produto);
-            setmodalInfoProduto?.(true);
+            active !== produto.id && setItemEstoque?.(produto);
+            active !== produto.id && setmodalInfoProduto?.(true);
           }}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: `${active === produto.id ? "default" : "pointer"}` }}
         >
           <Card.Body className="p-0 overflow-hidden">
             <Row
@@ -129,7 +145,11 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               </Col>
               <Col xs={1} className="p-1 d-flex justify-content-center">
                 <img
-                  src={produtos.img || "assets/tube-spinner.svg"}
+                  src={
+                    produtos.img
+                      ? produtos.img
+                      : "assets/tube-spinner.svg"
+                  }
                   alt={produto.nome}
                   className="img-fluid rounded border shadow-sm"
                   style={{
@@ -139,7 +159,7 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
                   }}
                 />
               </Col>
-              <Col xs={4} className="ps-2 text-truncate fw-semibold">
+              <Col xs={3} className="ps-2 text-truncate fw-semibold">
                 {produto.nome}
               </Col>
               <Col xs={2} className="p-0 text-truncate text-muted">
@@ -150,6 +170,19 @@ function Produtos({ produtos, setItemEstoque, setmodalInfoProduto }) {
               </Col>
               <Col xs={2} className="p-0 d-flex justify-content-center">
                 {getStatusBadge(produto.status)}
+              </Col>
+              <Col xs={1} className="d-flex justify-content-center p-0">
+                <Button 
+                  variant="none" 
+                  size="sm" 
+                  className="p-1 px-2 text-roxo hover:bg-roxo-subtle rounded-circle"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditItem?.(produto);
+                  }}
+                >
+                  <Edit size={14} />
+                </Button>
               </Col>
             </Row>
           </Card.Body>

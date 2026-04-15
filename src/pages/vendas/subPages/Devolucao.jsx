@@ -10,8 +10,8 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import utils from "@app/utils";
-import API from "@app/api";
+import utils from "@services/utils";
+import API from "@services";
 
 export default function Devolucao() {
   const navigate = useNavigate();

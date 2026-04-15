@@ -8,16 +8,19 @@ import contaRoutes from "./Conta.routes.js";
 import dashboardRoutes from "./Dashboard.routes.js";
 import catalogoRoutes from "./Catalogo.routes.js";
 import coresRoutes from "./Cores.routes.js";
+import ImagensRoute from "./Imagens.routes.js";
 
-export { 
-    produtoRoutes,
-    categoriaRoutes,
-    clienteRoutes,
-    notaRoutes,
-    vendaRoutes,
-    notaVendaRoutes,
-    contaRoutes,
-    dashboardRoutes,
-    catalogoRoutes,
-    coresRoutes
-};
+// eslint-disable-next-line no-unused-vars
+export default async function RegistarRotas(server, options){
+    await server.register(produtoRoutes);
+    await server.register(categoriaRoutes);
+    await server.register(clienteRoutes);
+    await server.register(notaRoutes);
+    await server.register(vendaRoutes);
+    await server.register(notaVendaRoutes);
+    await server.register(contaRoutes);
+    await server.register(dashboardRoutes);
+    await server.register(catalogoRoutes);
+    await server.register(coresRoutes);
+    await server.register(ImagensRoute)
+}

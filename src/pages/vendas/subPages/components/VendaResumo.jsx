@@ -1,5 +1,5 @@
 import { Card, Button, Row, Col, Form } from "react-bootstrap";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import { Trash2, Pencil } from "lucide-react";
 
 export function VendaResumo({

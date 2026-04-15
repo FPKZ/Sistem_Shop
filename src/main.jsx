@@ -1,43 +1,35 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import "./imports.jsx";
-import {
-  Cadastro,
-  Clientes,
-  Produtos,
-  Notas,
-  Vendas,
-  NovaVenda,
-  TelaVendas,
-  Extorno,
-  Devolucao,
-  CadastroCliente,
-  CadastroNota,
-  CadastroProduto,
-  TelaCadastro,
-  Login,
-  CadastroUser,
-  PerfilPage,
-  GerenciamentoUsuario,
-  Catalogo,
-} from "./Router.jsx";
-import Layout from "./components/layout/Layout.jsx";
-import ProtectedRoute from "./auth/sistem/ProtectedRoute.jsx";
+import router from "./Router.jsx";
+import LoadingPage from "./auth/sistem/LoadingPage.jsx";
 import { AuthProvider } from "./auth/sistem/AuthContext.jsx";
 import ToastProvider from "./contexts/ToastContext.jsx";
 import ModalProvider from "./contexts/ModalContext.jsx";
-import { QueryClient } from "@tanstack/react-query";
+import GlobalError from "./pages/erros/GlobalError.jsx";
+import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      // Ignora requisições canceladas pelo usuário ou revalidações invisíveis
+      if (error?.message === "canceled") return;
+      window.dispatchEvent(new CustomEvent("global:toast", { detail: { type: "error", message: `Erro ao carregar dados: ${error.message}` } }));
+    }
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      window.dispatchEvent(new CustomEvent("global:toast", { detail: { type: "error", message: `Erro na operação: ${error.message}` } }));
+    }
+  }),
   defaultOptions: {
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 horas - Tempo para manter os dados no LocalStorage
       staleTime: 60000, // 1 minuto
-      refetchOnWindowFocus: false, // Evita picos de rede/processamento ao voltar para a aba
+      refetchOnWindowFocus: true, // Evita picos de rede/processamento ao voltar para a aba
     },
   },
 });
@@ -56,8 +48,6 @@ function prefetchBlobCache() {
       if (!cache) return;
       if (cache.catalogo) queryClient.setQueryData(["catalogo"], cache.catalogo);
       if (cache.categorias) queryClient.setQueryData(["categorias"], cache.categorias);
-      if (cache.notas) queryClient.setQueryData(["notas"], cache.notas);
-      if (cache.produtos) queryClient.setQueryData(["produtos"], cache.produtos);
       if (cache.cores) queryClient.setQueryData(["cores"], cache.cores);
       
       console.log("[CACHE] TanStack Query hidratado via Vercel Blob");
@@ -67,59 +57,26 @@ function prefetchBlobCache() {
 
 prefetchBlobCache();
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <Layout />,
-        children: [
-          { index: true, element: <App /> },
-          {
-            path: "cadastro",
-            element: <Cadastro />,
-            children: [
-              { index: true, element: <TelaCadastro /> },
-              { path: "produto", element: <CadastroProduto /> },
-              { path: "nota", element: <CadastroNota /> },
-              { path: "cliente", element: <CadastroCliente /> },
-            ],
-          },
-          { path: "clientes", element: <Clientes /> },
-          { path: "produtos", element: <Produtos /> },
-          { path: "notas", element: <Notas /> },
-          {
-            path: "vendas",
-            element: <Vendas />,
-            children: [
-              { index: true, element: <TelaVendas /> },
-              { path: "Nova-Venda", element: <NovaVenda /> },
-              { path: "Extorno", element: <Extorno /> },
-              { path: "Devolucao", element: <Devolucao /> },
-            ],
-          },
-          { path: "perfil", element: <PerfilPage /> },
-          { path: "usuarios", element: <GerenciamentoUsuario /> },
-        ],
-      },
-    ],
-  },
-  { path: "login", element: <Login /> },
-  { path: "cadastro-user", element: <CadastroUser /> },
-  { path: "catalogo", element: <Catalogo /> },
-]);
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <ToastProvider>
-        <ModalProvider>
-          <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-            <RouterProvider router={router} />
-          </PersistQueryClientProvider>
-        </ModalProvider>
-      </ToastProvider>
-    </AuthProvider>
+    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+      <AuthProvider>
+        <ToastProvider>
+          <ModalProvider>
+            {/* 
+              O <Suspense> trabalha em conjunto com o React.lazy() do Router.jsx.
+              Sempre que o usuário navegar para uma rota em que o arquivo JS (chunk) 
+              ainda não foi baixado, o React suspende a renderização e exibe o "fallback" 
+              (no nosso caso, a LoadingPage). Quando o download terminar, ele exibe a página.
+            */}
+            <Suspense fallback={<LoadingPage />}>
+              <RouterProvider router={router} />
+            </Suspense>
+          </ModalProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </PersistQueryClientProvider>
   </StrictMode>,
 );

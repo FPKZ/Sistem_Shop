@@ -1,6 +1,6 @@
 import { Card } from "react-bootstrap";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ReferenceLine } from "recharts";
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 export function DashboardCharts({ chartData }) {
   // Formatar datas para exibir apenas Dia/Mês, pulando alguns labels se houver muitos dados

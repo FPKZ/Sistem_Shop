@@ -26,6 +26,8 @@ export const env = {
 
   // Negócio
   WHATSAPP_NUMBER: process.env.VITE_WHATSAPP_NUMBER,
+  BLOB_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+  CRON_SECRET: process.env.CRON_SECRET || "limpeza_agendada_secret_123",
 };
 
 export default env;

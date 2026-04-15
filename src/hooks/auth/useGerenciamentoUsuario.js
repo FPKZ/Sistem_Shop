@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "@app/api";
+import API from "@services";
 import { useRequestHandler } from "@hooks/useRequestHandler";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
@@ -15,6 +15,9 @@ export function useGerenciamentoUsuario() {
   const [modalCadastroUser, setModalCadastroUser] = useState(false);
   const [modalInfoUser, setModalInfoUser] = useState(false);
   const [modalSenha, setModalSenha] = useState(false);
+  const [modalPermissionUser, setModalPermissionUser] = useState(false);
+
+  const [activeTab, setActiveTab] = useState("users");
 
   const { isLoading, handleRequest } = useRequestHandler();
 
@@ -92,6 +95,7 @@ export function useGerenciamentoUsuario() {
     const response = await handleRequest(() => API.editarUser(userEdit));
     if (response?.ok) {
       setModalInfoUser(false);
+      setModalPermissionUser(false);
       setAtt(!att);
     }
   };
@@ -132,8 +136,13 @@ export function useGerenciamentoUsuario() {
     handleSubmitCreate,
     handleSubmitEdit,
     handleUserEditChange,
+    setUserEdit,
     handleModalSenha,
     resetSenha,
+    modalPermissionUser,
+    setModalPermissionUser,
     isLoading, // Exportando loading para feedback visual opcional no componente
+    activeTab,
+    setActiveTab,
   };
 }

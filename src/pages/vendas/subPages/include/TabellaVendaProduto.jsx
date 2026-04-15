@@ -1,5 +1,5 @@
 import { Container, Card, Row, Col, Badge, Button, ButtonGroup, OverlayTrigger, Tooltip} from "react-bootstrap"
-import util from "@app/utils.js"
+import util from "@services/utils.js"
 
 export default function TabelaProdutos({mobile, produto, deleteList, width, custom, setmodalInfoProduto, setProduto}){
     if(!produto || produto === null || produto === undefined || produto.length === 0) return

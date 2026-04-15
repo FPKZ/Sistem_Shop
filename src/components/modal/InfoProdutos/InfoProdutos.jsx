@@ -1,15 +1,21 @@
-import { useState, useEffect, useRef } from "react";
-import util from "@app/utils.js";
+import util from "@services/utils.js";
 import {
   Modal,
   Row,
   Col,
   Button,
   Card,
-  Container,
   Badge,
+  Tabs,
+  Tab,
+  Dropdown,
 } from "react-bootstrap";
+import ImageCarousel from "@components/ImageCarousel";
 import TabelaProdutos from "@tabelas/TabelaProduto.jsx";
+import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
+import ImageCropModal from "@components/modal/ImageCropModal";
+import useInfoProdutos from "@hooks/produtos/useInfoProdutos";
+import useEditarProduto from "@hooks/produtos/useEditarProduto";
 import {
   Tag,
   Package,
@@ -34,24 +40,19 @@ export default function ProdutoInfo({
   mobile,
   tableShow = true,
 }) {
-  const [itemEstoque, setItemEstoque] = useState({});
-  const detailsRef = useRef(null);
+  const {
+    itemEstoque,
+    setItemEstoque,
+    // detailsRef,
+    activeTab,
+    setActiveTab,
+    modalImagens,
+    setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
+  } = useInfoProdutos({ visible, tableShow, produto });
 
-  useEffect(() => {
-    if (visible && !tableShow) {
-      setItemEstoque(produto);
-    }
-  }, [visible, tableShow, produto]);
-
-  useEffect(() => {
-    if (visible && tableShow) setItemEstoque({});
-  }, [visible, produto, tableShow]);
-
-  useEffect(() => {
-    if (visible && detailsRef.current) {
-      detailsRef.current.scrollTop = 0;
-    }
-  }, [visible, itemEstoque]);
+  const { imageUpload, removeImagem, updateImage, isLoading: isUpdating } = useEditarProduto(produto);
 
   if (!visible) return null;
 
@@ -121,9 +122,30 @@ export default function ProdutoInfo({
       </div>
     </Col>
   );
-
+  
   return (
-    <Modal
+    <>
+      {/* Modais de Gerenciamento de Imagem (Apenas renderiza junto com o pai) */}
+      <GerenciarImagensModal
+        visible={modalImagens}
+        onClose={() => setModalImagens(false)}
+        imagens={produto?.imgs || []}
+        onRemove={removeImagem}
+        activeTab={activeTabModalImagens}
+        onTabChange={setActiveTabModalImagens}
+        imageUpload={imageUpload}
+        mobile={mobile}
+      />
+
+      <ImageCropModal
+        src={imageUpload.cropSrc}
+        visible={imageUpload.showCrop}
+        onClose={imageUpload.handlers.handleCropCancel}
+        onConfirm={imageUpload.handlers.handleCropConfirm}
+        aspect={1}
+      />
+
+      <Modal
       show={visible}
       onHide={onClose}
       size="xl"
@@ -140,11 +162,11 @@ export default function ProdutoInfo({
 
       <Modal.Body
         style={{
-          height: mobile ? "auto" : "75dvh",
-          minHeight: mobile ? "auto" : "550px",
+          // height: mobile ? "auto" : "75dvh",
+          // minHeight: mobile ? "auto" : "550px",
           padding: 0,
         }}
-        className={`${mobile ? "overflow-auto" : "overflow-hidden"} bg-white`}
+        className={`rounded-bottom-4 ${mobile ? "overflow-auto" : "overflow-hidden"} bg-white`}
       >
         <Row className="h-100 g-0">
           {/* Tabela lateral opcional */}
@@ -154,7 +176,7 @@ export default function ProdutoInfo({
               produto={produto}
               setItemEstoque={setItemEstoque}
               width={mobile ? 12 : 5}
-              custom={`border-end ${mobile ? "border-bottom" : ""}`}
+              custom={` ${mobile ? "border-bottom" : ""}`}
             />
           )}
 
@@ -162,40 +184,78 @@ export default function ProdutoInfo({
           <Col
             lg={tableShow ? 7 : 12}
             xl={tableShow ? 7 : 12}
-            className={`order-2 ${mobile ? "" : "h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-4`}
+            className={`${mobile ? "order-1" : "order-md-2 h-100 overflow-y-auto custom-scrollbar"} p-3 p-md-3 pt-md-0 `}
           >
-            {!itemEstoque.id ? (
-              <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
-                <div className="bg-roxo-subtle p-4 rounded-circle mb-3">
-                  <Package size={48} className="text-roxo" />
-                </div>
-                <h4 className="fw-bold">Nenhum item selecionado</h4>
-                <p className="text-muted">
-                  Selecione um item da lista lateral para visualizar as
-                  especificações, valores e status atualizado.
-                </p>
-              </div>
-            ) : (
               <div className="animate-fade-in">
                 {/* Cabeçalho do Produto */}
                 <div className="d-flex flex-column flex-md-row gap-3 mb-2 pb-2 border-bottom align-items-start align-items-md-center">
-                  <div
-                    className="bg-light rounded-4 border p-2 shadow-sm"
-                    style={{
-                      width: "140px",
-                      height: "140px",
-                      minWidth: "140px",
-                    }}
-                  >
-                    <img
-                      className="w-100 h-100 rounded-3 object-fit-cover"
-                      src={produto.img || "assets/tube-spinner.svg"}
-                      alt={produto.nome}
-                    />
-                  </div>
+                  <Dropdown className="group">
+                    <Dropdown.Toggle
+                      variant="none"
+                      className="bg-light rounded-4 border p-2 shadow-sm position-relative dropdown-toggle-no-caret overflow-hidden"
+                      style={{
+                        width: "140px",
+                        height: "140px",
+                        minWidth: "140px",
+                      }}
+                    >
+                      <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300 z-10">
+                      </div>
+                      <div
+                        className="position-absolute top-[45%] left-[45%] translate-middle m-2 rounded-3 opacity-0 group-hover:opacity-100! transition-all ease-in-out duration-300"
+                        style={{ zIndex: 10 }}
+                      >
+                        <Edit size={24} className="text-white/80" />
+                      </div>
+                      <div className="w-100 h-100 position-relative">
+                        <img
+                          className={`w-100 h-100 rounded-3 object-fit-cover transition-all duration-300 ${isUpdating ? 'opacity-50 blur-sm' : ''}`}
+                          src={
+                            produto.img
+                              ? produto.img
+                              : "assets/tube-spinner.svg"
+                          }
+                          alt={produto.nome}
+                        />
+                        {isUpdating && (
+                          <div className="position-absolute top-50 start-50 translate-middle">
+                            <div className="spinner-border text-roxo" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
+                      <div className="d-flex flex-wrap gap-1 p-0 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
+                        {produto?.imgs?.map((img, index) => (
+                          <Dropdown.Item
+                            className="w-auto cursor-pointer hover:bg-transparent! active:bg-transparent!"
+                            key={index}
+                            as="div"
+                            onClick={() => updateImage(img)}
+                          >
+                            <div
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                width: '5rem',
+                                height: '5rem',
+                                borderRadius: '10%',
+                                marginBottom: '5px',
+                                border: '1px solid #ccc',
+                                overflow: "hidden"
+                              }}
+                            >
+                              <img src={img} alt={produto.nome} />
+                            </div>
+                          </Dropdown.Item>
+                        ))}
+                      </div>
+                    </Dropdown.Menu>
+                  </Dropdown>
                   <div className="grow">
                     <div className="d-flex align-items-center gap-2 mb-2">
-                      {getStatusBadge(itemEstoque.status)}
+                      {!itemEstoque.id && !itemEstoque._id ? null : getStatusBadge(itemEstoque.status)}
                       <Badge
                         bg="roxo-subtle"
                         className="text-roxo px-3 py-2 rounded-pill d-flex align-items-center gap-1"
@@ -227,69 +287,123 @@ export default function ProdutoInfo({
                     </div>
                   </div>
                 </div>
-
                 {/* Grid de Informações */}
+                {!itemEstoque.id && !itemEstoque._id ? (
+                  <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
+                    <div className="mb-3">
+                      <img
+                        src="assets/tube-spinner.svg"
+                        alt="Sem Imagem"
+                        className="img-fluid"
+                        style={{ maxWidth: "100px" }}
+                      />
+                    </div>
+                    <h4 className="fw-bold text-muted">Nenhum produto selecionado</h4>
+                    <p className="text-muted small">
+                      Selecione um produto na lista ao lado para visualizar suas informações detalhadas.
+                    </p>
+                  </div>
+                ) : (
                 <Row className="g-3">
                   <Col xl={8} lg={12}>
                     <Card className="border-0 shadow-sm rounded-4 h-100">
-                      <Card.Body className="p-2">
-                        <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
-                          <InfoIcon size={20} className="text-roxo" />{" "}
-                          Informações Técnicas
-                        </h5>
-                        <Row className="g-3">
-                          <InfoBlock
-                            label="Marca"
-                            value={itemEstoque.marca}
-                            icon={Package}
-                            colIdx={6}
-                          />
-                          <InfoBlock
-                            label="Tamanho"
-                            value={itemEstoque.tamanho}
-                            icon={Layers}
-                            colIdx={4}
-                          />
-                          <Col md={2} xs={2} className="mb-2">
-                            <div className="p-3 rounded-4 bg-light border border-opacity-10 h-100 shadow-sm d-flex flex-column align-items-center">
-                              <span
-                                className="text-muted small fw-bold text-uppercase mb-2"
-                                style={{ fontSize: "0.6rem" }}
-                              >
-                                COR
+                      <Card.Body className="p-3 position-relative">
+                        {activeTab === "imagens" && (
+                          <div 
+                            className="position-absolute top-0 end-0 m-3 cursor-pointer d-flex align-items-center gap-1 hover-opacity shadow-sm bg-white p-2 rounded-3 border z-10"
+                            style={{ zIndex: 10, cursor: "pointer" }}
+                            onClick={() => setModalImagens(true)}
+                          >
+                            <Edit size={16} className="text-roxo" /> 
+                            <span className="small fw-semibold text-roxo">Gerenciar Imagens</span>
+                          </div>
+                        )}
+                        <Tabs
+                          activeKey={activeTab}
+                          onSelect={(k) => setActiveTab(k)}
+                          id="produto-detalhes-tabs"
+                          className="mb-3 custom-tabs"
+                        >
+                          <Tab
+                            eventKey="tecnico"
+                            title={
+                              <span className="d-flex align-items-center gap-2">
+                                <InfoIcon size={18} /> Info. Técnica
                               </span>
-                              <div
-                                className="rounded-circle border shadow-sm"
-                                style={{
-                                  width: "1.5rem",
-                                  height: "1.5rem",
-                                  backgroundColor: itemEstoque.cor || "#000",
-                                }}
+                            }
+                          >
+                            <Row className="g-3 animate-fade-in">
+                              <InfoBlock
+                                label="Marca"
+                                value={itemEstoque.marca}
+                                icon={Package}
+                                colIdx={6}
+                              />
+                              <InfoBlock
+                                label="Tamanho"
+                                value={itemEstoque.tamanho}
+                                icon={Layers}
+                                colIdx={4}
+                              />
+                              <Col md={2} xs={2} className="mb-2">
+                                <div className="p-3 rounded-4 bg-light border border-opacity-10 h-100 shadow-sm d-flex flex-column align-items-center">
+                                  <span
+                                    className="text-muted small fw-bold text-uppercase mb-2"
+                                    style={{ fontSize: "0.6rem" }}
+                                  >
+                                    COR
+                                  </span>
+                                  <div
+                                    className="rounded-circle border shadow-sm"
+                                    style={{
+                                      width: "1.5rem",
+                                      height: "1.5rem",
+                                      backgroundColor:
+                                        itemEstoque.cor || "#000",
+                                    }}
+                                  />
+                                </div>
+                              </Col>
+                              <InfoBlock
+                                label="Código de Barras"
+                                value={itemEstoque.codigo_barras}
+                                icon={Barcode}
+                                colIdx={12}
+                                xs={12}
+                              />
+                              <InfoBlock
+                                label="Origem (Nota)"
+                                value={
+                                  itemEstoque.nota
+                                    ? `#${itemEstoque.nota.codigo}`
+                                    : "Nenhuma nota associada"
+                                }
+                                icon={Archive}
+                                colIdx={12}
+                                xs={12}
+                                color={
+                                  itemEstoque.nota ? "text-roxo" : "text-danger"
+                                }
+                              />
+                            </Row>
+                          </Tab>
+                          <Tab
+                            eventKey="imagens"
+                            title={
+                              <span className="d-flex align-items-center gap-2">
+                                <Package size={18} /> Imagens
+                              </span>
+                            }
+                          >
+                            <div className="p-2 animate-fade-in">
+                              <ImageCarousel
+                                imgs={produto.imgs}
+                                height="300px"
+                                objectFit="contain"
                               />
                             </div>
-                          </Col>
-                          <InfoBlock
-                            label="Código de Barras"
-                            value={itemEstoque.codigo_barras}
-                            icon={Barcode}
-                            colIdx={12}
-                            xs={12}
-                          />
-                          <InfoBlock
-                            label="Origem (Nota)"
-                            value={
-                              itemEstoque.nota
-                                ? `#${itemEstoque.nota.codigo}`
-                                : "Nenhuma nota associada"
-                            }
-                            icon={Archive}
-                            colIdx={12}
-                            xs={12}
-                            color={
-                              itemEstoque.nota ? "text-roxo" : "text-danger"
-                            }
-                          />
-                        </Row>
+                          </Tab>
+                        </Tabs>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -347,11 +461,12 @@ export default function ProdutoInfo({
                     </Card>
                   </Col>
                 </Row>
+                )}
               </div>
-            )}
           </Col>
         </Row>
       </Modal.Body>
     </Modal>
+  </>
   );
 }

@@ -1,0 +1,17 @@
+{
+  "name": "Sistem Shop",
+  "short_name": "Sistem Shop",
+  "description": "Sistema de Gestão e Catálogo Sistem Shop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#710c85",
+  "icons": [
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

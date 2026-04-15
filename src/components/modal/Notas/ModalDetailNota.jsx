@@ -10,7 +10,7 @@ import {
   User,
   ShoppingBag,
 } from "lucide-react";
-import utils from "@app/utils";
+import utils from "@services/utils";
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 
 const ModalDetailNota = ({ visible, onClose, selectNota, handleBuy, handlePrintCustom }) => {

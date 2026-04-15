@@ -1,7 +1,7 @@
-import API from "@app/api";
+import API from "@services";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 export function useCadastroCliente(onSuccess, clienteParaEditar = null) {
   const { isLoading, handleRequest } = useRequestHandler();
@@ -10,7 +10,7 @@ export function useCadastroCliente(onSuccess, clienteParaEditar = null) {
   const transformers = {
     telefone: utils.formatPhone,
     nome: (value) =>
-      value.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()),
+      value.toLowerCase().replace(/(?:^|\s)\S/g, (l) => l.toUpperCase()),
   };
 
   // Configuração de VALIDAÇÕES (Seguindo lógica do modal)

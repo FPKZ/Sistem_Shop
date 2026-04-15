@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import { Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpDown, Search } from 'lucide-react';
 
-import utils from "@app/utils";
+import utils from "@services/utils";
 
 
 export default function TableNota({notas, handleShowDetails, mobile, handleBuy, handlePrintCustom}){

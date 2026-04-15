@@ -7,7 +7,6 @@ export default function UsuarioInfoModal({
   user,
   onChange,
   onSubmit,
-  onResetPassword,
 }) {
   return (
     <Modal show={show} onHide={onHide} size="md" centered>
@@ -48,15 +47,6 @@ export default function UsuarioInfoModal({
               </Form.Group>
             </Col>
             <Col xs={12}>
-              <Button
-                size="sm"
-                className="btn-roxo w-100"
-                onClick={() => onResetPassword(user)}
-              >
-                Resetar Senha
-              </Button>
-            </Col>
-            <Col xs={12}>
               <Form.Group>
                 <Form.Label>Permissão:</Form.Label>
                 <Form.Select
@@ -65,8 +55,9 @@ export default function UsuarioInfoModal({
                   onChange={onChange}
                   required
                 >
-                  <option value="User">User</option>
-                  <option value="Adm">Adm</option>
+                  <option value="vendedor">Vendedor</option>
+                  <option value="gerente">Gerente</option>
+                  <option value="admin">Administrador</option>
                 </Form.Select>
               </Form.Group>
             </Col>

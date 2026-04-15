@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import API from "@app/api";
+import API from "@services";
 
 /**
  * Hook para buscar e gerenciar os dados principais do dashboard.

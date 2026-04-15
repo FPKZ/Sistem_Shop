@@ -42,7 +42,7 @@ export function useLogin() {
       });
 
       if (response?.ok) {
-        const from = location.state?.from?.pathname || "/";
+        const from = location.state?.from?.pathname || "/painel";
         navigate(from, { replace: true });
       } else if (response) {
         setErros(

@@ -1,20 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import API from "@app/api";
+import API from "@services";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
-import useCurrencyInput from "@hooks/useCurrencyInput";
+import useImageUpload from "@hooks/produtos/useImageUpload";
+import useProductPricing from "@hooks/produtos/useProductPricing";
 
-export function useCadastroProduto(onSuccess) {
-  const [categoria, setCategoria] = useState({});
-  const [nota, setNota] = useState({});
+export function useCadastroProduto(onSuccess, caseNota = false) {
   const [modalCadastroNota, setModalCadastroNota] = useState(false);
-  const [modalCadastroCategoria, setModalCadastroCategoia] = useState(false);
+  const [modalCadastroCategoria, setModalCadastroCategoria] = useState(false);
   const [modalCriar, setModalCriar] = useState(false);
   const [itensCriados, setItensCriados] = useState([]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [modalImagens, setModalImagens] = useState(false);
+  const [activeTabModalImagens, setActiveTabModalImagens] = useState("galeria");
+  const [isProdutoExistente, setIsProdutoExistente] = useState(false);
 
-
-  // Configuração do useForm para os campos básicos do produto
+  // 1. Hook de Formulário Base
   const {
     formValue,
     erros,
@@ -27,107 +29,171 @@ export function useCadastroProduto(onSuccess) {
   } = useForm(
     {
       nome: "",
-      img: null,
-      cor: "#000000",
+      imgs: [],
+      cor: null,
+      categoria_id: null,
       marca: "",
       tamanho: "",
+      nota_id: null,
       codigo_barras: "",
-      descricao: "",
       quantidade: 1,
+      valor_compra: null,
+      valor_venda: null,
+      lucro: null,
+      descricao: "",
     },
     {
       validators: {
         nome: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        marca: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        tamanho: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
+        nota_id: (v) => (!caseNota ? (v == null ? "Campo obrigatório!" : null) : null),
+        categoria_id: (v) => (v == null ? "Campo obrigatório!" : null),
+        codigo_barras: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
         quantidade: (v) => (!v || v < 1 ? "Quantidade mínima é 1" : null),
+        valor_compra: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
+        valor_venda: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
+        lucro: (v) => (!v?.toString().trim() ? "Campo obrigatório!" : null),
+        descricao: (v) => (!v?.trim() ? "Campo obrigatório!" : null),
       },
     },
   );
-  console.log(formValue)
-  const valorCompraHook = useCurrencyInput({ initialValue: 0 });
-  const valorVendaHook = useCurrencyInput({ initialValue: 0 });
-  const lucroHook = useCurrencyInput({ initialValue: 0 });
 
+  // 2. Hook de Precificação (Lucro/Valores)
+  const pricing = useProductPricing();
+  const { valorCompra, valorVenda, lucro } = pricing;
+
+  // 3. Hook de Imagem (Upload/Crop)
+  const imageUpload = useImageUpload(async (file) => {
+    if (file) {
+      setIsUploadingImage(true);
+      try {
+        // Fazemos o upload de forma "silenciosa" (sem usar o handleRequest para não disparar o loading global)
+        const response = await API.postImagens([file]);
+        if (response?.ok && response.data) {
+          setFormValue((prev) => ({
+            ...prev,
+            imgs: [...(prev.imgs || []), ...(response.data || [])],
+          }));
+        }
+      } catch (error) {
+        console.error("Erro no upload silencioso de imagem:", error);
+      } finally {
+        setIsUploadingImage(false);
+      }
+    }
+  });
+
+  // useRequestHandler deve vir antes de removeImagem, que usa handleRequest
   const { isLoading, handleRequest } = useRequestHandler();
 
-  // Handlers de precificação (lógica complexa mantida localmente para clareza)
-  const handleValorCompraChange = (e) => {
-    valorCompraHook.onChange(e);
-    const newValorCompra =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorVendaHook.value > 0) {
-      lucroHook.setValue(valorVendaHook.value - newValorCompra);
-    } else if (lucroHook.value > 0) {
-      valorVendaHook.setValue(newValorCompra + lucroHook.value);
+  const removeImagem = useCallback(async (url) => {
+    const response = await API.deleteImagem(url);
+    if (response?.ok) {
+      setFormValue((prev) => ({
+        ...prev,
+        imgs: prev.imgs.filter((img) => img !== url),
+      }));
     }
-  };
+  }, [setFormValue]);
 
-  const handleValorVendaChange = (e) => {
-    valorVendaHook.onChange(e);
-    const newValorVenda =
-      parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorCompraHook.value > 0) {
-      lucroHook.setValue(newValorVenda - valorCompraHook.value);
+  // Sincronização automática dos valores decimais do hook de preço com o formValue
+  useEffect(() => {
+    setFormValue((prev) => ({
+      ...prev,
+      valor_compra: valorCompra.value,
+      valor_venda: valorVenda.value,
+      lucro: lucro.value,
+    }));
+  }, [valorCompra.value, valorVenda.value, lucro.value, setFormValue]);
+
+  const resetForm = useCallback(() => {
+    setFormValue({
+      nome: "",
+      imgs: [],
+      cor: null,
+      categoria_id: null,
+      marca: "",
+      tamanho: "",
+      nota_id: null,
+      codigo_barras: "",
+      quantidade: 1,
+      valor_compra: null,
+      valor_venda: null,
+      lucro: null,
+      descricao: "",
+    });
+    setValidated(false);
+    setErros({});
+    pricing.handlers.resetPricing();
+    imageUpload.handlers.clearImage();
+    setActiveTabModalImagens("galeria");
+    setIsProdutoExistente(false);
+  }, [setFormValue, setValidated, setErros, pricing.handlers, imageUpload.handlers]);
+
+  // Reset automático quando o modal de sucesso fecha ou o fluxo reinicia
+  useEffect(() => {
+    if (modalCriar) {
+      resetForm();
     }
-  };
+  }, [modalCriar, resetForm]); // Simplificado pois resetForm é estável ou as dependências internas já são tratadas
 
-  const handleLucroChange = (e) => {
-    lucroHook.onChange(e);
-    const newLucro = parseFloat(e.target.value.replace(/\D/g, "")) / 100 || 0;
-    if (valorCompraHook.value > 0) {
-      valorVendaHook.setValue(valorCompraHook.value + newLucro);
-    }
-  };
-
-  const gerarFormData = () => {
-    const finalFormData = new FormData();
-    finalFormData.append("nome", formValue.nome);
-    finalFormData.append("descricao", formValue.descricao);
-    finalFormData.append("img", formValue.img);
-    finalFormData.append("categoria_id", categoria.id || "");
-
+  const gerarPayloadData = () => {
     const quantidade = parseInt(formValue.quantidade) || 1;
     const itens = Array.from({ length: quantidade }, () => ({
       codigo_barras: formValue.codigo_barras,
-      nota_id: nota.id || "",
+      nota_id: formValue.nota_id || "",
       tamanho: formValue.tamanho,
       cor: formValue.cor,
       marca: formValue.marca,
-      valor_compra: valorCompraHook.value,
-      valor_venda: valorVendaHook.value,
-      lucro: lucroHook.value,
+      valor_compra: valorCompra.value,
+      valor_venda: valorVenda.value,
+      lucro: lucro.value,
     }));
 
-    finalFormData.set("itens", JSON.stringify(itens));
-    return finalFormData;
+    return {
+      nome: formValue.nome,
+      descricao: formValue.descricao,
+      imgs: formValue.imgs,
+      categoria_id: formValue.categoria_id,
+      itens: itens,
+    };
   };
 
   async function handleSubimit(e) {
     if (e && e.preventDefault) e.preventDefault();
 
-    if (validate()) {
-      const finalFormData = gerarFormData();
+    if (isUploadingImage) {
+      // Opcional: mostrar um alerta ou simplesmente bloquear
+      return;
+    }
 
-      const response = await handleRequest(() =>
-        API.postProduto(finalFormData),
-      );
+    if (validate()) {
+      const payload = gerarPayloadData();
+
+      const response = await handleRequest(() => API.postProduto(payload));
 
       if (response?.ok) {
-        if (response.itensEstoque) {
-          setItensCriados(response.itensEstoque);
+        const data = response.data || response;
+        if (data.itensEstoque) {
+          const dadosItens = Array.isArray(data.itensEstoque)
+            ? data.itensEstoque
+            : [data.itensEstoque];
+          setItensCriados(dadosItens);
           setModalCriar(true);
         }
-        if (onSuccess) onSuccess(response.itensEstoque);
+        if (onSuccess) onSuccess(data.itensEstoque);
       }
     }
   }
 
-  // Integração com TanStack Query para os dropdowns da tela de cadastro
+  // Queries de Dados de Apoio (DropDowns)
   const { data: categoriasData } = useQuery({
     queryKey: ["categorias"],
     queryFn: async () => {
       const res = await API.getCategoria();
       return res?.data || [];
-    }
+    },
   });
 
   const { data: notasData } = useQuery({
@@ -135,7 +201,7 @@ export function useCadastroProduto(onSuccess) {
     queryFn: async () => {
       const res = await API.getNotas();
       return res || [];
-    }
+    },
   });
 
   const { data: coresData } = useQuery({
@@ -143,45 +209,83 @@ export function useCadastroProduto(onSuccess) {
     queryFn: async () => {
       const res = await API.getCores();
       return res?.data || [];
-    }
+    },
   });
 
+  const { data: produtosData } = API.getProdutos({itens: "none"})
+  // console.log(produtosData)
+  // Reverte unwrap condicional — certas versões cacheadas ou rotas
+  // podem retornar objetos inteiros em vez de apenas a propriedade "data",
+  // o que impede arrays de funcionarem com funções nativas como `.find()`
   const categorias = categoriasData?.data || categoriasData || [];
-  const notas = notasData || [];
+  const notas = notasData?.data || notasData || [];
   const cores = coresData?.data || coresData || [];
-
+  const produtos = Array.isArray(produtosData?.data) ? produtosData.data : (Array.isArray(produtosData) ? produtosData : []);
+  // console.log(produtos)
+  const handleSelectProduto = useCallback((event, newValue) => {
+    if (typeof newValue === 'string') {
+      // FreeSolo text (digitou um nome que não está na lista)
+      setFormValue((prev) => ({ ...prev, nome: newValue }));
+      setIsProdutoExistente(false);
+    } else if (newValue && newValue.id) {
+      // Selecionou um produto existente
+      setFormValue((prev) => ({
+        ...prev,
+        nome: newValue.nome,
+        imgs: newValue.imgs || [],
+        categoria_id: newValue.categoria_id,
+        descricao: newValue.descricao || ""
+      }));
+      // Cor não vem no root do produto normalmente, mas se vier a gente seta, caso contrário manter neutra/null
+      setIsProdutoExistente(true);
+    } else {
+      // Limpou o autocomplete
+      setFormValue((prev) => ({ ...prev, nome: "" }));
+      setIsProdutoExistente(false);
+    }
+  }, [setFormValue]);
 
   return {
-    categoria,
-    setCategoria,
+    // Dados
     cores,
-    nota,
-    setNota,
     notas,
     categorias,
+    produtos,
+    itensCriados,
+    formValue,
+    erros,
+    validated,
+    isLoading: isLoading || isUploadingImage,
+    isUploadingImage,
+    
+    // Estados de UI
     modalCadastroNota,
     setModalCadastroNota,
     modalCadastroCategoria,
-    setModalCadastroCategoia,
+    setModalCadastroCategoria,
     modalCriar,
     setModalCriar,
-    itensCriados,
-    erros,
-    setErros,
-    validated,
-    setValidated,
-    formValue,
-    setFormValue,
-    isLoading,
-    valorCompraHook,
-    valorVendaHook,
-    lucroHook,
+    isProdutoExistente,
+    
+    // Hooks Acoplados (Exposição direta para o componente visual)
+    pricing,
+    imageUpload,
+    modalImagens,
+    setModalImagens,
+    activeTabModalImagens,
+    setActiveTabModalImagens,
+    removeImagem,
+    
+    // Handlers
     handleChange,
-    handleValorCompraChange,
-    handleValorVendaChange,
-    handleLucroChange,
-    validate,
-    gerarFormData,
+    handleSelectProduto,
     handleSubimit,
+    validate,
+    gerarPayloadData,
+    resetForm,
+    setFormValue,
+    setValidated,
+    setErros,
   };
 }
+

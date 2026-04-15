@@ -4,7 +4,7 @@ import CadastroModal from "@components/modal/CadastroProdutos/CadastroIntenModal
 import ProdutosCriados from "@components/modal/ProdutosCriados/ProdutosCriados";
 import ProdutoInfo from "@components/modal/InfoProdutos/InfoProdutos";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useCadastroNota } from "@hooks/notas/useCadastroNota";
 
 export default function Notas() {
@@ -33,6 +33,8 @@ export default function Notas() {
     handleChange,
     handleSubimit,
   } = useCadastroNota(() => navigate(-1));
+
+  const { mobile } = useOutletContext();
 
   return (
     <div className="w-100 p-3">
@@ -198,7 +200,7 @@ export default function Notas() {
           disabled={isLoading || modalCadastroPrduto}
           type="submit"
         >
-          Adicionar
+          {isLoading ? "Salvando..." : "Salvar Nota"}
         </Button>
       </Form>
       <CadastroModal
@@ -206,6 +208,7 @@ export default function Notas() {
         onClose={() => setmodalCadastroPrduto(false)}
         cadastroNota={true}
         cadastrarProduto={cadastrarProduto}
+        mobile={mobile}
       />
       <ProdutoInfo
         visible={modalInfoProduto}
@@ -215,7 +218,10 @@ export default function Notas() {
       />
       <ProdutosCriados
         visible={modalCriar}
-        onClose={() => setModalCriar(false)}
+        onClose={() => {
+          setModalCriar(false);
+          navigate("/notas");
+        }}
         itens={itensCriados}
       />
     </div>

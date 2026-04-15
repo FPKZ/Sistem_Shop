@@ -4,22 +4,22 @@ import multipart from "@fastify/multipart";
 import process from "node:process";
 import { env } from "./config/env.js";
 import sequelize from "./database/sequelize.js";
-import {
-  produtoRoutes,
-  categoriaRoutes,
-  clienteRoutes,
-  notaRoutes,
-  vendaRoutes,
-  notaVendaRoutes,
-  contaRoutes,
-  dashboardRoutes,
-  catalogoRoutes,
-  coresRoutes,
-} from "./routes/routers.js";
+import RegistarRotas from "./routes/routers.js";
 import tableCores from "./database/interface/tableCores.js";
 import { syncCacheToBlob } from "./services/cache.service.js";
+import { limparImagensOrfas } from "./services/img.service.js";
 
-const server = fastify({ logger: true, trustProxy: true });
+const server = fastify({ 
+  logger: true,
+  trustProxy: true,
+  ajv: {
+    customOptions: {
+      removeAdditional: false,
+      useDefaults: true,
+      allErrors: true
+    }
+  }
+});
 
 // ──────────────────────────────────────────────
 // CORS
@@ -42,13 +42,12 @@ if (env.FRONTEND_URL === "ALL") {
 } else {
   if (env.FRONTEND_URL) origins.push(env.FRONTEND_URL);
   console.log("\n[CORS] Modo: Restrito às seguintes origens:", origins);
-  await server.register(cors, { ...CORS_OPTIONS, origin: origins });
 }
 
 // ──────────────────────────────────────────────
 // Plugins
 // ──────────────────────────────────────────────
-server.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } });
+server.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } }); // Conta: 100 MegaBytes * 1024 KiloBytes * 1024 Bytes = 104.857.600 bytes
 
 // ──────────────────────────────────────────────
 // Decorators de Resposta Padronizados
@@ -57,7 +56,8 @@ server.decorateReply("ok", function (data = {}, message = "Operação realizada 
   return this.code(this.statusCode === 200 ? 200 : this.statusCode).send({ ok: true, message, ...data });
 });
 
-server.decorateReply("err", function (message = "Ocorreu um erro", code = 400) {
+server.decorateReply("err", function (error = "Ocorreu um erro", code = 400) {
+  const message = error instanceof Error ? error.message : error;
   return this.code(code).send({ ok: false, error: message });
 });
 
@@ -68,10 +68,23 @@ server.addHook("onRequest", async (request) => {
   server.log.info(`[REQUISICAO] ${request.method} ${request.url} - IP: ${request.ip}`);
 });
 
+// Prefixos de rotas cujas mutações afetam os dados do catálogo público.
+// Apenas essas rotas disparam a sincronização do cache no Vercel Blob.
+// Rotas como /venda, /nota, /cliente, /imagem não impactam dados públicos
+// e não precisam re-gerar o cache a cada operação.
+const ROTAS_QUE_AFETAM_CACHE = ["/produto", "/categoria", "/cores"];
+
 server.addHook("onResponse", async (request, reply) => {
-  // Dispara a sincronização de cache em background se foi uma operação de escrita/modificação/remoção com sucesso
-  if (["POST", "PUT", "DELETE"].includes(request.method) && reply.statusCode >= 200 && reply.statusCode < 300) {
-    syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização pós-requisição:", err));
+  const afetoCache = ROTAS_QUE_AFETAM_CACHE.some(r => request.url.startsWith(r));
+
+  if (
+    ["POST", "PUT", "DELETE"].includes(request.method) &&
+    reply.statusCode >= 200 && reply.statusCode < 300 &&
+    afetoCache
+  ) {
+    syncCacheToBlob(server.log).catch(err =>
+      server.log.error("[CACHE] Falha na sincronização pós-requisição:", err)
+    );
   }
 });
 
@@ -81,11 +94,38 @@ server.addHook("onResponse", async (request, reply) => {
 server.setErrorHandler((error, request, reply) => {
   server.log.error(error);
 
+  if(error.validation) {
+    return reply.status(400).send({
+      status: "error_validacao",
+      message: "Erro de validação",
+      detalhes: error.validation.map(err => ({
+        campo: err.instancePath.replace("/", "") || err.params.missingProperty,
+        regra: err.keyword,
+        mensagem: err.message
+      })),
+      ok: false
+    })
+  }
+
   // Erros de negócio lançados pelos services com statusCode
   const statusCode = error.statusCode || 500;
   const message = statusCode === 500 ? "Erro interno no servidor" : error.message;
 
   reply.code(statusCode).send({ ok: false, error: message });
+});
+
+server.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
+  if (body === '') {
+    done(null, {}); // Se vier vazio, transforma em um objeto vazio
+    return;
+  }
+  try {
+    const json = JSON.parse(body);
+    done(null, json);
+  } catch (err) {
+    err.statusCode = 400;
+    done(err, undefined);
+  }
 });
 
 // ──────────────────────────────────────────────
@@ -99,24 +139,22 @@ server.get("/", async (request, reply) => {
 // ──────────────────────────────────────────────
 // Registro de Rotas
 // ──────────────────────────────────────────────
-server.register(produtoRoutes);
-server.register(categoriaRoutes);
-server.register(clienteRoutes);
-server.register(notaRoutes);
-server.register(vendaRoutes);
-server.register(notaVendaRoutes);
-server.register(contaRoutes);
-server.register(dashboardRoutes);
-server.register(catalogoRoutes);
-server.register(coresRoutes);
+server.register(RegistarRotas)
 
 // ──────────────────────────────────────────────
 // Inicialização
 // ──────────────────────────────────────────────
 async function start() {
   try {
-    await sequelize.sync({ alter: true });
-    server.log.info("Conectado ao banco de dados com sucesso!");
+    // DB_SYNC=true faz o Sequelize verificar e alterar colunas — útil em desenvolvimento.
+    // Em produção (Render), deixar desligado para acelerar o boot.
+    if (process.env.DB_SYNC === 'true') {
+      await sequelize.sync({ alter: true });
+      server.log.info("[BD] Sincronizado com alter:true");
+    } else {
+      await sequelize.authenticate();
+      server.log.info("[BD] Conexão verificada (sem sync)");
+    }
     await server.listen({ port: env.PORT, host: "0.0.0.0" });
 
     const seedCores = new tableCores();
@@ -125,8 +163,19 @@ async function start() {
     // Sincroniza o cache estático no Vercel Blob para que esteja atualizado no primeiro boot
     syncCacheToBlob(server.log).catch(err => server.log.error("[CACHE] Falha na sincronização na inicialização:", err));
 
+    // Agenda a limpeza de imagens órfãs (24 horas = 24 * 60 * 60 * 1000 ms)
+    const INTERVALO_LIMPEZA = 24 * 60 * 60 * 1000;
+    setInterval(() => {
+        limparImagensOrfas().catch(err => server.log.error("[CLEANUP] Falha na limpeza agendada:", err));
+    }, INTERVALO_LIMPEZA);
+
+    // Executa uma limpeza inicial após 1 hora para não sobrecarregar o boot
+    setTimeout(() => {
+        limparImagensOrfas().catch(err => server.log.error("[CLEANUP] Falha na limpeza inicial:", err));
+    }, 10 * 60 * 1000);
+
   } catch (err) {
-    server.log.error("Erro ao iniciar o servidor:", err);
+    server.log.error(err);
     process.exit(1);
   }
 }

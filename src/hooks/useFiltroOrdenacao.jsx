@@ -41,6 +41,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparac
 
   // Processamento principal: Filtragem -> Ordenação
   const dadosProcessados = useMemo(() => {
+    if (!dadosIniciais || !Array.isArray(dadosIniciais)) return [];
     let dadosFiltrados = [...dadosIniciais];
 
     // Lógica de Filtragem
@@ -119,11 +120,13 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparac
     // Lógica de Ordenação
     dadosFiltrados.sort((a, b) => {
       // Prioridade 1: Disponibilidade (Esgotados sempre por último)
-      const esgotadoA = a[camposSeparacao[0]] === camposSeparacao[1];
-      const esgotadoB = b[camposSeparacao[0]] === camposSeparacao[1];
+      if (camposSeparacao && Array.isArray(camposSeparacao) && camposSeparacao.length >= 2) {
+        const esgotadoA = a[camposSeparacao[0]] === camposSeparacao[1];
+        const esgotadoB = b[camposSeparacao[0]] === camposSeparacao[1];
 
-      if (esgotadoA && !esgotadoB) return 1;
-      if (!esgotadoA && esgotadoB) return -1;
+        if (esgotadoA && !esgotadoB) return 1;
+        if (!esgotadoA && esgotadoB) return -1;
+      }
 
       // Prioridade 2: Ordenação Principal (definida pelo usuário)
       const valorA = a[order.chave];
@@ -135,7 +138,7 @@ export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparac
     });
 
     return dadosFiltrados;
-  }, [dadosIniciais, filtroDebounced, order, camposFiltragem]);
+  }, [dadosIniciais, filtroDebounced, order, camposFiltragem, camposSeparacao]);
 
   /**
    * Altera a coluna de ordenação ou inverte a direção se for a mesma coluna.

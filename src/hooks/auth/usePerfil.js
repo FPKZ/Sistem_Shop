@@ -1,15 +1,47 @@
-import API from "@app/api";
+import API from "@services";
+import { useEffect, useState } from "react";
 import { useForm } from "@hooks/useForm";
 import { useRequestHandler } from "@hooks/useRequestHandler";
+import { useAuth } from "@auth-sistem/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@contexts/ToastContext";
+import useImageUpload from "@hooks/produtos/useImageUpload";
 
 export function usePerfil() {
+  const  [ edit, setEdit ] = useState(false);
+  const  [ openPassword, setOpenPassword ] = useState(false);
   const { handleRequest } = useRequestHandler();
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const { user, logout } = useAuth();
+  
+  // Hook para upload e recorte de imagem
+  const imageUpload = useImageUpload(async (file) => {
+    if (file) {
+      const response = await handleRequest(() => API.postImagens([file]));
+      if (response?.ok && response.data?.[0]) {
+        perfilForm.handleChange("img", response.data[0]);
+      }
+    }
+  });
+
+  // Sincroniza o formulário quando os dados do usuário carregam/mudam
+  useEffect(() => {
+    if (user) {
+      perfilForm.resetForm({
+        nome: user.nome || "",
+        email: user.email || "",
+        img: user.img || "",
+      });
+    }
+  }, [user]);
 
   // Usamos useForm para os dados do perfil
   const perfilForm = useForm(
     {
-      nome: "João da Silva",
-      email: "joao.silva@example.com",
+      nome: user?.nome || "",
+      email: user?.email || "",
+      img: user?.img || "",
     },
     {
       validators: {
@@ -18,6 +50,20 @@ export function usePerfil() {
       },
     },
   );
+
+  const mutation = useMutation({
+    mutationFn: (data) => API.updatePerfil(user.id, data),
+    onSuccess: (response) => {
+      showToast(
+        response?.message || "Perfil atualizado com sucesso!",
+        "success",
+      );
+      queryClient.invalidateQueries({ queryKey: ["perfil"] });
+    },
+    onError: (err) => {
+      showToast(err?.message || "Erro ao atualizar perfil.", "error");
+    },
+  });
 
   // Usamos useForm para a troca de senha
   const passwordForm = useForm(
@@ -38,23 +84,47 @@ export function usePerfil() {
   const handlePerfilSubmit = async (e) => {
     e.preventDefault();
     if (perfilForm.validate()) {
-      // Simulação de update via handler genérico
-      await handleRequest(async () => {
-        // API.updatePerfil(perfilForm.formValue)
-        return { ok: true, message: "Informações atualizadas com sucesso!" };
+      const playload = {
+        nome: perfilForm.formValue.nome === user.nome ? null : perfilForm.formValue.nome,
+        email: perfilForm.formValue.email === user.email ? null : perfilForm.formValue.email,
+        img: perfilForm.formValue.img === user.img ? null : perfilForm.formValue.img,
+      };
+      Object.keys(playload).forEach((key) => {
+        if (playload[key] === null) {
+          delete playload[key];
+        }
       });
+      if (Object.keys(playload).length === 0) {
+        showToast("Nenhum dado para atualizar", "error");
+        return;
+      }
+      mutation.mutate(playload);
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordForm.validate()) {
-      await handleRequest(async () => {
-        // API.changePassword(passwordForm.formValue)
-        return { ok: true, message: "Senha atualizada com sucesso!" };
-      });
-      passwordForm.resetForm();
+      const response = await handleRequest(() =>
+        API.mudarSenha({
+          id: user.id,
+          senhaAtual: passwordForm.formValue.current,
+          novaSenha: passwordForm.formValue.new,
+        }),
+      );
+      if (response?.ok) {
+        passwordForm.resetForm();
+        showToast("Senha alterada com sucesso! Por favor, faça login novamente.", "success");
+        setTimeout(() => {
+          logout();
+        }, 1500);
+      }
     }
+  };
+
+  const handlePasswordCancel = () => {
+    passwordForm.resetForm();
+    setOpenPassword(false);
   };
 
   return {
@@ -66,5 +136,11 @@ export function usePerfil() {
     handlePasswordChange: passwordForm.handleChange,
     handlePerfilSubmit,
     handlePasswordSubmit,
+    imageUpload,
+    edit,
+    setEdit,
+    openPassword,
+    setOpenPassword,
+    handlePasswordCancel,
   };
 }

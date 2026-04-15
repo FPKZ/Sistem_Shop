@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "@app/api";
+import API from "@services";
 
 export function useVendaCart(produtos) {
   const [listaVenda, setListaVenda] = useState([]);

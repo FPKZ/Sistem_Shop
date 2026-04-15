@@ -1,12 +1,10 @@
-import { Modal, Button, ListGroup, Badge, Form } from "react-bootstrap"
+import { Modal, Button, ListGroup, Badge, Form } from "react-bootstrap";
 import { Package2, Copy, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./ProdutosCriados.css"
 
-export default function ProdutosCriados({visible, onClose, itens}){
-    const navigate = useNavigate()
-    const [checkedItems, setCheckedItems] = useState({});
+export default function ProdutosCriados({ visible, onClose, itens }) {
+  const [checkedItems, setCheckedItems] = useState({});
 
     useEffect(() => {
         if (visible) {
@@ -14,7 +12,9 @@ export default function ProdutosCriados({visible, onClose, itens}){
         }
     }, [visible]);
 
-    if(!visible || (!itens || itens.length === 0)) return null
+  const displayItens = Array.isArray(itens) ? itens : itens ? [itens] : [];
+
+  if (!visible || displayItens.length === 0) return null;
 
     const handleCheckChange = (id, isChecked) => {
         setCheckedItems(prev => ({
@@ -23,27 +23,26 @@ export default function ProdutosCriados({visible, onClose, itens}){
         }));
     };
 
-    const allChecked = itens.every(item => checkedItems[item.id]);
+  const allChecked = displayItens.every((item) => checkedItems[item.id]);
 
-    const handleSubimit = async (e) => {
-        e.preventDefault()
-        if (allChecked) {
-            navigate(-1)
-            onClose()
-        }
+  const handleSubimit = async (e) => {
+    e.preventDefault();
+    if (allChecked) {
+      onClose();
     }
+  };
 
     return (
-        <Modal show={visible} centered size="lg" >
-            <Modal.Header className="d-flex justify-content-between">
+    <Modal show={visible} onHide={onClose} centered size="lg">
+      <Modal.Header className="d-flex justify-content-between">
                 <Modal.Title as="h5" className="fw-bold">
                     Produtos Criados
                 </Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubimit}>
-                <Modal.Body className="p-0 w-100 overflow-auto" style={{maxHeight: `calc(100dvh - 210px)`}}>
-                    <ListGroup variant="flush">
-                            {itens.map((item) => (
+        <Modal.Body className="p-0 w-100 overflow-auto" style={{maxHeight: `calc(100dvh - 210px)`}}>
+            <ListGroup variant="flush">
+                    {displayItens.map((item) => (
                                 <ListGroup.Item
                                     key={item.id}
                                     

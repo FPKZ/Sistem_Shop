@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./include/Header";
@@ -8,102 +7,58 @@ import Carrinho from "./include/Carrinho";
 import Produto from "./include/Produto";
 import Menu from "./include/Menu";
 
-//Hooks
+import { useEffect } from "react";
+import { useNavigationType } from "react-router-dom";
 import useCatalogo from "../../hooks/catalogo/useCatalogo";
-import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
-import { usePagination } from "@hooks/usePagination";
-import { useScrollRestoration } from "../../hooks/useScrollRestoration";
-import { useHistoryBack } from "../../hooks/useHistoryBack";
 
 export default function Catalogo() {
+  const navType = useNavigationType();
+  const shouldAnimate = navType !== "POP";
+
   const {
-    produtos,
-    categorias,
-    produtoSelecionado,
-    selecionarProduto,
-    telaProduto,
-    setTelaProduto,
-    carrinho,
-    formValue,
-    handleChange,
-    handleChangeQuantity,
-    handleBadge,
-    adicionarAoCarrinho,
-    removerItemDoCarrinho,
-    alterarQuantidade,
-    totalItens,
-    valorTotal,
-    obs,
-    setObs,
-    pedir,
-    carrinhoAberto,
-    setCarrinhoAberto,
-    menu,
-    setMenu,
-    loading,
-    getCor,
-    handleTalk,
+    // States and Variables
+    produtos, categorias, produtoSelecionado, selecionarProduto,
+    telaProduto, setTelaProduto, carrinho, formValue, handleChange,
+    handleChangeQuantity, handleBadge, adicionarAoCarrinho,
+    removerItemDoCarrinho, alterarQuantidade, totalItens, valorTotal,
+    obs, setObs, pedir, carrinhoAberto, menu,
+    setMenu, loading, getCor, handleTalk,
+
+    // UI Refs and States
+    topRef, whatsappRef, talkExpanded, setTalkExpanded, isHovered, setIsHovered,
+
+    // Sources and Handlers
+    dadosProcessados, filtro, setFiltro, ordenarPorChave,
+    currentPage, itemsPerPage, currentItems, totalPages, totalItems,
+    indexOfFirstItem, indexOfLastItem, handlePageChangeSafely, handleItemsPerPageChangeSafely
   } = useCatalogo();
 
-  const { dadosProcessados, filtro, setFiltro, ordenarPorChave } = useFiltroOrdenacao(produtos, [
-    "nome",
-    "categoria",
-    { path: "tags", subCampos: ["label"] },
-  ], ["quantidade", "Esgotado"]);
-
-  const { 
-    currentPage,
-    itemsPerPage,
-    currentItems,
-    totalPages,
-    totalItems,
-    indexOfFirstItem,
-    indexOfLastItem,
-    handlePageChange,
-    handleItemsPerPageChange,
-  } = usePagination(dadosProcessados, 20);
-
-  const topRef = useRef(null);
-  const [talkExpanded, setTalkExpanded] = (useCatalogo.expandedState || useState)(false);
-  const [isHovered, setIsHovered] = useState(false);
+  useEffect(() => {
+    // BUG FIX: O estilo padrão do body (style.css) tem overflow: hidden para o Dashboard.
+    // Como o Catálogo renderiza por fora do Layout.jsx, o Lazy Loading perdeu a herança.
+    // Forçamos o body-scroll-visible para que a página possa rolar livremente nativamente.
+    document.body.classList.add("body-scroll-visible");
+    return () => {
+      document.body.classList.remove("body-scroll-visible");
+    };
+  }, []);
 
   const whatsappVariants = {
     collapsed: { x: "65%" },
     expanded: { x: "10%" }
   };
 
-  // 1. Controle de Posição de Rolagem Inteligente
-  useScrollRestoration(carrinhoAberto || telaProduto, topRef, [currentPage, filtro]);
-
-  // 2. Controle do Botão Voltar (Android / Navegador)
-  useHistoryBack([
-    { isOpen: carrinhoAberto, close: () => setCarrinhoAberto(false) },
-    { isOpen: telaProduto, close: () => setTelaProduto(false) },
-    { isOpen: menu, close: () => setMenu(false) }
-  ]);
-
-  // 3. Fechar botão do WhatsApp ao clicar fora
-  const whatsappRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (whatsappRef.current && !whatsappRef.current.contains(event.target)) {
-        setTalkExpanded(false);
-      }
-    }
-
-    if (talkExpanded) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [talkExpanded, setTalkExpanded]);
-
   return (
-    <div className="d-flex flex-column h-100">
-      <div ref={topRef} style={{ height: 0, overflow: "hidden", position: "absolute", top: 0 }} />
+    <div className="d-flex flex-column min-vh-100">
+      {/* Âncora absoluta no topo da página. Serve como fallback nativo
+          para garantir que o scrollIntoView funcione puxando o fluxo do documento
+          para o nível inicial. */}
+      <div
+        ref={topRef}
+        tabIndex="-1"
+        aria-hidden="true"
+        style={{ position: "absolute", top: 0, left: 0, width: 0, height: 0, pointerEvents: "none", outline: "none", zIndex: -1 }}
+      />
       {/* Header fixo no topo ocupando toda a largura */}
       <Header
         carrinhoAberto={carrinhoAberto}
@@ -146,7 +101,7 @@ export default function Catalogo() {
         </div>
 
         <div className="flex-grow-1 d-flex flex-column bg-light bg-opacity-10">
-          <main className="flex-grow-1 container-fluid py-4 pt-3">
+          <main className="d-flex flex-column flex-grow-1 container-fluid py-4 pt-3">
             {carrinhoAberto ? (
               <Carrinho
                 produtos={produtos}
@@ -178,8 +133,8 @@ export default function Catalogo() {
                 totalItems={totalItems}
                 indexOfFirstItem={indexOfFirstItem}
                 indexOfLastItem={indexOfLastItem}
-                handlePageChange={handlePageChange}
-                handleItemsPerPageChange={handleItemsPerPageChange}
+                handlePageChange={handlePageChangeSafely}
+                handleItemsPerPageChange={handleItemsPerPageChangeSafely}
                 ordenarPorChave={ordenarPorChave}
                 setFiltro={setFiltro}
                 filtro={filtro}
@@ -187,6 +142,7 @@ export default function Catalogo() {
                 handleChangeQuantity={handleChangeQuantity}
                 selecionarProduto={selecionarProduto}
                 setTelaProduto={setTelaProduto}
+                shouldAnimate={shouldAnimate}
               />
             )}
           </main>
