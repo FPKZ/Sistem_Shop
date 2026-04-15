@@ -52,14 +52,14 @@ export default function PerfilPage() {
         </p>
       </div>
 
-      <Card className="shadow-md mb-8">
-        <Card.Header as="h3" className="text-xl font-semibold">
+      <Card className="shadow-md mb-8 rounded-4">
+        <Card.Header as="h3" className="text-xl font-semibold hidden md:block">
           Informações Pessoais
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="p-4">
           <Form onSubmit={handlePerfilSubmit}>
             <Row className="align-items-center">
-              <Col xs="auto" className="text-center mb-4 mb-md-0">
+              <Col xs="12" md="auto" className="text-center mb-4 mb-md-0">
                 <div className="position-relative d-inline-block">
                   <Image
                     src={profileImagePreview}
@@ -119,7 +119,7 @@ export default function PerfilPage() {
                 </Form.Group>
               </Col>
             </Row>
-            <div className="d-flex justify-content-end mt-4 gap-2">
+            <div className="d-flex justify-center md:justify-end mt-4 gap-2">
               {edit ? (<>
                   <Button
                     size="sm"
@@ -154,7 +154,7 @@ export default function PerfilPage() {
         </Card.Body>
       </Card>
 
-      <Card className="shadow-md">
+      <Card className="shadow-md rounded-4">
         <Collapsible.Root open={openPassword} onOpenChange={setOpenPassword}>
               <Collapsible.Trigger asChild>
                   <Card.Header as="h3" className="text-xl font-semibold cursor-pointer hover:bg-gray-50 transition-colors d-flex justify-content-between align-items-center group">
