@@ -6,7 +6,8 @@ const Conta = sequelize.define('Conta', {
     email: DataTypes.STRING,
     senha: DataTypes.STRING,
     img: DataTypes.STRING,
-    cargo: { type: DataTypes.STRING, defaultValue: "User"}
+    cargo: { type: DataTypes.STRING, defaultValue: "User"},
+    tokenVersion: { type: DataTypes.INTEGER, defaultValue: 0 }
 }, {
     tableName: 'Contas'
 });

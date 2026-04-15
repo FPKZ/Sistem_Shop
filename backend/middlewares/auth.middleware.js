@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { Conta } from "../database/models/index.js";
 
 /**
  * Middleware Fastify de autenticação JWT.
@@ -21,6 +22,14 @@ export async function authMiddleware(request, reply) {
 
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
+    
+    // Verificação de segurança: Invalidação de token via versão
+    const userDb = await Conta.findByPk(decoded.id, { attributes: ['id', 'tokenVersion'] });
+    
+    if (!userDb || userDb.tokenVersion !== decoded.tokenVersion) {
+      return reply.code(401).send({ ok: false, error: "Sessão inválida. Por favor, faça login novamente." });
+    }
+
     request.user = decoded; // disponibiliza o usuário decodificado na requisição
   } catch (err) {
     if (err.name === "TokenExpiredError") {

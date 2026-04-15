@@ -17,7 +17,7 @@ const SENHA_PADRAO_RESET = "mudar123";
 export async function autenticar(email, senha) {
   const conta = await Conta.findOne({ 
     where: { email }, 
-    attributes: ["id", "email", "nome", "img", "cargo", "senha"] 
+    attributes: ["id", "email", "nome", "img", "cargo", "senha", "tokenVersion"] 
   });
 
   if (!conta) {
@@ -35,19 +35,19 @@ export async function autenticar(email, senha) {
 
   // Converter para objeto simples e remover a senha antes de gerar o token e retornar
   const contaData = conta.get({ plain: true });
-  const { id, nome, cargo } = contaData;
+  const { senha: _, ...contaSemSenha } = contaData;
 
   // Incluir cargo no JWT para que o middleware requireCargo possa validar nas rotas
   const token = jwt.sign(
-    { id, nome, cargo },
+    contaSemSenha,
     env.JWT_SECRET,
     { expiresIn: "4h" }
   );
 
-  let permissoes = getPermissoes(cargo);
+  let permissoes = getPermissoes(contaSemSenha.cargo);
   // eslint-disable-next-line no-unused-vars
   permissoes = Object.fromEntries(Object.entries(permissoes).filter(([_,value]) => value === true));
-  return { conta: {id, nome, cargo}, token, permissoes };
+  return { conta: contaSemSenha, token, permissoes };
 }
 
 /**
@@ -81,7 +81,7 @@ export async function resetarSenha(id) {
   }
 
   const senhaHash = await bcrypt.hash(SENHA_PADRAO_RESET, SALT_ROUNDS);
-  await conta.update({ senha: senhaHash });
+  await conta.update({ senha: senhaHash, tokenVersion: (conta.tokenVersion || 0) + 1 });
 
   return { conta, senhaPadrao: SENHA_PADRAO_RESET };
 }
@@ -98,7 +98,7 @@ export async function mudarSenha(id, senhaAtual, novaSenha) {
   if(!validate) throw new Error("Senha atual incorreta")
 
   const novaSenhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS)
-  await conta.update({ senha: novaSenhaHash })
+  await conta.update({ senha: novaSenhaHash, tokenVersion: (conta.tokenVersion || 0) + 1 })
 
   return { messager: "Senha alterada com sucesso!" };
 }
