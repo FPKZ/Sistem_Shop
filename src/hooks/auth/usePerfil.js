@@ -122,6 +122,14 @@ export function usePerfil() {
     }
   };
 
+  const handleCancelEdit = async () => {
+    setEdit(false);
+    if (perfilForm.formValue.img !== user.img) {
+      await API.deleteImagem(perfilForm.formValue.img);
+      perfilForm.resetForm();
+    }
+  }
+
   const handlePasswordCancel = () => {
     passwordForm.resetForm();
     setOpenPassword(false);
@@ -142,5 +150,6 @@ export function usePerfil() {
     openPassword,
     setOpenPassword,
     handlePasswordCancel,
+    handleCancelEdit,
   };
 }

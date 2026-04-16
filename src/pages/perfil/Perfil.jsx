@@ -32,6 +32,7 @@ export default function PerfilPage() {
     openPassword,
     setOpenPassword,
     handlePasswordCancel,
+    handleCancelEdit,
   } = usePerfil();
 
   // O preview agora é simples pois o form recebe URLs do back imediatamente pós-recorte
@@ -125,7 +126,7 @@ export default function PerfilPage() {
                     size="sm"
                     variant=""
                     className="btn-roxo-secondary"
-                    onClick={() => setEdit(false)}>
+                    onClick={handleCancelEdit}>
                     Cancelar
                   </Button>
                   <Button
