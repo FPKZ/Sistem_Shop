@@ -30,7 +30,7 @@ export async function authMiddleware(request, reply) {
     if (!userDb || userDb.tokenVersion !== decoded.tokenVersion) {
       return reply.code(401).send({ ok: false, error: "Sessão inválida. Por favor, faça login novamente." });
     }
-    console.log(decoded)
+    
     request.user = decoded; // disponibiliza o usuário decodificado na requisição
   } catch (err) {
     if (err.name === "TokenExpiredError") {
