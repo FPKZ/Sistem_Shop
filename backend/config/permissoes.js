@@ -69,7 +69,7 @@ export const PERMISSOES = {
   },
   vendedor: {
     // Usuários
-    verUsuarios:          true,
+    verUsuarios:          false,
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
     // Cadastro
