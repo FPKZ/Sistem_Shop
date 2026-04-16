@@ -53,7 +53,7 @@ export async function expirarReservas() {
  * @returns {Promise<Venda>}
  * @throws {Error} com campos `statusCode` e `message` para erros esperados
  */
-export async function criarVenda(data) {
+export async function criarVenda(data, vendedor_id) {
   const { itensVendidos, reservar, cliente_id, notaVenda } = data;
 
   if (!itensVendidos?.length) {
@@ -108,6 +108,8 @@ export async function criarVenda(data) {
     await ItemReservado.destroy({ where: { itemEstoque_id: itensEstoqueIds } });
     data.status = calcularStatusVenda(notaVenda);
   }
+  
+  data.vendedor_id = vendedor_id;
 
   const novaVenda = await Venda.create(data, {
     include: [
