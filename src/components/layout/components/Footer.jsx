@@ -11,7 +11,7 @@ export default function Footer() {
       id="footer"
       className="bg-[#710c85] text-white py-5 mt-auto"
     >
-      <div className="container">
+      <div className="container-fluid">
         <div className="row g-4">
           <div className="col-12 col-md-4 text-center text-md-start">
             <h5 className="fw-bold mb-3">Sistem Shop</h5>
