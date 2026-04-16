@@ -37,6 +37,9 @@ ItemVendido.belongsTo(ItemEstoque, {
 Venda.hasMany(NotaVenda, { foreignKey: "venda_id", as: "notaVenda" });
 NotaVenda.belongsTo(Venda, { foreignKey: "venda_id", as: "venda" });
 
+Venda.belongsTo(Conta, { foreignKey: "vendedor_id", as: "vendedor" });
+Conta.hasMany(Venda, { foreignKey: "vendedor_id", as: "vendas" });
+
 ItemEstoque.hasOne(ItemReservado, {
   foreignKey: "itemEstoque_id",
   as: "detalheReserva",
