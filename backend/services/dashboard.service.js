@@ -107,7 +107,6 @@ function alertasEstoqueBaixo(itensEstoque) {
  * @returns {object[]}
  */
 function alertasNotasVencendo(todasNotas) {
-  console.log("Notas recebidas do banco: ", todasNotas)
   return todasNotas
     .map((nota) => ({
       id:             nota.id,
