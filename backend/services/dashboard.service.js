@@ -107,6 +107,7 @@ function alertasEstoqueBaixo(itensEstoque) {
  * @returns {object[]}
  */
 function alertasNotasVencendo(todasNotas) {
+  console.log("Notas recebidas do banco: ", todasNotas)
   return todasNotas
     .map((nota) => ({
       id:             nota.id,
@@ -115,6 +116,7 @@ function alertasNotasVencendo(todasNotas) {
       valor:          nota.valor_total,
       data_vencimento: nota.data_vencimento,
       diasParaVencer: diasAte(nota.data_vencimento),
+      status:         nota.status
     }))
     .filter((n) => n.diasParaVencer <= DIAS_ALERTA_VENCIMENTO)
     .sort((a, b) => a.diasParaVencer - b.diasParaVencer);
@@ -174,8 +176,11 @@ export async function gerarDashboard(user) {
         },
       }),
       Nota.findAll({
-        where: { status: "pendente" },
-        include: [{ model: ItemEstoque, as: "itensNota" }],
+        where: { 
+          status: { 
+            [Op.in]: ["pendente", "vencido"] 
+          } 
+        },
       })
     );
   }
