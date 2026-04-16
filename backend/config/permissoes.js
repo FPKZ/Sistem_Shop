@@ -7,6 +7,7 @@
 export const PERMISSOES = {
   admin: {
     // Usuários
+    verUsuarios:          true,
     gerenciarUsuarios:    true,
     aprovarSolicitacoes:  true,
     // Cadastro
@@ -37,6 +38,7 @@ export const PERMISSOES = {
   },
   gerente: {
     // Usuários
+    verUsuarios:          false,
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
     // Cadastro
@@ -67,6 +69,7 @@ export const PERMISSOES = {
   },
   vendedor: {
     // Usuários
+    verUsuarios:          true,
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
     // Cadastro
