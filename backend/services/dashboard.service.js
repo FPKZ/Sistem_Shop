@@ -124,7 +124,7 @@ function alertasNotasVencendo(todasNotas) {
  * Busca e consolida todos os dados do dashboard.
  * @returns {Promise<object>}
  */
-export async function gerarDashboard() {
+export async function gerarDashboard(user) {
   const trintaDiasAtras = new Date();
   trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
 
@@ -132,22 +132,39 @@ export async function gerarDashboard() {
   const umAnoAtras = new Date();
   umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
 
-  const includeItensVendidos = {
-    model: ItemVendido,
-    as: "itensVendidos",
-    include: [{ model: ItemEstoque, as: "itemEstoque" }],
+  const isVendedor = user.cargo === "vendedor";
+
+  // 1. Configurações Base
+  const configVendasRecentes = {
+    where: { data_venda: { [Op.gte]: trintaDiasAtras } },
+    include: [{
+      model: ItemVendido,
+      as: "itensVendidos",
+      include: [{ model: ItemEstoque, as: "itemEstoque" }],
+    }],
   };
 
-  const [vendasRecentes, todasVendas, notasRecentes, todasNotas, todosItensEstoque] =
-    await Promise.all([
-      Venda.findAll({
-        where: { data_venda: { [Op.gte]: trintaDiasAtras } },
-        include: [includeItensVendidos],
-      }),
-      Venda.findAll({
-        where: { data_venda: { [Op.gte]: umAnoAtras } },
-        include: [includeItensVendidos],
-      }),
+  const configVendasTotal = { ...configVendasRecentes, where: { data_venda: { [Op.gte]: umAnoAtras } } };
+
+  // 2. Aplica filtro de vendedor se necessário
+  if (isVendedor) {
+    configVendasRecentes.where.vendedor_id = user.id;
+    configVendasTotal.where.vendedor_id = user.id;
+  }
+
+  // 3. Montagem do array de Promises Dinâmico
+  const promises = [
+    Venda.findAll(configVendasRecentes),
+    Venda.findAll(configVendasTotal),
+    ItemEstoque.findAll({
+      where: { status: "Disponivel" },
+      include: [{ model: Produto, as: "produto" }],
+    }),
+  ];
+
+  // Adiciona as queries de Nota apenas se NÃO for vendedor
+  if (!isVendedor) {
+    promises.push(
       Nota.findAll({
         where: {
           [Op.or]: [
@@ -159,17 +176,17 @@ export async function gerarDashboard() {
       Nota.findAll({
         where: { status: "pendente" },
         include: [{ model: ItemEstoque, as: "itensNota" }],
-      }),
-      ItemEstoque.findAll({
-        where: { status: "Disponivel" },
-        include: [{ model: Produto, as: "produto" }],
-      }),
-    ]);
+      })
+    );
+  }
+
+  const [vendasRecentes, todasVendas, todosItensEstoque, notasRecentes, todasNotas] =
+    await Promise.all(promises);
 
   return {
     stats:          calcularStats(todasVendas),
-    chartData:      montarChartData(vendasRecentes, notasRecentes),
+    chartData:      montarChartData(vendasRecentes, notasRecentes || []),
     estoqueBaixo:   alertasEstoqueBaixo(todosItensEstoque),
-    notasVencendo:  alertasNotasVencendo(todasNotas),
+    notasVencendo:  !isVendedor ? alertasNotasVencendo(todasNotas) : [],
   };
 }
