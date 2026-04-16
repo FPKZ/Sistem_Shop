@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import { Conta } from "../database/models/index.js";
+import { getPermissoes } from "../config/permissoes.js";
 
 /**
  * Middleware Fastify de autenticação JWT.
@@ -29,7 +30,7 @@ export async function authMiddleware(request, reply) {
     if (!userDb || userDb.tokenVersion !== decoded.tokenVersion) {
       return reply.code(401).send({ ok: false, error: "Sessão inválida. Por favor, faça login novamente." });
     }
-
+    console.log(decoded)
     request.user = decoded; // disponibiliza o usuário decodificado na requisição
   } catch (err) {
     if (err.name === "TokenExpiredError") {
@@ -57,6 +58,29 @@ export function requireCargo(...cargos) {
       return reply.code(403).send({
         ok: false,
         error: `Acesso negado. Apenas ${cargos.join(" ou ")} pode executar esta ação.`,
+      });
+    }
+  };
+}
+
+/**
+ * Middleware factory de autorização por permissão.
+ * Verifica se o usuário logado tem a permissão necessária para acessar a rota.
+ * Deve ser usado APÓS o authMiddleware (que popula request.user).
+ *
+ * @param {...string} permissoes - Permissões necessárias (ex: "cadastrarProduto", "verDashboard")
+ * @returns {Function} Middleware do Fastify
+ *
+ * @example
+ * fastify.delete("/rota", { preHandler: [authMiddleware, requirePermissao("cadastrarProduto")] }, handler)
+ */
+export function requirePermissao(...permissoes) {
+  return async function (request, reply) {
+    const permissoesUsuario = getPermissoes(request.user?.cargo);
+    if (!permissoesUsuario || !permissoes.every((permissao) => permissoesUsuario[permissao])) {
+      return reply.code(403).send({
+        ok: false,
+        error: `Acesso negado.`,
       });
     }
   };

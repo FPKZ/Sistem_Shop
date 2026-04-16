@@ -58,9 +58,12 @@ export const PERMISSOES = {
     // Notas
     gerenciarNotas:       false,
     // Dashboard
-    verDashboard:         false,
+    verDashboard:         true,
     // Clientes
     gerenciarClientes:    false,
+    cadastrarCliente:     true,
+    editarCliente:        false,
+    deletarCliente:       false,
   },
 };
 
