@@ -81,8 +81,9 @@ export const PERMISSOES = {
     deletarProduto:       false,
     // Vendas
     realizarVendas:       true,
-    cancelarVendas:       false,
+    cancelarVendas:       true,
     verVendas:            true,
+    realizarDevolução:    false,
     realizarExtorno:      false,
     // Notas
     verNotas:             false,
