@@ -157,7 +157,7 @@ export default function NovaVenda() {
               : "Venda finalizada com sucesso!",
           "success",
         );
-        navigate("/vendas");
+        navigate("/painel/vendas");
       } else {
         showToast(response.message || "Erro ao processar venda!", "error");
       }
