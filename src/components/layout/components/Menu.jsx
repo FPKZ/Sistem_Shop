@@ -33,21 +33,25 @@ const Menu = React.memo(({menuExpand, setMenuExpand , mobile}) => {
         {mobile && (
           <ItenMenu icon="list" onClick={() => menuExpand ? setMenuExpand(false) : setMenuExpand(true)}>Menu</ItenMenu>
         )}
-        <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/painel`)}>Inicio</ItenMenu>
-        <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/painel/vendas`)}>Vendas</ItenMenu>
-        {pode("cadastrarProduto") && (
+        {pode("verDashboard") && (
+          <ItenMenu mobile={mobile} icon="house-fill" onClick={() => handleNavigate(`/painel`)}>Inicio</ItenMenu>
+        )}
+        {pode("verVendas") && (
+          <ItenMenu mobile={mobile} icon="bag-fill" onClick={() => handleNavigate(`/painel/vendas`)}>Vendas</ItenMenu>
+        )}
+        {pode("verCadastros") && (
           <ItenMenu mobile={mobile} icon="plus-square-fill" onClick={() => handleNavigate(`/painel/cadastro`)}>Cadastro</ItenMenu>
         )}
-        {pode("cadastrarProduto") && (
+        {pode("verProdutos") && (
           <ItenMenu mobile={mobile} icon="grid-fill" onClick={() => handleNavigate(`/painel/produtos`)}>Produtos</ItenMenu>
         )}
-        {pode("gerenciarClientes") && (
+        {pode("verClientes") && (
           <ItenMenu mobile={mobile} icon="journal-bookmark-fill" onClick={() => handleNavigate(`/painel/clientes`)}>Clientes</ItenMenu>
         )}
-        {pode("gerenciarNotas") && (
+        {pode("verNotas") && (
           <ItenMenu mobile={mobile} icon="upc" onClick={() => handleNavigate(`/painel/notas`)}>Notas</ItenMenu>
         )}
-        {pode("gerenciarUsuarios") && (
+        {pode("verUsuarios") && (
           <ItenMenu mobile={mobile} icon="people-fill" onClick={() => handleNavigate(`/painel/usuarios`)}>Usuários</ItenMenu>
         )}
       </ul>

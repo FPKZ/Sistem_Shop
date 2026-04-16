@@ -3,6 +3,7 @@ import API from "@services/index";
 import util from "@services/utils.js";
 import useInfoProdutos from "@hooks/produtos/useInfoProdutos";
 import useEditarProduto from "@hooks/produtos/useEditarProduto";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 import ImageCropModal from "@components/modal/ImageCropModal";
 import GerenciarImagensModal from "@components/modal/GerenciarImagensModal";
@@ -45,6 +46,8 @@ export default function InfoProduto() {
     const { id } = useParams();
     const { mobile } = useOutletContext();
     const { data: produto, isLoading, error } = API.getProdutos({ id });
+
+    const { pode } = usePermissoes();
 
     // console.log(`id: ${id} | data:`, produto, ` | isLoading: ${isLoading} | error: ${error}`);
 
@@ -195,40 +198,47 @@ export default function InfoProduto() {
                         <div className="d-flex flex-column flex-md-row gap-3 mb-2 pb-2 border-bottom align-items-center align-items-md-stretch">
                             <Dropdown className="group">
                                 <Dropdown.Toggle
-                                variant="none"
-                                className="bg-light rounded-4 border p-2 shadow-sm position-relative dropdown-toggle-no-caret overflow-hidden"
-                                style={{
-                                    width: sizeImg,
-                                    height: sizeImg,
-                                    minWidth: sizeImg,
-                                }}
+                                    disabled={!pode("editarProduto")}
+                                    variant="none"
+                                    className="bg-light rounded-4 border p-2 shadow-sm position-relative dropdown-toggle-no-caret overflow-hidden disabled:opacity-100!"
+                                    style={{
+                                        width: sizeImg,
+                                        height: sizeImg,
+                                        minWidth: sizeImg,
+                                    }}
                                 >
-                                <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300 z-10">
-                                </div>
-                                <div
-                                    className="position-absolute top-[45%] left-[45%] translate-middle m-2 rounded-3 opacity-0 group-hover:opacity-100! transition-all ease-in-out duration-300"
-                                    style={{ zIndex: 10 }}
-                                >
-                                    <Edit size={24} className="text-white/80" />
-                                </div>
-                                <div className="w-100 h-100 position-relative">
-                                    <img
-                                    className={`w-100 h-100 rounded-3 object-fit-cover transition-all duration-300 ${isUpdating ? 'opacity-50 blur-sm' : ''}`}
-                                    src={
-                                        produto.img
-                                        ? produto.img
-                                        : "assets/tube-spinner.svg"
-                                    }
-                                    alt={produto.nome}
-                                    />
-                                    {isUpdating && (
-                                    <div className="position-absolute top-50 start-50 translate-middle">
-                                        <div className="spinner-border text-roxo" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
+                                    {pode("editarProduto") ? (
+                                        <>
+                                            <div className="bg-stone-400 w-100 h-100 position-absolute top-0 end-0 rounded-3 opacity-0 group-hover:opacity-30! transition-all ease-in-out duration-300 z-10">
+                                            </div>
+                                            <div
+                                                className="position-absolute top-[45%] left-[45%] translate-middle m-2 rounded-3 opacity-0 group-hover:opacity-100! transition-all ease-in-out duration-300"
+                                                style={{ zIndex: 10 }}
+                                            >
+                                                <Edit size={24} className="text-white/80" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="hidden"></div>
                                     )}
-                                </div>
+                                    <div className="w-100 h-100 position-relative">
+                                        <img
+                                        className={`w-100 h-100 rounded-3 object-fit-cover transition-all duration-300 ${isUpdating ? 'opacity-50 blur-sm' : ''}`}
+                                        src={
+                                            produto.img
+                                            ? produto.img
+                                            : "assets/tube-spinner.svg"
+                                        }
+                                        alt={produto.nome}
+                                        />
+                                        {isUpdating && (
+                                        <div className="position-absolute top-50 start-50 translate-middle">
+                                            <div className="spinner-border text-roxo" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        )}
+                                    </div>
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu className="p-0 shadow-sm" style={{ width: '320px' }}>
                                 <div className="d-flex flex-wrap gap-1 p-0 custom-scrollbar" style={{ maxHeight: '300px', overflowY: 'auto', justifyContent: 'center' }}>
@@ -277,27 +287,31 @@ export default function InfoProduto() {
                                     </p>
                                 </div>
                                 <div className="d-flex w-100 md:w-auto! md:flex-col! justify-center! gap-2 mb-2">
-                                    <Button
-                                        variant="roxo"
-                                        className="d-flex align-items-center gap-2 px-4 shadow-sm"
-                                        onClick={() => setShowEditProduto(true)}
-                                    >
-                                        <Edit size={18} /> Editar
-                                    </Button>
-                                    <Button
-                                        variant="outline-danger"
-                                        className="d-flex align-items-center gap-2 px-4"
-                                        onClick={() => deletarProduto(itemEstoque.id)}
-                                    >
-                                        <Trash2 size={18} /> Excluir
-                                    </Button>
+                                    {pode("editarProduto") && (
+                                        <Button
+                                            variant="roxo"
+                                            className="d-flex align-items-center gap-2 px-4 shadow-sm"
+                                            onClick={() => setShowEditProduto(true)}
+                                        >
+                                            <Edit size={18} /> Editar
+                                        </Button>
+                                    )}
+                                    {pode("deletarProduto") && (
+                                        <Button
+                                            variant="outline-danger"
+                                            className="d-flex align-items-center gap-2 px-4"
+                                            onClick={() => deletarProduto(itemEstoque.id)}
+                                        >
+                                            <Trash2 size={18} /> Excluir
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
                         {/* Grid de Informações */}
                         
                         <Row className="g-3 position-relative">
-                            {activeTab === "imagens" && !mobile && (
+                            {activeTab === "imagens" && !mobile && pode("editarProduto") && (
                                 <div 
                                     className="position-absolute w-auto top-1 end-2 cursor-pointer d-flex align-items-center gap-1 hover-opacity shadow-sm bg-white p-2 rounded-3 border z-10"
                                     style={{ zIndex: 10, cursor: "pointer" }}
