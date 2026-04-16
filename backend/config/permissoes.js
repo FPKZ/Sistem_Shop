@@ -9,7 +9,10 @@ export const PERMISSOES = {
     // Usuários
     gerenciarUsuarios:    true,
     aprovarSolicitacoes:  true,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     true,
     editarProduto:        true,
     deletarProduto:       true,
@@ -17,37 +20,59 @@ export const PERMISSOES = {
     realizarVendas:       true,
     cancelarVendas:       true,
     verVendas:            true,
+    realizarExtorno:      true,
     // Notas
-    gerenciarNotas:       true,
+    verNotas:             true,
+    cadastrarNotas:       true,
+    editarNotas:          true,
+    deletarNotas:         true,
     // Dashboard
     verDashboard:         true,
     // Clientes
     gerenciarClientes:    true,
+    verClientes:          true,
+    cadastrarCliente:     true,
+    editarCliente:        true,
+    deletarCliente:       true,
   },
   gerente: {
     // Usuários
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     true,
     editarProduto:        true,
-    deletarProduto:       true,
+    deletarProduto:       false,
     // Vendas
     realizarVendas:       true,
     cancelarVendas:       true,
     verVendas:            true,
+    realizarExtorno:      true,
     // Notas
-    gerenciarNotas:       true,
+    verNotas:             true,
+    cadastrarNotas:       true,
+    editarNotas:          false,
+    deletarNotas:         false,
     // Dashboard
     verDashboard:         true,
     // Clientes
     gerenciarClientes:    true,
+    verClientes:          true,
+    cadastrarCliente:     true,
+    editarCliente:        true,
+    deletarCliente:       true,
   },
   vendedor: {
     // Usuários
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     false,
     editarProduto:        false,
     deletarProduto:       false,
@@ -55,12 +80,17 @@ export const PERMISSOES = {
     realizarVendas:       true,
     cancelarVendas:       false,
     verVendas:            true,
+    realizarExtorno:      false,
     // Notas
-    gerenciarNotas:       false,
+    verNotas:             false,
+    cadastrarNotas:       false,
+    editarNotas:          false,
+    deletarNotas:         false,
     // Dashboard
     verDashboard:         true,
     // Clientes
     gerenciarClientes:    false,
+    verClientes:          true,
     cadastrarCliente:     true,
     editarCliente:        false,
     deletarCliente:       false,
