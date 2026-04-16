@@ -121,7 +121,7 @@ export default async function vendaRoutes(fastify) {
     }
   });
 
-  fastify.put("/venda/:id/finalizar", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/venda/finalizar/:id", { preHandler: authMiddleware }, async (request, reply) => {
     try{
       const user = request.user
       
@@ -154,7 +154,7 @@ export default async function vendaRoutes(fastify) {
     return reply.code(204).send();
   });
 
-  fastify.put("/venda/:id/estorno", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/venda/estorno/:id", { preHandler: authMiddleware }, async (request, reply) => {
     try{
       const user = request.user;
       await estornarVenda(request.params.id, user);
@@ -164,7 +164,7 @@ export default async function vendaRoutes(fastify) {
     }
   });
 
-  fastify.put("/venda/:id/devolucao", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.put("/venda/devolucao/:id", { preHandler: authMiddleware }, async (request, reply) => {
     try{
       const user = request.user;
       const novaVenda = await devolverItens(request.params.id, request.body, user);

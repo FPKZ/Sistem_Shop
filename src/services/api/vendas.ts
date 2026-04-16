@@ -34,19 +34,19 @@ export async function getVendasDashboard() {
 
 export async function putFinalizarVenda(id: number | string, data: Partial<VendaPayload>): Promise<ApiResponse<{ venda: Venda }>> {
   try {
-    return await api.put(`/venda/${id}/finalizar`, data);
+    return await api.put(`/venda/finalizar/${id}`, data);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
 export async function putEstorno(id: number | string): Promise<ApiResponse<{ venda: Venda }>> {
   try {
-    return await api.put(`/venda/${id}/estorno`, {});
+    return await api.put(`/venda/estorno/${id}`, {});
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
 export async function putDevolucao(id: number | string, data: Partial<VendaPayload>): Promise<ApiResponse<{ venda: Venda }>> {
   try {
-    return await api.put(`/venda/${id}/devolucao`, data);
+    return await api.put(`/venda/devolucao/${id}`, data);
   } catch (err) { console.error("Erro na API", err); throw err; }
 }
 
