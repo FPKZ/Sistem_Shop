@@ -65,7 +65,7 @@ export const PERMISSOES = {
     verClientes:          true,
     cadastrarCliente:     true,
     editarCliente:        true,
-    deletarCliente:       true,
+    deletarCliente:       false,
   },
   vendedor: {
     // Usuários
