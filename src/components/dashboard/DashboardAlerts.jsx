@@ -42,7 +42,7 @@ export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
 
       {/* Notas Vencendo */}
       {
-        pode("gerenciarNotas") && (
+        pode("verNotas") && (
           <Col xs={12} lg={6} className="max-h-150">
             <Card className="shadow-sm border-0 h-100 overflow-hidden">
               <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
