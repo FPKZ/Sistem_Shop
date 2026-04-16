@@ -83,7 +83,7 @@ export default async function vendaRoutes(fastify) {
         order: [["data_venda", "DESC"]],
       }
 
-      if(user.cargo !== "admin"){
+      if(user.cargo === "vendedor"){
         config.where = {
           vendedor_id: user.id,
         }
