@@ -18,7 +18,7 @@ export function usePerfil() {
   // Hook para upload e recorte de imagem
   const imageUpload = useImageUpload(async (file) => {
     if (file) {
-      const response = await handleRequest(() => API.postImagens([file]));
+      const response = await API.postImagens([file]);
       if (response?.ok && response.data?.[0]) {
         perfilForm.handleChange("img", response.data[0]);
       }
@@ -59,6 +59,7 @@ export function usePerfil() {
         "success",
       );
       queryClient.invalidateQueries({ queryKey: ["perfil"] });
+      setEdit(false);
     },
     onError: (err) => {
       showToast(err?.message || "Erro ao atualizar perfil.", "error");
@@ -123,11 +124,16 @@ export function usePerfil() {
   };
 
   const handleCancelEdit = async () => {
-    setEdit(false);
-    if (perfilForm.formValue.img !== user.img) {
-      await API.deleteImagem(perfilForm.formValue.img);
-      perfilForm.resetForm();
+    // Se houve upload de imagem mas não salvou as alterações do perfil, deletamos a imagem órfã do servidor
+    if (perfilForm.formValue.img !== user.img && perfilForm.formValue.img?.startsWith('http')) {
+      try {
+        await API.deleteImagem(perfilForm.formValue.img);
+      } catch (err) {
+        console.error("Erro ao limpar imagem órfã no cancelamento:", err);
+      }
     }
+    perfilForm.resetForm(); 
+    setEdit(false);
   }
 
   const handlePasswordCancel = () => {
