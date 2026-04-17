@@ -34,17 +34,20 @@ export default function TabelaVendas({ vendas, onView }) {
           Cliente
         </Col>
         <Col md={2} className="text-secondary small text-uppercase fw-bold">
+          Vendedor
+        </Col>
+        <Col md={2} className="text-secondary small text-uppercase fw-bold text-center">
           Data
         </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold">
+        <Col md={2} className="text-secondary small text-uppercase fw-bold text-center">
           Valor
         </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold">
+        <Col md={1} className="text-secondary small text-uppercase fw-bold px-0 text-center">
           Status
         </Col>
         <Col
-          md={2}
-          className="text-secondary small text-uppercase fw-bold text-end"
+          md={1}
+          className="text-secondary small text-uppercase fw-bold text-end px-1"
         >
           Ações
         </Col>
@@ -55,7 +58,7 @@ export default function TabelaVendas({ vendas, onView }) {
         vendas.map((venda) => (
           <Row
             key={venda.id}
-            className="tabela-vendas-row align-items-center py-3 px-2 px-md-3 mb-2 border rounded g-2 hover:bg-zinc-100 transition cursor-pointer"
+            className="tabela-vendas-row align-items-center py-3 px-2 px-md-2 mb-2 border rounded g-2 hover:bg-zinc-100 transition cursor-pointer"
             onClick={() => onView(venda)}
           >
             {/* ID */}
@@ -78,11 +81,19 @@ export default function TabelaVendas({ vendas, onView }) {
               <span>{venda.cliente?.nome || "Cliente N/A"}</span>
             </Col>
 
+            {/* Vendedor */}
+            <Col xs={10} md={2} className="my-2 my-md-0 order-first order-md-0">
+              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
+                Vendedor:
+              </span>
+              <span>{venda.vendedor?.nome || "Vendedor N/A"}</span>
+            </Col>
+
             {/* Data */}
             <Col
               xs={4}
               md={2}
-              className="my-2 my-md-0 order-3 order-md-0 text-center text-md-start"
+              className="my-2 my-md-0 order-3 order-md-0 text-center"
             >
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Data:
@@ -94,7 +105,7 @@ export default function TabelaVendas({ vendas, onView }) {
             <Col
               xs={4}
               md={2}
-              className="my-2 my-md-0 order-4 order-md-0 text-end text-md-start"
+              className="my-2 my-md-0 order-4 order-md-0 text-end text-md-center"
             >
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Valor:
@@ -105,7 +116,7 @@ export default function TabelaVendas({ vendas, onView }) {
             </Col>
 
             {/* Status */}
-            <Col xs={4} md={2} className="my-2 my-md-0 order-2 order-md-0">
+            <Col xs={4} md={1} className="my-2 my-md-0 order-2 order-md-0 text-center">
               <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
                 Status:
               </span>
@@ -117,8 +128,8 @@ export default function TabelaVendas({ vendas, onView }) {
             {/* Ações */}
             <Col
               xs={12}
-              md={2}
-              className="my-2 my-md-0 text-md-end order-last order-md-0 d-flex justify-content-md-end"
+              md={1}
+              className="my-2 my-md-0 text-md-end order-last order-md-0 d-flex justify-content-md-end px-2"
             >
               <Dropdown onClick={(e) => e.stopPropagation()}>
                 <Dropdown.Toggle

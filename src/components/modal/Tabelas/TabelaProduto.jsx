@@ -50,7 +50,7 @@ export default function TabelaProdutos({
           )}
         </Row>
 
-        {produto.itemEstoque.length === 0 ? (
+        {!produto?.itemEstoque || produto.itemEstoque.length === 0 ? (
           <div className="text-center dashed d-flex flex-column align-items-center justify-content-center h-full!">
             <Package size={48} className="mb-2 opacity-60" />
             <p className="text-muted mb-0">Nenhum item cadastrado!</p>

@@ -1,0 +1,114 @@
+/* ============================================
+   NOVA VENDA — CSS Mínimo / Específico
+   Usar classes utilitárias (Tailwind/globais) sempre que possível.
+   ============================================ */
+
+/* --- Mobile Fixed Bottom Bar (com transição suave ao rolar) --- */
+.venda-mobile-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  background: #fff;
+  border-top: 1px solid #ede8f7;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4px 24px rgba(111, 66, 193, 0.12);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.35s ease;
+}
+
+.venda-mobile-bar.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Resumo (pseudo-elemento da curva do header no mobile) --- */
+.venda-resumo-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 32px;
+  background: linear-gradient(145deg, #1a1030, #2d1d50);
+  clip-path: ellipse(60% 100% at 50% 100%);
+  top: -28px;
+}
+
+/* --- Override de forms para escuro (no resumo) --- */
+.venda-pagamento-form .form-control,
+.venda-pagamento-form .form-select {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+  border-radius: 8px;
+}
+
+.venda-desconto-input {
+  background-color: transparent !important;
+  border: none!important;
+  color: #8a8a8a !important;
+  padding-right: 0;
+}
+
+.venda-pagamento-form .form-control::placeholder,
+.venda-desconto-input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+.venda-pagamento-form .form-control:focus,
+.venda-pagamento-form .form-select:focus,
+.venda-desconto-input:focus {
+  background: rgba(255,255,255,0.15) !important;
+  border-color: rgba(156, 114, 232, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(111,66,193,0.2) !important;
+  color: #fff !important;
+  padding-right: 0.5rem;
+}
+
+.venda-pagamento-form option {
+  background: #2d1d50;
+  color: #fff;
+}
+
+/* Animação do Form */
+.venda-pagamento-form {
+  animation: slideInUp 0.25s ease-out;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Desktop layout (Remove curva, adiciona sticky) */
+@media (min-width: 992px) {
+  .venda-resumo-section {
+    position: sticky;
+    top: 20px;
+  }
+
+  .venda-resumo-section::before {
+    display: none;
+  }
+}
+
+/* Scrollbar discreta na lista de produtos (desktop) */
+@media (min-width: 992px) {
+  .lg\:overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+  .lg\:overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .lg\:overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #dcc8ff;
+    border-radius: 4px;
+  }
+  .lg\:overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #9b72e8;
+  }
+}
