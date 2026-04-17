@@ -1,5 +1,74 @@
-import { Produto, ItemEstoque } from "../database/models/index.js";
+import {
+  Produto,
+  ItemEstoque,
+  Categoria,
+  Nota
+} from "../database/models/index.js";
+import { Op } from "sequelize";
 import { deletarImagem } from "./img.service.js";
+
+
+const INCLUDE_PRODUTO_COM_CATEGORIA = [
+  { model: Categoria, as: "categoria" },
+];
+
+const INCLUDE_ITEM_ESTOQUE_COMPLETO = [
+  { model: Categoria, as: "categoria" },
+  { model: ItemEstoque, as: "itemEstoque", include: [{ model: Nota, as: "nota" }] },
+];
+
+const INCLUDE_ITEM_COM_PRODUTO = [
+  { model: Nota, as: "nota" },
+  { model: Produto, as: "produto", include: [{ model: Categoria, as: "categoria" }] },
+];
+
+/**
+ * Buscar produtos
+ */
+export async function buscarProdutos(query) {
+  const { itens, nome, id } = query;
+
+    if (id) {
+      const produto = await Produto.findByPk(id, { include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
+      return produto;
+    }
+
+    if (itens === "all") {
+      const produtos = await ItemEstoque.findAll({ include: INCLUDE_ITEM_COM_PRODUTO });
+      return produtos;
+    }
+
+    if (itens === "vendidos") {
+      const produtos = await ItemEstoque.findAll({ where: { status: "Vendido" }, include: INCLUDE_ITEM_COM_PRODUTO });
+      return produtos;
+    }
+
+    if (itens === "estoque") {
+      const produtos = await Produto.findAll({
+        include: [
+          ...INCLUDE_PRODUTO_COM_CATEGORIA,
+          { model: ItemEstoque, as: "itemEstoque", where: { status: "Disponivel" } },
+        ],
+      });
+      return produtos;
+    }
+
+    if (itens === "reservado") {
+      const produtos = await ItemEstoque.findAll({ where: { status: "Reservado" }, include: INCLUDE_ITEM_COM_PRODUTO });
+      return produtos;
+    }
+
+    if (itens === "none") {
+      const produtos = await Produto.findAll({ include : INCLUDE_PRODUTO_COM_CATEGORIA});
+      console.log(produtos)
+      return produtos
+    }
+
+    const where = nome && nome !== " " ? { nome: { [Op.like]: `%${nome}%` } } : {};
+    const produtos = await Produto.findAll({ where, include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
+    return produtos
+}
+
 
 /**
  * Cadastra ou atualiza um produto e seus itens de estoque.
