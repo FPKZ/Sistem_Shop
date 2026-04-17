@@ -30,7 +30,7 @@ export default function Footer() {
             <h5 className="fw-bold mb-3">Contato</h5>
             <div className="small opacity-75">
               <p className="mb-2">WhatsApp: {utils.formatPhone(number)}</p>
-              <p className="mb-2">Email: suporte@sistemshop.com.br</p>
+              <p className="mb-2">Email: {import.meta.env.VITE_EMAIL_SUPORTE}</p>
               <p className="mb-0">Atendimento: Seg-Sex, 08h às 18h</p>
             </div>
           </div>
@@ -38,7 +38,7 @@ export default function Footer() {
             <h5 className="fw-bold mb-3">Desenvolvido por</h5>
             <div className="small opacity-75">
               <p className="mb-2">Luis Felipe dos Santos</p>
-              <p className="mb-2">Email: felipedosantos.tr@gmail.com</p>
+              <p className="mb-2">Email: {import.meta.env.VITE_EMAIL_DESENVOLVEDOR}</p>
               <p className="mb-0">Desenvolvedor Full Stack</p>
             </div>
           </div>
