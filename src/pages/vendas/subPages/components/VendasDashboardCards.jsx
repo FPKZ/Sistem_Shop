@@ -28,7 +28,7 @@ export function VendasDashboardCards() {
       </Col>
       <Col xs={6} sm={4}>
         <Card
-          className={`h-100 border-0 shadow-sm ${pode("realizarDevolução") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
+          className={`h-100 border-0 shadow-sm ${pode("realizarExtorno") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
           style={{ borderLeft: "4px solid #dc3545" }}
           onClick={() => pode("realizarExtorno") && navigate("Extorno")}
         >
@@ -43,9 +43,9 @@ export function VendasDashboardCards() {
       </Col>
       <Col xs={6} sm={4}>
         <Card
-          className={`h-100 border-0 shadow-sm ${pode("realizarDevolução") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
+          className={`h-100 border-0 shadow-sm ${pode("realizarDevolucao") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
           style={{ borderLeft: "4px solid #ffc107" }}
-          onClick={() => pode("realizarDevolução") && navigate("Devolucao")}
+          onClick={() => pode("realizarDevolucao") && navigate("Devolucao")}
         >
           <Card.Body className="d-flex align-items-center justify-content-between">
             <div>
