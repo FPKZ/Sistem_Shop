@@ -44,7 +44,7 @@ export default function TelaVendas() {
   }
 
   return (
-    <>
+    <div className="p-2 pt-3 p-md-4">
       <div className="mb-4">
         <h2 className="fw-bold text-dark">Vendas</h2>
         <span className="text-muted">
@@ -80,6 +80,6 @@ export default function TelaVendas() {
         onHide={() => setShowModal(false)}
         venda={selectedVenda}
       />
-    </>
+    </div>
   );
 }

@@ -53,7 +53,7 @@ function App() {
   }
 
   return (
-    <div className="min-vh-100">
+    <div className="min-vh-100 p-2 pt-3 p-md-4">
       {/* Header do Dashboard */}
       <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>

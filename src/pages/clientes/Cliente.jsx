@@ -67,7 +67,7 @@ function Clientes() {
   if (error) return <div>error</div>;
 
   return (
-    <div className="">
+    <div className="p-2 pt-3 p-md-4">
       <div className="p-0 p-md-4">
         <Card
           className={`border-0 p-0 p-md-3 ${mobile ? "bg-transparent" : "shadow-sm"} rounded-4`}

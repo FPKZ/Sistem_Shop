@@ -63,7 +63,7 @@ export default function Notas() {
   };
 
   return (
-    <Container fluid className="py-4 m-0 px-0">
+    <Container fluid className="p-2 py-3 p-md-4">
       <NotasHeader
         mobile={mobile}
       />

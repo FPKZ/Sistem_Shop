@@ -39,7 +39,7 @@ export default function PerfilPage() {
   const profileImagePreview = perfilData.img || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   return (
-    <Container className="d-flex flex-column gap-4">
+    <Container className="d-flex flex-column gap-4 p-4 pt-3 p-md-4">
       <ImageCropModal 
         visible={imageUpload.showCrop} 
         onClose={imageUpload.handlers.handleCropCancel} 

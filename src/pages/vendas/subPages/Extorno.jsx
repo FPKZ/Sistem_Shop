@@ -83,7 +83,7 @@ export default function Estorno() {
   };
 
   return (
-    <>
+    <div className="p-2 pt-3 p-md-4">
       <div className="mb-4">
         <h2 className="fw-bold text-dark">Estorno de Venda</h2>
         <span className="text-muted">Cancele uma venda realizada</span>
@@ -252,6 +252,6 @@ export default function Estorno() {
           )}
         </Col>
       </Row>
-    </>
+    </div>
   );
 }

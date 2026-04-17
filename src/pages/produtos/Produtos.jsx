@@ -20,7 +20,7 @@ function Produtos() {
   const { pode } = usePermissoes();
 
   return (
-    <div className="p-md-4 h-100 overflow-hidden">
+    <div className="p-2 pt-3 p-md-4 h-100 overflow-hidden">
       <Produto
         produtos={produtos}
         deleteProduto={deleteProduto}

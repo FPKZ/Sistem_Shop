@@ -65,7 +65,7 @@ export default function Layout() {
         mobile={mobile}
       />
       <div id="root-content">
-        <main className="main p-3 pt-md-0 " >
+        <main className="main p-0 pt-md-0 " >
           <Outlet context={ contextValue } />
         </main>
       </div>
