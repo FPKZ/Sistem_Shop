@@ -270,7 +270,7 @@ export default function InfoProduto() {
                             <div className="grow d-flex flex-column md:flex-row! justify-between md:gap-4">
                                 <div className="flex flex-col items-center md:items-start!">
                                     <div className="d-flex align-items-center md:align-items-start! gap-2 mb-2 md:order-2">
-                                        {getStatusBadge(produto.itemEstoque.some((item) => item.status === "Disponivel") ? "Disponivel" : "Esgotado")}
+                                        {getStatusBadge(produto.itemEstoque?.some((item) => item.status === "Disponivel") ? "Disponivel" : "Esgotado")}
                                         <Badge
                                             bg="roxo-subtle"
                                             className="text-roxo px-3 py-2 rounded-pill d-flex align-items-center gap-1"

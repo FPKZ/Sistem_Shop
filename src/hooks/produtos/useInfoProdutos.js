@@ -35,14 +35,15 @@ export default function useInfoProdutos({ visible, tableShow, produto }) {
   // Normaliza o produto para item de estoque quando não há tabela lateral
   useEffect(() => {
     if (visible && !tableShow && produto) {
-      // Se o produto vier do fluxo de nota (objeto com array 'itens'),
-      // normalizamos para que as propriedades do primeiro item sejam acessíveis no nível raiz
+      // Normalização: Tentamos encontrar a lista de itens, seja por 'itemEstoque' (backend) ou 'itens' (legado/fallback)
+      const listaItens = produto.itemEstoque || produto.itens;
+
       if (
-        produto.itens &&
-        Array.isArray(produto.itens) &&
-        produto.itens.length > 0
+        listaItens &&
+        Array.isArray(listaItens) &&
+        listaItens.length > 0
       ) {
-        const itemPrincipal = produto.itens[0];
+        const itemPrincipal = listaItens[0];
         setItemEstoque({
           ...itemPrincipal,
           imgs:      produto.imgs,      // Preserva as imagens do objeto pai
@@ -65,16 +66,17 @@ export default function useInfoProdutos({ visible, tableShow, produto }) {
   // Sincroniza o itemEstoque atual com os dados novos do produto pai (ex: após mutations)
   // Isso evita que a UI mostre dados antigos (como fotos antigas) após uma edição.
   useEffect(() => {
-    if (visible && tableShow && itemEstoque?.id && produto?.itens) {
-      const itemAtualizado = produto.itens.find(i => i.id === itemEstoque.id);
+    const listaItens = produto?.itemEstoque || produto?.itens;
+    if (visible && tableShow && itemEstoque?.id && listaItens) {
+      const itemAtualizado = listaItens.find(i => i.id === itemEstoque.id);
       if (itemAtualizado) {
         setItemEstoque({
           ...itemAtualizado,
-          imgs:      produto.imgs,      // Atualiza com as novas imagens do pai
-          img:       produto.img,       // Atualiza a nova capa do pai
-          nome:      produto.nome,      // Atualiza o nome
-          descricao: produto.descricao, // Atualiza a descrição
-          ...produto,                   // Mantém redundância de dados do pai
+          imgs:      produto.imgs,
+          img:       produto.img,
+          nome:      produto.nome,
+          descricao: produto.descricao,
+          ...produto,
         });
       }
     }
