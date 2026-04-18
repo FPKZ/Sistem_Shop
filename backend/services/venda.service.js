@@ -9,6 +9,62 @@ import {
 import { Op } from "sequelize";
 
 /**
+ *  Dashboard de vendas
+ * 
+ *  @returns {Promise<{stats: Object, chartData: Array<Object>}>}
+ */
+
+export async function DashboardVendas(user){
+  const seteDiasAtras = new Date();
+  seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
+
+  const config = {
+    where: { data_venda: { [Op.gte]: seteDiasAtras } },
+  }
+  const configTodasVendas = {}
+
+  // Se o usuario for vendedor, ele só pode ver suas vendas
+  if (user.cargo === "vendedor") {
+    config.where.vendedor_id = user.id;
+    configTodasVendas.where = { vendedor_id: user.id };
+  }
+
+  const [vendas, todasVendas] = await Promise.all([
+    Venda.findAll(config),
+    Venda.findAll(configTodasVendas),
+  ]);
+
+  const stats = {
+    totalVendas:        todasVendas.filter((v) => v.status !== "cancelada").length,
+    totalReceita:       todasVendas.reduce((acc, v) => ["concluida", "pendente"].includes(v.status) ? acc + (Number(v.valor_total) || 0) : acc, 0),
+    vendasConcluidas:   todasVendas.filter((v) => v.status === "concluida").length,
+    vendasPendentes:    todasVendas.filter((v) => v.status === "pendente").length,
+    devolucoes:         todasVendas.filter((v) => ["devolvida", "estorno"].includes(v.status)).length,
+    pagamentosAtrasados: todasVendas.filter((v) => v.status === "atrasado").length,
+  };
+
+  const chartDataMap = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0];
+    chartDataMap[dateStr] = { name: dateStr, vendas: 0, receita: 0 };
+  }
+
+  vendas.forEach((v) => {
+    const dateStr = new Date(v.data_venda).toISOString().split("T")[0];
+    if (chartDataMap[dateStr]) {
+      chartDataMap[dateStr].vendas += 1;
+      if (["concluida", "pendente"].includes(v.status)) {
+        chartDataMap[dateStr].receita += Number(v.valor_total) || 0;
+      }
+    }
+  });
+
+  return { stats, chartData: Object.values(chartDataMap) };
+}
+
+/**
  * Determina o status final de uma venda com base nas formas de pagamento.
  * Se todas as notas são Promissórias, a venda fica pendente.
  * @param {Array<{ forma_pagamento: string }>} notasVenda
