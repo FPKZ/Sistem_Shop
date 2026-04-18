@@ -1,4 +1,4 @@
-import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto } from "../database/models/index.js";
+import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto, Conta } from "../database/models/index.js";
 import { Op } from "sequelize";
 import {
   expirarReservas,
@@ -11,6 +11,7 @@ import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js"
 
 const INCLUDE_VENDA_COMPLETA = [
   { model: Cliente, as: "cliente" },
+  { model: Conta, as: "vendedor" },
   {
     model: ItemVendido,
     as: "itensVendidos",
@@ -113,8 +114,8 @@ export default async function vendaRoutes(fastify) {
 
   fastify.post("/venda", { preHandler: authMiddleware }, async (request, reply) => {
     try{
-      const { vendedor_id } = request.user;
-      const novaVenda = await criarVenda(request.body, vendedor_id);
+      const { id } = request.user;
+      const novaVenda = await criarVenda(request.body, id);
       return reply.code(201).ok({ novaVenda }, "Venda cadastrada com sucesso!");
     }catch(error){
       return reply.err(error.message, error.statusCode);

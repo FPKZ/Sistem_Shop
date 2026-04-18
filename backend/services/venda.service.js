@@ -110,7 +110,7 @@ export async function criarVenda(data, vendedor_id) {
   }
   
   data.vendedor_id = vendedor_id;
-
+  console.log(data);
   const novaVenda = await Venda.create(data, {
     include: [
       { model: ItemVendido, as: "itensVendidos" },
