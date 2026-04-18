@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   Container,
   Row,
@@ -32,13 +32,14 @@ export default function PerfilPage() {
     openPassword,
     setOpenPassword,
     handlePasswordCancel,
+    handleCancelEdit,
   } = usePerfil();
 
   // O preview agora é simples pois o form recebe URLs do back imediatamente pós-recorte
-  const profileImagePreview = perfilData.img;
+  const profileImagePreview = perfilData.img || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   return (
-    <Container className="d-flex flex-column gap-4">
+    <Container className="d-flex flex-column gap-4 p-4 pt-3 p-md-4">
       <ImageCropModal 
         visible={imageUpload.showCrop} 
         onClose={imageUpload.handlers.handleCropCancel} 
@@ -96,7 +97,7 @@ export default function PerfilPage() {
                     onChange={handlePerfilChange}
                     isInvalid={!!perfilErrors.nome}
                     disabled={!edit}
-                    className={`${edit ? "" : "bg-white! border-white"}`}
+                    className={`${edit ? "" : "bg-white! border-white! cursor-default!"}`}
                   />
                   <Form.Control.Feedback type="invalid">
                     {perfilErrors.nome}
@@ -111,7 +112,7 @@ export default function PerfilPage() {
                     onChange={handlePerfilChange}
                     isInvalid={!!perfilErrors.email}
                     disabled={!edit}
-                    className={`${edit ? "" : "bg-white! border-white"}`}
+                    className={`${edit ? "" : "bg-white! border-white! cursor-default!"}`}
                   />
                   <Form.Control.Feedback type="invalid">
                     {perfilErrors.email}
@@ -125,7 +126,7 @@ export default function PerfilPage() {
                     size="sm"
                     variant=""
                     className="btn-roxo-secondary"
-                    onClick={() => setEdit(false)}>
+                    onClick={handleCancelEdit}>
                     Cancelar
                   </Button>
                   <Button

@@ -7,9 +7,13 @@
 export const PERMISSOES = {
   admin: {
     // Usuários
+    verUsuarios:          true,
     gerenciarUsuarios:    true,
     aprovarSolicitacoes:  true,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     true,
     editarProduto:        true,
     deletarProduto:       true,
@@ -17,50 +21,85 @@ export const PERMISSOES = {
     realizarVendas:       true,
     cancelarVendas:       true,
     verVendas:            true,
+    realizarDevolucao:    true,
+    realizarExtorno:      true,
     // Notas
-    gerenciarNotas:       true,
+    verNotas:             true,
+    cadastrarNotas:       true,
+    editarNotas:          true,
+    deletarNotas:         true,
     // Dashboard
     verDashboard:         true,
     // Clientes
     gerenciarClientes:    true,
+    verClientes:          true,
+    cadastrarCliente:     true,
+    editarCliente:        true,
+    deletarCliente:       true,
   },
   gerente: {
     // Usuários
+    verUsuarios:          false,
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     true,
-    editarProduto:        true,
-    deletarProduto:       true,
+    editarProduto:        false,
+    deletarProduto:       false,
     // Vendas
     realizarVendas:       true,
     cancelarVendas:       true,
     verVendas:            true,
+    realizarDevolucao:    true,
+    realizarExtorno:      true,
     // Notas
-    gerenciarNotas:       true,
+    verNotas:             true,
+    cadastrarNotas:       true,
+    editarNotas:          false,
+    deletarNotas:         false,
     // Dashboard
     verDashboard:         true,
     // Clientes
     gerenciarClientes:    true,
+    verClientes:          true,
+    cadastrarCliente:     true,
+    editarCliente:        true,
+    deletarCliente:       false,
   },
   vendedor: {
     // Usuários
+    verUsuarios:          false,
     gerenciarUsuarios:    false,
     aprovarSolicitacoes:  false,
+    // Cadastro
+    verCadastros:         true,
     // Produtos
+    verProdutos:          true,
     cadastrarProduto:     false,
     editarProduto:        false,
     deletarProduto:       false,
     // Vendas
     realizarVendas:       true,
-    cancelarVendas:       false,
+    cancelarVendas:       true,
     verVendas:            true,
+    realizarDevolucao:    false,
+    realizarExtorno:      false,
     // Notas
-    gerenciarNotas:       false,
+    verNotas:             false,
+    cadastrarNotas:       false,
+    editarNotas:          false,
+    deletarNotas:         false,
     // Dashboard
-    verDashboard:         false,
+    verDashboard:         true,
     // Clientes
     gerenciarClientes:    false,
+    verClientes:          true,
+    cadastrarCliente:     true,
+    editarCliente:        false,
+    deletarCliente:       false,
   },
 };
 

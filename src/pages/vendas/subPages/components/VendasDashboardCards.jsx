@@ -1,13 +1,11 @@
 import { Row, Col, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
-const cardStyle = {
-  cursor: "pointer",
-  fontSize: "0.9rem",
-};
 
 export function VendasDashboardCards() {
   const navigate = useNavigate();
+  const { pode } = usePermissoes();
 
   return (
     <Row className="mb-4 g-3">
@@ -15,7 +13,6 @@ export function VendasDashboardCards() {
         <Card
           className="h-100 border-0 shadow-sm text-white hover:scale-105 transition cursor-pointer"
           style={{
-            ...cardStyle,
             background: "linear-gradient(45deg, #6f42c1, #8d5bd6)",
           }}
           onClick={() => navigate("Nova-Venda")}
@@ -31,9 +28,9 @@ export function VendasDashboardCards() {
       </Col>
       <Col xs={6} sm={4}>
         <Card
-          className="h-100 border-0 shadow-sm hover:scale-105 transition cursor-pointer"
-          style={{ ...cardStyle, borderLeft: "4px solid #dc3545" }}
-          onClick={() => navigate("Extorno")}
+          className={`h-100 border-0 shadow-sm ${pode("realizarExtorno") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
+          style={{ borderLeft: "4px solid #dc3545" }}
+          onClick={() => pode("realizarExtorno") && navigate("Extorno")}
         >
           <Card.Body className="d-flex align-items-center justify-content-between">
             <div>
@@ -46,9 +43,9 @@ export function VendasDashboardCards() {
       </Col>
       <Col xs={6} sm={4}>
         <Card
-          className="h-100 border-0 shadow-sm hover:scale-105 transition cursor-pointer"
-          style={{ ...cardStyle, borderLeft: "4px solid #ffc107" }}
-          onClick={() => navigate("Devolucao")}
+          className={`h-100 border-0 shadow-sm ${pode("realizarDevolucao") ? "hover:scale-105 transition cursor-pointer" : "bg-stone-200! opacity-70!" }`}
+          style={{ borderLeft: "4px solid #ffc107" }}
+          onClick={() => pode("realizarDevolucao") && navigate("Devolucao")}
         >
           <Card.Body className="d-flex align-items-center justify-content-between">
             <div>

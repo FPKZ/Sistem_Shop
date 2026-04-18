@@ -25,7 +25,7 @@ export function ProdutoHeader({
         <div className={`d-flex ${mobile ? "flex-column w-100" : ""} gap-3 align-items-center`}>
           <div className={`d-flex align-items-center position-relative ${mobile ? "order-2 w-100" : ""}`}>
             {/* Barra de Pesquisa Expansível */}
-            {showSearch || mobile && (
+            {(mobile || showSearch) && (
               <Form.Control
                 type="text"
                 placeholder="Pesquisar produto..."
@@ -39,10 +39,9 @@ export function ProdutoHeader({
               size="sm"
               variant=""
               onClick={() => {
+                setShowSearch(!showSearch);
                 if (showSearch) {
-                  setShowSearch(false);
-                } else {
-                  setShowSearch(true);
+                  setFiltro("");
                 }
               }}
               className="d-flex align-items-center justify-content-center p-1 rounded-circle border-0 icon-btn-sm"

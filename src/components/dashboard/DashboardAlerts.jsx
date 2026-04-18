@@ -1,11 +1,13 @@
 import { Card, ListGroup, Badge, Row, Col } from "react-bootstrap";
 import utils from "@services/utils";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
+  const { pode } = usePermissoes();
   return (
-    <Row className="g-4 mb-4">
+    <>
       {/* Estoque Baixo */}
-      <Col xs={12} lg={6} className="max-h-150">
+      <Col xs={12} lg={pode("cadastrarProduto") ? 6 : 4} className="max-h-150">
         <Card className="shadow-sm border-0 h-100 overflow-hidden">
           <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
             <i className="bi bi-box-seam text-warning me-2 fs-5"></i>
@@ -39,38 +41,42 @@ export function DashboardAlerts({ estoqueBaixo, notasVencendo }) {
       </Col>
 
       {/* Notas Vencendo */}
-      <Col xs={12} lg={6} className="max-h-150">
-        <Card className="shadow-sm border-0 h-100 overflow-hidden">
-          <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
-            <i className="bi bi-calendar-event text-danger me-2 fs-5"></i>
-            <h5 className="mb-0 fw-bold">Notas Pendentes (Próx. 7 dias)</h5>
-          </Card.Header>
-          <Card.Body className="p-0 overflow-auto">
-            {notasVencendo.length > 0 ? (
-              <ListGroup variant="flush">
-                {notasVencendo.map((nota) => (
-                  <ListGroup.Item key={nota.id} className="d-flex justify-content-between align-items-center py-3 border-light">
-                    <div>
-                      <div className="fw-bold text-dark">{nota.fornecedor || "Fornecedor N/A"}</div>
-                      <small className="text-muted">Doc: {nota.codigo}</small>
-                    </div>
-                    <div className="text-end">
-                      <div className="fw-bold text-danger">{utils.formatMoney(nota.valor)}</div>
-                      <Badge bg={nota.diasParaVencer <= 0 ? "danger" : "warning-light"} text={nota.diasParaVencer <= 0 ? "white" : "warning"} pill className="small">
-                        {nota.diasParaVencer <= 0 ? "VENCIDO" : `Vence em ${nota.diasParaVencer} dias`}
-                      </Badge>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            ) : (
-              <div className="p-4 text-center text-muted">
-                <p className="mb-0">Nenhuma nota vencendo em breve.</p>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
+      {
+        pode("verNotas") && (
+          <Col xs={12} lg={6} className="max-h-150">
+            <Card className="shadow-sm border-0 h-100 overflow-hidden">
+              <Card.Header className="bg-white py-3 border-0 d-flex align-items-center">
+                <i className="bi bi-calendar-event text-danger me-2 fs-5"></i>
+                <h5 className="mb-0 fw-bold">Notas Pendentes (Próx. 7 dias)</h5>
+              </Card.Header>
+              <Card.Body className="p-0 overflow-auto">
+                {notasVencendo.length > 0 ? (
+                  <ListGroup variant="flush">
+                    {notasVencendo.map((nota) => (
+                      <ListGroup.Item key={nota.id} className="d-flex justify-content-between align-items-center py-3 border-light">
+                        <div>
+                          <div className="fw-bold text-dark">{nota.fornecedor || "Fornecedor N/A"}</div>
+                          <small className="text-muted">Doc: {nota.codigo}</small>
+                        </div>
+                        <div className="text-end">
+                          <div className="fw-bold text-danger">{utils.formatMoney(nota.valor)}</div>
+                          <Badge bg={nota.diasParaVencer <= 0 ? "danger" : "warning-light"} text={nota.diasParaVencer <= 0 ? "white" : "warning"} pill className="small">
+                            {nota.diasParaVencer <= 0 ? "VENCIDO" : `Vence em ${nota.diasParaVencer} dias`}
+                          </Badge>
+                        </div>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <div className="p-4 text-center text-muted">
+                    <p className="mb-0">Nenhuma nota vencendo em breve.</p>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        )
+      }
+    </>
   );
 }

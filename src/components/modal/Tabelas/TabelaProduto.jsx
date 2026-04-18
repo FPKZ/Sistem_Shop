@@ -1,6 +1,7 @@
 import { Container, Card, Row, Col, Badge, Button } from "react-bootstrap";
 import { Package, Edit } from "lucide-react";
 import util from "@services/utils.js";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 export default function TabelaProdutos({
   // mobile,
@@ -12,6 +13,7 @@ export default function TabelaProdutos({
   setmodalInfoProduto,
   active
 }) {
+  const { pode } = usePermissoes();
   if (!produto || produto === null || produto === undefined) return;
   return (
     <>
@@ -29,7 +31,7 @@ export default function TabelaProdutos({
           <Col xs={1} className="text-center">
             <strong>IMG</strong>
           </Col>
-          <Col xs={3}>
+          <Col xs={pode("editarProduto") ? 3 : 4}>
             <strong>NOME</strong>
           </Col>
           <Col xs={2}>
@@ -41,12 +43,14 @@ export default function TabelaProdutos({
           <Col xs={2} className="text-center">
             <strong>STATUS</strong>
           </Col>
-          <Col xs={1} className="text-center">
-            <strong>AÇÕES</strong>
-          </Col>
+          {pode("editarProduto") && (
+            <Col xs={1} className="text-center">
+              <strong>AÇÕES</strong>
+            </Col>
+          )}
         </Row>
 
-        {produto.itemEstoque.length === 0 ? (
+        {!produto?.itemEstoque || produto.itemEstoque.length === 0 ? (
           <div className="text-center dashed d-flex flex-column align-items-center justify-content-center h-full!">
             <Package size={48} className="mb-2 opacity-60" />
             <p className="text-muted mb-0">Nenhum item cadastrado!</p>
@@ -61,6 +65,7 @@ export default function TabelaProdutos({
                 onEditItem={onEditItem}
                 setmodalInfoProduto={setmodalInfoProduto}
                 active={active}
+                pode={pode}
               />
           </div>
         )}
@@ -69,7 +74,7 @@ export default function TabelaProdutos({
   );
 }
 
-function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, active }) {
+function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, active, pode }) {
   if (!produtos) return;
   const itens = produtos.itemEstoque;
 
@@ -159,7 +164,7 @@ function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, a
                   }}
                 />
               </Col>
-              <Col xs={3} className="ps-2 text-truncate fw-semibold">
+              <Col xs={pode("editarProduto") ? 3 : 4} className="ps-2 text-truncate fw-semibold">
                 {produto.nome}
               </Col>
               <Col xs={2} className="p-0 text-truncate text-muted">
@@ -171,19 +176,21 @@ function Produtos({ produtos, setItemEstoque, onEditItem, setmodalInfoProduto, a
               <Col xs={2} className="p-0 d-flex justify-content-center">
                 {getStatusBadge(produto.status)}
               </Col>
-              <Col xs={1} className="d-flex justify-content-center p-0">
-                <Button 
-                  variant="none" 
-                  size="sm" 
-                  className="p-1 px-2 text-roxo hover:bg-roxo-subtle rounded-circle"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditItem?.(produto);
-                  }}
-                >
-                  <Edit size={14} />
-                </Button>
-              </Col>
+              {pode("editarProduto") && (
+                <Col xs={1} className="d-flex justify-content-center p-0">
+                  <Button 
+                    variant="none" 
+                    size="sm" 
+                    className="p-1 px-2 text-roxo hover:bg-roxo-subtle rounded-circle"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditItem?.(produto);
+                    }}
+                  >
+                    <Edit size={14} />
+                  </Button>
+                </Col>
+              )}
             </Row>
           </Card.Body>
         </Card>

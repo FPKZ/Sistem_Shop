@@ -53,7 +53,7 @@ export async function expirarReservas() {
  * @returns {Promise<Venda>}
  * @throws {Error} com campos `statusCode` e `message` para erros esperados
  */
-export async function criarVenda(data) {
+export async function criarVenda(data, vendedor_id) {
   const { itensVendidos, reservar, cliente_id, notaVenda } = data;
 
   if (!itensVendidos?.length) {
@@ -108,6 +108,8 @@ export async function criarVenda(data) {
     await ItemReservado.destroy({ where: { itemEstoque_id: itensEstoqueIds } });
     data.status = calcularStatusVenda(notaVenda);
   }
+  
+  data.vendedor_id = vendedor_id;
 
   const novaVenda = await Venda.create(data, {
     include: [
@@ -127,10 +129,16 @@ export async function criarVenda(data) {
  * @param {object} data - { notaVenda, desconto, valor_total }
  * @returns {Promise<void>}
  */
-export async function finalizarVenda(id, data) {
+export async function finalizarVenda(id, data, vendedor) {
   const venda = await Venda.findByPk(id, {
     include: [{ model: ItemVendido, as: "itensVendidos" }],
   });
+
+  if(venda.vendedor_id !== vendedor.id && vendedor.cargo !== "admin"){
+    const err = new Error("Você não tem permissão para finalizar esta venda");
+    err.statusCode = 403;
+    throw err;
+  }
 
   if (!venda) {
     const err = new Error("Venda não encontrada");
@@ -164,10 +172,16 @@ export async function finalizarVenda(id, data) {
  * @param {string|number} id
  * @returns {Promise<void>}
  */
-export async function estornarVenda(id) {
+export async function estornarVenda(id, user) {
   const venda = await Venda.findByPk(id, {
     include: [{ model: ItemVendido, as: "itensVendidos" }],
   });
+
+  if(venda.vendedor_id !== user.id && user.cargo !== "admin"){
+    const err = new Error("Você não tem permissão para estornar esta venda");
+    err.statusCode = 403;
+    throw err;
+  }
 
   if (!venda) {
     const err = new Error("Venda não encontrada");
@@ -192,7 +206,7 @@ export async function estornarVenda(id) {
  * @param {{ itensDevolverIds: number[], valorDevolvido: number }} data
  * @returns {Promise<Venda>}
  */
-export async function devolverItens(id, { itensDevolverIds, valorDevolvido }) {
+export async function devolverItens(id, { itensDevolverIds, valorDevolvido }, user) {
   if (!itensDevolverIds?.length) {
     const err = new Error("É necessário informar os itens para devolução");
     err.statusCode = 400;
@@ -203,6 +217,12 @@ export async function devolverItens(id, { itensDevolverIds, valorDevolvido }) {
   if (!venda) {
     const err = new Error("Venda não encontrada");
     err.statusCode = 404;
+    throw err;
+  }
+
+  if(venda.vendedor_id !== user.id && user.cargo !== "admin"){
+    const err = new Error("Você não tem permissão para devolver itens desta venda");
+    err.statusCode = 403;
     throw err;
   }
 

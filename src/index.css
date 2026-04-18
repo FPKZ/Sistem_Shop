@@ -213,8 +213,52 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Remove setas de inputs numéricos (Firefox) */
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* ============================================
+   Utilidades Globais (Sistema)
+   ============================================ */
+
+/* Seção estilo Folha Empilhada */
+.sheet-section {
+  background: #fff;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
+}
+.sheet-section::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: transparent;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* Sombra na "borda" inferior */
+  margin-bottom: 0;
+}
+
+/* Label de seção pequena uppercase */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9c8ab4;
+}
+
+/* Avatar Iniciais com Gradiente Roxo */
+.avatar-gradient-roxo {
+  background: linear-gradient(135deg, #9b72e8, #6f42c1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Roxo mais escuro pra backgrounds de painel/resumo */
+.bg-roxo-dark {
+  background: linear-gradient(145deg, #1a1030, #2d1d50);
+}
+
 

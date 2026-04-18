@@ -1,28 +1,13 @@
 import {
   Produto,
-  Categoria,
-  Nota,
   ItemEstoque,
   Cliente,
   ItemReservado,
 } from "../database/models/index.js";
-import { Op } from "sequelize";
-import { cadastrarProduto } from "../services/produto.service.js";
+import { cadastrarProduto, buscarProdutos } from "../services/produto.service.js";
 import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js";
 
-const INCLUDE_PRODUTO_COM_CATEGORIA = [
-  { model: Categoria, as: "categoria" },
-];
 
-const INCLUDE_ITEM_ESTOQUE_COMPLETO = [
-  { model: Categoria, as: "categoria" },
-  { model: ItemEstoque, as: "itemEstoque", include: [{ model: Nota, as: "nota" }] },
-];
-
-const INCLUDE_ITEM_COM_PRODUTO = [
-  { model: Nota, as: "nota" },
-  { model: Produto, as: "produto", include: [{ model: Categoria, as: "categoria" }] },
-];
 const putSchemaProduto = {
   body: {
     type: "object",
@@ -74,46 +59,7 @@ export default async function produtoRoutes(fastify) {
 
   // --- Leitura ---
   fastify.get("/produtos", { preHandler: authMiddleware }, async (request, reply) => {
-    const { itens, nome, id } = request.query;
-
-    if (id) {
-      const produto = await Produto.findByPk(id, { include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
-      return reply.code(200).send(produto);
-    }
-
-    if (itens === "all") {
-      const produtos = await ItemEstoque.findAll({ include: INCLUDE_ITEM_COM_PRODUTO });
-      return reply.code(200).send(produtos);
-    }
-
-    if (itens === "vendidos") {
-      const produtos = await ItemEstoque.findAll({ where: { status: "Vendido" }, include: INCLUDE_ITEM_COM_PRODUTO });
-      return reply.code(200).send(produtos);
-    }
-
-    if (itens === "estoque") {
-      const produtos = await Produto.findAll({
-        include: [
-          ...INCLUDE_PRODUTO_COM_CATEGORIA,
-          { model: ItemEstoque, as: "itemEstoque", where: { status: "Disponivel" }, include: [{ model: Nota, as: "nota" }] },
-        ],
-      });
-      return reply.code(200).send(produtos);
-    }
-
-    if (itens === "reservado") {
-      const produtos = await ItemEstoque.findAll({ where: { status: "Reservado" }, include: INCLUDE_ITEM_COM_PRODUTO });
-      return reply.code(200).send(produtos);
-    }
-
-    if (itens === "none") {
-      const produtos = await Produto.findAll({ include : INCLUDE_PRODUTO_COM_CATEGORIA});
-      console.log(produtos)
-      return reply.code(200).send(produtos)
-    }
-
-    const where = nome && nome !== " " ? { nome: { [Op.like]: `%${nome}%` } } : {};
-    const produtos = await Produto.findAll({ where, include: INCLUDE_ITEM_ESTOQUE_COMPLETO });
+    const produtos = await buscarProdutos(request.query)
     return reply.code(200).send(produtos);
   });
 

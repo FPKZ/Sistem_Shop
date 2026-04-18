@@ -1,231 +1,190 @@
-import { Card, Button, Row, Col, Dropdown } from "react-bootstrap";
 import utils from "@services/utils";
+import { Trash2, Package, UserPlus, ShoppingCart, ChevronRight } from "lucide-react";
+import { Dropdown } from "react-bootstrap";
 
 export function VendaCart({
-  mobile,
   cliente,
-  setShowModalCliente,
+  onOpenCliente,
   listaVenda,
-  setShowModalProduto,
+  onOpenProduto,
   produtos,
   handleAlterarQuantidade,
   handleRemoverProduto,
 }) {
+  const iniciais = cliente?.nome
+    ? cliente.nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    : null;
+
   return (
     <>
-      {/* Card Cliente */}
-      <Card className="border-0 shadow-sm mb-3">
-        <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center py-3">
-          <h5 className="mb-0">Cliente</h5>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setShowModalCliente(true)}
+      {/* ===================== SEÇÃO CLIENTE ===================== */}
+      <div className="sheet-section px-6 py-4 z-[2] lg:rounded-2xl lg:mb-4">
+        <p className="section-label mb-3">Cliente</p>
+
+        {cliente ? (
+          <div
+            className="flex items-center gap-3.5 px-4 py-3 bg-[#f9f6ff] border-[1.5px] border-[#dcc8ff] rounded-xl cursor-pointer transition-all duration-200 hover:border-[#9b72e8] hover:shadow-[0_0_0_3px_rgba(111,66,193,0.08)]"
+            onClick={onOpenCliente}
+            role="button"
           >
-            <i className="bi bi-person-plus me-2"></i>
-            {cliente ? "Alterar Cliente" : "Selecionar Cliente"}
-          </Button>
-        </Card.Header>
-        {cliente && (
-          <Card.Body>
-            <Row>
-              <Col md={6}>
-                <div className="mb-2">
-                  <small className="text-muted">Nome</small>
-                  <div className="fw-bold">{cliente.nome}</div>
-                </div>
-              </Col>
-              <Col md={3}>
-                <div className="mb-2">
-                  <small className="text-muted">Telefone</small>
-                  <div>{cliente.telefone || "N/A"}</div>
-                </div>
-              </Col>
-              <Col md={3}>
-                <div className="mb-2">
-                  <small className="text-muted">Email</small>
-                  <div className="small">{cliente.email || "N/A"}</div>
-                </div>
-              </Col>
-            </Row>
-          </Card.Body>
-        )}
-        {!cliente && (
-          <Card.Body className="text-center py-4 text-muted">
-            <i className="bi bi-person fs-1 d-block mb-2 opacity-25"></i>
-            Nenhum cliente selecionado
-          </Card.Body>
-        )}
-      </Card>
-
-      {/* Card Produtos */}
-      <Card className="border-0 shadow-sm">
-        <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center py-3">
-          <h5 className="mb-0">Produtos ({listaVenda.length})</h5>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setShowModalProduto(true)}
-            disabled={!cliente}
-          >
-            <i className="bi bi-plus-lg me-2"></i>
-            Adicionar Produto
-          </Button>
-        </Card.Header>
-        <Card.Body className="p-0">
-          {listaVenda.length > 0 ? (
-            <div className="d-flex flex-column">
-              {/* Header - Visível apenas em desktop */}
-              <Row className="py-2 m-0 d-none d-md-flex border-bottom">
-                <Col md={4} className="fw-semibold">
-                  Produto
-                </Col>
-                <Col md={2} className="fw-semibold">
-                  Preço Un.
-                </Col>
-                <Col md={3} className="fw-semibold text-center">
-                  Quantidade
-                </Col>
-                <Col md={2} className="fw-semibold">
-                  Subtotal
-                </Col>
-                <Col md={1} className="fw-semibold text-center m-0 p-0">
-                  Ação
-                </Col>
-              </Row>
-
-              {/* Lista de produtos */}
-              {listaVenda.map((item, index) => (
-                <div
-                  key={item.id}
-                  className={`border-top ${
-                    index % 2 === 0 ? "bg-white" : "bg-light bg-opacity-25"
-                  }`}
-                >
-                  <Row className="py-2 px-1 m-0 align-items-center">
-                    {/* Produto */}
-                    <Col xs={10} md={4} className="mb-2 mb-md-0 order-first">
-                      <div className="d-flex flex-column">
-                        <span className="d-none text-muted small mb-1">
-                          Produto
-                        </span>
-                        <div className="fw-bold">{item.nome}</div>
-                        <small className="text-muted">{item.codigo}</small>
-                      </div>
-                    </Col>
-
-                    {/* Preço Unitário */}
-                    <Col xs={3} md={2} className="mb-0 order-3 order-md-2">
-                      <div className="d-flex flex-column">
-                        <span className="d-md-none text-muted small mb-1">
-                          Preço Un.
-                        </span>
-                        <span className="text-success fw-bold">
-                          {utils.formatMoney(
-                            Math.max(
-                              ...item.itens.map((i) => i.valor_venda),
-                              0,
-                            ),
-                          )}
-                        </span>
-                      </div>
-                    </Col>
-
-                    {/* Quantidade */}
-                    <Col
-                      xs={3}
-                      md={3}
-                      className="mb-2 mb-md-0 order-2 order-md-3"
-                    >
-                      <div className="d-flex flex-column align-items-md-center w-100">
-                        <span className="d-md-none text-muted small mb-1">
-                          Quantidade
-                        </span>
-                        <div
-                          className={`d-flex align-items-center gap-1 ${mobile ? "w-100" : "w-50"}`}
-                        >
-                          <Dropdown className="w-100">
-                            <Dropdown.Toggle
-                              variant="outline-secondary"
-                              size="sm"
-                              className="w-100"
-                            >
-                              {item.quantidade}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-menu">
-                              {Array.from(
-                                {
-                                  length:
-                                    produtos.find((i) => i.id === item.id)
-                                      ?.itemEstoque?.length || 0,
-                                },
-                                (_, i) => i + 1,
-                              ).map((quantidade) => (
-                                <Dropdown.Item
-                                  className="text-center"
-                                  key={quantidade}
-                                  onClick={() =>
-                                    handleAlterarQuantidade(item.id, quantidade)
-                                  }
-                                >
-                                  {quantidade}
-                                </Dropdown.Item>
-                              ))}
-                            </Dropdown.Menu>
-                          </Dropdown>
-                        </div>
-                      </div>
-                    </Col>
-
-                    {/* Subtotal */}
-                    <Col
-                      xs={6}
-                      md={2}
-                      className="m-0 text-end text-md-start order-4 order-md-4"
-                    >
-                      <div className="d-flex flex-column">
-                        <span className="d-md-none text-muted small mb-1">
-                          Subtotal
-                        </span>
-                        <span className="fw-bold">
-                          {utils.formatMoney(
-                            item.itens.reduce(
-                              (total, i) => total + i.valor_venda,
-                              0,
-                            ),
-                          )}
-                        </span>
-                      </div>
-                    </Col>
-
-                    {/* Ação */}
-                    <Col
-                      xs={2}
-                      md={1}
-                      className="flex justify-content-end justify-content-md-center order-1 order-md-last"
-                    >
-                      <Button
-                        size="sm"
-                        variant="outline-danger"
-                        onClick={() => handleRemoverProduto(item.id)}
-                      >
-                        <i className="bi bi-trash"></i>
-                      </Button>
-                    </Col>
-                  </Row>
-                </div>
-              ))}
+            <div className="w-10! h-10! rounded-full avatar-gradient-roxo text-[1rem]">
+              {iniciais}
             </div>
-          ) : (
-            <div className="text-center py-5 text-muted">
-              <i className="bi bi-cart-x fs-1 d-block mb-2 opacity-25"></i>
+            <div className="flex-1 overflow-hidden">
+              <div className="font-bold text-[#1a1a2e] leading-none truncate">{cliente.nome}</div>
+              <div className="text-sm text-gray-500 truncate mt-1">
+                {cliente.telefone || cliente.email || "Sem contato cadastrado"}
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-gray-400 shrink-0" />
+          </div>
+        ) : (
+          <div
+            className="flex items-center gap-3 px-4 py-3.5 bg-[#f9f6ff] border-2 border-dashed border-[#dcc8ff] rounded-xl cursor-pointer transition-all duration-200 text-[#9c8ab4] hover:bg-[#f3eeff] hover:border-[#b08ef0] hover:text-[#6f42c1]"
+            onClick={onOpenCliente}
+            role="button"
+          >
+            <div className="w-10! h-10! rounded-full bg-[#f3eeff] flex items-center justify-center shrink-0">
+              <UserPlus size={20} color="#9b72e8" />
+            </div>
+            <div>
+              <div className="font-semibold text-[#6f42c1]">
+                Selecionar cliente
+              </div>
+              <div className="text-sm text-[#b0a0cc]">
+                Toque para buscar ou cadastrar
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===================== SEÇÃO PRODUTOS ===================== */}
+      <div className="bg-[#faf9fc] px-6 py-5 min-h-[160px] relative z-[1] shadow-[0_8px_20px_rgba(0,0,0,0.05)] lg:rounded-2xl">
+        <div className="flex justify-between items-center mb-3">
+          <p className="section-label mb-0">
+            Produtos
+            {listaVenda.length > 0 && (
+              <span className="ml-2 px-2 py-0 inline-block bg-[#6f42c1] text-white text-[0.7rem] font-bold rounded-full leading-[1.8]">
+                {listaVenda.length}
+              </span>
+            )}
+          </p>
+        </div>
+
+        {listaVenda.length === 0 ? (
+          <div className="text-center py-8 text-[#c0b0db]">
+            <ShoppingCart size={40} className="mb-2 opacity-50 mx-auto" />
+            <div className="text-sm">
               {cliente
                 ? "Nenhum produto adicionado"
-                : "Selecione um cliente para adicionar produtos"}
+                : "Selecione um cliente primeiro"}
             </div>
-          )}
-        </Card.Body>
-      </Card>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 lg:max-h-[420px] lg:overflow-y-auto lg:pr-1">
+            {listaVenda.map((item) => {
+              const precoUnit = Math.max(
+                ...item.itens.map((i) => i.valor_venda),
+                0
+              );
+              const subtotal = item.itens.reduce(
+                (t, i) => t + i.valor_venda,
+                0
+              );
+              const maxQty =
+                produtos.find((p) => p.id === item.id)?.itemEstoque?.length || 0;
+
+              return (
+                <div key={item.id} className="bg-white rounded-xl p-2 px-3 border border-[#ede8f7] flex items-center gap-3 transition-shadow duration-200 hover:shadow-[0_2px_12px_rgba(111,66,193,0.1)]">
+                  {/* Ícone do produto */}
+                  <div className="w-[44px] h-[44px] rounded-[10px] bg-[#f3eeff] flex items-center justify-center shrink-0">
+                    {item.img ? (
+                      <img
+                        src={item.img}
+                        alt={item.nome}
+                        className="w-full h-full object-cover rounded-[10px]"
+                      />
+                    ) : (
+                      <Package size={22} color="#9b72e8" />
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 overflow-hidden">
+                    <div className="font-bold truncate text-[#1a1a2e] text-[0.9rem]">
+                      {item.nome}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[0.75rem] text-[#28a745] font-semibold">
+                        {utils.formatMoney(precoUnit)} / un.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Controle de quantidade */}
+                  <div className="flex items-center gap-3">
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        variant="link"
+                        className="p-0 border-0 no-underline! shadow-none! dropdown-toggle-none"
+                      >
+                        <div className="flex items-center bg-[#f3eeff] rounded-lg overflow-hidden border border-[#dcc8ff]">
+                          <span className="px-2.5 py-1 font-bold text-[0.9rem] text-[#1a1a2e] min-w-[32px] text-center cursor-pointer">
+                            {item.quantidade}×
+                          </span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu align="end">
+                        {Array.from(
+                          { length: maxQty },
+                          (_, i) => i + 1
+                        ).map((qty) => (
+                          <Dropdown.Item
+                            key={qty}
+                            className="text-center"
+                            active={qty === item.quantidade}
+                            onClick={() =>
+                              handleAlterarQuantidade(item.id, qty)
+                            }
+                          >
+                            {qty}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+
+                    <div className="font-bold text-[#1a1a2e] text-[0.9rem]">
+                      {utils.formatMoney(subtotal)}
+                    </div>
+                  </div>
+
+                  {/* Remover */}
+                  <button
+                    onClick={() => handleRemoverProduto(item.id)}
+                    className="bg-transparent border-none py-1.5 pl-2 pr-1 cursor-pointer text-[#e0c5ff] shrink-0 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Botão Adicionar Produto */}
+        <button
+          className="w-full p-3.5 bg-gradient-to-br! from-[#f4eeff] to-[#ede8f7] border-2 border-dashed border-[#c9b2f0] rounded-xl! text-[#6f42c1] font-semibold text-[0.9rem] flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 mt-3 hover:from-[#ede8f7] hover:to-[#dcc8ff] hover:border-[#9b72e8] disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={onOpenProduto}
+          onMouseDown={(e) => e.preventDefault()}
+          disabled={!cliente}
+        >
+          <span className="w-6 h-6 rounded-full bg-[#6f42c1] text-white flex items-center justify-center text-[1.1rem] leading-none shrink-0">
+            +
+          </span>
+          Adicionar produto
+        </button>
+      </div>
     </>
   );
 }

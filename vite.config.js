@@ -49,6 +49,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@css": path.resolve(__dirname, "./public/css"),
       "@services": path.resolve(__dirname, "./src/services"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@tabelas": path.resolve(__dirname, "./src/components/modal/Tabelas"),

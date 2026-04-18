@@ -6,7 +6,7 @@ function Cadastro() {
   const { mobile } = useOutletContext();
   
   return (
-    <div className="p- p-md-4">
+    <div className="p-2 pt-3 p-md-4">
       <div className="row row-cols-* g-2 g-md-4">
         <Outlet context={{ mobile }}  />
       </div>

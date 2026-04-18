@@ -4,10 +4,12 @@ import { DashboardStats } from "@components/dashboard/DashboardStats";
 import { DashboardCharts } from "@components/dashboard/DashboardCharts";
 import { DashboardAlerts } from "@components/dashboard/DashboardAlerts";
 import { Row, Col, Button, Spinner } from "react-bootstrap";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 function App() {
   const navigate = useNavigate();
   const { stats, chartData, estoqueBaixo, notasVencendo, loading, refreshing } = useDashboardData();
+  const { pode } = usePermissoes();
 
   const atalhos = [
     {
@@ -51,7 +53,7 @@ function App() {
   }
 
   return (
-    <div className="min-vh-100">
+    <div className="min-vh-100 p-2 pt-3 p-md-4">
       {/* Header do Dashboard */}
       <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
@@ -76,34 +78,35 @@ function App() {
         </Col>
 
         {/* Atalhos Rápidos */}
-        <Col xs={12} xl={4}>
-          <div className="bg-white p-4 rounded shadow-sm h-100">
-            <h5 className="fw-bold mb-4">Atalhos Rápidos</h5>
-            <div className="d-grid grid-cols-2 xl:grid-cols-1 gap-3">
-              {atalhos.map((at, idx) => (
-                <Button
-                  key={idx}
-                  variant="light"
-                  className={`d-flex align-items-center justify-content-start p-3 border-0 shadow-sm transition-hover ${at.color}`}
-                  onClick={() => navigate(at.path)}
-                  style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}
-                >
-                  <span className="me-3">{at.icon}</span>
-                  <span className="fw-medium">{at.label}</span>
-                </Button>
-              ))}
+        {pode("cadastrarProduto") && (
+          <Col xs={12} xl={4}>
+            <div className="bg-white p-4 rounded shadow-sm h-100">
+              <h5 className="fw-bold mb-4">Atalhos Rápidos</h5>
+              <div className="d-grid grid-cols-2 xl:grid-cols-1 gap-3">
+                {atalhos.map((at, idx) => (
+                  <Button
+                    key={idx}
+                    variant="light"
+                    className={`d-flex align-items-center justify-content-start p-3 border-0 shadow-sm transition-hover ${at.color}`}
+                    onClick={() => navigate(at.path)}
+                    style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}
+                  >
+                    <span className="me-3">{at.icon}</span>
+                    <span className="fw-medium">{at.label}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
-        </Col>
-      </Row>
+          </Col>
+        )}
 
-      {/* Alertas */}
-      <div className="mt-4">
+        {/* Alertas */}
         <DashboardAlerts
           estoqueBaixo={estoqueBaixo}
           notasVencendo={notasVencendo}
         />
-      </div>
+      </Row>
+
     </div>
   );
 }

@@ -28,6 +28,7 @@
     /* Paths */
     "baseUrl": "src",
     "paths": {
+      "@css": ["public/css/*"],
       "@services": ["services/index.js"],
       "@services/*": ["services/*"],
       "@components": ["components/index.js"],

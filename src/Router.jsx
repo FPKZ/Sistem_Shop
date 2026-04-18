@@ -68,28 +68,43 @@ const router = createBrowserRouter([
           { index: true, element: <App /> },
           {
             path: "cadastro",
-            element: <PermissaoRoute permissao="cadastrarProduto" />,
+            element: <PermissaoRoute permissao="verCadastros" />,
             children: [
               {
                 path: "",
                 element: <Cadastro />,
                 children: [
-                  { index: true, element: <TelaCadastro /> },
-                  { path: "produto", element: <CadastroProduto /> },
-                  { path: "nota", element: <CadastroNota /> },
-                  { path: "cliente", element: <CadastroCliente /> },
+                  { 
+                    element: <PermissaoRoute permissao="verCadastros" />, 
+                    children: [{ index: true, element: <TelaCadastro /> }] 
+                  },
+                  { 
+                    path: "produto", 
+                    element: <PermissaoRoute permissao="cadastrarProduto" />, 
+                    children: [{ index: true, element: <CadastroProduto /> }] 
+                  },
+                  { 
+                    path: "nota", 
+                    element: <PermissaoRoute permissao="cadastrarNotas" />, 
+                    children: [{ index: true, element: <CadastroNota /> }] 
+                  },
+                  { 
+                    path: "cliente", 
+                    element: <PermissaoRoute permissao="cadastrarCliente" />, 
+                    children: [{ index: true, element: <CadastroCliente /> }] 
+                  },
                 ],
               },
             ],
           },
           { path: "clientes", 
-            element: <PermissaoRoute permissao="gerenciarClientes" />, 
+            element: <PermissaoRoute permissao="verClientes" />, 
             children: [
               { index: true, element: <Clientes /> },
             ] 
           },
           { path: "produtos", 
-            element: <PermissaoRoute permissao="cadastrarProduto" />, 
+            element: <PermissaoRoute permissao="verProdutos" />, 
             children: [
               { 
                 index: true,
@@ -102,7 +117,7 @@ const router = createBrowserRouter([
             ] 
           },
           { path: "notas", 
-            element: <PermissaoRoute permissao="gerenciarNotas" />, 
+            element: <PermissaoRoute permissao="verNotas" />, 
             children: [
               { index: true, element: <Notas /> },
             ] 

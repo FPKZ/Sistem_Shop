@@ -3,6 +3,7 @@ import HoverBtn from "@components/HoverBtn";
 import CadastroModal from "../../components/modal/CadastroProdutos/CadastroIntenModal.jsx";
 import ProdutosInfo from "@components/modal/InfoProdutos/InfoProdutos";
 import useProdutosPage from "@hooks/produtos/useProdutosPage";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 function Produtos() {
   const {
@@ -15,9 +16,11 @@ function Produtos() {
     setModalInfoProduto,
     deleteProduto,
   } = useProdutosPage();
+  
+  const { pode } = usePermissoes();
 
   return (
-    <div className="p-md-4 h-100 overflow-hidden">
+    <div className="p-2 pt-3 p-md-4 h-100 overflow-hidden">
       <Produto
         produtos={produtos}
         deleteProduto={deleteProduto}
@@ -25,9 +28,11 @@ function Produtos() {
         setProduto={setProduto}
         mobile={mobile}
       >
-        <HoverBtn mobile={mobile} func={cadastrarProduto}>
-          Adicionar Produto
-        </HoverBtn>
+        {pode("cadastrarProduto") && (
+          <HoverBtn mobile={mobile} func={cadastrarProduto}>
+            Adicionar Produto
+          </HoverBtn>
+        )}
       </Produto>
       <ProdutosInfo
         visible={modalInfoProduto}

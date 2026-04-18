@@ -7,7 +7,7 @@ import {
   estornarVenda,
   devolverItens,
 } from "../services/venda.service.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js";
 
 const INCLUDE_VENDA_COMPLETA = [
   { model: Cliente, as: "cliente" },
@@ -25,9 +25,20 @@ export default async function vendaRoutes(fastify) {
     const seteDiasAtras = new Date();
     seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
 
+    const config = {
+      where: { data_venda: { [Op.gte]: seteDiasAtras } },
+    }
+    const configTodasVendas = {}
+
+    // Se o usuario for vendedor, ele só pode ver suas vendas
+    if (request.user.cargo === "vendedor") {
+      config.where.vendedor_id = request.user.id;
+      configTodasVendas.where = { vendedor_id: request.user.id };
+    }
+
     const [vendas, todasVendas] = await Promise.all([
-      Venda.findAll({ where: { data_venda: { [Op.gte]: seteDiasAtras } } }),
-      Venda.findAll(),
+      Venda.findAll(config),
+      Venda.findAll(configTodasVendas),
     ]);
 
     const stats = {
@@ -61,54 +72,105 @@ export default async function vendaRoutes(fastify) {
   });
 
   fastify.get("/vendas", { preHandler: authMiddleware }, async (request, reply) => {
-    // Expira reservas vencidas de forma assíncrona sem bloquear a resposta principal
-    expirarReservas().catch((err) => fastify.log.error("[expirarReservas]", err));
+    try{
+      // Expira reservas vencidas de forma assíncrona sem bloquear a resposta principal
+      expirarReservas().catch((err) => fastify.log.error("[expirarReservas]", err));
+      
+      const user = request.user;
 
-    const vendas = await Venda.findAll({
-      include: INCLUDE_VENDA_COMPLETA,
-      order: [["data_venda", "DESC"]],
-    });
+      const config = {
+        include: INCLUDE_VENDA_COMPLETA,
+        order: [["data_venda", "DESC"]],
+      }
 
-    return reply.code(200).send(vendas);
+      if(user.cargo === "vendedor"){
+        config.where = {
+          vendedor_id: user.id,
+        }
+      }
+      const vendas = await Venda.findAll(config);
+
+      return reply.code(200).send(vendas); 
+    } catch (err) {
+      return reply.err(err.message, err.statusCode);
+    }
+   
   });
 
   fastify.get("/venda/:id", { preHandler: authMiddleware }, async (request, reply) => {
-    const venda = await Venda.findByPk(request.params.id, { include: INCLUDE_VENDA_COMPLETA });
-    if (!venda) return reply.err("Venda não encontrada", 404);
-    return reply.code(200).send(venda);
+    try{
+      const user = request.user;
+      const venda = await Venda.findByPk(request.params.id, { include: INCLUDE_VENDA_COMPLETA });
+      if (!venda) return reply.err("Venda não encontrada", 404);
+      if(user.cargo !== "admin"){
+        if(venda.vendedor_id !== user.id) return reply.err("Você não tem permissão para acessar esta venda", 403);
+      }
+      return reply.code(200).send(venda);
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
   fastify.post("/venda", { preHandler: authMiddleware }, async (request, reply) => {
-    const novaVenda = await criarVenda(request.body);
-    return reply.code(201).ok({ novaVenda }, "Venda cadastrada com sucesso!");
+    try{
+      const { vendedor_id } = request.user;
+      const novaVenda = await criarVenda(request.body, vendedor_id);
+      return reply.code(201).ok({ novaVenda }, "Venda cadastrada com sucesso!");
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
-  fastify.put("/venda/:id/finalizar", { preHandler: authMiddleware }, async (request, reply) => {
-    await finalizarVenda(request.params.id, request.body);
-    return reply.ok({}, "Venda finalizada com sucesso");
+  fastify.put("/venda/finalizar/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    try{
+      const user = request.user
+      
+      await finalizarVenda(request.params.id, request.body, user);
+      return reply.ok({}, "Venda finalizada com sucesso");
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
   fastify.put("/venda/:id", { preHandler: authMiddleware }, async (request, reply) => {
-    const venda = await Venda.findByPk(request.params.id);
-    if (!venda) return reply.err("Venda não encontrada", 404);
-    await venda.update(request.body);
-    return reply.ok({ venda }, "Venda atualizada com sucesso");
+    try{
+      const user = request.user;
+      const venda = await Venda.findByPk(request.params.id);
+      if (!venda) return reply.err("Venda não encontrada", 404);
+      if(user.cargo !== "admin"){
+        if(venda.vendedor_id !== user.id) return reply.err("Você não tem permissão para atualizar esta venda", 403);
+      }
+      await venda.update(request.body);
+      return reply.ok({ venda }, "Venda atualizada com sucesso");
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
-  fastify.delete("/venda/:id", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.delete("/venda/:id", { preHandler: [authMiddleware, requireCargo("admin")] }, async (request, reply) => {
     const venda = await Venda.findByPk(request.params.id);
     if (!venda) return reply.err("Venda não encontrada", 404);
     await venda.destroy();
     return reply.code(204).send();
   });
 
-  fastify.put("/venda/:id/estorno", { preHandler: authMiddleware }, async (request, reply) => {
-    await estornarVenda(request.params.id);
-    return reply.ok({}, "Estorno realizado com sucesso");
+  fastify.put("/venda/estorno/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    try{
+      const user = request.user;
+      await estornarVenda(request.params.id, user);
+      return reply.ok({}, "Estorno realizado com sucesso");
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
-  fastify.put("/venda/:id/devolucao", { preHandler: authMiddleware }, async (request, reply) => {
-    const novaVenda = await devolverItens(request.params.id, request.body);
-    return reply.ok({ novaVenda }, "Devolução parcial realizada com sucesso!");
+  fastify.put("/venda/devolucao/:id", { preHandler: authMiddleware }, async (request, reply) => {
+    try{
+      const user = request.user;
+      const novaVenda = await devolverItens(request.params.id, request.body, user);
+      return reply.ok({ novaVenda }, "Devolução parcial realizada com sucesso!");
+    } catch (err) {
+      return reply.err(err.message, err.statusCode);
+    }
   });
 }

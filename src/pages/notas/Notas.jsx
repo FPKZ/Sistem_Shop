@@ -5,6 +5,7 @@ import API from "@services";
 
 import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { usePagination } from "@hooks/usePagination";
+import PaginationButtons from "@components/Pagination/PaginationButtons";
 
 import ModalDetailNota from "@components/modal/Notas/ModalDetailNota";
 import TableNota from "./include/TableNota";
@@ -62,7 +63,7 @@ export default function Notas() {
   };
 
   return (
-    <Container fluid className="py-4 m-0 px-0">
+    <Container fluid className="p-2 py-3 p-md-4">
       <NotasHeader
         mobile={mobile}
       />
@@ -94,47 +95,11 @@ export default function Notas() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="mt-4">
-          {/* Usando o componente original de paginação ou a refatoração do handlePageChange */}
-          {/* Importado como componente dependente de dados externos */}
-          <div className="my-3 mb-4 d-flex justify-content-center">
-            <ul className="pagination">
-              <li
-                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Anterior
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <li
-                    key={page}
-                    className={`page-item ${currentPage === page ? "active" : ""}`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(page)}
-                    >
-                      {page}
-                    </button>
-                  </li>
-                ),
-              )}
-              <li
-                className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Próxima
-                </button>
-              </li>
-            </ul>
-          </div>
+          <PaginationButtons
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

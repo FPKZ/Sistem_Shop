@@ -157,7 +157,7 @@ export default function Devolucao() {
   };
 
   return (
-    <>
+    <div className="p-2 pt-3 p-md-4">
       <div className="mb-4">
         <h2 className="fw-bold text-dark">Devolução de Produtos</h2>
         <span className="text-muted">
@@ -339,6 +339,6 @@ export default function Devolucao() {
           )}
         </Col>
       </Row>
-    </>
+    </div>
   );
 }

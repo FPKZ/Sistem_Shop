@@ -7,6 +7,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
+import { usePermissoes } from "@hooks/auth/usePermissoes";
 
 export function ClienteList({
   clientes,
@@ -17,6 +18,7 @@ export function ClienteList({
   onEditClient,
   onDeleteRequest,
 }) {
+  const { pode } = usePermissoes();
   const renderSortIcon = (chave) => {
     if (order.chave !== chave) return null;
     return order.direcao === "desc" ? (
@@ -144,20 +146,26 @@ export function ClienteList({
                           <Eye size={16} /> Sobre
                         </div>
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => onEditClient(cliente)}>
-                        <div className="d-flex align-items-center gap-2">
-                          <Edit size={16} /> Editar
-                        </div>
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item
-                        onClick={() => onDeleteRequest(cliente)}
-                        className="text-danger"
-                      >
-                        <div className="d-flex align-items-center gap-2">
-                          <Trash2 size={16} /> Excluir
-                        </div>
-                      </Dropdown.Item>
+                      {pode("editarCliente") && (
+                        <Dropdown.Item onClick={() => onEditClient(cliente)}>
+                          <div className="d-flex align-items-center gap-2">
+                            <Edit size={16} /> Editar
+                          </div>
+                        </Dropdown.Item>
+                      )}
+                      {pode("deletarCliente") && (
+                        <>
+                          <Dropdown.Divider />
+                          <Dropdown.Item
+                            onClick={() => onDeleteRequest(cliente)}
+                            className="text-danger"
+                          >
+                            <div className="d-flex align-items-center gap-2">
+                              <Trash2 size={16} /> Excluir
+                            </div>
+                          </Dropdown.Item>
+                        </>
+                      )}
                     </Dropdown.Menu>
                   </Dropdown>
                 </Col>
