@@ -6,12 +6,13 @@ import {
   finalizarVenda,
   estornarVenda,
   devolverItens,
+  DashboardVendas
 } from "../services/venda.service.js";
 import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js";
 
 const INCLUDE_VENDA_COMPLETA = [
   { model: Cliente, as: "cliente" },
-  { model: Conta, as: "vendedor" },
+  { model: Conta, as: "vendedor", attributes: ["nome"] },
   {
     model: ItemVendido,
     as: "itensVendidos",
@@ -23,9 +24,13 @@ const INCLUDE_VENDA_COMPLETA = [
 export default async function vendaRoutes(fastify) {
 
   fastify.get("/vendas/dashboard", { preHandler: authMiddleware }, async (request, reply) => {
-    const user = request.user;
-    const {stats, chartData} = await DashboardVendas(user);
-    return reply.code(200).send({ stats, chartData });
+    try{
+      const user = request.user;
+      const {stats, chartData} = await DashboardVendas(user);
+      return reply.code(200).send({ stats, chartData });
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
+    }
   });
 
   fastify.get("/vendas", { preHandler: authMiddleware }, async (request, reply) => {
