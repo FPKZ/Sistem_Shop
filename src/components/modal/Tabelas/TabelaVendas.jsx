@@ -95,7 +95,7 @@ export default function TabelaVendas({ vendas, onView }) {
             </div>
 
             {/* Ações */}
-            <div className="col-span-2 order-5 md:order-6! flex justify-end gap-1">
+            <div className="col-span-1 md:col-span-2 order-5 md:order-6! flex justify-end gap-1">
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
