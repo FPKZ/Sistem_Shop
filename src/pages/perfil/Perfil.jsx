@@ -155,7 +155,7 @@ export default function PerfilPage() {
         </Card.Body>
       </Card>
 
-      <Card className="shadow-md rounded-4">
+      <Card className="shadow-md rounded-4 overflow-hidden">
         <Collapsible.Root open={openPassword} onOpenChange={setOpenPassword}>
               <Collapsible.Trigger asChild>
                   <Card.Header as="h3" className="text-xl font-semibold cursor-pointer hover:bg-gray-50 transition-colors d-flex justify-content-between align-items-center group">

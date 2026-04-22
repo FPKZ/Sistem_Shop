@@ -25,10 +25,10 @@ import { useState, useMemo, useEffect } from "react";
  *                                 Ex: ["quantidade", "Esgotado"]
  * @returns {Object} { filtro, setFiltro, order, dadosProcessados, setOrdem, requisitarOrdenacao }
  */
-export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparacao) => {
+export const useFiltroOrdenacao = (dadosIniciais, camposFiltragem, camposSeparacao, initialOrder = { chave: "id", direcao: "asc" }) => {
   const [filtroInput, setFiltroInput] = useState({});
   const [filtroDebounced, setFiltroDebounced] = useState({});
-  const [order, setOrder] = useState({ chave: "id", direcao: "asc" });
+  const [order, setOrder] = useState(initialOrder);
 
   // Debounce para evitar processamento excessivo a cada tecla digitada
   useEffect(() => {

@@ -1,188 +1,161 @@
-import { Row, Col, Button, Badge, Dropdown } from "react-bootstrap";
 import utils from "@services/utils";
-import { EyeIcon, CheckCircle, Printer, MoreVertical } from "lucide-react";
+import { Eye, Printer, MoreVertical, CheckCircle2, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { printPDF, getVendaConfig } from "@services/generatePDF";
+
+const StatusBadge = ({ status }) => {
+  const configs = {
+    concluida: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    finalizada: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    pendente: "bg-amber-100 text-amber-700 border-amber-200",
+    reservada: "bg-amber-100 text-amber-700 border-amber-200",
+    cancelada: "bg-rose-100 text-rose-700 border-rose-200",
+    estorno: "bg-sky-100 text-sky-700 border-sky-200",
+    andamento: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  };
+
+  const style = configs[status?.toLowerCase()] || "bg-slate-100 text-slate-700 border-slate-200";
+
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${style}`}>
+      {status}
+    </span>
+  );
+};
 
 export default function TabelaVendas({ vendas, onView }) {
   const navigate = useNavigate();
 
-  console.log(vendas);
-  const getStatusBadge = (status) => {
-    switch (status?.toLowerCase()) {
-      case "concluida":
-        return "success";
-      case "pendente":
-        return "warning";
-      case "cancelada":
-        return "danger";
-      case "devolvida":
-        return "info";
-      default:
-        return "secondary";
-    }
-  };
-
   return (
-    <div className=" d-flex flex-column gap-2">
-      {/* Header - Only visible on desktop */}
-      <Row className="tabela-vendas-header d-none d-md-flex bg-light py-2 px-3 mb-2 rounded">
-        <Col md={1} className="text-secondary small text-uppercase fw-bold">
-          ID
-        </Col>
-        <Col md={3} className="text-secondary small text-uppercase fw-bold">
-          Cliente
-        </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold">
-          Vendedor
-        </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold text-center">
-          Data
-        </Col>
-        <Col md={2} className="text-secondary small text-uppercase fw-bold text-center">
-          Valor
-        </Col>
-        <Col md={1} className="text-secondary small text-uppercase fw-bold px-0 text-center">
-          Status
-        </Col>
-        <Col
-          md={1}
-          className="text-secondary small text-uppercase fw-bold text-end px-1"
-        >
-          Ações
-        </Col>
-      </Row>
+    <div className="flex flex-col gap-2 py-2">
+      {/* Header Desktop */}
+      <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
+        <div className="col-span-3">Cliente</div>
+        <div className="col-span-2">Vendedor</div>
+        <div className="col-span-2 text-center">Data</div>
+        <div className="col-span-2 text-center">Valor Total</div>
+        <div className="col-span-1 text-center">Status</div>
+        <div className="col-span-2 text-end mr-5">Ações</div>
+      </div>
 
-      {/* Body */}
+      {/* Rows */}
       {vendas && vendas.length > 0 ? (
         vendas.map((venda) => (
-          <Row
+          <div
             key={venda.id}
-            className="tabela-vendas-row align-items-center py-3 px-2 px-md-2 mb-2 border rounded g-2 hover:bg-zinc-100 transition cursor-pointer"
             onClick={() => onView(venda)}
+            className="group grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-center p-3 md:px-4 md:py-3 bg-white border border-slate-100 rounded-xl hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all cursor-pointer relative overflow-hidden"
           >
-            {/* ID */}
-            <Col
-              xs={2}
-              md={1}
-              className="my-2 my-md-0 order-1 order-md-0 text-end text-md-start"
-            >
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                ID:
-              </span>
-              <span className="fw-bold">#{venda.id}</span>
-            </Col>
+            {/* Hover Indicator */}
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-300" />
 
             {/* Cliente */}
-            <Col xs={10} md={3} className="my-2 my-md-0 order-first order-md-0">
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                Cliente:
-              </span>
-              <span>{venda.cliente?.nome || "Cliente N/A"}</span>
-            </Col>
+            <div className="col-span-3 order-1 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs">
+                {venda.cliente?.nome?.charAt(0) || "C"}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-slate-700 truncate max-w-[150px] md:max-w-full">
+                  {venda.cliente?.nome || "Consumidor Final"}
+                </span>
+                <span className="md:hidden text-[10px] text-slate-400 font-medium lowercase">vendedor: {venda.vendedor?.nome || "não inf."}</span>
+              </div>
+            </div>
 
-            {/* Vendedor */}
-            <Col xs={10} md={2} className="my-2 my-md-0 order-first order-md-0">
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                Vendedor:
+            {/* Vendedor (Desktop Only) */}
+            <div className="hidden md:block col-span-2 order-2">
+              <span className="text-xs font-medium text-slate-600 truncate block">
+                {venda.vendedor?.nome || "Sistema"}
               </span>
-              <span>{venda.vendedor?.nome || "Vendedor N/A"}</span>
-            </Col>
+            </div>
 
             {/* Data */}
-            <Col
-              xs={4}
-              md={2}
-              className="my-2 my-md-0 order-3 order-md-0 text-center"
-            >
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                Data:
-              </span>
-              <span>{utils.formatDate(venda.data_venda)}</span>
-            </Col>
+            <div className="col-span-2 order-2 md:order-3! md:text-center">
+              <div className="flex md:flex-col items-center md:items-center gap-2 md:gap-0">
+                <span className="md:hidden text-[10px] font-bold text-slate-300 uppercase">Data:</span>
+                <span className="text-xs font-semibold text-slate-500">
+                  {utils.formatDate(venda.data_venda)}
+                </span>
+              </div>
+            </div>
 
             {/* Valor */}
-            <Col
-              xs={4}
-              md={2}
-              className="my-2 my-md-0 order-4 order-md-0 text-end text-md-center"
-            >
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                Valor:
-              </span>
-              <span className="fw-bold text-dark">
-                {utils.formatMoney(venda.valor_total)}
-              </span>
-            </Col>
+            <div className="col-span-2 order-4 md:order-4! md:text-center">
+              <div className="flex md:flex-col items-center md:items-center gap-2 md:gap-0">
+                <span className="md:hidden text-[10px] font-bold text-slate-300 uppercase">Total:</span>
+                <span className="text-sm font-black text-slate-800">
+                  {utils.formatMoney(venda.valor_total)}
+                </span>
+              </div>
+            </div>
 
             {/* Status */}
-            <Col xs={4} md={1} className="my-2 my-md-0 order-2 order-md-0 text-center">
-              <span className="d-md-none text-secondary small text-uppercase fw-bold me-2">
-                Status:
-              </span>
-              <Badge bg={getStatusBadge(venda.status)} className="fw-normal">
-                {utils.capitalize(venda.status)}
-              </Badge>
-            </Col>
+            <div className="col-span-1 order-2 md:order-5! flex justify-end md:justify-center">
+              <StatusBadge status={venda.status} />
+            </div>
 
             {/* Ações */}
-            <Col
-              xs={12}
-              md={1}
-              className="my-2 my-md-0 text-md-end order-last order-md-0 d-flex justify-content-md-end px-2"
-            >
-              <Dropdown onClick={(e) => e.stopPropagation()}>
-                <Dropdown.Toggle
-                  variant="light"
-                  size="sm"
-                  className="p-0 border-0 bg-transparent dropdown-toggle-no-caret"
-                  id={`dropdown-venda-${venda.id}`}
+            <div className="col-span-2 order-5 md:order-6! flex justify-end gap-1">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onView(venda);
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5 transition-colors"
+                title="Visualizar"
+              >
+                <Eye size={16} />
+              </button>
+              
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const configVenda = getVendaConfig(venda);
+                  printPDF(configVenda);
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-secondary hover:bg-secondary/5 transition-colors"
+                title="Imprimir"
+              >
+                <Printer size={16} />
+              </button>
+
+              {venda.status?.toLowerCase() === "reservada" && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/painel/vendas/Nova-Venda?vendaId=${venda.id}`);
+                  }}
+                  className="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 transition-colors"
+                  title="Finalizar Reserva"
                 >
-                  <MoreVertical size={20} className="text-secondary" />
-                </Dropdown.Toggle>
+                  <CheckCircle2 size={16} />
+                </button>
+              )}
 
-                <Dropdown.Menu align="end" className="shadow-sm border-0">
-                  <Dropdown.Item
-                    onClick={() => onView(venda)}
-                    className="d-flex align-items-center gap-2 py-2"
-                  >
-                    <EyeIcon size={16} className="text-info" />
-                    <span>Visualizar</span>
-                  </Dropdown.Item>
-
-                  {venda.status === "pendente" && (
-                    <Dropdown.Item
-                      onClick={() =>
-                        navigate(`/vendas/Nova-Venda?vendaId=${venda.id}`)
-                      }
-                      className="d-flex align-items-center gap-2 py-2 text-success"
-                    >
-                      <CheckCircle size={16} />
-                      <span>Finalizar Reserva</span>
-                    </Dropdown.Item>
-                  )}
-
-                  <Dropdown.Item
-                    onClick={() => {
-                      const configVenda = getVendaConfig(venda);
-                      printPDF(configVenda);
-                    }}
-                    className="d-flex align-items-center gap-2 py-2"
-                  >
-                    <Printer size={16} className="text-secondary" />
-                    <span>Imprimir Nota</span>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Col>
-          </Row>
+              {/* Ação de Estorno */}
+              {!["estorno", "cancelada", "pendente"].includes(venda.status?.toLowerCase()) && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/painel/vendas/estorno?vendaId=${venda.id}`);
+                  }}
+                  className="p-1.5 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Realizar Estorno"
+                >
+                  <RotateCcw size={16} />
+                </button>
+              )}
+            </div>
+          </div>
         ))
       ) : (
-        <Row>
-          <Col className="text-center py-4 text-muted">
-            Nenhuma venda encontrada.
-          </Col>
-        </Row>
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+            <MoreVertical className="text-slate-300" size={32} />
+          </div>
+          <h3 className="text-slate-600 font-bold mb-1">Nenhuma venda encontrada</h3>
+          <p className="text-slate-400 text-sm max-w-xs">Tente ajustar seus filtros ou verifique se há registros no período selecionado.</p>
+        </div>
       )}
     </div>
   );
