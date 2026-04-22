@@ -1,4 +1,4 @@
-import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto } from "../database/models/index.js";
+import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto, Conta } from "../database/models/index.js";
 import { Op } from "sequelize";
 import {
   expirarReservas,
@@ -11,6 +11,7 @@ import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js"
 
 const INCLUDE_VENDA_COMPLETA = [
   { model: Cliente, as: "cliente" },
+  { model: Conta, as: "vendedor", attributes: ["nome"] },
   {
     model: ItemVendido,
     as: "itensVendidos",
