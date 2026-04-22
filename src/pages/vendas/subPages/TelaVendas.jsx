@@ -1,10 +1,11 @@
-import { Row, Col, Spinner } from "react-bootstrap";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { Spinner } from "react-bootstrap";
 import { usePagination } from "@hooks/usePagination";
 import ModalDetalhesVenda from "@components/modal/Vendas/ModalDetalhesVenda";
 
 import { useVendasDashboard } from "@hooks/vendas/useVendasDashboard";
+import { useFiltroOrdenacao } from "@hooks/useFiltroOrdenacao";
 import { VendasDashboardCards } from "./components/VendasDashboardCards";
 import { VendasHistorico } from "./components/VendasHistorico";
 import { VendasStatsSidebar } from "./components/VendasStatsSidebar";
@@ -13,8 +14,29 @@ export default function TelaVendas() {
   const { mobile } = useOutletContext();
   const [selectedVenda, setSelectedVenda] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  
   const { vendas, loading, stats, chartData } = useVendasDashboard();
+
+  // Campos para busca no hook
+  const camposBusca = [
+    "cliente.nome", 
+    "vendedor.nome", 
+    "status", 
+    "data_venda", 
+    "metodo_pagamento"
+  ];
+
+  // Hook de filtragem e ordenação
+  const { 
+    dadosProcessados: filteredVendas, 
+    filtro: filters, 
+    setFiltro: setFilters 
+  } = useFiltroOrdenacao(
+    vendas, 
+    camposBusca, 
+    null, 
+    { chave: "data_venda", direcao: "desc" }
+  );
 
   const {
     currentItems,
@@ -23,7 +45,7 @@ export default function TelaVendas() {
     itemsPerPage,
     setCurrentPage,
     setItemsPerPage,
-  } = usePagination(vendas, 5);
+  } = usePagination(filteredVendas, 5);
 
   const handleViewVenda = (venda) => {
     setSelectedVenda(venda);
@@ -34,31 +56,36 @@ export default function TelaVendas() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      >
-        <Spinner animation="border" variant="primary" />
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner animation="border" variant="primary" className="!w-12 !h-12 border-4" />
+          <p className="text-slate-500 font-medium animate-pulse">Carregando dashboard...</p>
+        </div>
       </div>
     );
   }
+  console.log(currentItems)
 
   return (
-    <div className="p-2 pt-3 p-md-4">
-      <div className="mb-4">
-        <h2 className="fw-bold text-dark">Vendas</h2>
-        <span className="text-muted">
-          Gerencie suas vendas e acompanhe o desempenho
-        </span>
+    <div className={`p-4 md:p-6 lg:p-8 min-h-screen ${mobile ? 'pb-24' : ''}`}>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Dashboard de Vendas</h1>
+          <p className="text-slate-500 font-medium mt-1">Acompanhe métricas, gerencie pedidos e analise o desempenho do seu negócio.</p>
+        </div>
       </div>
 
+      {/* Action Cards Section */}
       <VendasDashboardCards />
 
-      <Row className="g-4">
-        <Col md={8}>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Sales History Table - Takes more space on desktop */}
+        <div className="lg:col-span-8 xl:col-span-9 h-full">
           <VendasHistorico
             mobile={mobile}
-            vendas={vendas}
+            vendas={filteredVendas}
             currentItems={currentItems}
             currentPage={currentPage}
             totalPages={totalPages}
@@ -67,13 +94,16 @@ export default function TelaVendas() {
             setCurrentPage={setCurrentPage}
             handleViewVenda={handleViewVenda}
             paginate={paginate}
+            filters={filters}
+            setFilters={setFilters}
           />
-        </Col>
+        </div>
 
-        <Col md={4}>
+        {/* Stats and Charts Sidebar */}
+        <div className="lg:col-span-4 xl:col-span-3 space-y-6">
           <VendasStatsSidebar stats={stats} chartData={chartData} />
-        </Col>
-      </Row>
+        </div>
+      </div>
 
       <ModalDetalhesVenda
         show={showModal}
