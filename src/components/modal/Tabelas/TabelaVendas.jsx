@@ -7,7 +7,6 @@ import { printPDF, getVendaConfig } from "@services/generatePDF";
 export default function TabelaVendas({ vendas, onView }) {
   const navigate = useNavigate();
 
-  console.log(vendas);
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
       case "concluida":
