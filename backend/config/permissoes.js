@@ -22,7 +22,7 @@ export const PERMISSOES = {
     cancelarVendas:       true,
     verVendas:            true,
     realizarDevolucao:    true,
-    realizarExtorno:      true,
+    realizarEstorno:      true,
     // Notas
     verNotas:             true,
     cadastrarNotas:       true,
@@ -54,7 +54,7 @@ export const PERMISSOES = {
     cancelarVendas:       true,
     verVendas:            true,
     realizarDevolucao:    true,
-    realizarExtorno:      true,
+    realizarEstorno:      true,
     // Notas
     verNotas:             true,
     cadastrarNotas:       true,
@@ -86,7 +86,7 @@ export const PERMISSOES = {
     cancelarVendas:       true,
     verVendas:            true,
     realizarDevolucao:    false,
-    realizarExtorno:      false,
+    realizarEstorno:      false,
     // Notas
     verNotas:             false,
     cadastrarNotas:       false,

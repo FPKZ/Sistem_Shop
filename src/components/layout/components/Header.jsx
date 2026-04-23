@@ -17,7 +17,7 @@ const Header = React.memo(({ mobile }) => {
   // eslint-disable-next-line no-unused-vars
   const breadcrumbTitles = {
     usuarios: "Usuários",
-    Extorno: "Estorno",
+    estorno: "Estorno",
     Devolucao: "Devolução",
   };
 

@@ -33,7 +33,7 @@ const Notas                = lazy(() => import("./pages/notas/Notas.jsx"));
 const Vendas               = lazy(() => import("./pages/vendas/Vendas.jsx"));
 const NovaVenda            = lazy(() => import("./pages/vendas/subPages/NovaVenda.jsx"));
 const TelaVendas           = lazy(() => import("./pages/vendas/subPages/TelaVendas.jsx"));
-const Extorno              = lazy(() => import("./pages/vendas/subPages/Extorno.jsx"));
+const Estorno              = lazy(() => import("./pages/vendas/subPages/Estorno.jsx"));
 const Devolucao            = lazy(() => import("./pages/vendas/subPages/Devolucao.jsx"));
 const CadastroCliente      = lazy(() => import("./pages/cadastro/include/Clientes.jsx"));
 const CadastroProduto      = lazy(() => import("./pages/cadastro/include/Produtos.jsx"));
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <TelaVendas /> },
               { path: "Nova-Venda", element: <NovaVenda /> },
-              { path: "Extorno", element: <Extorno /> },
+              { path: "estorno", element: <Estorno /> },
               { path: "Devolucao", element: <Devolucao /> },
             ],
           },

@@ -1,4 +1,4 @@
-import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto } from "../database/models/index.js";
+import { Venda, Cliente, ItemVendido, NotaVenda, ItemEstoque, Produto, Conta } from "../database/models/index.js";
 import { Op } from "sequelize";
 import {
   expirarReservas,
@@ -6,11 +6,13 @@ import {
   finalizarVenda,
   estornarVenda,
   devolverItens,
+  DashboardVendas
 } from "../services/venda.service.js";
 import { authMiddleware, requireCargo } from "../middlewares/auth.middleware.js";
 
 const INCLUDE_VENDA_COMPLETA = [
   { model: Cliente, as: "cliente" },
+  { model: Conta, as: "vendedor", attributes: ["nome"] },
   {
     model: ItemVendido,
     as: "itensVendidos",
@@ -22,53 +24,13 @@ const INCLUDE_VENDA_COMPLETA = [
 export default async function vendaRoutes(fastify) {
 
   fastify.get("/vendas/dashboard", { preHandler: authMiddleware }, async (request, reply) => {
-    const seteDiasAtras = new Date();
-    seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
-
-    const config = {
-      where: { data_venda: { [Op.gte]: seteDiasAtras } },
+    try{
+      const user = request.user;
+      const {stats, chartData} = await DashboardVendas(user);
+      return reply.code(200).send({ stats, chartData });
+    }catch(error){
+      return reply.err(error.message, error.statusCode);
     }
-    const configTodasVendas = {}
-
-    // Se o usuario for vendedor, ele só pode ver suas vendas
-    if (request.user.cargo === "vendedor") {
-      config.where.vendedor_id = request.user.id;
-      configTodasVendas.where = { vendedor_id: request.user.id };
-    }
-
-    const [vendas, todasVendas] = await Promise.all([
-      Venda.findAll(config),
-      Venda.findAll(configTodasVendas),
-    ]);
-
-    const stats = {
-      totalVendas:        todasVendas.filter((v) => v.status !== "cancelada").length,
-      totalReceita:       todasVendas.reduce((acc, v) => ["concluida", "pendente"].includes(v.status) ? acc + (Number(v.valor_total) || 0) : acc, 0),
-      vendasConcluidas:   todasVendas.filter((v) => v.status === "concluida").length,
-      vendasPendentes:    todasVendas.filter((v) => v.status === "pendente").length,
-      devolucoes:         todasVendas.filter((v) => ["devolvida", "estorno"].includes(v.status)).length,
-      pagamentosAtrasados: todasVendas.filter((v) => v.status === "atrasado").length,
-    };
-
-    const chartDataMap = {};
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
-      chartDataMap[dateStr] = { name: dateStr, vendas: 0, receita: 0 };
-    }
-
-    vendas.forEach((v) => {
-      const dateStr = new Date(v.data_venda).toISOString().split("T")[0];
-      if (chartDataMap[dateStr]) {
-        chartDataMap[dateStr].vendas += 1;
-        if (["concluida", "pendente"].includes(v.status)) {
-          chartDataMap[dateStr].receita += Number(v.valor_total) || 0;
-        }
-      }
-    });
-
-    return reply.code(200).send({ stats, chartData: Object.values(chartDataMap) });
   });
 
   fastify.get("/vendas", { preHandler: authMiddleware }, async (request, reply) => {
@@ -113,8 +75,8 @@ export default async function vendaRoutes(fastify) {
 
   fastify.post("/venda", { preHandler: authMiddleware }, async (request, reply) => {
     try{
-      const { vendedor_id } = request.user;
-      const novaVenda = await criarVenda(request.body, vendedor_id);
+      const { id } = request.user;
+      const novaVenda = await criarVenda(request.body, id);
       return reply.code(201).ok({ novaVenda }, "Venda cadastrada com sucesso!");
     }catch(error){
       return reply.err(error.message, error.statusCode);
