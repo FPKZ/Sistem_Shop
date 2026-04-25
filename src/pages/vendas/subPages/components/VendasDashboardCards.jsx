@@ -14,7 +14,7 @@ const ActionCard = ({ title, subtitle, icon, colorClass, onClick, disabled }) =>
     {/* Background Decorative Gradient */}
     <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white opacity-10 group-hover:scale-150 transition-all duration-700`} />
     
-    <div className="relative z-10 flex items-center justify-between">
+    <div className="relative flex items-center justify-between">
       <div>
         <h3 className={`text-lg font-bold mb-0.5 ${disabled ? 'text-slate-500' : 'text-white'}`}>{title}</h3>
         <p className={`text-sm ${disabled ? 'text-slate-400' : 'text-white/80'}`}>{subtitle}</p>

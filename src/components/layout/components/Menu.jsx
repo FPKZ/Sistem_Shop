@@ -24,7 +24,7 @@ const Menu = React.memo(({menuExpand, setMenuExpand , mobile}) => {
     <nav 
       id="menu" 
       ref={menuRef} 
-      className="d-flex flex-column text-white p-0 z-3" 
+      className="d-flex flex-column text-white p-0 z-1003" 
       style={{height: "100dvh"}}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
