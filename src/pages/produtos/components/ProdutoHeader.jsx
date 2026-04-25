@@ -19,11 +19,11 @@ export function ProdutoHeader({
 
   
   return (
-    <div className="mb-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0">
+    <div className="mb-4 row d-flex flex-wrap gap-md-0 gap-sm-2 gap-2 p-0 mt-2 mt-md-0">
       <div className="d-flex justify-content-between align-items-center">
         <div className={`h5 text-center fw-normal m-0 ${mobile ? "d-none" : ""}`}>Produtos</div>
         <div className={`d-flex ${mobile ? "flex-column w-100" : ""} gap-3 align-items-center`}>
-          <div className={`d-flex align-items-center position-relative ${mobile ? "order-2 w-100" : ""}`}>
+          <div className={`d-flex align-items-center position-relative w-100 ${mobile ? "order-0 " : ""}`}>
             {/* Barra de Pesquisa Expansível */}
             {(mobile || showSearch) && (
               <Form.Control
@@ -31,8 +31,7 @@ export function ProdutoHeader({
                 placeholder="Pesquisar produto..."
                 value={isObject(filtro) ? "" : filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                autoFocus
-                className="me-2 shadow-sm rounded-pill search-input-expand"
+                className="me-2 shadow-sm rounded-pill w-100!"
               />
             )}
             <Button
@@ -44,7 +43,8 @@ export function ProdutoHeader({
                   setFiltro("");
                 }
               }}
-              className="d-flex align-items-center justify-content-center p-1 rounded-circle border-0 icon-btn-sm"
+              disabled={mobile}
+              className={`d-flex align-items-center justify-content-center p-1 rounded-circle border-0 icon-btn-sm ${mobile ? "absolute right-2" : ""}`}
             >
               <Search
                 size={15}

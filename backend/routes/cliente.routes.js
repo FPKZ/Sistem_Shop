@@ -13,7 +13,7 @@ export default async function clienteRoutes(fastify) {
           { model: NotaVenda, as: "notaVenda" },
         ],
       }],
-      order: [["id", "ASC"]],
+      order: [["nome", "ASC"]],
     });
     return reply.code(200).send(clientes);
   });
