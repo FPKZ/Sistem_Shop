@@ -33,7 +33,7 @@ function Clientes() {
   );
 
   const { filtro, setFiltro, order, dadosProcessados, requisitarOrdenacao } =
-    useFiltroOrdenacao(clientes || [], camposFiltragem);
+    useFiltroOrdenacao(clientes || [], camposFiltragem, [], { chave: "nome", direcao: "asc" });
 
   const {
     currentItems,
