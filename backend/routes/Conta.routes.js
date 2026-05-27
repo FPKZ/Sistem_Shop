@@ -13,14 +13,62 @@ import { requireCargo } from "../middlewares/auth.middleware.js";
 import { getPermissoes, getAllPermissoes } from "../config/permissoes.js";
 
 export default async function contaRoutes(fastify) {
+  // --- Esquemas de Documentação (Swagger) ---
+  const loginSchema = {
+    description: "Autentica um usuário e retorna o token JWT",
+    tags: ["Autenticação"],
+    body: {
+      type: "object",
+      required: ["email", "senha"],
+      properties: {
+        email: { type: "string", format: "email", examples: ["admin@loja.com"] },
+        senha: { type: "string", examples: ["123456"] }
+      }
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          ok: { type: "boolean" },
+          message: { type: "string" },
+          conta: {
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              nome: { type: "string" },
+              email: { type: "string" },
+              cargo: { type: "string" }
+            }
+          },
+          token: { type: "string" },
+          permissoes: { type: "object" }
+        }
+      }
+    }
+  };
+
+  const registerSchema = {
+    description: "Solicita a criação de uma nova conta de usuário",
+    tags: ["Autenticação"],
+    body: {
+      type: "object",
+      required: ["nome", "email", "senha"],
+      properties: {
+        nome: { type: "string", examples: ["Fulano de Tal"] },
+        email: { type: "string", format: "email", examples: ["fulano@loja.com"] },
+        senha: { type: "string", examples: ["123456"] }
+      }
+    }
+  };
+
   // Rotas Públicas
-  fastify.post("/login", async (request, reply) => {
+  fastify.post("/login", { schema: loginSchema }, async (request, reply) => {
     const { email, senha } = request.body;
     const { conta, token, permissoes } = await autenticar(email, senha);
     return reply.ok({ conta, token, permissoes }, "Login bem-sucedido");
   });
 
-  fastify.post("/register", async (request, reply) => {
+  fastify.post("/register", { schema: registerSchema }, async (request, reply) => {
     await pedidosRegistros.sync();
     const { nome, email, senha } = request.body;
 
@@ -43,7 +91,14 @@ export default async function contaRoutes(fastify) {
   // Rotas Protegidas
   fastify.get(
     "/contas",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Lista todas as contas cadastradas (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }]
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const contas = await Conta.findAll({
         attributes: { exclude: ["senha"] },
@@ -54,7 +109,24 @@ export default async function contaRoutes(fastify) {
 
   fastify.post(
     "/cadastrar-conta",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Cadastra uma nova conta diretamente no sistema (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["nome", "email", "senha", "cargo"],
+          properties: {
+            nome: { type: "string", examples: ["Novo Usuário"] },
+            email: { type: "string", format: "email", examples: ["novo@loja.com"] },
+            senha: { type: "string", examples: ["123456"] },
+            cargo: { type: "string", enum: ["admin", "gerente", "vendedor", "User"], examples: ["vendedor"] }
+          }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       await criarConta(request.body);
       return reply.ok({ message: "Conta cadastrada com sucesso!" }, 201);
@@ -65,12 +137,20 @@ export default async function contaRoutes(fastify) {
     "/user-edit/:id",
     {
       schema: {
+        description: "Permite que o próprio usuário edite seus dados cadastrais (nome, e-mail e avatar)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        },
         body: {
           type: "object",
           properties: {
-            nome: { type: "string" },
-            email: { type: "string" },
-            img: { type: "string" },
+            nome: { type: "string", examples: ["João da Silva"] },
+            email: { type: "string", examples: ["joao@email.com"] },
+            img: { type: "string", examples: ["https://url-da-imagem.com/avatar.jpg"] },
           },
         },
       },
@@ -105,7 +185,28 @@ export default async function contaRoutes(fastify) {
 
   fastify.put(
     "/editar-user/:id",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Permite que um Admin edite os dados de qualquer conta do sistema",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        },
+        body: {
+          type: "object",
+          properties: {
+            nome: { type: "string", examples: ["Nome Atualizado"] },
+            email: { type: "string", examples: ["email@atualizado.com"] },
+            cargo: { type: "string", enum: ["admin", "gerente", "vendedor", "User"], examples: ["gerente"] },
+            img: { type: "string", examples: ["https://url-da-imagem.com/avatar.jpg"] }
+          }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const conta = await Conta.findByPk(request.params.id);
       if (!conta) return reply.err("Usuário não encontrado", 404);
@@ -116,7 +217,19 @@ export default async function contaRoutes(fastify) {
 
   fastify.put(
     "/reset-senha/:id",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Redefine a senha de um usuário para o valor padrão do sistema (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       await resetarSenha(request.params.id);
       return reply.ok({}, "Senha redefinida com sucesso!");
@@ -127,14 +240,17 @@ export default async function contaRoutes(fastify) {
     "/mudar-senha",
     {
       schema: {
+        description: "Permite que o próprio usuário troque sua senha fornecendo a senha atual e a nova",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
         body: {
           type: "object",
-          properties: {
-            id: { type: "number" },
-            senhaAtual: { type: "string" },
-            novaSenha: { type: "string" },
-          },
           required: ["id", "senhaAtual", "novaSenha"],
+          properties: {
+            id: { type: "number", examples: [1] },
+            senhaAtual: { type: "string", examples: ["senhaAntiga123"] },
+            novaSenha: { type: "string", examples: ["novaSenha456"] },
+          },
         },
       },
       preHandler: authMiddleware,
@@ -155,7 +271,19 @@ export default async function contaRoutes(fastify) {
 
   fastify.delete(
     "/delete-user/:id",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Remove permanentemente uma conta de usuário do sistema (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const conta = await Conta.findByPk(request.params.id);
       if (!conta) return reply.err("Conta não encontrada", 404);
@@ -166,7 +294,14 @@ export default async function contaRoutes(fastify) {
 
   fastify.get(
     "/pendentes",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Lista as solicitações de cadastro pendentes de aprovação (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }]
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const solicitacoes = await Solicitacao.findAll({
         where: { status: "pendente" },
@@ -177,7 +312,19 @@ export default async function contaRoutes(fastify) {
 
   fastify.put(
     "/aprovar/:id",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Aprova uma solicitação de cadastro pendente, criando a conta do usuário (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const solicitacao = await Solicitacao.findByPk(request.params.id);
       if (!solicitacao) return reply.err("Solicitação não encontrada", 404);
@@ -200,7 +347,19 @@ export default async function contaRoutes(fastify) {
 
   fastify.delete(
     "/negar/:id",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Nega e remove uma solicitação de cadastro pendente (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "number", examples: [1] } }
+        }
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       const solicitacao = await Solicitacao.findByPk(request.params.id);
       if (!solicitacao) return reply.err("Solicitação não encontrada", 404);
@@ -216,7 +375,14 @@ export default async function contaRoutes(fastify) {
    */
   fastify.get(
     "/perfil",
-    { preHandler: authMiddleware },
+    {
+      schema: {
+        description: "Retorna os dados do usuário autenticado e suas permissões de acesso. Usado pelo frontend para validar sessão",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }]
+      },
+      preHandler: authMiddleware
+    },
     async (request, reply) => {
       const conta = await Conta.findByPk(request.user.id, {
         attributes: { exclude: ["senha"] },
@@ -233,7 +399,14 @@ export default async function contaRoutes(fastify) {
 
   fastify.get(
     "/permissions",
-    { preHandler: [authMiddleware, requireCargo("admin")] },
+    {
+      schema: {
+        description: "Retorna a lista completa de permissões disponíveis no sistema (Apenas Admin)",
+        tags: ["Conta"],
+        security: [{ BearerAuth: [] }]
+      },
+      preHandler: [authMiddleware, requireCargo("admin")]
+    },
     async (request, reply) => {
       try {
         return reply.ok({ permissoes: getAllPermissoes() });

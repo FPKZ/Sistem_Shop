@@ -1,7 +1,66 @@
 import { getColors, createColor, updateColor, deleteColor } from "../services/cores.service.js";
 
-export default async function CoresRoutes(fastify, options) {
-    fastify.get("/cores", async (request, reply) => {
+export default async function CoresRoutes(fastify) {
+  // --- Esquemas de Documentação (Swagger) ---
+  const getCoresSchema = {
+    description: "Lista as cores disponíveis no sistema. Filtre por id, name ou hex (apenas um por vez)",
+    tags: ["Cores"],
+    querystring: {
+      type: "object",
+      properties: {
+        id: { type: "number", examples: [1] },
+        name: { type: "string", examples: ["Azul"] },
+        hex: { type: "string", examples: ["#0000FF"] }
+      }
+    }
+  };
+
+  const postCoresSchema = {
+    description: "Cria uma nova cor no sistema",
+    tags: ["Cores"],
+    body: {
+      type: "object",
+      required: ["name", "hex"],
+      properties: {
+        name: { type: "string", examples: ["Vermelho"] },
+        hex: { type: "string", examples: ["#FF0000"] }
+      }
+    }
+  };
+
+  const putCoresSchema = {
+    description: "Atualiza os dados de uma cor existente por ID",
+    tags: ["Cores"],
+    params: {
+      type: "object",
+      required: ["id"],
+      properties: {
+        id: { type: "number", examples: [1] }
+      }
+    },
+    body: {
+      type: "object",
+      required: ["name", "hex"],
+      properties: {
+        name: { type: "string", examples: ["Azul Escuro"] },
+        hex: { type: "string", examples: ["#00008B"] }
+      }
+    }
+  };
+
+  const deleteCoresSchema = {
+    description: "Remove uma cor do sistema por ID",
+    tags: ["Cores"],
+    params: {
+      type: "object",
+      required: ["id"],
+      properties: {
+        id: { type: "number", examples: [1] }
+      }
+    }
+  };
+
+    fastify.get("/cores", { schema: getCoresSchema }, async (request, reply) => {
         try {
             const query = request.query;
 
@@ -12,9 +71,6 @@ export default async function CoresRoutes(fastify, options) {
             const cores = await getColors(query);
             if (!cores) return reply.err("Nenhuma cor encontrada");
             
-            // Usamos `.send()` nativo para devolver a Array crua
-            // pois o seu decorador `reply.ok()` transforma arrays em Objetos (Ex: { "0": {...}, "1": {...} })
-            // return reply.send(cores);
             return reply.ok({data : cores})
         } catch (error) {
             console.error("Erro ao buscar cores:", error);
@@ -22,7 +78,7 @@ export default async function CoresRoutes(fastify, options) {
         }
     });
 
-    fastify.post("/cores", async (request, reply) => {
+    fastify.post("/cores", { schema: postCoresSchema }, async (request, reply) => {
         try {
 
             const { name, hex } = request.body;
@@ -39,7 +95,7 @@ export default async function CoresRoutes(fastify, options) {
         }
     });
 
-    fastify.put("/cores/:id", async (request, reply) => {
+    fastify.put("/cores/:id", { schema: putCoresSchema }, async (request, reply) => {
         try {
             const { id } = request.params;
             const { name, hex } = request.body;
@@ -56,7 +112,7 @@ export default async function CoresRoutes(fastify, options) {
         }
     });
 
-    fastify.delete("/cores/:id", async (request, reply) => {
+    fastify.delete("/cores/:id", { schema: deleteCoresSchema }, async (request, reply) => {
         try {
             const { id } = request.params;
 

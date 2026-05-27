@@ -8,6 +8,8 @@ import RegistarRotas from "./routes/routers.js";
 import tableCores from "./database/interface/tableCores.js";
 import { syncCacheToBlob } from "./services/cache.service.js";
 import { limparImagensOrfas } from "./services/img.service.js";
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUI from '@fastify/swagger-ui'
 
 const server = fastify({ 
   logger: true,
@@ -136,6 +138,37 @@ server.get("/", async (request, reply) => {
   const ip = request.ip.replace("::ffff:", "");
   return reply.code(200).send({ ok: true, message: "API online", clientIp: ip });
 });
+
+// ──────────────────────────────────────────────
+// Documentação (Swagger)
+// ──────────────────────────────────────────────
+await server.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Documentação APIs",
+      description: "Documentação das rotas de backend do Sistema Shop",
+      version: "1.0.0",
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Insira o token JWT gerado no login (somente a hash, sem a palavra 'Bearer')"
+        }
+      }
+    }
+  },
+})
+await server.register(fastifySwaggerUI, {
+  routePrefix: "/docs",
+  uiConfig: {
+    docExpansion: "list",
+    deepLinking: false
+  },
+  // staticCSP: true
+})
 
 // ──────────────────────────────────────────────
 // Registro de Rotas

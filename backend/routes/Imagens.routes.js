@@ -3,8 +3,46 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { env } from "../config/env.js";
 
 export default async function ImagensRoute(fastify) {
+  // --- Esquemas de Documentação (Swagger) ---
+  const getImagensSchema = {
+    description: "Lista todas as imagens salvas no servidor de armazenamento (Vercel Blob)",
+    tags: ["Imagens"],
+    security: [{ BearerAuth: [] }]
+  };
 
-    fastify.get("/imagens", { preHandler: authMiddleware }, async ( request, reply ) => {
+  const postSalvarImagensSchema = {
+    description: "Faz o upload de uma ou mais imagens (PNG ou JPEG) — envio via multipart/form-data. Limite máximo: 10MB por arquivo",
+    tags: ["Imagens"],
+    security: [{ BearerAuth: [] }],
+    consumes: ["multipart/form-data"]
+  };
+
+  const deletarImagemSchema = {
+    description: "Remove uma imagem do servidor de armazenamento pelo seu URL",
+    tags: ["Imagens"],
+    security: [{ BearerAuth: [] }],
+    body: {
+      type: "object",
+      required: ["url"],
+      properties: {
+        url: { type: "string", examples: ["https://fzn0iexwimnmopem.public.blob.vercel-storage.com/imagem.jpg"] }
+      }
+    }
+  };
+
+  const postLimparOrfasSchema = {
+    description: "Dispara a limpeza de imagens órfãs (sem vínculo a produtos) no armazenamento. Protegida por chave secreta de cron",
+    tags: ["Imagens"],
+    querystring: {
+      type: "object",
+      required: ["secret"],
+      properties: {
+        secret: { type: "string", examples: ["limpeza_agendada_secret_123"] }
+      }
+    }
+  };
+
+    fastify.get("/imagens", { schema: getImagensSchema, preHandler: authMiddleware }, async ( request, reply ) => {
         try{
             const list = await listarImgs()
             reply.ok({data: list})
@@ -13,7 +51,7 @@ export default async function ImagensRoute(fastify) {
         }
     })
 
-    fastify.post("/imagens/salvar", { preHandler: authMiddleware }, async ( request, reply) => {
+    fastify.post("/imagens/salvar", { schema: postSalvarImagensSchema, preHandler: authMiddleware }, async ( request, reply) => {
         try{
             const tipospermitidos = ["image/png", "image/jpeg"]
     
@@ -49,7 +87,7 @@ export default async function ImagensRoute(fastify) {
         }
     })
 
-    fastify.delete("/imagen/deletar", { preHandler: authMiddleware }, async ( request, reply ) => {
+    fastify.delete("/imagen/deletar", { schema: deletarImagemSchema, preHandler: authMiddleware }, async ( request, reply ) => {
         try{
             const { url } = request.body
             console.log(`URL: ${url}`)
@@ -61,7 +99,7 @@ export default async function ImagensRoute(fastify) {
         }
     })
 
-    fastify.post("/imagens/limpar-orfas", async ( request, reply ) => {
+    fastify.post("/imagens/limpar-orfas", { schema: postLimparOrfasSchema }, async ( request, reply ) => {
         try{
             const { secret } = request.query
             
